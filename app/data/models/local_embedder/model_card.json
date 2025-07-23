@@ -1,0 +1,17 @@
+{
+  "model_type": "bert",
+  "pipeline_tag": "sentence-similarity",
+  "tags": [
+    "sentence-transformers",
+    "sentence-similarity",
+    "bert"
+  ],
+  "license": "apache-2.0",
+  "datasets": [
+    "sentence-transformers/embedding-training-data"
+  ],
+  "metrics": [
+    "cosine_similarity"
+  ],
+  "library_name": "sentence-transformers"
+}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Office Search</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <input type="text" id="officeSearch" class="form-control" placeholder="Search offices...">
+                    </div>
+                    <div id="searchResults" class="mt-3">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('officeSearch').addEventListener('input', function(e) {
+    const query = e.target.value.trim();
+    if (query.length < 2) {
+        document.getElementById('searchResults').innerHTML = '';
+        return;
+    }
+
+    fetch(`/offices/search?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            const resultsDiv = document.getElementById('searchResults');
+            if (data.length === 0) {
+                resultsDiv.innerHTML = '<p>No results found</p>';
+                return;
+            }
+
+            const html = data.map(office => `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">${office['Internal Name']}</h5>
+                        <p class="card-text">
+                            <strong>Location:</strong> ${office.Location}<br>
+                            <strong>Phone:</strong> ${office.Phone}<br>
+                            <strong>Address:</strong> ${office.Address}<br>
+                            <strong>Manager:</strong> ${office.Manager}<br>
+                            <strong>Mnemonic:</strong> ${office.Mnemonic}<br>
+                            <strong>IP:</strong> ${office.IP}<br>
+                            <strong>Number:</strong> ${office.Number}
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+
+            resultsDiv.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('searchResults').innerHTML = '<p>Error searching offices</p>';
+        });
+});
+</script>
+{% endblock %} 

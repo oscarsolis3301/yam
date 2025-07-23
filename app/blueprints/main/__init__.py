@@ -1,0 +1,73 @@
+from flask import Blueprint
+
+bp = Blueprint('main', __name__)
+
+# Add context processor to ensure template functions are available
+@bp.context_processor
+def inject_template_globals():
+    """Inject global functions and variables into template context."""
+    return {
+        'hasattr': hasattr,
+        'getattr': getattr,
+        'isinstance': isinstance,
+        'len': len,
+        'str': str,
+        'int': int,
+        'float': float,
+        'list': list,
+        'dict': dict,
+        'tuple': tuple,
+        'set': set,
+        'bool': bool,
+        'type': type,
+        'enumerate': enumerate,
+        'zip': zip,
+        'map': map,
+        'filter': filter,
+        'sorted': sorted,
+        'reversed': reversed,
+        'min': min,
+        'max': max,
+        'sum': sum,
+        'abs': abs,
+        'round': round,
+        'divmod': divmod,
+        'pow': pow,
+        'all': all,
+        'any': any,
+        'chr': chr,
+        'ord': ord,
+        'hex': hex,
+        'oct': oct,
+        'bin': bin,
+        'format': format,
+        'repr': repr,
+        'ascii': ascii,
+        'hash': hash,
+        'id': id,
+        'callable': callable,
+        'issubclass': issubclass,
+        'super': super,
+        'property': property,
+        'staticmethod': staticmethod,
+        'classmethod': classmethod,
+        'vars': vars,
+        'dir': dir,
+        'globals': globals,
+        'locals': locals,
+        'breakpoint': breakpoint,
+        'compile': compile,
+        'eval': eval,
+        'exec': exec,
+        'open': open,
+        'print': print,
+        'input': input,
+        'help': help,
+        'copyright': copyright,
+        'credits': credits,
+        'license': license,
+        'exit': exit,
+        'quit': quit
+    }
+
+from . import routes 
