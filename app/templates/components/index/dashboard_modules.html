@@ -1,0 +1,9 @@
+{% macro render_dashboard_modules() %}
+<!-- Render all modular JavaScript components -->
+{{ socket.render_socket_manager() }}
+{{ user_funcs.render_user_functions() }}
+{{ outage_funcs.render_outage_functions() }}
+{{ calendar_funcs.render_calendar_functions() }}
+{{ chart_funcs.render_chart_functions() }}
+{{ onshift_funcs.render_on_shift_functions() }}
+{% endmacro %} 

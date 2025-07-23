@@ -140,10 +140,10 @@ def login():
                     current_app.logger.error(f"Error logging login activity: {e}")
                     db.session.rollback()
 
-                # Get the next page from the request args, defaulting to main.index (which renders YAM.html)
+                # Get the next page from the request args, defaulting to main.index (which renders dashboard.html)
                 next_page = request.args.get('next')
                 if not next_page or not next_page.startswith('/'):
-                    next_page = url_for('main.index')  # This will render YAM.html for authenticated users
+                    next_page = url_for('main.index')  # This will render dashboard.html for authenticated users
                 
                 print(f"Final session data before redirect: {dict(session)}")
                 print(f"Redirecting to: {next_page}")

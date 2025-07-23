@@ -1,0 +1,2617 @@
+﻿<!-- Patterson Dashboard JavaScript Component -->
+<script>
+// Global variables
+let currentDate = new Date();
+let tickets = [];
+let calendarEvents = [];
+let userRole = '{{ current_user.role }}';
+let refreshInterval;
+let lastUpdateTime = null;
+let countdownInterval = null;
+let selectedCalendarDate = null;
+let currentMappingId = null;
+let isRefreshing = false; // Add flag to prevent multiple simultaneous refreshes
+let timerExpired = false; // Add flag to track if timer has expired
+
+// Initialize the dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    initializeDashboard();
+    
+    // Add event listeners
+    const userMappingForm = document.getElementById('userMappingForm');
+    if (userMappingForm) {
+        userMappingForm.addEventListener('submit', addUserMapping);
+    }
+    
+    // Initialize countdown timer for non-user roles
+    if (userRole !== 'user') {
+        initializeCountdownTimer();
+    }
+    
+    // Remove automatic real-time updates - only manual refresh
+    // startRealTimeUpdates();
+
+    // Initialize modal event listeners with enhanced functionality
+    const userMappingModal = document.getElementById('userMappingModal');
+    if (userMappingModal) {
+        
+        // Initialize Bootstrap Tooltips for all elements with data-bs-toggle="tooltip"
+        const tooltipTriggerList = [].slice.call(userMappingModal.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                placement: tooltipTriggerEl.getAttribute('data-bs-placement') || 'top',
+                trigger: 'hover'
+            });
+        });
+
+        // Initialize custom tooltips for tab navigation
+        const tabTooltips = [];
+        const tabButtons = userMappingModal.querySelectorAll('[data-tooltip]');
+        tabButtons.forEach(function(button) {
+            const tooltip = new bootstrap.Tooltip(button, {
+                title: button.getAttribute('data-tooltip'),
+                placement: 'top',
+                trigger: 'hover'
+            });
+            tabTooltips.push(tooltip);
+        });
+
+        userMappingModal.addEventListener('shown.bs.modal', function() {
+            switchUserMappingView('edit'); // Explicitly set the default view on open
+            refreshMappingData();
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', handleModalKeyboardShortcuts);
+            
+            // Re-initialize tooltips after modal is shown
+            const newTooltipTriggerList = [].slice.call(userMappingModal.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            newTooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                if (!tooltipTriggerEl.hasAttribute('data-bs-original-title')) {
+                    new bootstrap.Tooltip(tooltipTriggerEl, {
+                        placement: tooltipTriggerEl.getAttribute('data-bs-placement') || 'top',
+                        trigger: 'hover'
+                    });
+                }
+            });
+
+            // Re-initialize custom tooltips for tab navigation
+            const newTabButtons = userMappingModal.querySelectorAll('[data-tooltip]');
+            newTabButtons.forEach(function(button) {
+                if (!button.hasAttribute('data-bs-original-title')) {
+                    new bootstrap.Tooltip(button, {
+                        title: button.getAttribute('data-tooltip'),
+                        placement: 'top',
+                        trigger: 'hover'
+                    });
+                }
+            });
+        });
+        
+        userMappingModal.addEventListener('hidden.bs.modal', function() {
+            // Clean up keyboard shortcuts
+            document.removeEventListener('keydown', handleModalKeyboardShortcuts);
+            
+            // Dispose all tooltips to prevent memory leaks
+            tooltipList.forEach(tooltip => {
+                if (tooltip) {
+                    tooltip.dispose();
+                }
+            });
+            
+            // Dispose custom tab tooltips
+            tabTooltips.forEach(tooltip => {
+                if (tooltip) {
+                    tooltip.dispose();
+                }
+            });
+        });
+        
+        // Initialize Bootstrap 5 tabs with enhanced animations
+        /*
+        const tabElements = userMappingModal.querySelectorAll('[data-bs-toggle="pill"]');
+        tabElements.forEach(tabElement => {
+            tabElement.addEventListener('shown.bs.tab', function(event) {
+                // Handle tab-specific actions
+                const targetId = event.target.getAttribute('data-bs-target');
+                if (targetId === '#unmapped-users-pane') {
+                    loadUnmappedUsers();
+                } else if (targetId === '#mappings-table-pane') {
+                    loadUserMappings();
+                } else if (targetId === '#add-edit-pane') {
+                    loadUnmappedUserOptions();
+                }
+            });
+        });
+        */
+    }
+
+    // Enhanced form validation with better UX
+    const form = document.getElementById('userMappingForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (validateForm()) {
+                submitMappingForm();
+            } else {
+                showFormValidationErrors();
+            }
+        });
+    }
+});
+
+function switchUserMappingView(viewToShow) {
+    console.log(`Switching to view: ${viewToShow}`);
+    
+    const panes = {
+        'edit': document.getElementById('add-edit-pane'),
+        'mapped': document.getElementById('mappings-table-pane'),
+        'unmapped': document.getElementById('unmapped-users-pane')
+    };
+    const tabs = {
+        'edit': document.getElementById('add-edit-tab'),
+        'mapped': document.getElementById('mappings-table-tab'),
+        'unmapped': document.getElementById('unmapped-users-tab')
+    };
+
+    // Hide all panes and deactivate all tabs
+    for (const view in panes) {
+        if (panes[view]) {
+            panes[view].classList.remove('show', 'active');
+        }
+        if (tabs[view]) {
+            tabs[view].classList.remove('active');
+        }
+    }
+
+    // Show the selected pane and activate its tab
+    if (panes[viewToShow]) {
+        panes[viewToShow].classList.add('show', 'active');
+    }
+    if (tabs[viewToShow]) {
+        tabs[viewToShow].classList.add('active');
+    }
+
+    // Load data for the active view
+    if (viewToShow === 'unmapped') {
+        console.log('Loading unmapped users...');
+        loadUnmappedUsers();
+    } else if (viewToShow === 'mapped') {
+        console.log('Loading user mappings...');
+        loadUserMappings();
+    } else if (viewToShow === 'edit') {
+        console.log('Loading unmapped user options for dropdown...');
+        loadUnmappedUserOptions();
+    }
+}
+
+// Helper functions for icon button loading states
+function setButtonLoading(buttonSelector, isLoading) {
+    const button = document.querySelector(buttonSelector);
+    if (button) {
+        if (isLoading) {
+            button.classList.add('loading');
+            button.disabled = true;
+            // Store original icon
+            const icon = button.querySelector('i');
+            if (icon) {
+                icon.dataset.originalClass = icon.className;
+                icon.className = 'bi bi-arrow-clockwise';
+            }
+        } else {
+            button.classList.remove('loading');
+            button.disabled = false;
+            // Restore original icon
+            const icon = button.querySelector('i');
+            if (icon && icon.dataset.originalClass) {
+                icon.className = icon.dataset.originalClass;
+                delete icon.dataset.originalClass;
+            }
+        }
+    }
+}
+
+function setAllButtonsLoading(isLoading) {
+    const buttons = [
+        '.icon-btn-warning', // Initialize DB
+        '.icon-btn-success', // Import Dated Files
+        '.icon-btn-primary', // Pull API Data
+        '.icon-btn-info'     // Upload File
+    ];
+    
+    buttons.forEach(selector => {
+        setButtonLoading(selector, isLoading);
+    });
+}
+
+// Initialize dashboard
+async function initializeDashboard() {
+    try {
+        // Load data instantly from files
+        await Promise.all([
+            loadTickets(),
+            loadCalendarData(),
+            loadOffices(),
+            loadTechnicians()
+        ]);
+        
+        // Check if we have any tickets, if not, try to import dated files automatically
+        if (tickets.length === 0 && userRole !== 'user') {
+            console.log('No tickets found, attempting to import dated files automatically...');
+            await importDatedFiles();
+        }
+        
+        updateStats();
+        updateConnectionStatus(true, 'Connected to file system');
+        
+        // Set default date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('scheduled-date').value = today;
+        document.getElementById('edit-scheduled-date').value = today;
+        
+    } catch (error) {
+        console.error('Error initializing dashboard:', error);
+        updateConnectionStatus(false, 'Error loading data');
+        showUpdateIndicator('Failed to initialize dashboard', 'error');
+    }
+}
+
+// Initialize countdown timer for non-user roles
+async function initializeCountdownTimer() {
+    try {
+        // Clear any existing timer first
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+        }
+        
+        // Reset timer expired flag
+        timerExpired = false;
+        
+        const response = await fetch('/patterson/api/next-refresh');
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log(`Timer initialized: ${data.source}, time until refresh: ${data.time_until_refresh}s`);
+            startCountdownTimer(data.time_until_refresh);
+        } else {
+            console.error('Failed to get refresh time:', data.error);
+        }
+    } catch (error) {
+        console.error('Error initializing countdown timer:', error);
+    }
+}
+
+// Start countdown timer
+function startCountdownTimer(initialSeconds) {
+    let secondsLeft = Math.max(0, Math.floor(initialSeconds)); // Ensure integer seconds
+    
+    function updateCountdown() {
+        const hours = Math.floor(secondsLeft / 3600);
+        const minutes = Math.floor((secondsLeft % 3600) / 60);
+        const seconds = Math.floor(secondsLeft % 60); // Ensure integer seconds
+        
+        const display = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        const countdownDisplay = document.getElementById('countdown-display');
+        if (countdownDisplay) {
+            countdownDisplay.textContent = display;
+            
+            // Add warning/critical classes based on time remaining
+            countdownDisplay.classList.remove('warning', 'critical');
+            if (secondsLeft <= 1800) { // 30 minutes
+                countdownDisplay.classList.add('critical');
+            } else if (secondsLeft <= 3600) { // 1 hour
+                countdownDisplay.classList.add('warning');
+            }
+        }
+        
+        if (secondsLeft <= 0 && !timerExpired) {
+            // Timer expired, but only trigger once
+            timerExpired = true;
+            console.log('Timer expired, refreshing data...');
+            refreshDataAndRestartTimer();
+        } else if (secondsLeft > 0) {
+            // Reset expired flag if timer is restarted
+            timerExpired = false;
+            secondsLeft--;
+        }
+    }
+    
+    // Update immediately
+    updateCountdown();
+    
+    // Clear existing interval if any
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+    }
+    
+    // Set new interval
+    countdownInterval = setInterval(updateCountdown, 1000);
+}
+
+// Load tickets from file system (instant)
+async function loadTickets() {
+    try {
+        const response = await fetch('/patterson/api/tickets');
+        const data = await response.json();
+        
+        if (data.success) {
+            tickets = data.tickets;
+            renderTickets();
+            updateStats();
+            
+            // Refresh calendar data to show tickets with scheduled dates
+            await loadCalendarData();
+            
+            if (data.source === 'database') {
+                updateConnectionStatus(true, `Connected - ${tickets.length} tickets from database`);
+                showUpdateIndicator(`Loaded ${tickets.length} tickets from database`);
+            } else if (data.source === 'file') {
+                updateConnectionStatus(true, `Connected - ${tickets.length} tickets from file`);
+                showUpdateIndicator(`Loaded ${tickets.length} tickets from file system`);
+            } else if (data.source === 'freshworks') {
+                updateConnectionStatus(true, `Connected - ${tickets.length} tickets from Freshworks`);
+                showUpdateIndicator(`Loaded ${tickets.length} tickets from Freshworks`);
+            } else {
+                updateConnectionStatus(false, 'Using sample data');
+                showUpdateIndicator('Using sample data - no file data available', 'warning');
+            }
+            
+            lastUpdateTime = new Date();
+        } else {
+            console.error('Failed to load tickets:', data.error);
+            updateConnectionStatus(false, 'Failed to load tickets');
+            showUpdateIndicator('Failed to load tickets: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error loading tickets:', error);
+        updateConnectionStatus(false, 'Connection error');
+        showUpdateIndicator('Connection error - using sample data', 'error');
+        
+        // Fallback to sample data
+        tickets = [
+            {
+                id: 1,
+                ticket_number: 'INC-2024-001',
+                office_name: '6 - IRV',
+                technician: 'John Smith',
+                technician_id: 1,
+                description: 'Network connectivity issues - Router needs replacement',
+                priority: 'High',
+                status: 'Scheduled',
+                scheduled_date: '2024-01-15',
+                scheduled_time: '09:00',
+                estimated_duration: '2 hours',
+                stage: 'scheduled',
+                created_at: '2024-01-10T10:30:00',
+                updated_at: '2024-01-10T14:45:00'
+            }
+        ];
+        renderTickets();
+        updateStats();
+    }
+}
+
+// Refresh data and restart timer
+async function refreshDataAndRestartTimer() {
+    // Prevent multiple simultaneous refreshes
+    if (isRefreshing) {
+        console.log('Refresh already in progress, skipping...');
+        return;
+    }
+    
+    isRefreshing = true;
+    
+    try {
+        showUpdateIndicator('Timer expired - refreshing data from Freshworks...', 'info');
+        
+        const response = await fetch('/patterson/api/refresh');
+        const data = await response.json();
+        
+        if (data.success) {
+            tickets = data.tickets;
+            renderTickets();
+            updateStats();
+            
+            // Refresh calendar data to show tickets with scheduled dates
+            await loadCalendarData();
+            
+            showUpdateIndicator(`Auto-refresh completed! ${tickets.length} tickets loaded.`, 'success');
+            lastUpdateTime = new Date();
+            
+            // Add a small delay before restarting timer to prevent rapid successive calls
+            console.log('Auto-refresh completed, waiting 2 seconds before restarting timer...');
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Restart timer for next 3-hour cycle
+            console.log('Restarting timer for next 3-hour cycle...');
+            await initializeCountdownTimer();
+        } else {
+            console.error('Failed to auto-refresh data:', data.error);
+            showUpdateIndicator('Failed to auto-refresh data: ' + data.error, 'error');
+            
+            // Still restart timer even if refresh failed, but with delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            await initializeCountdownTimer();
+        }
+    } catch (error) {
+        console.error('Error auto-refreshing data:', error);
+        showUpdateIndicator('Error auto-refreshing data - check connection', 'error');
+        
+        // Still restart timer even if refresh failed, but with delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        await initializeCountdownTimer();
+    } finally {
+        // Always reset the refreshing flag
+        isRefreshing = false;
+    }
+}
+
+// Refresh data manually (only when user clicks refresh)
+async function refreshData() {
+    // Prevent multiple simultaneous refreshes
+    if (isRefreshing) {
+        console.log('Refresh already in progress, skipping...');
+        return;
+    }
+    
+    isRefreshing = true;
+    
+    try {
+        showUpdateIndicator('Refreshing data from Freshworks...', 'info');
+        
+        const response = await fetch('/patterson/api/refresh');
+        const data = await response.json();
+        
+        if (data.success) {
+            tickets = data.tickets;
+            renderTickets();
+            updateStats();
+            
+            // Refresh calendar data to show tickets with scheduled dates
+            await loadCalendarData();
+            
+            showUpdateIndicator(`Data refreshed successfully! ${tickets.length} tickets loaded.`, 'success');
+            lastUpdateTime = new Date();
+            
+            // Add a small delay before restarting timer to prevent rapid successive calls
+            console.log('Manual refresh completed, waiting 2 seconds before restarting timer...');
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Restart timer for next 3-hour cycle after manual refresh
+            console.log('Manual refresh completed, restarting timer...');
+            await initializeCountdownTimer();
+        } else {
+            console.error('Failed to refresh data:', data.error);
+            showUpdateIndicator('Failed to refresh data: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error refreshing data:', error);
+        showUpdateIndicator('Error refreshing data - check connection', 'error');
+    } finally {
+        // Always reset the refreshing flag
+        isRefreshing = false;
+    }
+}
+
+// Initialize database with all historical ticket data
+async function initializeDatabase() {
+    // Show the modal and set loading message
+    const modal = new bootstrap.Modal(document.getElementById('initializerOutputModal'));
+    const outputPre = document.getElementById('initializer-output');
+    outputPre.textContent = 'Initializing database... Please wait.';
+    modal.show();
+
+    try {
+        const response = await fetch('/patterson/api/run-initializer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
+        if (data.success) {
+            outputPre.textContent = data.output || 'Initialization complete (no output).';
+            showUpdateIndicator('Database initialized successfully!', 'success');
+            // Optionally reload tickets and stats
+            await loadTickets();
+            await loadCalendarData();
+            updateStats();
+        } else {
+            outputPre.textContent = (data.output || data.error || 'Unknown error occurred.');
+            showUpdateIndicator('Failed to initialize database: ' + (data.error || 'Unknown error'), 'error');
+        }
+    } catch (error) {
+        outputPre.textContent = 'Error: ' + error;
+        showUpdateIndicator('Error initializing database - check connection', 'error');
+    }
+}
+
+// Import all dated .txt files from Freshworks directory
+async function importDatedFiles() {
+    try {
+        setButtonLoading('.icon-btn-success', true);
+        showUpdateIndicator('Importing all dated .txt files from Freshworks directory...', 'info');
+        
+        const response = await fetch('/patterson/api/import-dated-files', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showUpdateIndicator(`Successfully imported ${data.total_imported} tickets from dated files! Total tickets in database: ${data.total_tickets_in_db}`, 'success');
+            
+            // Reload tickets to show the new data
+            await loadTickets();
+            
+            // Refresh calendar data to show tickets with scheduled dates
+            await loadCalendarData();
+            
+            // Update statistics
+            updateStats();
+        } else {
+            console.error('Failed to import dated files:', data.error);
+            showUpdateIndicator('Failed to import dated files: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error importing dated files:', error);
+        showUpdateIndicator('Error importing dated files - check connection', 'error');
+    } finally {
+        setButtonLoading('.icon-btn-success', false);
+    }
+}
+
+// Load calendar data from file system
+async function loadCalendarData() {
+    try {
+        const response = await fetch('/patterson/api/calendar');
+        const data = await response.json();
+        
+        if (data.success) {
+            calendarEvents = data.events;
+            document.getElementById('current-month').textContent = data.current_month;
+            renderCalendar();
+        } else {
+            console.error('Failed to load calendar data:', data.error);
+            // Use sample calendar data
+            calendarEvents = [
+                {
+                    id: 1,
+                    title: 'INC-2024-001 - 6 - IRV',
+                    date: '2024-01-15',
+                    time: '09:00',
+                    priority: 'High',
+                    stage: 'scheduled'
+                }
+            ];
+            document.getElementById('current-month').textContent = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            renderCalendar();
+        }
+    } catch (error) {
+        console.error('Error loading calendar data:', error);
+        // Use sample calendar data on error
+        calendarEvents = [
+            {
+                id: 1,
+                title: 'INC-2024-001 - 6 - IRV',
+                date: '2024-01-15',
+                time: '09:00',
+                priority: 'High',
+                stage: 'scheduled'
+            }
+        ];
+        document.getElementById('current-month').textContent = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        renderCalendar();
+    }
+}
+
+// Load offices
+async function loadOffices() {
+    try {
+        const response = await fetch('/patterson/api/offices');
+        const data = await response.json();
+        
+        if (data.success) {
+            const officeSelect = document.getElementById('office-select');
+            const editOfficeSelect = document.getElementById('edit-office-select');
+            
+            const officeOptions = '<option value="">Select Office</option>' + 
+                data.offices.map(office => `<option value="${office}">${office}</option>`).join('');
+            
+            officeSelect.innerHTML = officeOptions;
+            editOfficeSelect.innerHTML = officeOptions;
+        }
+    } catch (error) {
+        console.error('Error loading offices:', error);
+    }
+}
+
+// Load technicians
+async function loadTechnicians() {
+    try {
+        const response = await fetch('/patterson/api/technicians');
+        const data = await response.json();
+        
+        if (data.success) {
+            const technicianSelect = document.getElementById('technician-select');
+            const editTechnicianSelect = document.getElementById('edit-technician-select');
+            
+            const technicianOptions = '<option value="">Select Technician</option>' + 
+                data.technicians.map(technician => {
+                    // Create a display name that shows the source for unmapped IDs
+                    let displayName = technician.name;
+                    if (technician.source === 'unmapped_freshworks') {
+                        displayName = `${technician.name} (Unmapped)`;
+                    } else if (technician.source === 'user_mapping') {
+                        displayName = `${technician.name} (Mapped)`;
+                    }
+                    
+                    return `<option value="${technician.id}" 
+                             data-email="${technician.email}" 
+                             data-role="${technician.role}"
+                             data-source="${technician.source}">
+                        ${displayName}
+                    </option>`;
+                }).join('');
+            
+            if (technicianSelect) technicianSelect.innerHTML = technicianOptions;
+            if (editTechnicianSelect) editTechnicianSelect.innerHTML = technicianOptions;
+        }
+    } catch (error) {
+        console.error('Error loading technicians:', error);
+    }
+}
+
+// Update statistics
+function updateStats() {
+    const totalTickets = tickets.length;
+    const scheduledTickets = tickets.filter(t => t.stage === 'scheduled').length;
+    const inProgressTickets = tickets.filter(t => t.stage === 'in_progress').length;
+    const completedTickets = tickets.filter(t => t.stage === 'completed').length;
+    
+    // Active tickets exclude completed ones
+    const activeTickets = scheduledTickets + inProgressTickets;
+    
+    document.getElementById('total-tickets').textContent = totalTickets;
+    document.getElementById('scheduled-tickets').textContent = scheduledTickets;
+    document.getElementById('in-progress-tickets').textContent = inProgressTickets;
+    document.getElementById('completed-tickets').textContent = completedTickets;
+    
+    // Update the Active Tickets badge (if present)
+    const activeBadge = document.getElementById('active-ticket-count');
+    if (activeBadge) {
+        activeBadge.textContent = activeTickets;
+    }
+}
+
+// Update connection status
+function updateConnectionStatus(isOnline, message) {
+    const statusDot = document.getElementById('connection-status');
+    const statusText = document.getElementById('connection-text');
+    
+    if (statusDot) {
+        statusDot.className = `status-dot ${isOnline ? 'online' : 'offline'}`;
+    }
+    
+    if (statusText) {
+        statusText.textContent = message;
+    }
+}
+
+// Show update indicator
+function showUpdateIndicator(message, type = 'success') {
+    const indicator = document.getElementById('update-indicator');
+    const messageElement = document.getElementById('update-message');
+    
+    if (indicator && messageElement) {
+        messageElement.textContent = message;
+        indicator.className = `update-indicator show ${type}`;
+        
+        setTimeout(() => {
+            indicator.classList.remove('show');
+        }, 5000);
+    }
+}
+
+// Filter tickets
+function filterTickets() {
+    renderTickets();
+}
+
+// Format date for display
+function formatDate(dateString) {
+    if (!dateString) return 'Not scheduled yet';
+    
+    // Parse the date string as local time to avoid timezone issues
+    // For dates in YYYY-MM-DD format, create a local date
+    if (typeof dateString === 'string' && dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [year, month, day] = dateString.split('-').map(Number);
+        const date = new Date(year, month - 1, day); // month is 0-indexed
+        return formatDateWithOrdinal(date);
+    } else {
+        // Fallback for other date formats
+        const date = new Date(dateString);
+        return formatDateWithOrdinal(date);
+    }
+}
+
+// Helper function to format date with ordinal suffix and full day name
+function formatDateWithOrdinal(date) {
+    const month = date.toLocaleDateString('en-US', { month: 'long' });
+    const day = date.getDate();
+    const year = date.getFullYear();
+    const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
+    
+    // Add ordinal suffix to day
+    const ordinalSuffix = getOrdinalSuffix(day);
+    
+    return `${month} ${day}${ordinalSuffix}, ${year} [${weekday}]`;
+}
+
+// Helper function to get ordinal suffix (1st, 2nd, 3rd, etc.)
+function getOrdinalSuffix(day) {
+    if (day >= 11 && day <= 13) {
+        return 'th';
+    }
+    switch (day % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+    }
+}
+
+// Calendar navigation
+function previousMonth() {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    renderCalendar();
+    document.getElementById('current-month').textContent = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+}
+
+function nextMonth() {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    renderCalendar();
+    document.getElementById('current-month').textContent = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+}
+
+// Manual API pull
+async function manualApiPull() {
+    // Prevent multiple simultaneous API pulls
+    if (isRefreshing) {
+        console.log('API pull already in progress, skipping...');
+        return;
+    }
+    
+    isRefreshing = true;
+    
+    try {
+        setButtonLoading('.icon-btn-primary', true);
+        showUpdateIndicator('Pulling data from Freshworks API...', 'info');
+        
+        const response = await fetch('/patterson/api/manual-api-pull', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showUpdateIndicator(`Successfully pulled ${data.tickets_pulled} tickets from Freshworks API!`, 'success');
+            
+            // Reload tickets to show the new data
+            await loadTickets();
+            
+            // Refresh calendar data to show tickets with scheduled dates
+            await loadCalendarData();
+            
+            // Update statistics
+            updateStats();
+            
+            // Add a small delay before restarting timer to prevent rapid successive calls
+            console.log('Manual API pull completed, waiting 2 seconds before restarting timer...');
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Restart timer for next 3-hour cycle after manual pull
+            console.log('Manual API pull completed, restarting timer...');
+            await initializeCountdownTimer();
+        } else {
+            console.error('Failed to pull from API:', data.error);
+            showUpdateIndicator('Failed to pull from API: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error pulling from API:', error);
+        showUpdateIndicator('Error pulling from API - check connection', 'error');
+    } finally {
+        setButtonLoading('.icon-btn-primary', false);
+        // Always reset the refreshing flag
+        isRefreshing = false;
+    }
+}
+
+// Handle file upload
+async function handleFileUpload(input) {
+    const file = input.files[0];
+    if (!file) {
+        showUpdateIndicator('No file selected', 'error');
+        return;
+    }
+    
+    // Check file extension
+    const allowedExtensions = ['txt', 'csv', 'json'];
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+    if (!allowedExtensions.includes(fileExtension)) {
+        showUpdateIndicator('Invalid file type. Only .txt, .csv, and .json files are allowed.', 'error');
+        return;
+    }
+    
+    // Create FormData
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+        setButtonLoading('.icon-btn-info', true);
+        showUpdateIndicator('Uploading file...', 'info');
+        
+        const response = await fetch('/patterson/api/upload-file', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showUpdateIndicator(`File uploaded successfully! Processed ${data.tickets_processed} tickets.`, 'success');
+            
+            // Reload tickets to show the new data
+            await loadTickets();
+            
+            // Refresh calendar data to show tickets with scheduled dates
+            await loadCalendarData();
+            
+            // Update statistics
+            updateStats();
+        } else {
+            showUpdateIndicator('Failed to upload file: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        showUpdateIndicator('Error uploading file. Please try again.', 'error');
+    } finally {
+        setButtonLoading('.icon-btn-info', false);
+        // Reset file input
+        input.value = '';
+    }
+}
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+    }
+});
+
+// Render tickets list with enhanced styling
+function renderTickets() {
+    const ticketsList = document.getElementById('tickets-list');
+    const filterStatus = document.getElementById('filter-status').value;
+    
+    let filteredTickets = tickets;
+    if (filterStatus) {
+        filteredTickets = tickets.filter(ticket => ticket.stage === filterStatus);
+    }
+    
+    // Sort tickets so that Scheduled appear first, followed by In Progress, then Completed
+    const stageOrder = { 'scheduled': 0, 'in_progress': 1, 'completed': 2 };
+    filteredTickets.sort((a, b) => {
+        const orderDiff = (stageOrder[a.stage] ?? 99) - (stageOrder[b.stage] ?? 99);
+        if (orderDiff !== 0) return orderDiff;
+
+        // Within the same stage, order by scheduled_date (earlier dates first)
+        if (a.scheduled_date && b.scheduled_date) {
+            try {
+                return new Date(a.scheduled_date) - new Date(b.scheduled_date);
+            } catch (err) {
+                // Fallback to no change if dates are invalid
+            }
+        }
+        return 0;
+    });
+    
+    ticketsList.innerHTML = '';
+    
+    if (filteredTickets.length === 0) {
+        ticketsList.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.7);">
+                <i class="bi bi-inbox" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                <h4>No tickets found</h4>
+                <p>${filterStatus ? `No tickets with status "${filterStatus}"` : 'No tickets available'}</p>
+            </div>
+        `;
+        return;
+    }
+    
+    filteredTickets.forEach(ticket => {
+        const ticketCard = createTicketCard(ticket);
+        ticketsList.appendChild(ticketCard);
+    });
+}
+
+// Create enhanced ticket card element
+function createTicketCard(ticket) {
+    const card = document.createElement('div');
+    card.className = 'ticket-card';
+    card.id = `ticket-${ticket.id}`;
+    
+    // Make all tickets clickable to show details or edit
+    card.classList.add('clickable');
+    if (userRole !== 'user') {
+        // For non-user roles, clicking opens edit modal
+        card.onclick = () => openEditTicketModal(ticket);
+    } else {
+        // For user role, clicking shows details only
+        card.onclick = () => showTicketDetails(ticket);
+    }
+    
+    // Flip stage order: in_progress -> scheduled -> completed
+    const stages = ['in_progress', 'scheduled', 'completed'];
+    const stageLabels = ['In Progress', 'Scheduled', 'Completed'];
+    const currentStageIndex = stages.indexOf(ticket.stage);
+    
+    // Format dates for display
+    const createdDate = new Date(ticket.created_at).toLocaleDateString();
+    const updatedDate = new Date(ticket.updated_at).toLocaleDateString();
+    
+    // Handle scheduled date display
+    let scheduledDateDisplay = 'Not scheduled yet';
+    if (ticket.scheduled_date) {
+        scheduledDateDisplay = formatDate(ticket.scheduled_date);
+    }
+    
+    // Build primary/secondary headings intelligently
+    const isUnknown = !ticket.office_name || ticket.office_name === 'Unknown Office';
+    const headingHtml = `<div class="ticket-office">${isUnknown ? (ticket.subject || 'No Subject') : ticket.office_name}</div>`;
+    // We no longer render a separate subject line to prevent duplicates
+    const subjectHtml = '';
+    const descHtml = ticket.description ? `<div class=\"ticket-description\">${ticket.description}</div>` : '';
+
+    card.innerHTML = `
+        <div class="ticket-header">
+            <div class="ticket-number">${ticket.ticket_number}</div>
+            <div class="ticket-priority priority-${ticket.priority.toLowerCase()}">${ticket.priority}</div>
+        </div>
+        <div class="ticket-details">
+            ${headingHtml}
+            ${subjectHtml}
+            <div class="ticket-technician">
+                <i class="bi bi-person-circle me-1"></i>
+                ${ticket.technician}
+                <span class="badge">${ticket.freshworks_id ? 'Freshworks' : 'Local'}</span>
+            </div>
+            ${descHtml}
+        </div>
+        
+        <div class="ticket-schedule">
+            <div class="schedule-info">
+                <div class="schedule-label">Scheduled Date</div>
+                <div class="schedule-value">${scheduledDateDisplay}</div>
+            </div>
+        </div>
+        
+        <div class="stage-progress">
+            <div class="stage-bar">
+                ${stages.map((stage, index) => `
+                    <div class="stage-segment ${index < currentStageIndex ? 'completed' : index === currentStageIndex ? 'active' : 'pending'}"></div>
+                `).join('')}
+            </div>
+            <div class="stage-labels">
+                ${stageLabels.map((label, index) => `
+                    <div class="stage-label ${index < currentStageIndex ? 'completed' : index === currentStageIndex ? 'active' : ''}">${label}</div>
+                `).join('')}
+            </div>
+        </div>
+        
+        <div class="ticket-actions">
+            ${stages.map((stage, index) => `
+                <button class="btn-stage${index === currentStageIndex ? ' ' + stage : ''}"
+                        style="${index === currentStageIndex ? '' : 'background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);'}"
+                        onclick="event.stopPropagation(); updateTicketStage(${ticket.id}, '${stage}')" 
+                        ${index <= currentStageIndex ? '' : 'disabled'}>
+                    ${stageLabels[index]}
+                </button>
+            `).join('')}
+        </div>
+    `;
+    
+    return card;
+}
+
+function createDayTicketListItem(ticket) {
+    const item = document.createElement('div');
+    item.className = 'ticket-card'; // Reuse ticket-card style for consistency
+    item.onclick = () => {
+        // Close the current modal and open the edit/details modal
+        const dayModal = bootstrap.Modal.getInstance(document.getElementById('dayTicketsModal'));
+        dayModal.hide();
+
+        if (userRole !== 'user') {
+            openEditTicketModal(ticket);
+        } else {
+            showTicketDetails(ticket);
+        }
+    };
+
+    item.innerHTML = `
+        <div class="ticket-title">${ticket.title}</div>
+        <div class="ticket-technician">
+            <i class="bi bi-person"></i> ${ticket.technician || 'Unassigned'}
+        </div>
+        <div class="ticket-priority priority-${ticket.priority.toLowerCase()}">${ticket.priority}</div>
+    `;
+    return item;
+}
+
+function openDayTicketsModal(tickets, dateStr) {
+    const modalElement = document.getElementById('dayTicketsModal');
+    const modalTitle = document.getElementById('dayTicketsModalTitle');
+    const modalBody = document.getElementById('day-tickets-list');
+
+    // Format date for the title
+    const date = new Date(dateStr + 'T00:00:00'); // Avoid timezone issues
+    modalTitle.textContent = `Tickets for ${date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+
+    modalBody.innerHTML = '';
+    if (tickets && tickets.length > 0) {
+        tickets.forEach(ticket => {
+            const ticketItem = createDayTicketListItem(ticket);
+            modalBody.appendChild(ticketItem);
+        });
+    } else {
+        modalBody.innerHTML = '<p>No tickets scheduled for this day.</p>';
+    }
+
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+}
+
+// Enhanced calendar rendering
+function renderCalendar() {
+    const calendarGrid = document.getElementById('calendar-grid');
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    // Group events by date for quick lookup
+    const eventsByDate = {};
+    calendarEvents.forEach(event => {
+        // The backend now sends one event object per day with a count and a list of tickets
+        eventsByDate[event.date] = event;
+    });
+    
+    // Clear calendar
+    calendarGrid.innerHTML = '';
+    
+    // Add day headers
+    const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    dayHeaders.forEach(day => {
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'calendar-day-header';
+        dayHeader.textContent = day;
+        calendarGrid.appendChild(dayHeader);
+    });
+    
+    // Get first day of month and number of days
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDay = firstDay.getDay();
+    
+    // Always render 6 rows (42 days)
+    let dayCounter = 1 - startingDay;
+    for (let i = 0; i < 42; i++) {
+        const dayDate = new Date(year, month, dayCounter);
+        const dayCell = document.createElement('div');
+        dayCell.className = 'calendar-day';
+        if (
+            dayDate.getMonth() !== month
+        ) {
+            dayCell.style.opacity = '0.3';
+        }
+        if (
+            dayDate.getDate() === new Date().getDate() &&
+            dayDate.getMonth() === new Date().getMonth() &&
+            dayDate.getFullYear() === new Date().getFullYear()
+        ) {
+            dayCell.classList.add('today');
+        }
+        
+        // Add click handler for non-user roles
+        if (userRole !== 'user') {
+            dayCell.style.cursor = 'pointer';
+            dayCell.onclick = () => openCalendarEventModal(dayDate);
+        }
+        
+        // Day number
+        const dayNumber = document.createElement('div');
+        dayNumber.className = 'day-number';
+        dayNumber.textContent = dayDate.getDate();
+        dayCell.appendChild(dayNumber);
+        
+        // Events
+        const dateStr = dayDate.toISOString().slice(0, 10);
+        const dayEvent = eventsByDate[dateStr];
+        
+        if (dayEvent && dayEvent.count > 0) {
+            dayCell.classList.add('has-events');
+            
+            const eventsContainer = document.createElement('div');
+            eventsContainer.className = 'calendar-events-container';
+            
+            const eventBubble = document.createElement('div');
+            eventBubble.className = 'event-count-bubble';
+            eventBubble.textContent = dayEvent.count;
+            eventBubble.onclick = (e) => {
+                e.stopPropagation(); // Prevent day click from firing
+                openDayTicketsModal(dayEvent.tickets, dateStr);
+            };
+            
+            eventsContainer.appendChild(eventBubble);
+            dayCell.appendChild(eventsContainer);
+        }
+
+        calendarGrid.appendChild(dayCell);
+        dayCounter++;
+    }
+}
+
+// Open calendar event modal
+function openCalendarEventModal(date, event = null) {
+    if (userRole === 'user') return;
+    
+    selectedCalendarDate = date;
+    
+    if (event) {
+        // Editing existing event
+        document.getElementById('edit-event-id').value = event.id;
+        document.getElementById('edit-event-title').value = event.title;
+        document.getElementById('edit-event-date').value = event.date;
+        document.getElementById('edit-event-time').value = event.time;
+        document.getElementById('edit-event-duration').value = event.duration || '1 hour';
+        document.getElementById('edit-event-office').value = event.office || 'General';
+        document.getElementById('edit-event-technician').value = event.technician_id || '';
+        document.getElementById('edit-event-priority').value = event.priority || 'Medium';
+        document.getElementById('edit-event-urgency').value = event.urgency || 'Medium';
+        document.getElementById('edit-event-description').value = event.description;
+        
+        // Populate dropdowns and show edit modal
+        populateEventDropdowns().then(() => {
+            const modal = new bootstrap.Modal(document.getElementById('editCalendarEventModal'));
+            modal.show();
+        });
+    } else {
+        // Creating new event
+        document.getElementById('event-date').value = date.toISOString().split('T')[0];
+        
+        // Populate office and technician dropdowns
+        populateEventDropdowns().then(() => {
+            const modal = new bootstrap.Modal(document.getElementById('calendarEventModal'));
+            modal.show();
+        });
+    }
+}
+
+// Populate event dropdowns
+async function populateEventDropdowns() {
+    try {
+        // Load offices
+        const officesResponse = await fetch('/patterson/api/offices');
+        const officesData = await officesResponse.json();
+        
+        if (officesData.success) {
+            const officeSelect = document.getElementById('event-office');
+            const editOfficeSelect = document.getElementById('edit-event-office');
+            
+            const officeOptions = '<option value="General">General</option>';
+            officesData.offices.forEach(office => {
+                officeOptions += `<option value="${office}">${office}</option>`;
+            });
+            
+            if (officeSelect) officeSelect.innerHTML = officeOptions;
+            if (editOfficeSelect) editOfficeSelect.innerHTML = officeOptions;
+        }
+        
+        // Load technicians
+        const techniciansResponse = await fetch('/patterson/api/technicians');
+        const techniciansData = await techniciansResponse.json();
+        
+        if (techniciansData.success) {
+            const technicianSelect = document.getElementById('event-technician');
+            const editTechnicianSelect = document.getElementById('edit-event-technician');
+            
+            const technicianOptions = '<option value="">Unassigned</option>';
+            techniciansData.technicians.forEach(technician => {
+                // Create a display name that shows the source for unmapped IDs
+                let displayName = technician.name;
+                if (technician.source === 'unmapped_freshworks') {
+                    displayName = `${technician.name} (Unmapped)`;
+                } else if (technician.source === 'user_mapping') {
+                    displayName = `${technician.name} (Mapped)`;
+                }
+                
+                technicianOptions += `<option value="${technician.id}">${displayName}</option>`;
+            });
+            
+            if (technicianSelect) technicianSelect.innerHTML = technicianOptions;
+            if (editTechnicianSelect) editTechnicianSelect.innerHTML = technicianOptions;
+        }
+    } catch (error) {
+        console.error('Error populating event dropdowns:', error);
+    }
+}
+
+// Create calendar event
+async function createCalendarEvent() {
+    const title = document.getElementById('event-title').value;
+    const date = document.getElementById('event-date').value;
+    const time = document.getElementById('event-time').value;
+    const duration = document.getElementById('event-duration').value;
+    const office = document.getElementById('event-office').value;
+    const technician = document.getElementById('event-technician').value;
+    const priority = document.getElementById('event-priority').value;
+    const urgency = document.getElementById('event-urgency').value;
+    const description = document.getElementById('event-description').value;
+    
+    if (!title || !date || !description) {
+        showUpdateIndicator('Please fill in all required fields', 'error');
+        return;
+    }
+    
+    // Show loading state
+    const createBtn = document.querySelector('#calendarEventModal .btn-primary-patterson');
+    const btnText = document.getElementById('create-event-btn-text');
+    const btnSpinner = document.getElementById('create-event-btn-spinner');
+    
+    btnText.style.display = 'none';
+    btnSpinner.style.display = 'inline-block';
+    createBtn.disabled = true;
+    
+    try {
+        const response = await fetch('/patterson/api/calendar/events', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: title,
+                date: date,
+                time: time,
+                duration: duration,
+                office: office,
+                technician_id: technician ? parseInt(technician) : null,
+                priority: priority,
+                urgency: urgency,
+                description: description
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Add new event to calendar
+            calendarEvents.push(data.event);
+            
+            // Close modal and refresh
+            const modal = bootstrap.Modal.getInstance(document.getElementById('calendarEventModal'));
+            modal.hide();
+            
+            // Reset form
+            document.getElementById('calendarEventForm').reset();
+            document.getElementById('event-time').value = '09:00';
+            document.getElementById('event-duration').value = '1 hour';
+            document.getElementById('event-priority').value = 'Medium';
+            document.getElementById('event-urgency').value = 'Medium';
+            
+            // Refresh calendar display
+            renderCalendar();
+            
+            showUpdateIndicator('Calendar event created successfully');
+        } else {
+            showUpdateIndicator('Failed to create event: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error creating calendar event:', error);
+        showUpdateIndicator('Error creating event. Please try again.', 'error');
+    } finally {
+        // Reset button state
+        btnText.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+        createBtn.disabled = false;
+    }
+}
+
+// Update ticket stage with enhanced feedback
+async function updateTicketStage(ticketId, newStage) {
+    try {
+        const response = await fetch(`/patterson/api/tickets/${ticketId}/stage`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ stage: newStage })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update local ticket data
+            const ticketIndex = tickets.findIndex(t => t.id === ticketId);
+            if (ticketIndex !== -1) {
+                tickets[ticketIndex] = data.ticket;
+            }
+            
+            // Animate the ticket card
+            const ticketCard = document.getElementById(`ticket-${ticketId}`);
+            ticketCard.classList.add('stage-update');
+            
+            setTimeout(() => {
+                ticketCard.classList.remove('stage-update');
+                renderTickets();
+                updateStats();
+            }, 600);
+            
+            showUpdateIndicator(`Ticket stage updated to ${newStage.replace('_', ' ')}`);
+            
+        } else {
+            console.error('Failed to update ticket stage:', data.error);
+            showUpdateIndicator('Failed to update ticket stage', 'error');
+        }
+    } catch (error) {
+        console.error('Error updating ticket stage:', error);
+        showUpdateIndicator('Error updating ticket stage', 'error');
+    }
+}
+
+// Open edit ticket modal (enhanced for non-user roles)
+function openEditTicketModal(ticket) {
+    if (userRole === 'user') {
+        // For users, just show details
+        showTicketDetails(ticket);
+        return;
+    }
+    
+    // For non-user roles, show enhanced edit modal
+    // Populate form fields
+    document.getElementById('edit-ticket-id').value = ticket.id;
+    document.getElementById('edit-office-select').value = ticket.office_name;
+    document.getElementById('edit-technician-select').value = ticket.technician_id || '';
+    document.getElementById('edit-scheduled-date').value = ticket.scheduled_date;
+    document.getElementById('edit-scheduled-time').value = ticket.scheduled_time;
+    document.getElementById('edit-priority-select').value = ticket.priority;
+    document.getElementById('edit-duration-select').value = ticket.estimated_duration;
+    document.getElementById('edit-description').value = ticket.description;
+    document.getElementById('edit-stage-select').value = ticket.stage;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('editTicketModal'));
+    modal.show();
+}
+
+// Show ticket details
+function showTicketDetails(ticket) {
+    const modal = new bootstrap.Modal(document.getElementById('ticketDetailsModal'));
+    const content = document.getElementById('ticket-details-content');
+    
+    content.innerHTML = `
+        <div class="ticket-details-view">
+            <h6>Ticket Number: ${ticket.ticket_number}</h6>
+            <p><strong>Office:</strong> ${ticket.office_name}</p>
+            <p><strong>Technician:</strong> ${ticket.technician}</p>
+            <p><strong>Description:</strong> ${ticket.description}</p>
+            <p><strong>Priority:</strong> ${ticket.priority}</p>
+            <p><strong>Stage:</strong> ${ticket.stage}</p>
+            <p><strong>Scheduled Date:</strong> ${ticket.scheduled_date ? formatDate(ticket.scheduled_date) : 'Not scheduled'}</p>
+            <p><strong>Scheduled Time:</strong> ${ticket.scheduled_time || 'Not scheduled'}</p>
+            <p><strong>Created:</strong> ${new Date(ticket.created_at).toLocaleDateString()}</p>
+            <p><strong>Updated:</strong> ${new Date(ticket.updated_at).toLocaleDateString()}</p>
+        </div>
+    `;
+    
+    modal.show();
+}
+
+// Open new ticket modal
+function openNewTicketModal() {
+    if (userRole === 'user') return;
+    
+    // Reset form
+    document.getElementById('newTicketForm').reset();
+    
+    // Set default date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('scheduled-date').value = today;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('newTicketModal'));
+    modal.show();
+}
+
+// Create new ticket
+async function createTicket() {
+    const ticketData = {
+        office_name: document.getElementById('office-select').value,
+        technician_id: parseInt(document.getElementById('technician-select').value),
+        description: document.getElementById('description').value,
+        scheduled_date: document.getElementById('scheduled-date').value,
+        scheduled_time: document.getElementById('scheduled-time').value,
+        priority: document.getElementById('priority-select').value,
+        estimated_duration: document.getElementById('duration-select').value
+    };
+    
+    // Validate required fields
+    const requiredFields = ['office_name', 'technician_id', 'description', 'scheduled_date', 'scheduled_time'];
+    for (const field of requiredFields) {
+        if (!ticketData[field]) {
+            showUpdateIndicator(`Please fill in the ${field.replace('_', ' ')} field.`, 'error');
+            return;
+        }
+    }
+    
+    // Show loading state
+    const createBtn = document.querySelector('#newTicketModal .btn-primary-patterson');
+    const btnText = document.getElementById('create-btn-text');
+    const btnSpinner = document.getElementById('create-btn-spinner');
+    
+    btnText.style.display = 'none';
+    btnSpinner.style.display = 'inline-block';
+    createBtn.disabled = true;
+    
+    try {
+        const response = await fetch('/patterson/api/tickets', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(ticketData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Add new ticket to list
+            tickets.push(data.ticket);
+            
+            // Close modal and refresh
+            const modal = bootstrap.Modal.getInstance(document.getElementById('newTicketModal'));
+            modal.hide();
+            
+            // Reset form
+            document.getElementById('newTicketForm').reset();
+            
+            // Refresh displays
+            renderTickets();
+            loadCalendarData();
+            updateStats();
+            
+            showUpdateIndicator('Ticket created successfully');
+        } else {
+            showUpdateIndicator('Failed to create ticket: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error creating ticket:', error);
+        showUpdateIndicator('Error creating ticket. Please try again.', 'error');
+    } finally {
+        // Reset button state
+        btnText.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+        createBtn.disabled = false;
+    }
+}
+
+// Test function to check modal functionality
+function testModal() {
+    console.log('Testing modal functionality...');
+    
+    // Check if Bootstrap is available
+    if (typeof bootstrap === 'undefined') {
+        console.error('Bootstrap is not loaded!');
+        alert('Bootstrap is not loaded!');
+        return;
+    }
+    
+    // Check if modal element exists
+    const modalElement = document.getElementById('userMappingModal');
+    if (!modalElement) {
+        console.error('Modal element not found!');
+        alert('Modal element not found!');
+        return;
+    }
+    
+    console.log('Modal element found:', modalElement);
+    console.log('Modal classes:', modalElement.className);
+    console.log('Modal style display:', modalElement.style.display);
+    console.log('Modal computed style display:', window.getComputedStyle(modalElement).display);
+    
+    // Try to show the modal directly
+    try {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+        console.log('Modal show() called successfully');
+    } catch (error) {
+        console.error('Error showing modal:', error);
+        alert('Error showing modal: ' + error.message);
+    }
+}
+
+// Open user mapping modal (Updated)
+function openUserMappingModal() {
+    console.log('Opening user mappings modal...');
+    
+    if (userRole === 'user') {
+        console.log('User role is user, access denied');
+        return;
+    }
+    
+    console.log('User role:', userRole, '- proceeding with modal open');
+    
+    // Load all data for the modal *before* showing it
+    refreshMappingData().then(() => {
+        const modalElement = document.getElementById('userMappingModal');
+        if (!modalElement) {
+            console.error('userMappingModal element not found');
+            return;
+        }
+        
+        console.log('Modal element found, creating Bootstrap modal...');
+        console.log('Modal element:', modalElement);
+        console.log('Modal element classes:', modalElement.className);
+        console.log('Modal element style:', modalElement.style.display);
+        
+        // Check if Bootstrap is available
+        if (typeof bootstrap === 'undefined') {
+            console.error('Bootstrap is not loaded!');
+            return;
+        }
+        
+        const modal = new bootstrap.Modal(modalElement, {
+            backdrop: 'static',
+            keyboard: false
+        });
+        
+        console.log('Showing modal...');
+        modal.show();
+        
+        // Add event listener to handle modal close
+        modalElement.addEventListener('hidden.bs.modal', function() {
+            console.log('Modal closed');
+        }, { once: true });
+        
+        console.log('Modal opened successfully');
+    }).catch(error => {
+        console.error('Failed to refresh data for modal:', error);
+        // Optionally show an error to the user
+    });
+}
+
+// Load mapping statistics
+async function loadMappingStatistics() {
+    try {
+        const response = await fetch('/patterson/api/mapping-statistics');
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('mapped-users-count').textContent = data.stats.mapped_users || 0;
+            document.getElementById('unmapped-users-count').textContent = data.stats.unmapped_users || 0;
+document.getElementById('assigned-tickets-count').textContent = data.stats.assigned_tickets || 0;document.getElementById('mapping-coverage').textContent = `${data.stats.coverage || 0}%`;
+        } else {
+            console.error('Failed to load stats:', data.error);
+        }
+    } catch (error) {
+        console.error('Error loading mapping statistics:', error);
+    }
+}
+
+// Load unmapped users (Updated)
+async function loadUnmappedUsers() {
+    const tableBody = document.getElementById('unmapped-table-body');
+    if (!tableBody) {
+        console.error('unmapped-table-body not found');
+        return;
+    }
+
+    // Show loading state
+    tableBody.innerHTML = `<tr><td colspan="5" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>`;
+
+    try {
+        console.log('Loading unmapped users...');
+        const response = await fetch('/patterson/api/unmapped-users');
+        const data = await response.json();
+        
+        console.log('Unmapped users response:', data);
+        
+        if (data.success) {
+            tableBody.innerHTML = ''; // Clear loading spinner
+            
+            if (!data.users || data.users.length === 0) {
+                // Display a polished "empty state" message
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            <div class="empty-message">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                All users appear to be mapped!
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                data.users.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><span class="badge bg-secondary">${user.id}</span></td>
+                        <td>${user.name || 'Unknown'}</td>
+                        <td><span class="badge bg-primary">${user.ticket_count || 0}</span></td>
+                        <td>${user.last_seen || 'Never'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary action-btn" onclick="quickMapUser('${user.id}', '${user.name || 'Unknown'}')" data-bs-toggle="tooltip" title="Quick map this user">
+                                <i class="bi bi-link-45deg"></i>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+            
+            // Update the unmapped users count in statistics
+            const unmappedCount = data.users ? data.users.length : 0;
+            const unmappedCountElement = document.getElementById('unmapped-users-count');
+            if (unmappedCountElement) {
+                unmappedCountElement.textContent = unmappedCount;
+            }
+        } else {
+            tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Error: ${data.error || 'Unknown error'}</td></tr>`;
+        }
+    } catch (error) {
+        console.error('Error loading unmapped users:', error);
+        tableBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Failed to load data: ${error.message}</td></tr>`;
+    }
+}
+
+// Test function to check unmapped users
+async function testUnmappedUsers() {
+    console.log('Testing unmapped users...');
+    
+    try {
+        // Test the API endpoint directly
+        const response = await fetch('/patterson/api/unmapped-users');
+        const data = await response.json();
+        
+        console.log('API Response:', data);
+        
+        if (data.success) {
+            console.log('Unmapped users found:', data.users.length);
+            data.users.forEach(user => {
+                console.log('Unmapped user:', user);
+            });
+        } else {
+            console.error('API Error:', data.error);
+        }
+        
+        // Also test the statistics endpoint
+        const statsResponse = await fetch('/patterson/api/mapping-statistics');
+        const statsData = await statsResponse.json();
+        
+        console.log('Statistics Response:', statsData);
+        
+    } catch (error) {
+        console.error('Test failed:', error);
+    }
+}
+
+// Enhanced refresh function that includes testing
+async function refreshMappingData() {
+    try {
+        showUpdateIndicator('Refreshing all data...', 'info');
+        
+        // Update last update time
+        document.getElementById('last-update-time').textContent = new Date().toLocaleTimeString();
+        
+        // Test unmapped users first
+        await testUnmappedUsers();
+        
+        await Promise.all([
+            loadMappingStatistics(),
+            loadUnmappedUsers(),
+            loadUserMappings(),
+            loadAvailableUsers(),
+            loadUnmappedUserOptions()
+        ]);
+        
+        showUpdateIndicator('All data refreshed successfully');
+    } catch (error) {
+        console.error('Error refreshing mapping data:', error);
+        showUpdateIndicator('Error refreshing data', 'error');
+    }
+}
+
+function quickMapUser(userId, userName) {
+    // Switch to the 'Add/Edit' tab
+    switchUserMappingView('edit');
+
+    // Populate the form fields after a short delay to allow tab to switch
+    setTimeout(() => {
+        const unmappedSelect = document.getElementById('unmapped-user-select');
+        const nameInput = document.getElementById('user-name');
+        
+        // Create a new option if it doesn't exist
+        if (!unmappedSelect.querySelector(`option[value="${userId}"]`)) {
+            const option = new Option(`${userId} - ${userName}`, userId, true, true);
+            unmappedSelect.appendChild(option);
+        }
+        
+        unmappedSelect.value = userId;
+        nameInput.value = userName;
+
+        // Trigger a change event to update any listeners
+        unmappedSelect.dispatchEvent(new Event('change'));
+        nameInput.focus();
+        showSuccessMessage(`Form pre-filled for user ${userName}.`);
+    }, 200);
+}
+
+// Refresh unmapped users
+async function refreshUnmappedUsers() {
+    try {
+        showUpdateIndicator('Refreshing unmapped users...', 'info');
+        await loadUnmappedUsers();
+        showUpdateIndicator('Unmapped users refreshed successfully');
+    } catch (error) {
+        console.error('Error refreshing unmapped users:', error);
+        showUpdateIndicator('Error refreshing unmapped users', 'error');
+    }
+}
+
+// Export unmapped users
+function exportUnmappedUsers() {
+    try {
+        const tbody = document.getElementById('unmapped-table-body');
+        const rows = tbody.querySelectorAll('tr');
+        
+        if (rows.length === 0) {
+            showUpdateIndicator('No unmapped users to export', 'warning');
+            return;
+        }
+        
+        let csvContent = 'data:text/csv;charset=utf-8,';
+        csvContent += 'Freshworks ID,Display Name,Ticket Count,Last Seen\n';
+        
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length >= 4) {
+                const id = cells[0].textContent.trim();
+                const name = cells[1].textContent.trim();
+                const tickets = cells[2].textContent.trim();
+                const lastSeen = cells[3].textContent.trim();
+                
+                csvContent += `"${id}","${name}","${tickets}","${lastSeen}"\n`;
+            }
+        });
+        
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', `unmapped_users_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showUpdateIndicator('Unmapped users exported successfully');
+    } catch (error) {
+        console.error('Error exporting unmapped users:', error);
+        showUpdateIndicator('Error exporting unmapped users', 'error');
+    }
+}
+
+// Load available users for linking (Updated)
+async function loadAvailableUsers() {
+    try {
+        const response = await fetch('/patterson/api/available-users');
+        const data = await response.json();
+        
+        if (data.success) {
+            const select = document.getElementById('linked-user-select');
+            select.innerHTML = '<option value="">Select User Account (Optional)</option>';
+            
+            if (data.users && data.users.length > 0) {
+                data.users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = `${user.username} (${user.email})`;
+                    select.appendChild(option);
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Error loading available users:', error);
+    }
+}
+
+// Search users (Updated)
+async function searchUsers() {
+    const searchTerm = document.getElementById('user-search').value.trim();
+    if (!searchTerm) {
+        loadAvailableUsers();
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/patterson/api/search-users?q=${encodeURIComponent(searchTerm)}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const select = document.getElementById('linked-user-select');
+            select.innerHTML = '<option value="">Select User Account (Optional)</option>';
+            
+            if (data.users && data.users.length > 0) {
+                data.users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = `${user.username} (${user.email})`;
+                    select.appendChild(option);
+                });
+            } else {
+                select.innerHTML = '<option value="">No users found</option>';
+            }
+        }
+    } catch (error) {
+        console.error('Error searching users:', error);
+    }
+}
+
+// Load user mappings into the new table
+async function loadUserMappings() {
+    const tableBody = document.getElementById('mappings-table-body');
+    if (!tableBody) return;
+
+    tableBody.innerHTML = '<tr><td colspan="7" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></td></tr>';
+
+    try {
+        const response = await fetch('/patterson/api/user-mappings');
+        const data = await response.json();
+
+        if (data.success) {
+            tableBody.innerHTML = '';
+            if (data.mappings.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No user mappings found.</td></tr>';
+                return;
+            }
+
+            data.mappings.forEach(mapping => {
+                const row = document.createElement('tr');
+                row.dataset.mappingId = mapping.id;
+                row.innerHTML = `
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="/static/uploads/profile_pictures/${mapping.profile_picture || 'boy.png'}" 
+                                 alt="Avatar" 
+                                 class="user-avatar"
+                                 onerror="this.onerror=null;this.src='/static/images/PFP/boy.png';">
+                            <div>
+                                <span class="fw-bold">${mapping.name}</span>
+                                <small class="d-block text-muted">${mapping.email || 'No Email'}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-secondary">${mapping.freshworks_id}</span></td>
+                    <td>${mapping.email || 'N/A'}</td>
+                    <td><span class="badge bg-info">${mapping.role}</span></td>
+                    <td><span class="badge bg-primary">${mapping.ticket_count || 0}</span></td>
+                    <td>${mapping.last_seen ? new Date(mapping.last_seen).toLocaleDateString() : 'Never'}</td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-primary action-btn" onclick="editMapping(${mapping.id})"><i class="bi bi-pencil-fill"></i></button>
+                            <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteMapping(${mapping.id})"><i class="bi bi-trash-fill"></i></button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } else {
+            tableBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Error: ${data.error}</td></tr>`;
+        }
+    } catch (error) {
+        console.error('Error loading user mappings:', error);
+        tableBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Failed to load user mappings.</td></tr>';
+    }
+}
+
+// Dummy functions for edit/delete to be implemented
+function editMapping(id) {
+    console.log('Editing mapping:', id);
+    // You would typically open the form and populate it with data for this user
+    showUpdateIndicator(`Editing user ${id}...`, 'info');
+}
+
+function deleteMapping(id) {
+    console.log('Deleting mapping:', id);
+    if (confirm('Are you sure you want to delete this mapping?')) {
+        // Implement fetch to delete endpoint here
+        showUpdateIndicator(`Deleted user ${id}`, 'success');
+    }
+}
+
+// Add user mapping (Updated with form validation)
+async function addUserMapping(event) {
+    event.preventDefault();
+    
+    // Form validation
+    const form = event.target;
+    if (!form.checkValidity()) {
+        event.stopPropagation();
+        form.classList.add('was-validated');
+        return;
+    }
+    
+    const freshworksId = document.getElementById('unmapped-user-select').value;
+    const name = document.getElementById('user-name').value;
+    const email = document.getElementById('user-email').value;
+    const role = document.getElementById('user-role').value;
+    const region = document.getElementById('user-region').value;
+    const linkedUserId = document.getElementById('linked-user-select').value;
+    const autoVerify = document.getElementById('auto-verify').checked;
+    
+    if (!freshworksId || !name) {
+        showUpdateIndicator('Please fill in all required fields', 'error');
+        return;
+    }
+    
+    // Show loading state
+    const submitBtn = document.querySelector('#userMappingForm .btn-primary');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span class="loading-spinner me-2"></span>Saving...';
+    submitBtn.disabled = true;
+    
+    try {
+        const response = await fetch('/patterson/api/user-mappings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                freshworks_id: parseInt(freshworksId),
+                name: name,
+                email: email,
+                role: role,
+                region: region,
+                user_id: linkedUserId || null,
+                auto_verify: autoVerify
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Reset form
+            document.getElementById('userMappingForm').reset();
+            document.getElementById('auto-verify').checked = true;
+            form.classList.remove('was-validated');
+            
+            // Reload all data
+            loadMappingStatistics();
+            loadUnmappedUsers();
+            loadUserMappings();
+            
+            showUpdateIndicator('User mapping added successfully');
+        } else {
+            showUpdateIndicator('Failed to add mapping: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error adding user mapping:', error);
+        showUpdateIndicator('Error adding mapping. Please try again.', 'error');
+    } finally {
+        // Reset button state
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+}
+
+// Clear mapping form (Updated)
+function clearMappingForm() {
+    const form = document.getElementById('userMappingForm');
+    form.reset();
+    document.getElementById('auto-verify').checked = true;
+    form.classList.remove('was-validated');
+    
+    // Restore original button text and behavior
+    const submitBtn = form.querySelector('.btn-primary');
+    submitBtn.innerHTML = '<i class="bi bi-save-fill me-1"></i>Save Mapping';
+    
+    showUpdateIndicator('Form cleared', 'info');
+}
+
+// View user statistics
+async function viewUserStats(freshworksId) {
+    try {
+        const response = await fetch(`/patterson/api/user-stats/${freshworksId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const stats = data.stats;
+            const modal = new bootstrap.Modal(document.getElementById('ticketDetailsModal'));
+            
+            const statsHtml = `
+                <div class="user-stats-container">
+                    <h5 class="mb-4">
+                        <i class="bi bi-graph-up me-2"></i>
+                        Performance Statistics for ${stats.name}
+                    </h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="stat-card bg-primary text-white mb-3">
+                                <div class="stat-icon">
+                                    <i class="bi bi-ticket-detailed"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-number">${stats.total_tickets_handled}</div>
+                                    <div class="stat-label">Total Tickets</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stat-card bg-success text-white mb-3">
+                                <div class="stat-icon">
+                                    <i class="bi bi-check-circle"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-number">${stats.success_rate?.toFixed(1) || 0}%</div>
+                                    <div class="stat-label">Success Rate</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="stat-card bg-info text-white mb-3">
+                                <div class="stat-icon">
+                                    <i class="bi bi-clock"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-number">${stats.average_resolution_time?.toFixed(1) || 0}h</div>
+                                    <div class="stat-label">Avg Resolution Time</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stat-card bg-warning text-dark mb-3">
+                                <div class="stat-icon">
+                                    <i class="bi bi-calendar-week"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-number">${stats.tickets_this_week}</div>
+                                    <div class="stat-label">This Week</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h6>Recent Activity</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Tickets</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${stats.recent_activity?.map(activity => `
+                                        <tr>
+                                            <td>${activity.date}</td>
+                                            <td>${activity.ticket_count}</td>
+                                            <td><span class="badge bg-${activity.status_color}">${activity.status}</span></td>
+                                        </tr>
+                                    `).join('') || '<tr><td colspan="3" class="text-center text-muted">No recent activity</td></tr>'}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('ticket-details-content').innerHTML = statsHtml;
+            modal.show();
+        }
+    } catch (error) {
+        console.error('Error loading user stats:', error);
+        showUpdateIndicator('Error loading user statistics', 'error');
+    }
+}
+
+// Update all statistics
+async function updateAllStats() {
+    try {
+        const response = await fetch('/patterson/api/update-all-stats', {
+            method: 'POST'
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            loadUserMappings();
+            showUpdateIndicator('Statistics updated successfully');
+        } else {
+            showUpdateIndicator('Failed to update statistics: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error updating statistics:', error);
+        showUpdateIndicator('Error updating statistics', 'error');
+    }
+}
+
+// Delete user mapping
+async function deleteUserMapping(freshworksId) {
+    if (!confirm('Are you sure you want to delete this user mapping? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/patterson/api/user-mappings/${freshworksId}`, {
+            method: 'DELETE'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Reload all data
+            loadMappingStatistics();
+            loadUnmappedUsers();
+            loadUserMappings();
+            
+            showUpdateIndicator('User mapping deleted successfully');
+        } else {
+            showUpdateIndicator('Failed to delete mapping: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting user mapping:', error);
+        showUpdateIndicator('Error deleting mapping. Please try again.', 'error');
+    }
+}
+
+// Edit user mapping
+async function editUserMapping(freshworksId) {
+    try {
+        const response = await fetch(`/patterson/api/user-mappings/${freshworksId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const mapping = data.mapping;
+            
+            // Pre-fill the form for editing
+            document.getElementById('unmapped-user-select').value = mapping.freshworks_id;
+            document.getElementById('user-name').value = mapping.name;
+            document.getElementById('user-email').value = mapping.email || '';
+            document.getElementById('user-role').value = mapping.role || 'technician';
+            document.getElementById('user-region').value = mapping.region || '';
+            
+            // Change button text
+            const btnText = document.getElementById('add-mapping-btn-text');
+            btnText.innerHTML = '<i class="bi bi-check-circle me-1"></i>Update Mapping';
+            
+            // Change form action
+            document.getElementById('userMappingForm').onsubmit = updateUserMapping;
+            
+            showUpdateIndicator('Form loaded for editing. Update the fields and click Update Mapping.', 'info');
+        }
+    } catch (error) {
+        console.error('Error loading mapping for edit:', error);
+        showUpdateIndicator('Error loading mapping details', 'error');
+    }
+}
+
+// Update user mapping
+async function updateUserMapping(event) {
+    event.preventDefault();
+    
+    const freshworksId = document.getElementById('unmapped-user-select').value;
+    const name = document.getElementById('user-name').value;
+    const email = document.getElementById('user-email').value;
+    const role = document.getElementById('user-role').value;
+    const region = document.getElementById('user-region').value;
+    
+    if (!freshworksId || !name) {
+        showUpdateIndicator('Please fill in all required fields', 'error');
+        return;
+    }
+    
+    // Show loading state
+    const submitBtn = document.querySelector('#userMappingForm .btn-primary');
+    const btnText = document.getElementById('add-mapping-btn-text');
+    const btnSpinner = document.getElementById('add-mapping-btn-spinner');
+    
+    btnText.style.display = 'none';
+    btnSpinner.style.display = 'inline-block';
+    submitBtn.disabled = true;
+    
+    try {
+        const response = await fetch(`/patterson/api/user-mappings/${freshworksId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                role: role,
+                region: region
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Reset form and restore original behavior
+            clearMappingForm();
+            
+            // Reload all data
+            loadMappingStatistics();
+            loadUnmappedUsers();
+            loadUserMappings();
+            
+            showUpdateIndicator('User mapping updated successfully');
+        } else {
+            showUpdateIndicator('Failed to update mapping: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error updating user mapping:', error);
+        showUpdateIndicator('Error updating mapping. Please try again.', 'error');
+    } finally {
+        // Reset button state
+        btnText.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+        submitBtn.disabled = false;
+    }
+}
+
+// View user tickets
+async function viewUserTickets(freshworksId) {
+    try {
+        const response = await fetch(`/patterson/api/user-tickets/${freshworksId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            // Create a modal to show the tickets
+            const tickets = data.tickets;
+            let ticketsHtml = '';
+            
+            if (tickets.length === 0) {
+                ticketsHtml = '<p class="text-muted">No tickets found for this user.</p>';
+            } else {
+                tickets.forEach(ticket => {
+                    ticketsHtml += `
+                        <div class="ticket-item mb-3 p-3 border rounded">
+                            <h6>${ticket.ticket_number}</h6>
+                            <p class="mb-1">${ticket.title}</p>
+                            <small class="text-muted">
+                                Status: ${ticket.status} | Date: ${ticket.scheduled_date || 'Not scheduled'}
+                            </small>
+                        </div>
+                    `;
+                });
+            }
+            
+            // Show in a simple alert for now (could be enhanced with a proper modal)
+            const modal = new bootstrap.Modal(document.getElementById('ticketDetailsModal'));
+            document.getElementById('ticket-details-content').innerHTML = ticketsHtml;
+            modal.show();
+        }
+    } catch (error) {
+        console.error('Error loading user tickets:', error);
+        showUpdateIndicator('Error loading user tickets', 'error');
+    }
+}
+
+// Export mappings
+function exportMappings() {
+    // This would trigger a download of the mappings as JSON/CSV
+    showUpdateIndicator('Export feature coming soon!', 'info');
+}
+
+// Import mappings
+function importMappings() {
+    document.getElementById('mappings-import-file').click();
+}
+
+// Handle mappings import
+function handleMappingsImport(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const mappings = JSON.parse(e.target.result);
+            // Process the imported mappings
+            showUpdateIndicator(`Imported ${mappings.length} mappings`, 'success');
+        } catch (error) {
+            showUpdateIndicator('Invalid file format', 'error');
+        }
+    };
+    reader.readAsText(file);
+    
+    // Clear the input
+    input.value = '';
+}
+
+function showToast(message, type = 'success') {
+    const toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+        console.error("Toast container not found!");
+        return;
+    }
+    const toastId = 'toast-' + Date.now();
+    const bgClass = type === 'danger' ? 'bg-danger' : 'bg-success';
+    const toastHtml = `
+        <div id="${toastId}" class="toast align-items-center text-white ${bgClass}" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    `;
+    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+    const toastEl = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+    toast.show();
+    toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+}
+
+// Enhanced viewport management for full-screen modal
+function initializeModalViewport() {
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden';
+    
+    // Ensure modal takes full viewport
+    const modal = document.getElementById('userMappingModal');
+    if (modal) {
+        modal.style.height = '100vh';
+        modal.style.width = '100vw';
+    }
+    
+    // Optimize content layout
+    const contentArea = modal.querySelector('.main-content-area-compact');
+    if (contentArea) {
+        const viewportHeight = window.innerHeight;
+        const headerHeight = modal.querySelector('.user-mapping-modal__header').offsetHeight;
+        const statsHeight = modal.querySelector('.stats-dashboard-compact').offsetHeight;
+        const tabsHeight = modal.querySelector('.modern-tab-navigation-compact').offsetHeight;
+        const footerHeight = modal.querySelector('.user-mapping-modal__footer').offsetHeight;
+        
+        const availableHeight = viewportHeight - headerHeight - statsHeight - tabsHeight - footerHeight - 100; // 100px for padding/margins
+        contentArea.style.maxHeight = `${availableHeight}px`;
+    }
+}
+
+function resetModalViewport() {
+    // Restore body scroll
+    document.body.style.overflow = '';
+}
+
+// Enhanced keyboard shortcuts for modal
+function handleModalKeyboardShortcuts(event) {
+    // Escape key to close modal
+    if (event.key === 'Escape') {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('userMappingModal'));
+        if (modal) {
+            modal.hide();
+        }
+    }
+    
+    // Tab navigation shortcuts
+    if (event.ctrlKey || event.metaKey) {
+        switch(event.key) {
+            case '1':
+                event.preventDefault();
+                switchUserMappingView('edit');
+                break;
+            case '2':
+                event.preventDefault();
+                switchUserMappingView('mapped');
+                break;
+            case '3':
+                event.preventDefault();
+                switchUserMappingView('unmapped');
+                break;
+            case 'r':
+                event.preventDefault();
+                refreshMappingData();
+                break;
+        }
+    }
+}
+
+// Enhanced field validation
+function validateField(field) {
+    const value = field.value.trim();
+    const fieldName = field.name || field.id;
+    
+    // Remove existing validation classes
+    field.classList.remove('is-valid', 'is-invalid');
+    
+    // Validate based on field type
+    let isValid = true;
+    let errorMessage = '';
+    
+    if (field.hasAttribute('required') && !value) {
+        isValid = false;
+        errorMessage = `${fieldName.replace(/([A-Z])/g, ' $1').toLowerCase()} is required`;
+    } else if (field.type === 'email' && value && !isValidEmail(value)) {
+        isValid = false;
+        errorMessage = 'Please enter a valid email address';
+    } else if (fieldName === 'user-name' && value && value.length < 2) {
+        isValid = false;
+        errorMessage = 'Display name must be at least 2 characters';
+    }
+    
+    // Apply validation classes
+    if (isValid && value) {
+        field.classList.add('is-valid');
+        field.classList.remove('is-invalid');
+    } else if (!isValid) {
+        field.classList.add('is-invalid');
+        field.classList.remove('is-valid');
+    }
+    
+    // Update validation message
+    const feedbackElement = field.parentElement.querySelector('.invalid-feedback');
+    if (feedbackElement) {
+        feedbackElement.textContent = errorMessage;
+    }
+    
+    return isValid;
+}
+
+// Enhanced form validation
+function validateForm() {
+    const form = document.getElementById('userMappingForm');
+    const fields = form.querySelectorAll('.form-control, .form-select');
+    let isValid = true;
+    
+    fields.forEach(field => {
+        if (!validateField(field)) {
+            isValid = false;
+        }
+    });
+    
+    return isValid;
+}
+
+// Enhanced form submission
+async function submitMappingForm() {
+    const form = document.getElementById('userMappingForm');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    try {
+        // Show loading state
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Saving...';
+        submitBtn.disabled = true;
+        
+        // Collect form data
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        
+        // Submit to API
+        const response = await fetch('/patterson/api/user-mappings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showSuccessMessage('User mapping saved successfully!');
+            form.reset();
+            refreshMappingData();
+        } else {
+            showErrorMessage(result.error || 'Failed to save mapping');
+        }
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        showErrorMessage('Network error occurred');
+    } finally {
+        // Restore button state
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+}
+
+// Enhanced form validation error display
+function showFormValidationErrors() {
+    const invalidFields = document.querySelectorAll('.is-invalid');
+    if (invalidFields.length > 0) {
+        // Scroll to first invalid field
+        invalidFields[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Show error message
+        showErrorMessage(`Please fix ${invalidFields.length} validation error${invalidFields.length > 1 ? 's' : ''}`);
+    }
+}
+
+// Enhanced success/error message display
+function showSuccessMessage(message) {
+    const indicator = document.getElementById('update-indicator');
+    if (indicator) {
+        indicator.className = 'update-indicator success';
+        indicator.querySelector('#update-message').textContent = message;
+        indicator.style.display = 'flex';
+        
+        setTimeout(() => {
+            indicator.style.display = 'none';
+        }, 3000);
+    }
+}
+
+function showErrorMessage(message) {
+    const indicator = document.getElementById('update-indicator');
+    if (indicator) {
+        indicator.className = 'update-indicator error';
+        indicator.querySelector('#update-message').textContent = message;
+        indicator.style.display = 'flex';
+        
+        setTimeout(() => {
+            indicator.style.display = 'none';
+        }, 5000);
+    }
+}
+
+// Utility function for email validation
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// Enhanced unmapped user options loading
+async function loadUnmappedUserOptions() {
+    try {
+        console.log('Loading unmapped user options...');
+        const response = await fetch('/patterson/api/unmapped-users');
+        const data = await response.json();
+        
+        console.log('Unmapped users API response:', data);
+        
+        if (data.success) {
+            const select = document.getElementById('unmapped-user-select');
+            if (!select) {
+                console.error('unmapped-user-select not found');
+                return;
+            }
+            
+            select.innerHTML = '<option value="">Select Unmapped User ID</option>';
+            
+            if (data.users && data.users.length > 0) {
+                console.log(`Adding ${data.users.length} unmapped users to dropdown`);
+                data.users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = `${user.id} - ${user.name || 'Unknown'}`;
+                    select.appendChild(option);
+                });
+            } else {
+                console.log('No unmapped users found');
+            }
+        } else {
+            console.error('Failed to load unmapped users:', data.error);
+        }
+    } catch (error) {
+        console.error('Error loading unmapped user options:', error);
+    }
+}
+</script> 

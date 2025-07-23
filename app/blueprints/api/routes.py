@@ -785,11 +785,12 @@ def upload_profile_picture():
     if file and allowed_file(file.filename):
         filename = secure_filename(f"{current_user.id}_{file.filename}")
 
-        # Ensure the uploads directory exists (config value mirrors legacy path)
-        upload_dir = current_app.config.get('UPLOAD_FOLDER', 'uploads')
-        os.makedirs(upload_dir, exist_ok=True)
+        # Ensure the profile pictures directory exists
+        upload_dir = current_app.config.get('UPLOAD_FOLDER', 'static/uploads')
+        profile_pictures_dir = os.path.join(upload_dir, 'profile_pictures')
+        os.makedirs(profile_pictures_dir, exist_ok=True)
 
-        filepath = os.path.join(upload_dir, filename)
+        filepath = os.path.join(profile_pictures_dir, filename)
         file.save(filepath)
 
         # Persist on the user record
@@ -2482,7 +2483,6 @@ def service_worker():
         return send_from_directory('static', 'sw.js', mimetype='application/javascript')
     except Exception as e:
         logger.error(f"Error serving service worker: {e}")
-<<<<<<< HEAD
         return '', 404
 
 @bp.route('/active-users', methods=['GET'])
@@ -2867,6 +2867,3 @@ def get_user_profile(username):
             'error': 'Failed to get user profile',
             'message': str(e)
         }), 500
-=======
-        return '', 404
->>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909

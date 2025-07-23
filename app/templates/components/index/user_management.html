@@ -1,0 +1,1536 @@
+{% macro render_user_management(current_user) %}
+<div class="user-management-section">
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="management-card fade-in" style="animation-delay: 0.4s;">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="bi bi-people-fill text-primary"></i>
+                        Team Members
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-sm btn-outline-light refresh-btn" id="reloadUsersBtn" title="Refresh">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                        {% if current_user.role == 'admin' %}
+                        <button class="btn btn-sm btn-outline-light cleanup-btn" onclick="teamMembersManager.triggerManualCleanup()" title="Cleanup">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="scrollable-container">
+                        <div id="teamMembersList" class="users-list">
+                            <!-- Loading state -->
+                            <div class="loading-state">
+                                <i class="bi bi-people"></i>
+                                <div>Loading team members...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-background"></div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+            <div class="management-card fade-in" style="animation-delay: 0.5s;">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="bi bi-clock-history text-info"></i>
+                        Recent Activity
+                        {% if current_user.role == 'admin' %}
+                        <span class="activity-badge" id="activityCount">0</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-sm btn-outline-light refresh-btn" onclick="activityManager.refreshActivity()" title="Refresh">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                        {% if current_user.role == 'admin' %}
+                        <button class="btn btn-sm btn-outline-light filter-btn" onclick="activityManager.toggleFilters()" title="Filters">
+                            <i class="bi bi-funnel"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="scrollable-container">
+                        <div id="recentActivity" class="activity-list">
+                            <!-- Activity will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="card-background"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userDetailsModalLabel">User Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="userDetailsContent">
+                    <!-- User details will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Activity Filters Modal (Admin Only) -->
+{% if current_user.role == 'admin' %}
+<div class="modal fade" id="activityFiltersModal" tabindex="-1" aria-labelledby="activityFiltersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="activityFiltersModalLabel">Activity Filters</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="activityFiltersForm">
+                    <div class="form-group mb-3">
+                        <label for="activityUserFilter" class="form-label">Filter by User</label>
+                        <select class="form-control" id="activityUserFilter">
+                            <option value="">All Users</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="activityTypeFilter" class="form-label">Filter by Action Type</label>
+                        <select class="form-control" id="activityTypeFilter">
+                            <option value="">All Actions</option>
+                            <option value="page_view">Page Views</option>
+                            <option value="outage_created">Outage Created</option>
+                            <option value="outage_resolved">Outage Resolved</option>
+                            <option value="outage_deleted">Outage Deleted</option>
+                            <option value="login">Login</option>
+                            <option value="logout">Logout</option>
+                            <option value="search">Search</option>
+                            <option value="file_upload">File Upload</option>
+                            <option value="settings_changed">Settings Changed</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="activityTimeFilter" class="form-label">Time Range</label>
+                        <select class="form-control" id="activityTimeFilter">
+                            <option value="1">Last Hour</option>
+                            <option value="24" selected>Last 24 Hours</option>
+                            <option value="168">Last Week</option>
+                            <option value="720">Last Month</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="activityManager.applyFilters()">Apply Filters</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+.user-management-section {
+    margin-bottom: 2.5rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.management-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.management-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.management-card:hover::before {
+    opacity: 1;
+}
+
+.management-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.card-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.management-card:hover .card-background {
+    opacity: 1;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 2rem 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.card-title i {
+    font-size: 1.4rem;
+}
+
+.activity-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+}
+
+.card-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.refresh-btn, .cleanup-btn, .filter-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.refresh-btn:hover, .cleanup-btn:hover, .filter-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transform: scale(1.1);
+}
+
+.refresh-btn:active, .cleanup-btn:active, .filter-btn:active {
+    transform: scale(0.95);
+}
+
+.refresh-btn i, .cleanup-btn i, .filter-btn i {
+    font-size: 1rem;
+}
+
+.card-content {
+    padding: 1.5rem 2rem 2rem 2rem;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.scrollable-container {
+    max-height: 450px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.scrollable-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.scrollable-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scrollable-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.scrollable-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.users-list, .activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.user-item, .activity-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    z-index: 10 !important;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+}
+
+.user-item::before, .activity-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #667eea, #764ba2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.user-item:hover::before, .activity-item:hover::before {
+    opacity: 1;
+}
+
+.user-item:hover, .activity-item:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    transform: translateX(8px) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+}
+
+.user-item:active, .activity-item:active {
+    transform: translateX(4px) scale(0.98) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.user-info, .activity-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.user-avatar, .activity-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.user-avatar img, .activity-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.user-avatar.online::after, .activity-avatar.online::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background: #4caf50;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+.user-avatar.offline::after, .activity-avatar.offline::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background: #f44336;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-details, .activity-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.user-name, .activity-user {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.25rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.user-status, .activity-action {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.user-time, .activity-time {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 0.5rem;
+}
+
+.user-role-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.user-role-badge.admin {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+}
+
+.user-role-badge.dev {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+}
+
+.user-role-badge.user {
+    background: rgba(33, 150, 243, 0.2);
+    color: #2196f3;
+}
+
+/* Loading and empty states */
+.loading-state, .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.loading-state i, .empty-state i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* User Details Modal Styles */
+.user-details-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    color: #fff;
+}
+
+.user-profile-section {
+    text-align: center;
+}
+
+.user-profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 600;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.user-profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.user-profile-avatar.online::after {
+    content: '';
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    background: #4caf50;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);
+}
+
+.user-stats-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.user-info-section {
+    grid-column: 1 / -1;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.info-value {
+    color: #fff;
+}
+
+/* Enhanced Modal Styles - Fixed Z-Index and Positioning */
+.modal {
+    z-index: 99999 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+.modal-backdrop {
+    z-index: 99998 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+.modal-dialog {
+    z-index: 100000 !important;
+    position: relative !important;
+    margin: 0 !important;
+    max-width: 90vw !important;
+    max-height: 90vh !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+.modal-content {
+    background: rgba(30, 30, 30, 0.98) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 20px !important;
+    color: #fff !important;
+    z-index: 100001 !important;
+    position: relative !important;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6) !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 1.5rem 2rem !important;
+    z-index: 100002 !important;
+    position: relative !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+.modal-title {
+    font-weight: 700 !important;
+    font-size: 1.3rem !important;
+    z-index: 100002 !important;
+    position: relative !important;
+    color: #fff !important;
+}
+
+.modal-body {
+    padding: 2rem !important;
+    z-index: 100002 !important;
+    position: relative !important;
+    background: transparent !important;
+    overflow-y: auto !important;
+    max-height: calc(90vh - 120px) !important;
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 1.5rem 2rem !important;
+    z-index: 100002 !important;
+    position: relative !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+/* Ensure modal close button is clickable */
+.btn-close {
+    z-index: 100003 !important;
+    position: relative !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 50% !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-close:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    transform: scale(1.1) !important;
+}
+
+.btn-close::before,
+.btn-close::after {
+    content: '' !important;
+    position: absolute !important;
+    width: 16px !important;
+    height: 2px !important;
+    background: #fff !important;
+    border-radius: 1px !important;
+}
+
+.btn-close::before {
+    transform: rotate(45deg) !important;
+}
+
+.btn-close::after {
+    transform: rotate(-45deg) !important;
+}
+
+.form-label {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #667eea;
+    color: #fff;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* Enhanced responsive design */
+@media (max-width: 1200px) {
+    .user-info, .activity-info {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: center;
+    }
+    
+    .user-avatar, .activity-avatar {
+        align-self: center;
+    }
+    
+    .user-details-content {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .card-title {
+        font-size: 1.2rem;
+    }
+    
+    .card-content {
+        padding: 1rem 1.5rem 1.5rem 1.5rem;
+    }
+    
+    .user-item, .activity-item {
+        padding: 1.25rem;
+    }
+    
+    .user-info, .activity-info {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: center;
+    }
+    
+    .user-avatar, .activity-avatar {
+        align-self: center;
+    }
+    
+    .user-stats-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-content {
+        padding: 1rem;
+    }
+    
+    .user-item, .activity-item {
+        padding: 1rem;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .user-name, .activity-user {
+        font-size: 1rem;
+    }
+    
+    .user-status, .activity-action {
+        font-size: 0.85rem;
+    }
+    
+    .user-time, .activity-time {
+        font-size: 0.75rem;
+    }
+}
+
+/* Animation classes */
+.fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Real-time update animations */
+.user-item.updating, .activity-item.updating {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.user-item.adding, .activity-item.adding {
+    animation: slideIn 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-100%);
+        height: 0;
+        margin: 0;
+        padding: 0;
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+        height: auto;
+        margin: 0 0 1rem 0;
+        padding: 1.5rem;
+    }
+}
+</style>
+
+<script>
+// Enhanced Team Members Management with Stable Updates
+class TeamMembersManager {
+    constructor() {
+        this.teamMembers = [];
+        this.socket = null;
+        this.isInitialized = false;
+        this.isLoading = false;
+        this.lastUpdate = 0;
+        this.updateInterval = null;
+        
+        this.init();
+    }
+    
+    init() {
+        this.loadTeamMembers();
+        this.setupSocketListeners();
+        this.setupEventHandlers();
+        this.setupPeriodicRefresh();
+    }
+    
+    async loadTeamMembers() {
+        if (this.isLoading) return; // Prevent multiple simultaneous requests
+        
+        this.isLoading = true;
+        this.showLoadingState();
+        
+        try {
+            const response = await fetch('/api/admin/users/online');
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
+            const users = await response.json();
+            this.teamMembers = users || [];
+            this.updateTeamMembersList();
+            this.lastUpdate = Date.now();
+            
+        } catch (error) {
+            console.error('Error loading team members:', error);
+            this.showError('Failed to load team members.');
+        } finally {
+            this.isLoading = false;
+        }
+    }
+    
+    updateTeamMembersList() {
+        const container = document.getElementById('teamMembersList');
+        if (!container) return;
+        
+        if (!this.teamMembers || this.teamMembers.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-people"></i>
+                    <div>No team members online</div>
+                    <small>Check back later</small>
+                </div>
+            `;
+            return;
+        }
+        
+        // Sort users: online first, then by name
+        const sortedUsers = [...this.teamMembers].sort((a, b) => {
+            if (a.is_online !== b.is_online) return b.is_online - a.is_online;
+            return (a.name || a.username || '').localeCompare(b.name || b.username || '');
+        });
+        
+        container.innerHTML = sortedUsers.map(user => this.renderUserItem(user)).join('');
+        
+        // Add click handlers to user items
+        this.addUserClickHandlers();
+    }
+    
+    renderUserItem(user) {
+        const status = user.is_online ? 'online' : 'offline';
+        const statusText = user.is_online ? 'Online' : 'Offline';
+        const lastSeen = user.last_seen ? this.formatTimestamp(user.last_seen) : 'Unknown';
+        const roleClass = user.role || 'user';
+        
+        return `
+            <div class="user-item" data-user-id="${user.id}" data-user-data='${JSON.stringify(user)}'>
+                <div class="user-info">
+                    <div class="user-avatar ${status}">
+                        ${user.profile_picture ? 
+                            `<img src="/static/uploads/profile_pictures/${user.profile_picture}" alt="${user.name || user.username}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` :
+                            ''
+                        }
+                        <span style="${user.profile_picture ? 'display: none;' : ''}">${(user.name || user.username || 'U').charAt(0).toUpperCase()}</span>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">
+                            ${this.escapeHtml(user.name || user.username || 'Unknown User')}
+                            <span class="user-role-badge ${roleClass}">${user.role || 'user'}</span>
+                        </div>
+                        <div class="user-status">${statusText}</div>
+                        <div class="user-time">Last seen: ${lastSeen}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    addUserClickHandlers() {
+        const userItems = document.querySelectorAll('.user-item[data-user-id]');
+        console.log('Found user items:', userItems.length);
+        userItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                console.log('User item clicked:', e.target);
+                const userId = item.getAttribute('data-user-id');
+                const userData = JSON.parse(item.getAttribute('data-user-data'));
+                console.log('User data:', userData);
+                this.showUserDetails(userData);
+            });
+        });
+    }
+    
+    async showUserDetails(user) {
+        console.log('showUserDetails called with user:', user);
+        try {
+            // Load additional user statistics
+            const response = await fetch(`/api/admin/users/${user.id}/stats`);
+            const stats = response.ok ? await response.json() : {};
+            
+            const modalElement = document.getElementById('userDetailsModal');
+            const content = document.getElementById('userDetailsContent');
+            
+            // Ensure modal element has proper z-index and positioning
+            modalElement.style.zIndex = '99999';
+            modalElement.style.position = 'fixed';
+            modalElement.style.top = '0';
+            modalElement.style.left = '0';
+            modalElement.style.width = '100vw';
+            modalElement.style.height = '100vh';
+            modalElement.style.display = 'flex';
+            modalElement.style.alignItems = 'center';
+            modalElement.style.justifyContent = 'center';
+            modalElement.style.background = 'rgba(0, 0, 0, 0.5)';
+            modalElement.style.backdropFilter = 'blur(8px)';
+            modalElement.style.pointerEvents = 'auto';
+            
+            // Ensure modal content is properly positioned
+            const modalContent = modalElement.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.style.zIndex = '100001';
+                modalContent.style.position = 'relative';
+                modalContent.style.maxWidth = '90vw';
+                modalContent.style.maxHeight = '90vh';
+                modalContent.style.overflow = 'auto';
+            }
+            
+            // Ensure close button is clickable
+            const closeBtn = modalElement.querySelector('.btn-close');
+            if (closeBtn) {
+                closeBtn.style.zIndex = '100003';
+                closeBtn.style.position = 'relative';
+                closeBtn.style.pointerEvents = 'auto';
+            }
+            
+            content.innerHTML = this.renderUserDetails(user, stats);
+            
+            // Show modal using Bootstrap
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            } else {
+                // Fallback: show modal manually
+                modalElement.style.display = 'flex';
+                modalElement.classList.add('show');
+                console.log('Modal shown manually (Bootstrap not available)');
+            }
+            
+            // Add body class to prevent background scrolling
+            document.body.classList.add('modal-open');
+            
+        } catch (error) {
+            console.error('Error loading user details:', error);
+            // Show basic details without stats
+            const modalElement = document.getElementById('userDetailsModal');
+            const content = document.getElementById('userDetailsContent');
+            
+            // Apply same positioning fixes
+            modalElement.style.zIndex = '99999';
+            modalElement.style.position = 'fixed';
+            modalElement.style.top = '0';
+            modalElement.style.left = '0';
+            modalElement.style.width = '100vw';
+            modalElement.style.height = '100vh';
+            modalElement.style.display = 'flex';
+            modalElement.style.alignItems = 'center';
+            modalElement.style.justifyContent = 'center';
+            modalElement.style.background = 'rgba(0, 0, 0, 0.5)';
+            modalElement.style.backdropFilter = 'blur(8px)';
+            modalElement.style.pointerEvents = 'auto';
+            
+            content.innerHTML = this.renderUserDetails(user, {});
+            
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            } else {
+                // Fallback: show modal manually
+                modalElement.style.display = 'flex';
+                modalElement.classList.add('show');
+                console.log('Modal shown manually (Bootstrap not available)');
+            }
+            
+            document.body.classList.add('modal-open');
+        }
+    }
+    
+    renderUserDetails(user, stats) {
+        const status = user.is_online ? 'online' : 'offline';
+        const statusText = user.is_online ? 'Online' : 'Offline';
+        
+        return `
+            <div class="user-details-content">
+                <div class="user-profile-section">
+                    <div class="user-profile-avatar ${status}">
+                        ${user.profile_picture ? 
+                            `<img src="/static/uploads/profile_pictures/${user.profile_picture}" alt="${user.name || user.username}">` :
+                            (user.name || user.username || 'U').charAt(0).toUpperCase()
+                        }
+                    </div>
+                    <h4>${this.escapeHtml(user.name || user.username || 'Unknown User')}</h4>
+                    <p class="text-muted">${statusText}</p>
+                </div>
+                
+                <div class="user-stats-section">
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.tickets_created || 0}</div>
+                        <div class="stat-label">Tickets Created</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.tickets_resolved || 0}</div>
+                        <div class="stat-label">Tickets Resolved</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.login_count || 0}</div>
+                        <div class="stat-label">Login Count</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.last_login_days || 'N/A'}</div>
+                        <div class="stat-label">Days Since Last Login</div>
+                    </div>
+                </div>
+                
+                <div class="user-info-section">
+                    <div class="info-row">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">${this.escapeHtml(user.email || 'N/A')}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Role:</span>
+                        <span class="info-value">${user.role || 'user'}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Last Seen:</span>
+                        <span class="info-value">${this.formatTimestamp(user.last_seen)}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Account Created:</span>
+                        <span class="info-value">${this.formatDate(user.created_at)}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    async triggerManualCleanup() {
+        if (!confirm('Are you sure you want to trigger manual cleanup?')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/admin/users/cleanup', {
+                method: 'POST'
+            });
+            
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
+            this.showToast('Manual cleanup triggered successfully', 'success');
+            this.loadTeamMembers(); // Refresh the list
+            
+        } catch (error) {
+            console.error('Error triggering cleanup:', error);
+            this.showToast('Error triggering cleanup', 'error');
+        }
+    }
+    
+    // Socket event handlers
+    setupSocketListeners() {
+        if (window.socketState && window.socketState.socket) {
+            this.socket = window.socketState.socket;
+            
+            this.socket.on('online_users_update', (users) => {
+                this.teamMembers = users || [];
+                this.updateTeamMembersList();
+            });
+            
+            this.socket.on('user_status_change', (userData) => {
+                this.updateUserStatus(userData);
+            });
+        }
+    }
+    
+    updateUserStatus(userData) {
+        const userIndex = this.teamMembers.findIndex(u => u.id === userData.id);
+        if (userIndex !== -1) {
+            this.teamMembers[userIndex] = { ...this.teamMembers[userIndex], ...userData };
+        } else if (userData.is_online) {
+            this.teamMembers.unshift(userData);
+        }
+        this.updateTeamMembersList();
+    }
+    
+    // Event handlers
+    setupEventHandlers() {
+        const reloadBtn = document.getElementById('reloadUsersBtn');
+        if (reloadBtn) {
+            reloadBtn.addEventListener('click', () => {
+                this.loadTeamMembers();
+                this.showToast('Team members refreshed', 'info');
+            });
+        }
+        
+        // Set up modal close event handlers
+        this.setupModalCloseHandlers();
+    }
+    
+    setupModalCloseHandlers() {
+        const userDetailsModal = document.getElementById('userDetailsModal');
+        if (userDetailsModal) {
+            // Listen for modal hidden event
+            userDetailsModal.addEventListener('hidden.bs.modal', () => {
+                document.body.classList.remove('modal-open');
+            });
+            
+            // Ensure close button works properly
+            const closeBtn = userDetailsModal.querySelector('.btn-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    document.body.classList.remove('modal-open');
+                });
+            }
+            
+            // Close modal when clicking outside
+            userDetailsModal.addEventListener('click', (e) => {
+                if (e.target === userDetailsModal) {
+                    const modal = bootstrap.Modal.getInstance(userDetailsModal);
+                    if (modal) {
+                        modal.hide();
+                    }
+                    document.body.classList.remove('modal-open');
+                }
+            });
+        }
+    }
+    
+    // Periodic refresh with debouncing
+    setupPeriodicRefresh() {
+        this.updateInterval = setInterval(() => {
+            // Only refresh if it's been more than 30 seconds since last update
+            if (Date.now() - this.lastUpdate > 30000) {
+                this.loadTeamMembers();
+            }
+        }, 30000); // Check every 30 seconds
+    }
+    
+    // Loading and error states
+    showLoadingState() {
+        const container = document.getElementById('teamMembersList');
+        if (container) {
+            container.innerHTML = `
+                <div class="loading-state">
+                    <i class="bi bi-people"></i>
+                    <div>Loading team members...</div>
+                </div>
+            `;
+        }
+    }
+    
+    showError(message) {
+        const container = document.getElementById('teamMembersList');
+        if (container) {
+            container.innerHTML = `
+                <div class="loading-state">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <div>${message}</div>
+                </div>
+            `;
+        }
+    }
+    
+    // Utility methods
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    formatTimestamp(timestamp) {
+        if (!timestamp) return 'Unknown';
+        
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diff = now - date;
+        
+        if (diff < 60000) return 'Just now';
+        if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+        if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+        return date.toLocaleDateString();
+    }
+    
+    formatDate(timestamp) {
+        if (!timestamp) return 'Unknown';
+        return new Date(timestamp).toLocaleDateString();
+    }
+    
+    showToast(message, type = 'info') {
+        if (typeof showToast === 'function') {
+            showToast(message, type);
+        } else {
+            console.log(`${type.toUpperCase()}: ${message}`);
+        }
+    }
+    
+    destroy() {
+        if (this.updateInterval) {
+            clearInterval(this.updateInterval);
+        }
+        
+        if (this.socket) {
+            this.socket.off('online_users_update');
+            this.socket.off('user_status_change');
+        }
+    }
+}
+
+// Enhanced Activity Management with Comprehensive Tracking
+class ActivityManager {
+    constructor() {
+        this.activities = [];
+        this.filters = {
+            user: '',
+            action: '',
+            timeRange: '24'
+        };
+        this.socket = null;
+        this.isInitialized = false;
+        
+        this.init();
+    }
+    
+    init() {
+        this.loadActivities();
+        this.setupSocketListeners();
+        this.setupEventHandlers();
+        this.setupPeriodicRefresh();
+    }
+    
+    async loadActivities() {
+        try {
+            let url = '/api/admin/activity';
+            const params = new URLSearchParams();
+            
+            if (this.filters.user) params.append('user', this.filters.user);
+            if (this.filters.action) params.append('action', this.filters.action);
+            if (this.filters.timeRange) params.append('hours', this.filters.timeRange);
+            
+            if (params.toString()) {
+                url += '?' + params.toString();
+            }
+            
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
+            const activities = await response.json();
+            this.activities = activities || [];
+            this.updateActivityList();
+            this.updateActivityCount();
+        } catch (error) {
+            console.error('Error loading activities:', error);
+            this.showError('Failed to load activity data.');
+        }
+    }
+    
+    updateActivityList() {
+        const container = document.getElementById('recentActivity');
+        if (!container) return;
+        
+        if (!this.activities || this.activities.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-clock-history"></i>
+                    <div>No recent activity</div>
+                    <small>Activity will appear here</small>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = this.activities.map(activity => this.renderActivityItem(activity)).join('');
+    }
+    
+    renderActivityItem(activity) {
+        const actionType = activity.type || activity.action || 'unknown';
+        const description = activity.description || 'No description available';
+        const timestamp = activity.timestamp || new Date().toISOString();
+        const user = activity.user || { name: 'Unknown User', profile_picture: 'default.png' };
+        
+        return `
+            <div class="activity-item" data-activity-id="${activity.id || Date.now()}">
+                <div class="activity-info">
+                    <div class="activity-avatar">
+                        <img src="/static/images/${user.profile_picture}" alt="${user.name}" 
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <span style="display: none;">${user.name.charAt(0).toUpperCase()}</span>
+                    </div>
+                    <div class="activity-details">
+                        <div class="activity-user">
+                            ${this.escapeHtml(user.name)}
+                            <span class="activity-type-badge ${actionType}">${this.formatActionType(actionType)}</span>
+                        </div>
+                        <div class="activity-action">${this.escapeHtml(description)}</div>
+                        <div class="activity-time">${this.formatTimestamp(timestamp)}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    formatActionType(actionType) {
+        const typeMap = {
+            'page_view': 'Page Visit',
+            'outage_created': 'Outage Created',
+            'outage_resolved': 'Outage Resolved',
+            'outage_deleted': 'Outage Deleted',
+            'login': 'Login',
+            'logout': 'Logout',
+            'search': 'Search',
+            'file_upload': 'File Upload',
+            'settings_changed': 'Settings',
+            'user_management': 'User Management'
+        };
+        return typeMap[actionType] || actionType;
+    }
+    
+    refreshActivity() {
+        this.loadActivities();
+    }
+    
+    toggleFilters() {
+        const modal = new bootstrap.Modal(document.getElementById('activityFiltersModal'));
+        modal.show();
+    }
+    
+    async applyFilters() {
+        this.filters.user = document.getElementById('activityUserFilter').value;
+        this.filters.action = document.getElementById('activityTypeFilter').value;
+        this.filters.timeRange = document.getElementById('activityTimeFilter').value;
+        
+        const modal = bootstrap.Modal.getInstance(document.getElementById('activityFiltersModal'));
+        modal.hide();
+        
+        await this.loadActivities();
+    }
+    
+    updateActivityCount() {
+        const badge = document.getElementById('activityCount');
+        if (badge) {
+            badge.textContent = this.activities.length;
+        }
+    }
+    
+    // Socket event handlers
+    setupSocketListeners() {
+        if (window.socketState && window.socketState.socket) {
+            this.socket = window.socketState.socket;
+            
+            this.socket.on('activity_update', (activity) => {
+                this.addActivityToList(activity);
+            });
+        }
+    }
+    
+    addActivityToList(activity) {
+        this.activities.unshift(activity);
+        if (this.activities.length > 50) {
+            this.activities = this.activities.slice(0, 50);
+        }
+        
+        const container = document.getElementById('recentActivity');
+        if (container && container.children.length > 0) {
+            const newItem = document.createElement('div');
+            newItem.innerHTML = this.renderActivityItem(activity);
+            const activityElement = newItem.firstElementChild;
+            activityElement.classList.add('adding');
+            container.insertBefore(activityElement, container.firstChild);
+            
+            setTimeout(() => {
+                activityElement.classList.remove('adding');
+            }, 300);
+        } else {
+            this.updateActivityList();
+        }
+        
+        this.updateActivityCount();
+    }
+    
+    // Event handlers
+    setupEventHandlers() {
+        // Filter form event handlers will be set up when modal is shown
+    }
+    
+    // Periodic refresh
+    setupPeriodicRefresh() {
+        setInterval(() => {
+            this.loadActivities();
+        }, 60000); // Refresh every minute
+    }
+    
+    // Utility methods
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    formatTimestamp(timestamp) {
+        if (!timestamp) return 'Unknown';
+        
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diff = now - date;
+        
+        if (diff < 60000) return 'Just now';
+        if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+        if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+        return date.toLocaleDateString();
+    }
+    
+    showError(message) {
+        const container = document.getElementById('recentActivity');
+        if (container) {
+            container.innerHTML = `
+                <div class="loading-state">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <div>${message}</div>
+                </div>
+            `;
+        }
+    }
+}
+
+// Initialize managers when DOM is loaded
+let teamMembersManager, activityManager;
+document.addEventListener('DOMContentLoaded', () => {
+    teamMembersManager = new TeamMembersManager();
+    activityManager = new ActivityManager();
+    
+    // Export for global access
+    window.teamMembersManager = teamMembersManager;
+    window.activityManager = activityManager;
+    
+    console.log('Team Members Manager initialized:', teamMembersManager);
+    console.log('Activity Manager initialized:', activityManager);
+});
+</script>
+{% endmacro %} 

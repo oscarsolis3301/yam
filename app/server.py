@@ -59,6 +59,10 @@ yam_app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production wit
 yam_app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 yam_app.config['SESSION_COOKIE_NAME'] = 'yam_session'  # Custom session cookie name
 
+# Server startup tracking for session invalidation
+SERVER_STARTUP_TIME = datetime.utcnow()
+yam_app.config['SERVER_STARTUP_TIME'] = SERVER_STARTUP_TIME
+
 # Configure auto-reload based on debug mode
 debug_mode = os.getenv('FLASK_DEBUG', '0') == '1' or os.getenv('FLASK_ENV') == 'development'
 yam_app.config['TEMPLATES_AUTO_RELOAD'] = debug_mode
@@ -75,8 +79,7 @@ yam_app.config['SESSION_FILE_DIR'] = str(session_dir)
 CORS(yam_app)
 
 # Import config and extensions
-from app.config import Config
-from extensions import db, login_manager, socketio, migrate
+from extensions import Config, db, login_manager, socketio, migrate
 from app.models import User
 
 yam_app.config.from_object(Config)
@@ -89,6 +92,39 @@ db.init_app(yam_app)
 login_manager.init_app(yam_app)
 socketio.init_app(yam_app)
 migrate.init_app(yam_app, db)
+
+def clear_all_sessions():
+    """Clear all user sessions on server restart/shutdown."""
+    try:
+        with yam_app.app_context():
+            # Clear all session files
+            session_dir = Path(yam_app.config['SESSION_FILE_DIR'])
+            if session_dir.exists():
+                for session_file in session_dir.glob('*'):
+                    try:
+                        session_file.unlink()
+                        logger.info(f"Cleared session file: {session_file}")
+                    except Exception as e:
+                        logger.warning(f"Could not delete session file {session_file}: {e}")
+            
+            # Mark all users as offline in presence service
+            try:
+                from app.services.user_presence import presence_service
+                presence_service.clear_all_users()
+                logger.info("All users marked as offline")
+            except Exception as e:
+                logger.warning(f"Could not clear user presence: {e}")
+            
+            # Clear any cached sessions
+            if hasattr(yam_app, 'session_interface'):
+                try:
+                    yam_app.session_interface.clear()
+                    logger.info("Session interface cleared")
+                except Exception as e:
+                    logger.warning(f"Could not clear session interface: {e}")
+                    
+    except Exception as e:
+        logger.error(f"Error clearing sessions: {e}")
 
 # Add template context processor to make hasattr available in templates
 @yam_app.context_processor
@@ -750,6 +786,27 @@ def service_worker():
 def before_request_handler():
     """Handle session management before each request."""
     try:
+        # Check if server has restarted (session created before server startup)
+        if session.get('user_id'):
+            session_startup_time = session.get('server_startup_time')
+            current_startup_time = yam_app.config.get('SERVER_STARTUP_TIME')
+            
+            # If session was created before current server startup, invalidate it
+            if session_startup_time and current_startup_time:
+                try:
+                    session_startup_dt = datetime.fromisoformat(session_startup_time)
+                    if session_startup_dt < current_startup_time:
+                        logger.info(f"Invalidating session for user {session.get('user_id')} - server restarted")
+                        session.clear()
+                        return redirect(url_for('auth.login'))
+                except (ValueError, TypeError):
+                    # Invalid timestamp, clear session
+                    session.clear()
+                    return redirect(url_for('auth.login'))
+            
+            # Update session with current server startup time
+            session['server_startup_time'] = current_startup_time.isoformat()
+        
         # Clean up stale sessions periodically
         if not hasattr(yam_app, '_last_cleanup') or time.time() - yam_app._last_cleanup > 300:  # Every 5 minutes
             cleanup_stale_sessions()
@@ -2055,6 +2112,14 @@ if __name__ == '__main__':
         print('\n[SHUTDOWN] Received termination signal, shutting down immediately...')
         print('[SHUTDOWN] Cleaning up resources...')
         
+        # Clear all user sessions
+        try:
+            print('[SHUTDOWN] Clearing all user sessions...')
+            clear_all_sessions()
+            print('[SHUTDOWN] All sessions cleared successfully')
+        except Exception as e:
+            print(f'[SHUTDOWN] Error clearing sessions: {e}')
+        
         # Close database connections
         try:
             with yam_app.app_context():
@@ -2103,6 +2168,11 @@ if __name__ == '__main__':
     # Initialize presence service and socket handlers
     with yam_app.app_context():
         try:
+            # Clear any existing sessions on server startup
+            print('[STARTUP] Clearing any existing sessions from previous server instance...')
+            clear_all_sessions()
+            print('[STARTUP] Session cleanup completed')
+            
             # Initialize presence service
             from app.utils.user_activity import initialize_presence_service
             initialize_presence_service(yam_app)
@@ -2239,7 +2309,6 @@ if __name__ == '__main__':
                 """Debugger console interface."""
                 return render_template('debugger/console.html')
             
-<<<<<<< HEAD
             @yam_app.route('/debugger/clear-cache')
             def debugger_clear_cache():
                 """Clear template and static file cache."""
@@ -2341,6 +2410,13 @@ if __name__ == '__main__':
     print(f'Static folder: {yam_app.static_folder}')
     print(f'Session lifetime: 2 hours')
     print(f'Session directory: {session_dir}')
+    print(f'Server startup time: {SERVER_STARTUP_TIME.strftime("%Y-%m-%d %H:%M:%S")}')
+    print('=' * 60)
+    print('🔄 SESSION MANAGEMENT:')
+    print('   • All sessions cleared on server restart')
+    print('   • Users must re-authenticate after server restart')
+    print('   • Session validation against server startup time')
+    print('   • Automatic cleanup on server shutdown')
     print('=' * 60)
     print('✅ Enhanced Session Management:')
     print('   🔄 Session hydration on every request')

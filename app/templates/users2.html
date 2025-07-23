@@ -1,0 +1,428 @@
+{% extends "base.html" %}
+{% block head %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="pragma" content="no-cache">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/Y.ico') }}">
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/sidebars/">
+    <script src="../static/JS/color-modes.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="../static/CSS/style.css">
+    <link href="../static/css/sidebars.css" rel="stylesheet">
+
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background: #1a1a1a;
+        color: white;
+      }
+
+      .content-wrapper {
+        position: relative;
+        width: calc(100% - 4.5rem);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 10vh;
+        margin-left: 4.5rem;
+        transition: width 0.3s ease-in-out, margin-left 0.3s ease-in-out;
+      }
+
+      .content-wrapper.sidebar-collapsed {
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .input-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 800px;
+        transition: all 0.2s ease;
+      }
+
+      .input-container.has-results {
+        position: relative;
+        top: 0;
+        left: 0;
+        transform: none;
+        margin: 2rem auto;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        font-size: 1.2rem;
+        color: #fff;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .results-container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem;
+        display: none;
+      }
+
+      .results-section {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+      }
+
+      .results-header {
+        padding: 1rem 1.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .results-content {
+        padding: 1.5rem;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        color: #fff;
+      }
+
+      th, td {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      th {
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      @media (max-width: 768px) {
+        .search-container {
+          width: 95%;
+        }
+        
+        .results-container {
+          width: 95%;
+          padding: 0.5rem;
+        }
+      }
+
+      /* WebKit browsers */
+      input:focus::-webkit-input-placeholder {
+        color: transparent;
+      }
+
+      /* Firefox 19+ */
+      input:focus::-moz-placeholder {
+        color: transparent;
+      }
+
+      /* Firefox 18- */
+      input:focus:-moz-placeholder {
+        color: transparent;
+      }
+
+      /* Internet Explorer 10+ */
+      input:focus:-ms-input-placeholder {
+        color: transparent;
+      }
+
+      #search-input {
+        height: 3.7rem;         /* whatever height you want */
+        line-height: 3rem;    /* same as height */
+        text-align: left;   /* horizontally center */
+        padding: 25px;   
+        text-size-adjust: 10%;        /* kill any extra top/bottom padding */
+        box-sizing: border-box;
+      }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <main class="d-flex flex-nowrap">
+      <div class="content-wrapper">
+        <div class="content-blur"></div>
+        
+        <div class="input-container">
+          <input type="text" class="search-input" id="search-input" placeholder="Search Clock ID..." autocomplete="off">
+        </div>
+
+        <div class="results-container">
+          <!-- User Results -->
+          <div class="results-section" id="user-results">
+            <div class="results-header">
+              <i class="bi bi-person"></i> Users
+            </div>
+            <div class="results-content"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('search-input');
+        const searchContainer = document.querySelector('.input-container');
+        const resultsContainer = document.querySelector('.results-container');
+        const contentWrapper = document.querySelector('.content-wrapper');
+        const sidebar = document.querySelector('.sidebar-fixed');
+
+        // Add event listener for sidebar collapse
+        document.addEventListener('sidebarCollapsed', (e) => {
+          if (e.detail.collapsed) {
+            contentWrapper.classList.add('sidebar-collapsed');
+          } else {
+            contentWrapper.classList.remove('sidebar-collapsed');
+          }
+        });
+
+        // Initialize sidebar state from localStorage
+        const savedState = localStorage.getItem('sidebarCollapsed');
+        if (savedState === 'true') {
+          contentWrapper.classList.add('sidebar-collapsed');
+        }
+
+        // Spinner for user search
+        let userSearchSpinner = document.createElement('div');
+        userSearchSpinner.id = 'user-search-spinner';
+        userSearchSpinner.style.display = 'none';
+        userSearchSpinner.style.textAlign = 'center';
+        userSearchSpinner.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Searching...</span></div><div style="color:#fff;margin-top:8px;">Searching for user...</div>';
+        resultsContainer.parentNode.insertBefore(userSearchSpinner, resultsContainer);
+
+        // Function to check if a string is a potential clock ID
+        function isClockId(query) {
+          return /^\d{1,5}$/.test(query);
+        }
+
+        // Function to pad clock ID with leading zeros
+        function padClockId(id) {
+          return id.padStart(5, '0');
+        }
+
+        // Function to perform user search via PowerShell
+        async function searchUser(clockId) {
+          try {
+            const response = await fetch('/users', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ user: clockId })
+            });
+
+            if (!response.ok) {
+              throw new Error('User search failed');
+            }
+
+            const data = await response.json();
+            displayUserResults(data);
+          } catch (error) {
+            console.error('Error searching user:', error);
+          }
+        }
+
+        // Function to display user search results
+        function displayUserResults(user) {
+          // Preferred order for key fields
+          const preferredOrder = [
+            "FullName", "Title", "Email", "PasswordLastReset", "DisplayName",
+            "Username", "ClockID", "LastChecked", "AccountStatus", "LockedOut", "PasswordExpired"
+          ];
+          const orderedData = {};
+          preferredOrder.forEach(key => {
+            if (key in user) orderedData[key] = user[key];
+          });
+          for (const key in user) {
+            if (!(key in orderedData)) orderedData[key] = user[key];
+          }
+
+          // Table rows
+          let rows = '';
+          for (const key in orderedData) {
+            let value = String(orderedData[key]);
+            const displayKey = key.replace(/([a-z])([A-Z])/g, '$1 $2');
+            if (value === "true") value = "True";
+            else if (value === "false") value = "False";
+            else if (["enabled", "disabled", "locked", "unlocked", "expired", "active", "inactive"].includes(value.toLowerCase()))
+              value = value.charAt(0).toUpperCase() + value.slice(1);
+            const isAlert = (key === "LockedOut" || key === "PasswordExpired") && value === "True";
+            let rowClass = isAlert ? 'bg-danger text-white fw-bold' : '';
+            if (key === 'FullName' || key === 'Title') {
+              value = value.replace(/\b\w/g, char => char.toUpperCase());
+            }
+            if (key === 'PasswordLastReset') {
+              value += ` (${timeAgo(orderedData[key])})`;
+            }
+            rows += `<tr class='${rowClass}'><td class='fw-bold text-light'>${displayKey}</td><td>${value}</td></tr>`;
+          }
+
+          // Table with dark theme and icons in header
+          const section = document.createElement('div');
+          section.className = 'results-section';
+          section.innerHTML = `
+            <table class="table table-striped table-dark" id="userTable" style="width: 100%;">
+              <thead>
+                <tr class="align-middle" style="background: #23272b; color: #fff;">
+                  <th colspan="2">
+                    <div class="d-flex justify-content-between align-items-center position-relative">
+                      <span class="fw-bold text-center"><i class="bi bi-person"></i> User Information</span>
+                      <span class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#ticketModal" title="Create Ticket">➕</button>
+                        <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#resetModal" title="Reset Password">🔑</button>
+                      </span>
+                    </div>
+                  </th>
+                </tr>
+                <tr style="background: #181a1b; color: #fff;"><th>Field</th><th>Value</th></tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+            <!-- Ticket Modal -->
+            <div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content text-dark">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Create New Ticket</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <form id="createTicketForm">
+                    <div class="modal-body">
+                      <div class="mb-3">
+                        <label for="ticketSubject" class="form-label text-light">Subject</label>
+                        <input type="text" class="form-control" id="ticketSubject" name="subject" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="ticketDesc" class="form-label text-light">Description</label>
+                        <textarea class="form-control" id="ticketDesc" name="description" rows="3" required></textarea>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="submit" class="btn btn-primary text-light">Create Ticket</button>
+                      <button type="button" class="btn btn-secondary text-light" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <!-- Reset Password Modal -->
+            <div class="modal fade" id="resetModal" tabindex="-1" aria-labelledby="resetModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content text-dark">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Reset Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <div class="modal-body">Are you sure you want to reset the password for this user?</div>
+                  <div class="modal-footer">
+                    <button id="confirmResetBtn" type="button" class="btn btn-danger">Yes, Reset</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          resultsContainer.innerHTML = '';
+          resultsContainer.appendChild(section);
+          resultsContainer.style.display = 'block';
+          searchContainer.classList.add('has-results');
+
+          // Store user data for modal actions
+          window._currentUserData = user;
+
+          // Helper for timeAgo
+          function timeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            if (diffDays === 0) return 'Today';
+            if (diffDays === 1) return '1 day ago';
+            return `${diffDays} days ago`;
+          }
+
+          // Ticket creation handler
+          const ticketForm = document.getElementById('createTicketForm');
+          if (ticketForm) {
+            ticketForm.onsubmit = async function(e) {
+              e.preventDefault();
+              const subject = document.getElementById('ticketSubject').value;
+              const description = document.getElementById('ticketDesc').value;
+              const requestor = window._currentUserData.Email || window._currentUserData.Username || window._currentUserData.User || '';
+              try {
+                const res = await fetch('/create_ticket', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ subject, description, requestor })
+                });
+                const data = await res.json();
+                alert(data.message || 'Ticket created successfully!');
+                bootstrap.Modal.getInstance(document.getElementById('ticketModal')).hide();
+                ticketForm.reset();
+              } catch (error) {
+                alert('Failed to create ticket.');
+              }
+            };
+          }
+
+          // Password reset handler
+          const resetBtn = document.getElementById('confirmResetBtn');
+          if (resetBtn) {
+            resetBtn.onclick = async function() {
+              try {
+                await fetch('/reset_password', { method: 'POST' });
+                alert('Password reset successfully!');
+                bootstrap.Modal.getInstance(document.getElementById('resetModal')).hide();
+              } catch (error) {
+                alert('Password reset failed.');
+              }
+            };
+          }
+        }
+
+        // Handle Enter key press
+        searchInput.addEventListener('keypress', async (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const query = searchInput.value.trim();
+            
+            // If query is only numbers and 5 or fewer digits, treat as clock ID
+            if (isClockId(query)) {
+              userSearchSpinner.style.display = 'block';
+              searchInput.disabled = true;
+              const paddedId = padClockId(query);
+              await searchUser(paddedId);
+              userSearchSpinner.style.display = 'none';
+              searchInput.disabled = false;
+            }
+          }
+        });
+      });
+    </script>
+{% endblock %}

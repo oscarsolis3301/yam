@@ -1,0 +1,205 @@
+<!-- YAM Dashboard Core JavaScript -->
+{% macro render_yam_dashboard_core_js() %}
+<script>
+// Enhanced YAM Dashboard Object with Component Registration
+window.yamDashboard = {
+    components: {},
+    initialized: false,
+    
+    // Register component function that was missing
+    registerComponent: function(name, component) {
+        try {
+            this.components[name] = component;
+            console.log(`YAM Component registered: ${name}`);
+            return true;
+        } catch (error) {
+            console.error(`Failed to register component ${name}:`, error);
+            return false;
+        }
+    },
+    
+    // Get component function
+    getComponent: function(name) {
+        return this.components[name] || null;
+    },
+    
+    // Initialize dashboard
+    init: function() {
+        if (this.initialized) {
+            console.log('YAM Dashboard already initialized');
+            return;
+        }
+        
+        console.log('YAM Dashboard initialization started');
+        this.initialized = true;
+        
+        // Initialize modal system
+        this.initModals();
+        
+        // Initialize real data integration
+        this.initRealData();
+        
+        console.log('YAM Dashboard initialization completed');
+    },
+    
+    // Initialize modal system
+    initModals: function() {
+        window.yamModals = {
+            currentModal: null,
+            
+            openModal: function(modalId) {
+                const overlay = window.safeGetElementById('yamModalOverlay');
+                const container = window.safeGetElementById('yamModalContainer');
+                const title = window.safeGetElementById('yamModalTitle');
+                const content = window.safeGetElementById('yamModalContent');
+                const modalContent = window.safeGetElementById(modalId + 'Content');
+                
+                if (!overlay || !container || !title || !content || !modalContent) {
+                    console.error('Modal elements not found');
+                    return;
+                }
+                
+                // Set modal content
+                title.textContent = this.getModalTitle(modalId);
+                content.innerHTML = modalContent.innerHTML;
+                
+                // Show modal
+                overlay.style.display = 'flex';
+                overlay.setAttribute('aria-hidden', 'false');
+                this.currentModal = modalId;
+                
+                // Focus management
+                setTimeout(() => {
+                    const closeBtn = overlay.querySelector('.yam-modal-close');
+                    if (closeBtn) closeBtn.focus();
+                }, 100);
+                
+                // Prevent body scroll
+                document.body.style.overflow = 'hidden';
+                
+                // Track modal open
+                if (window.yamLayout && window.yamLayout.trackEvent) {
+                    window.yamLayout.trackEvent('yam_modal_open', { modal: modalId });
+                }
+            },
+            
+            closeModal: function() {
+                const overlay = window.safeGetElementById('yamModalOverlay');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                    overlay.setAttribute('aria-hidden', 'true');
+                    
+                    // Restore body scroll
+                    document.body.style.overflow = '';
+                    
+                    // Track modal close
+                    if (this.currentModal && window.yamLayout && window.yamLayout.trackEvent) {
+                        window.yamLayout.trackEvent('yam_modal_close', { modal: this.currentModal });
+                        this.currentModal = null;
+                    }
+                }
+            },
+            
+            getModalTitle: function(modalId) {
+                const titles = {
+                    'statusModal': 'System Status',
+                    'userPresenceModal': 'User Presence Map',
+                    'userAnalyticsModal': 'User Analytics',
+                    'activityHeatmapModal': 'Activity Heatmap',
+                    'advancedStatusModal': 'Advanced Status',
+                    'systemMonitorModal': 'System Monitor',
+                    'systemHealthModal': 'System Health',
+                    'teamPerformanceModal': 'Team Performance',
+                    'teamCollaborationModal': 'Team Collaboration',
+                    'recentActivityModal': 'Recent Activity',
+                    'activityTrackerModal': 'Activity Tracker',
+                    'notificationsModal': 'Notifications',
+                    'teamChatModal': 'Team Chat'
+                };
+                return titles[modalId] || 'Modal';
+            }
+        };
+        
+        // Add click outside to close modal
+        const overlay = window.safeGetElementById('yamModalOverlay');
+        if (overlay) {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    window.yamModals.closeModal();
+                }
+            });
+        }
+        
+        // Add escape key to close modal
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && window.yamModals.currentModal) {
+                window.yamModals.closeModal();
+            }
+        });
+    },
+    
+    // Initialize real data integration
+    initRealData: function() {
+        window.yamRealData = {
+            refreshInterval: null,
+            
+            init: function() {
+                this.startAutoRefresh();
+                console.log('YAM Real Data integration initialized');
+            },
+            
+            startAutoRefresh: function() {
+                // Refresh data every 30 seconds
+                this.refreshInterval = setInterval(() => {
+                    this.refreshAllData();
+                }, 30000);
+            },
+            
+            stopAutoRefresh: function() {
+                if (this.refreshInterval) {
+                    clearInterval(this.refreshInterval);
+                    this.refreshInterval = null;
+                }
+            },
+            
+            refreshAllData: function() {
+                try {
+                    // Refresh analytics data
+                    if (window.dailyAnalytics && window.dailyAnalytics.refresh) {
+                        window.dailyAnalytics.refresh();
+                    }
+                    
+                    // Refresh system data
+                    if (window.systemMonitor && window.systemMonitor.refresh) {
+                        window.systemMonitor.refresh();
+                    }
+                    
+                    // Refresh user data
+                    if (window.userAnalytics && window.userAnalytics.refresh) {
+                        window.userAnalytics.refresh();
+                    }
+                    
+                    console.log('YAM Real Data refreshed successfully');
+                } catch (error) {
+                    console.error('Error refreshing YAM real data:', error);
+                }
+            },
+            
+            // Track data loading performance
+            trackDataLoad: function(endpoint, duration) {
+                if (window.gtag) {
+                    window.gtag('event', 'yam_data_load', {
+                        endpoint: endpoint,
+                        duration: duration,
+                        timestamp: Date.now()
+                    });
+                }
+            }
+        };
+        
+        // Initialize real data integration
+        window.yamRealData.init();
+    }
+};
+</script>
+{% endmacro %} 

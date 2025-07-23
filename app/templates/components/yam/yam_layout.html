@@ -1,0 +1,426 @@
+{% macro render_yam_layout() %}
+<!-- YAM Dashboard Layout Component -->
+<style>
+/* YAM Dashboard Full-Width Layout */
+.yam-dashboard-full {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    min-height: 100vh;
+    color: #e0e0e0;
+    overflow-x: hidden;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100vw !important;
+    max-width: none !important;
+    position: relative;
+    box-sizing: border-box;
+}
+
+/* Full-width container that accounts for sidebar */
+.yam-container-full {
+    width: calc(100vw - 3.5rem); /* Account for sidebar width */
+    margin-left: 3.5rem; /* Offset for sidebar */
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-height: 100vh;
+    box-sizing: border-box;
+    max-width: none !important;
+    overflow-x: hidden;
+}
+
+/* When sidebar is collapsed */
+.yam-container-full.sidebar-collapsed {
+    width: 100vw;
+    margin-left: 0;
+}
+
+/* Welcome Section - Full Width */
+.yam-welcome-full {
+    background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid #404040;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.yam-welcome-full h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #5865f2, #7289da);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+}
+
+.yam-welcome-full .yam-subtitle {
+    font-size: 1.1rem;
+    color: #b0b0b0;
+    font-weight: 400;
+}
+
+/* Analytics Grid - Full Width */
+.yam-analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    margin: 0;
+}
+
+/* Stats Grid - Full Width */
+.yam-stats-grid-full {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    margin: 0;
+}
+
+/* Action Grid - Full Width */
+.yam-actions-grid-full {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    margin: 0;
+}
+
+/* Enhanced Card Styles */
+.yam-card-enhanced {
+    background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #404040;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.yam-card-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #5865f2, #7289da, #5865f2);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+.yam-card-enhanced:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    border-color: #5865f2;
+}
+
+/* Component Header Styles */
+.yam-component-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.yam-component-header h5 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #e0e0e0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.yam-component-header h5 i {
+    color: #5865f2;
+}
+
+.yam-header-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.yam-refresh-btn {
+    background: rgba(88, 101, 242, 0.1);
+    border: 1px solid rgba(88, 101, 242, 0.3);
+    color: #5865f2;
+    padding: 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+.yam-refresh-btn:hover {
+    background: rgba(88, 101, 242, 0.2);
+    border-color: #5865f2;
+    transform: scale(1.05);
+}
+
+.yam-refresh-btn:active {
+    transform: scale(0.95);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .yam-analytics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .yam-stats-grid-full {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .yam-actions-grid-full {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .yam-container-full {
+        width: 100vw;
+        margin-left: 0;
+        padding: 0.75rem;
+        gap: 1rem;
+    }
+    
+    .yam-welcome-full {
+        padding: 1.5rem;
+    }
+    
+    .yam-welcome-full h1 {
+        font-size: 2rem;
+    }
+    
+    .yam-analytics-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .yam-stats-grid-full {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .yam-actions-grid-full {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .yam-card-enhanced {
+        padding: 1rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .yam-analytics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .yam-stats-grid-full {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .yam-actions-grid-full {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Animation */
+@keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* Loading States */
+.yam-loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.yam-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Accessibility */
+.yam-focus-visible:focus-visible {
+    outline: 2px solid #5865f2;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .yam-card-enhanced {
+        border-width: 2px;
+    }
+    
+    .yam-refresh-btn {
+        border-width: 2px;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .yam-card-enhanced,
+    .yam-refresh-btn {
+        animation: none;
+        transition: none;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .yam-refresh-btn {
+        display: none !important;
+    }
+    
+    .yam-card-enhanced {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+}
+</style>
+
+<script>
+// YAM Layout Management
+window.yamLayout = {
+    init() {
+        this.setupSidebarListener();
+        this.setupResponsiveGrid();
+        this.setupAccessibility();
+        console.log('YAM Layout initialized');
+    },
+    
+    setupSidebarListener() {
+        // Listen for sidebar collapse events
+        document.addEventListener('sidebarCollapsed', (e) => {
+            const container = document.querySelector('.yam-container-full');
+            if (container) {
+                if (e.detail.collapsed) {
+                    container.classList.add('sidebar-collapsed');
+                } else {
+                    container.classList.remove('sidebar-collapsed');
+                }
+            }
+        });
+        
+        // Check initial sidebar state
+        const sidebar = document.querySelector('.sidebar-fixed');
+        if (sidebar && sidebar.classList.contains('collapsed')) {
+            const container = document.querySelector('.yam-container-full');
+            if (container) {
+                container.classList.add('sidebar-collapsed');
+            }
+        }
+    },
+    
+    setupResponsiveGrid() {
+        const updateGridColumns = () => {
+            const width = window.innerWidth;
+            const analyticsGrid = document.querySelector('.yam-analytics-grid');
+            const statsGrid = document.querySelector('.yam-stats-grid-full');
+            const actionsGrid = document.querySelector('.yam-actions-grid-full');
+            
+            if (width < 768) {
+                this.setGridColumns(analyticsGrid, '1fr');
+                this.setGridColumns(statsGrid, '1fr');
+                this.setGridColumns(actionsGrid, '1fr');
+            } else if (width < 1024) {
+                this.setGridColumns(analyticsGrid, 'repeat(2, 1fr)');
+                this.setGridColumns(statsGrid, 'repeat(2, 1fr)');
+                this.setGridColumns(actionsGrid, 'repeat(2, 1fr)');
+            } else {
+                this.setGridColumns(analyticsGrid, 'repeat(auto-fit, minmax(300px, 1fr))');
+                this.setGridColumns(statsGrid, 'repeat(auto-fit, minmax(280px, 1fr))');
+                this.setGridColumns(actionsGrid, 'repeat(auto-fit, minmax(300px, 1fr))');
+            }
+        };
+        
+        updateGridColumns();
+        window.addEventListener('resize', updateGridColumns);
+    },
+    
+    setGridColumns(grid, columns) {
+        if (grid) {
+            grid.style.gridTemplateColumns = columns;
+        }
+    },
+    
+    setupAccessibility() {
+        // Focus management
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                // Close any open modals or dropdowns
+                const modals = document.querySelectorAll('.yam-modal-overlay');
+                modals.forEach(modal => {
+                    if (modal.style.display === 'flex') {
+                        if (window.yamModals) {
+                            window.yamModals.closeModal();
+                        }
+                    }
+                });
+            }
+        });
+        
+        // ARIA live regions
+        const dashboard = document.querySelector('.yam-dashboard-full');
+        if (dashboard) {
+            dashboard.setAttribute('role', 'main');
+            dashboard.setAttribute('aria-label', 'YAM Dashboard');
+        }
+    },
+    
+    // Utility function to get container width
+    getContainerWidth() {
+        const container = document.querySelector('.yam-container-full');
+        if (container) {
+            return container.offsetWidth;
+        }
+        return window.innerWidth - 56; // Fallback: viewport width minus sidebar
+    },
+    
+    // Utility function to check if sidebar is collapsed
+    isSidebarCollapsed() {
+        const sidebar = document.querySelector('.sidebar-fixed');
+        return sidebar && sidebar.classList.contains('collapsed');
+    }
+};
+
+// Initialize layout when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.yamLayout.init();
+});
+</script>
+{% endmacro %} 

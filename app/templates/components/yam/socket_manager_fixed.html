@@ -1,0 +1,432 @@
+{% macro render_socket_manager_fixed() %}
+<!-- Fixed Socket Manager Component -->
+<script>
+// Fixed Socket Manager - Addresses WebSocket and Authentication Issues
+window.yamSocketManagerFixed = {
+    socket: null,
+    isConnected: false,
+    reconnectAttempts: 0,
+    maxReconnectAttempts: 3,
+    heartbeatInterval: null,
+    connectionId: null,
+    isInitialized: false,
+    userPresenceInterval: null,
+    
+    init() {
+        if (this.isInitialized) {
+            console.log('Socket manager already initialized');
+            return;
+        }
+        
+        this.isInitialized = true;
+        this.connectionId = 'yam_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        
+        console.log('🔌 Initializing fixed socket manager with ID:', this.connectionId);
+        this.connect();
+        this.setupEventListeners();
+    },
+    
+    connect() {
+        if (this.socket && this.socket.connected) {
+            console.log('Socket already connected');
+            return;
+        }
+        
+        try {
+            // Create socket with fixed configuration
+            this.socket = io({
+                withCredentials: true,
+                reconnection: true,
+                reconnectionAttempts: this.maxReconnectAttempts,
+                reconnectionDelay: 2000,
+                reconnectionDelayMax: 10000,
+                timeout: 30000,
+                transports: ['polling'], // Force polling to avoid WebSocket issues
+                upgrade: false, // Disable upgrade to prevent connection issues
+                rememberUpgrade: false,
+                forceNew: false,
+                query: {
+                    connection_id: this.connectionId,
+                    timestamp: Date.now()
+                }
+            });
+            
+            this.setupSocketEventHandlers();
+            console.log('✅ Socket connection created');
+            
+        } catch (error) {
+            console.error('❌ Error creating socket connection:', error);
+            this.handleConnectionError(error);
+        }
+    },
+    
+    setupSocketEventHandlers() {
+        if (!this.socket) return;
+        
+        this.socket.on('connect', () => {
+            console.log('✅ Socket connected successfully');
+            this.isConnected = true;
+            this.reconnectAttempts = 0;
+            
+            // Start heartbeat
+            this.startHeartbeat();
+            
+            // Start user presence updates
+            this.startUserPresenceUpdates();
+            
+            // Send initial presence
+            this.sendPresenceUpdate('online');
+            
+            // Request initial online users data
+            this.requestOnlineUsers();
+            
+            // Update UI
+            this.updateConnectionStatus(true);
+        });
+        
+        this.socket.on('disconnect', (reason) => {
+            console.log('❌ Socket disconnected:', reason);
+            this.isConnected = false;
+            this.stopHeartbeat();
+            this.stopUserPresenceUpdates();
+            
+            // Update UI
+            this.updateConnectionStatus(false);
+            
+            // Handle reconnection based on reason
+            if (reason === 'io server disconnect') {
+                console.log('Server initiated disconnect');
+            } else if (reason === 'transport close') {
+                console.log('Transport closed');
+            } else if (reason === 'ping timeout') {
+                console.log('Ping timeout');
+            } else {
+                console.log('Disconnect reason:', reason);
+            }
+        });
+        
+        this.socket.on('connect_error', (error) => {
+            console.error('❌ Socket connection error:', error);
+            this.reconnectAttempts++;
+            
+            if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+                console.log('Max reconnection attempts reached');
+                this.handleMaxReconnectAttempts();
+            }
+        });
+        
+        this.socket.on('reconnect', (attemptNumber) => {
+            console.log('✅ Socket reconnected after', attemptNumber, 'attempts');
+            this.reconnectAttempts = 0;
+            this.isConnected = true;
+            this.startHeartbeat();
+            this.startUserPresenceUpdates();
+            this.sendPresenceUpdate('online');
+            this.requestOnlineUsers();
+            this.updateConnectionStatus(true);
+        });
+        
+        this.socket.on('reconnect_attempt', (attemptNumber) => {
+            console.log('🔄 Socket reconnection attempt:', attemptNumber);
+        });
+        
+        this.socket.on('reconnect_error', (error) => {
+            console.error('❌ Socket reconnection error:', error);
+        });
+        
+        this.socket.on('reconnect_failed', () => {
+            console.error('❌ Socket reconnection failed');
+            this.handleReconnectFailed();
+        });
+        
+        // Handle authentication errors
+        this.socket.on('auth_error', (data) => {
+            console.error('❌ Authentication error:', data);
+            this.handleAuthError(data);
+        });
+        
+        // Handle online users updates
+        this.socket.on('online_users_update', (users) => {
+            console.log('👥 Received online users update:', users.length, 'users');
+            this.handleOnlineUsersUpdate(users);
+        });
+        
+        // Handle presence stats updates
+        this.socket.on('presence_stats', (stats) => {
+            console.log('📊 Received presence stats:', stats);
+            this.handlePresenceStatsUpdate(stats);
+        });
+        
+        // Handle user status changes
+        this.socket.on('user_status_change', (userData) => {
+            console.log('👤 User status change:', userData);
+            this.handleUserStatusChange(userData);
+        });
+        
+        // Handle heartbeat acknowledgment
+        this.socket.on('heartbeat_ack', (data) => {
+            console.debug('💓 Heartbeat acknowledged:', data);
+        });
+        
+        // Handle general errors
+        this.socket.on('error', (error) => {
+            console.error('❌ Socket error:', error);
+            this.handleSocketError(error);
+        });
+    },
+    
+    startHeartbeat() {
+        this.stopHeartbeat(); // Clear existing interval
+        
+        this.heartbeatInterval = setInterval(() => {
+            if (this.socket && this.socket.connected) {
+                this.socket.emit('heartbeat');
+            }
+        }, 30000); // 30 seconds
+    },
+    
+    stopHeartbeat() {
+        if (this.heartbeatInterval) {
+            clearInterval(this.heartbeatInterval);
+            this.heartbeatInterval = null;
+        }
+    },
+    
+    startUserPresenceUpdates() {
+        this.stopUserPresenceUpdates(); // Clear existing interval
+        
+        this.userPresenceInterval = setInterval(() => {
+            if (this.socket && this.socket.connected) {
+                this.sendPresenceUpdate('online');
+                this.requestOnlineUsers();
+            }
+        }, 60000); // 1 minute
+    },
+    
+    stopUserPresenceUpdates() {
+        if (this.userPresenceInterval) {
+            clearInterval(this.userPresenceInterval);
+            this.userPresenceInterval = null;
+        }
+    },
+    
+    sendPresenceUpdate(status) {
+        if (this.socket && this.socket.connected) {
+            this.socket.emit('user_presence', {
+                action: status,
+                timestamp: Date.now(),
+                connection_id: this.connectionId
+            });
+        }
+    },
+    
+    requestOnlineUsers() {
+        if (this.socket && this.socket.connected) {
+            this.socket.emit('get_online_users');
+        }
+    },
+    
+    updateConnectionStatus(connected) {
+        // Update connection status in UI
+        const statusElements = document.querySelectorAll('.connection-status');
+        statusElements.forEach(element => {
+            if (connected) {
+                element.classList.remove('offline');
+                element.classList.add('connected');
+                element.innerHTML = '<i class="bi bi-wifi"></i><span>Connected</span>';
+            } else {
+                element.classList.remove('connected');
+                element.classList.add('offline');
+                element.innerHTML = '<i class="bi bi-wifi-off"></i><span>Disconnected</span>';
+            }
+        });
+        
+        // Update real-time indicators
+        const indicators = document.querySelectorAll('.real-time-indicator');
+        indicators.forEach(indicator => {
+            indicator.style.opacity = connected ? '1' : '0.5';
+        });
+    },
+    
+    handleConnectionError(error) {
+        console.error('Connection error:', error);
+        // Show user-friendly error message
+        this.showError('Connection failed. Please check your network and refresh the page.');
+    },
+    
+    handleMaxReconnectAttempts() {
+        console.log('Max reconnection attempts reached');
+        this.showError('Unable to connect to server. Please refresh the page.');
+    },
+    
+    handleReconnectFailed() {
+        console.log('Reconnection failed');
+        this.showError('Connection lost. Please refresh the page to reconnect.');
+    },
+    
+    handleAuthError(data) {
+        console.error('Authentication error:', data);
+        
+        // Redirect to login if authentication failed
+        if (data && data.redirect) {
+            window.location.href = data.redirect;
+        } else {
+            window.location.href = '/auth/login';
+        }
+    },
+    
+    handleOnlineUsersUpdate(users) {
+        console.log('🔄 Broadcasting online users update to components');
+        
+        // Update online users in all components
+        if (window.yamUserPresenceMap && window.yamUserPresenceMap.updateUsers) {
+            window.yamUserPresenceMap.updateUsers(users);
+        }
+        
+        if (window.userActivityHeatmap && window.userActivityHeatmap.updateUsers) {
+            window.userActivityHeatmap.updateUsers(users);
+        }
+        
+        if (window.advancedUserStatus && window.advancedUserStatus.updateUsers) {
+            window.advancedUserStatus.updateUsers(users);
+        }
+        
+        if (window.teamPerformanceAnalytics && window.teamPerformanceAnalytics.updateUsers) {
+            window.teamPerformanceAnalytics.updateUsers(users);
+        }
+        
+        // Emit custom event for other components
+        window.dispatchEvent(new CustomEvent('onlineUsersUpdate', { detail: users }));
+        
+        // Update any other components that might be listening
+        if (window.updateOnlineUsersList) {
+            window.updateOnlineUsersList(users);
+        }
+    },
+    
+    handlePresenceStatsUpdate(stats) {
+        console.log('📊 Broadcasting presence stats update to components');
+        
+        // Update stats in components that need them
+        if (window.yamUserPresenceMap && window.yamUserPresenceMap.updateStats) {
+            window.yamUserPresenceMap.updateStats(stats);
+        }
+        
+        // Emit custom event for stats
+        window.dispatchEvent(new CustomEvent('presenceStatsUpdate', { detail: stats }));
+    },
+    
+    handleUserStatusChange(userData) {
+        console.log('👤 Broadcasting user status change to components');
+        
+        // Update user status in components
+        if (window.yamUserPresenceMap && window.yamUserPresenceMap.updateUserStatus) {
+            window.yamUserPresenceMap.updateUserStatus(userData);
+        }
+        
+        // Emit custom event for user status changes
+        window.dispatchEvent(new CustomEvent('userStatusChange', { detail: userData }));
+    },
+    
+    handleSocketError(error) {
+        console.error('Socket error:', error);
+        this.showError('Connection error: ' + (error.message || 'Unknown error'));
+    },
+    
+    showError(message) {
+        // Show error message to user
+        console.error('Error:', message);
+        
+        // Create toast notification if available
+        if (window.showToast) {
+            window.showToast(message, 'error');
+        } else {
+            // Fallback alert
+            alert(message);
+        }
+    },
+    
+    setupEventListeners() {
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && this.isConnected) {
+                this.sendPresenceUpdate('online');
+                this.requestOnlineUsers();
+            }
+        });
+        
+        // Handle window focus
+        window.addEventListener('focus', () => {
+            if (this.isConnected) {
+                this.sendPresenceUpdate('online');
+                this.requestOnlineUsers();
+            }
+        });
+        
+        // Handle page unload
+        window.addEventListener('beforeunload', () => {
+            if (this.isConnected) {
+                this.sendPresenceUpdate('offline');
+            }
+        });
+        
+        // Handle authentication status
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'auth_status' && event.newValue === 'logged_out') {
+                console.log('User logged out in another tab');
+                this.handleAuthError({ redirect: '/auth/login' });
+            }
+        });
+        
+        // Handle manual refresh requests
+        window.addEventListener('refreshOnlineUsers', () => {
+            console.log('🔄 Manual refresh requested');
+            this.requestOnlineUsers();
+        });
+    },
+    
+    disconnect() {
+        if (this.socket) {
+            this.sendPresenceUpdate('offline');
+            this.socket.disconnect();
+        }
+        this.stopHeartbeat();
+        this.stopUserPresenceUpdates();
+        this.isConnected = false;
+    },
+    
+    // Public methods for components to use
+    getSocket() {
+        return this.socket;
+    },
+    
+    isSocketConnected() {
+        return this.isConnected;
+    },
+    
+    emit(event, data) {
+        if (this.socket && this.socket.connected) {
+            this.socket.emit(event, data);
+        } else {
+            console.warn('Socket not connected, cannot emit:', event);
+        }
+    },
+    
+    // Method to manually trigger online users update
+    refreshOnlineUsers() {
+        this.requestOnlineUsers();
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.yamSocketManagerFixed.init();
+});
+
+// Global socket access for components
+window.getYamSocket = () => window.yamSocketManagerFixed.getSocket();
+window.isYamSocketConnected = () => window.yamSocketManagerFixed.isSocketConnected();
+window.emitYamEvent = (event, data) => window.yamSocketManagerFixed.emit(event, data);
+window.refreshOnlineUsers = () => window.yamSocketManagerFixed.refreshOnlineUsers();
+</script>
+{% endmacro %} 

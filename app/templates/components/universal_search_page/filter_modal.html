@@ -1,0 +1,51 @@
+<!-- Universal Search Page Filter Modal Component -->
+<div class="filter-modal" id="universalSearchFilterModal">
+    <div class="filter-modal-header">
+        <h3 class="filter-modal-title">Filter Search Results</h3>
+        <p class="filter-modal-subtitle">Refine your search by content type and section</p>
+        <button
+            type="button"
+            class="btn-close btn-close-white"
+            aria-label="Close"
+            onclick="
+                document.getElementById('universalSearchFilterModal').classList.remove('active');
+                document.getElementById('universalSearchFilterModalOverlay').classList.remove('active');
+            "
+        ></button>
+    </div>
+    
+    <div class="filter-modal-content">
+        <div class="filter-section">
+            <div class="filter-section-title">
+                <i class="bi bi-collection"></i>
+                Content Types
+            </div>
+            <div class="filter-options-grid" id="modal-content-type-filters">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+        
+        <div class="filter-section">
+            <div class="filter-section-title">
+                <i class="bi bi-diagram-3"></i>
+                Sections
+            </div>
+            <div class="filter-options-grid" id="modal-section-filters">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+        
+        <div class="filter-modal-actions">
+            <button class="filter-modal-btn secondary" onclick="
+                document.getElementById('universalSearchFilterModal').classList.remove('active');
+                document.getElementById('universalSearchFilterModalOverlay').classList.remove('active');
+            ">
+                Cancel
+            </button>
+            <button class="filter-modal-btn primary" id="apply-filters">
+                Apply Filters
+            </button>
+        </div>
+    </div>
+</div>
+<div class="filter-modal-overlay" id="universalSearchFilterModalOverlay"></div> 

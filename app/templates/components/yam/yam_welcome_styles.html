@@ -1,0 +1,162 @@
+<!-- YAM Welcome Banner Styles -->
+{% macro render_yam_welcome_styles() %}
+<style>
+/* ENHANCED WELCOME CONTAINER - LARGER AND MORE PROMINENT */
+.yam-welcome-full {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    animation: welcomeSlideIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden !important; /* Prevent overflow */
+}
+
+.yam-welcome-full .yam-welcome-banner {
+    padding: 2rem !important; /* Slightly reduced for better fit */
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%) !important;
+    border-radius: 16px !important; /* Slightly reduced */
+    border: 2px solid rgba(88, 101, 242, 0.3) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    animation: welcomeGlow 3s ease-in-out infinite alternate;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.yam-welcome-full .yam-welcome-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #5865f2, #7289da, #5865f2, #5865f2);
+    background-size: 300% 100%;
+    animation: shimmer 4s ease-in-out infinite;
+}
+
+.yam-welcome-full .welcome-title {
+    font-size: 2.25rem !important; /* Slightly reduced for better fit */
+    margin-bottom: 0.75rem !important;
+    line-height: 1.2 !important;
+    animation: titleFadeIn 1s ease-out 0.3s both;
+    text-shadow: 0 0 20px rgba(88, 101, 242, 0.3);
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+.yam-welcome-full .welcome-subtitle {
+    font-size: 1.1rem !important; /* Slightly reduced */
+    margin-bottom: 1.25rem !important;
+    animation: subtitleFadeIn 1s ease-out 0.5s both;
+    opacity: 0.9;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+.yam-welcome-full .welcome-info {
+    gap: 1rem !important; /* Reduced gap for better fit */
+    flex-wrap: wrap !important;
+    animation: infoFadeIn 1s ease-out 0.7s both;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.yam-welcome-full .info-item {
+    padding: 0.6rem 1rem !important; /* Adjusted padding */
+    font-size: 0.95rem !important; /* Slightly reduced */
+    background: rgba(88, 101, 242, 0.1) !important;
+    border: 1px solid rgba(88, 101, 242, 0.2) !important;
+    border-radius: 10px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    animation: infoItemFloat 3s ease-in-out infinite;
+    white-space: nowrap !important; /* Prevent text wrapping */
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 200px !important; /* Limit width */
+}
+
+.yam-welcome-full .info-item:hover {
+    background: rgba(88, 101, 242, 0.2) !important;
+    border-color: rgba(88, 101, 242, 0.4) !important;
+    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: 0 8px 25px rgba(88, 101, 242, 0.3) !important;
+}
+
+.yam-welcome-full .info-item:nth-child(1) { animation-delay: 0s; }
+.yam-welcome-full .info-item:nth-child(2) { animation-delay: 0.2s; }
+.yam-welcome-full .info-item:nth-child(3) { animation-delay: 0.4s; }
+
+/* Welcome Animations */
+@keyframes welcomeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes welcomeGlow {
+    from {
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    }
+    to {
+        box-shadow: 0 12px 40px rgba(88, 101, 242, 0.2);
+    }
+}
+
+@keyframes titleFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes subtitleFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes infoFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes infoItemFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-2px);
+    }
+}
+
+@keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+</style>
+{% endmacro %} 

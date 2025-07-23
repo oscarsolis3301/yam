@@ -1,0 +1,40 @@
+.modal-card{
+    animation:navAnimOpen .3s ease-in-out;        
+ }      
+ .navbar-dropdown {
+    animation: navAnimOpen .3s ease-in-out;
+ }
+ .dropdown-menu {
+    animation: navAnimOpen .3s ease-in-out;
+ }
+ .flexbox-item-scripts{
+    animation: navAnimOpen .5s ease-in-out;
+ }  
+ .box{
+       animation: navAnimOpen .5s ease-in-out;
+ }    
+ .selection{
+    transition: transform .3s;        
+ }
+ .selection:hover{
+    transform: scale(1.05);
+ }
+
+
+ @keyframes fadeIn {
+ 0% { opacity: 0; }
+ 100% { opacity: 1; }
+ }
+ @keyframes navAnimOpen {
+ 0% {display: none;opacity: 0;}
+ 1% {display: block;opacity: 0;}
+ 100% {opacity: 1;}
+ }
+
+ .ticketInfo {
+   text-transform: lowercase;
+ }
+
+ .ticketInfo::first-letter {
+   text-transform: uppercase;
+ }

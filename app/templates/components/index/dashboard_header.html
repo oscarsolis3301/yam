@@ -1,0 +1,269 @@
+{% macro render_dashboard_header(name, current_user) %}
+<div class="dashboard-header">
+    <div class="header-content">
+        <div class="header-left">
+            <h1 class="dashboard-welcome">
+                Welcome back, <span class="welcome-name">{{ name }}</span><span class="welcome-emoji">👋</span>
+            </h1>
+            <p class="dashboard-subtitle">
+                <i class="bi bi-calendar3"></i>
+                <span id="currentDate"></span>
+                <i class="bi bi-geo-alt"></i>
+                Pacific Time
+                <i class="bi bi-clock"></i>
+                <span id="currentTime"></span>
+            </p>
+        </div>
+        <div class="header-right">
+            <div class="header-badges">
+                <div class="connection-status" id="connectionStatus">
+                    <i class="bi bi-wifi"></i>
+                    <span>Connected</span>
+                </div>
+                <div class="user-role-badge">
+                    {% if current_user and current_user.role %}
+                        {{ current_user.role.title() }}
+                    {% else %}
+                        User
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.dashboard-header {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.dashboard-header:hover::before {
+    opacity: 1;
+}
+
+.dashboard-header:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.header-left {
+    flex: 1;
+}
+
+.dashboard-welcome {
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+}
+
+.welcome-name {
+    color: #fff;
+    -webkit-text-fill-color: #fff;
+}
+
+.welcome-emoji {
+    margin-left: 0.5rem;
+    animation: wave 2s infinite;
+    display: inline-block;
+}
+
+@keyframes wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(20deg); }
+    75% { transform: rotate(-10deg); }
+}
+
+.dashboard-subtitle {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    font-weight: 500;
+}
+
+.dashboard-subtitle i {
+    color: #667eea;
+    font-size: 1.2rem;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.header-badges {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(76, 175, 80, 0.15);
+    color: #4caf50;
+    padding: 0.75rem 1.25rem;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.connection-status.offline {
+    background: rgba(244, 67, 54, 0.15);
+    color: #f44336;
+    border-color: rgba(244, 67, 54, 0.3);
+}
+
+.connection-status i {
+    font-size: 1rem;
+}
+
+.user-role-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+.user-role-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .dashboard-welcome {
+        font-size: 2rem;
+    }
+    
+    .dashboard-subtitle {
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .header-badges {
+        justify-content: center;
+    }
+    
+    .dashboard-header {
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-welcome {
+        font-size: 1.8rem;
+    }
+    
+    .dashboard-subtitle {
+        font-size: 1rem;
+        gap: 0.75rem;
+    }
+    
+    .header-badges {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+}
+</style>
+
+<script>
+// Update date and time
+function updateDateTime() {
+    const now = new Date();
+    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    
+    const dateElement = document.getElementById('currentDate');
+    const timeElement = document.getElementById('currentTime');
+    
+    if (dateElement) {
+        dateElement.textContent = now.toLocaleDateString('en-US', dateOptions);
+    }
+    if (timeElement) {
+        timeElement.textContent = now.toLocaleTimeString('en-US', timeOptions);
+    }
+}
+
+// Update connection status
+function updateConnectionStatus(isConnected) {
+    const statusElement = document.getElementById('connectionStatus');
+    if (statusElement) {
+        if (isConnected) {
+            statusElement.className = 'connection-status';
+            statusElement.innerHTML = '<i class="bi bi-wifi"></i><span>Connected</span>';
+        } else {
+            statusElement.className = 'connection-status offline';
+            statusElement.innerHTML = '<i class="bi bi-wifi-off"></i><span>Disconnected</span>';
+        }
+    }
+}
+
+// Update immediately and then every second
+updateDateTime();
+setInterval(updateDateTime, 1000);
+
+// Listen for socket connection status
+if (typeof window !== 'undefined' && window.yamSocketManager) {
+    window.yamSocketManager.socket.on('connect', () => {
+        updateConnectionStatus(true);
+    });
+    
+    window.yamSocketManager.socket.on('disconnect', () => {
+        updateConnectionStatus(false);
+    });
+}
+</script>
+{% endmacro %} 

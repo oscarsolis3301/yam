@@ -1,0 +1,321 @@
+{% macro render_dashboard_metrics() %}
+<div class="metrics-section">
+    <div class="row">
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="metric-card slide-in" style="animation-delay: 0.1s;">
+                <div class="metric-icon bg-primary">
+                    <i class="bi bi-ticket-detailed text-white"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-value" id="openTickets">--</div>
+                    <div class="metric-label">Open Tickets</div>
+                    <div class="metric-trend positive">
+                        <i class="bi bi-arrow-up"></i>
+                        <span id="ticketsTrend">+12%</span>
+                    </div>
+                </div>
+                <div class="metric-background"></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="metric-card slide-in" style="animation-delay: 0.2s;">
+                <div class="metric-icon bg-danger">
+                    <i class="bi bi-exclamation-triangle text-white"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-value" id="activeOutages">--</div>
+                    <div class="metric-label">Active Outages</div>
+                    <div class="metric-trend negative">
+                        <i class="bi bi-arrow-down"></i>
+                        <span id="outagesTrend">-5%</span>
+                    </div>
+                </div>
+                <div class="metric-background"></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="metric-card slide-in" style="animation-delay: 0.3s;">
+                <div class="metric-icon bg-success">
+                    <i class="bi bi-people text-white"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-value" id="onlineUsersMetric">--</div>
+                    <div class="metric-label">Online Users</div>
+                    <div class="metric-trend positive">
+                        <i class="bi bi-arrow-up"></i>
+                        <span id="usersTrend">+8%</span>
+                    </div>
+                </div>
+                <div class="metric-background"></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+            <div class="metric-card slide-in" style="animation-delay: 0.4s;">
+                <div class="metric-icon bg-info">
+                    <i class="bi bi-activity text-white"></i>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-value" id="systemHealth">98%</div>
+                    <div class="metric-label">System Health</div>
+                    <div class="metric-trend positive">
+                        <i class="bi bi-arrow-up"></i>
+                        <span id="healthTrend">+2%</span>
+                    </div>
+                </div>
+                <div class="metric-background"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.metrics-section {
+    margin-bottom: 2.5rem;
+}
+
+.metric-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    cursor: pointer;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.metric-card:hover::before {
+    opacity: 1;
+}
+
+.metric-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.metric-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.metric-card:hover .metric-background {
+    opacity: 1;
+}
+
+.metric-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    font-size: 1.75rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.metric-card:hover .metric-icon {
+    transform: scale(1.1);
+}
+
+.metric-icon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+    border-radius: 18px;
+}
+
+.metric-content {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.metric-value {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 0.75rem;
+    line-height: 1;
+    transition: all 0.3s ease;
+}
+
+.metric-card:hover .metric-value {
+    transform: scale(1.05);
+}
+
+.metric-label {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+    font-weight: 600;
+}
+
+.metric-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.metric-trend.positive {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4caf50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.metric-trend.negative {
+    background: rgba(244, 67, 54, 0.15);
+    color: #f44336;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.metric-trend.neutral {
+    background: rgba(158, 158, 158, 0.15);
+    color: #9e9e9e;
+    border: 1px solid rgba(158, 158, 158, 0.3);
+}
+
+.metric-trend i {
+    font-size: 0.9rem;
+}
+
+/* Animation classes */
+.slide-in {
+    opacity: 0;
+    transform: translateY(40px);
+    animation: slideInUp 0.8s ease forwards;
+}
+
+@keyframes slideInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Pulse animation for real-time updates */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.metric-value.updating {
+    animation: pulse 0.6s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .metric-card {
+        padding: 2rem;
+    }
+    
+    .metric-value {
+        font-size: 2.5rem;
+    }
+    
+    .metric-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .metric-label {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .metric-card {
+        padding: 1.5rem;
+    }
+    
+    .metric-value {
+        font-size: 2rem;
+    }
+    
+    .metric-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+}
+</style>
+
+<script>
+// Function to update metric with animation
+function updateMetric(elementId, newValue, trendElementId = null, trendValue = null) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    // Add updating animation
+    element.classList.add('updating');
+    
+    // Update value after a short delay
+    setTimeout(() => {
+        element.textContent = newValue;
+        element.classList.remove('updating');
+    }, 300);
+    
+    // Update trend if provided
+    if (trendElementId && trendValue) {
+        const trendElement = document.getElementById(trendElementId);
+        if (trendElement) {
+            trendElement.textContent = trendValue;
+        }
+    }
+}
+
+// Function to calculate trend percentage
+function calculateTrend(oldValue, newValue) {
+    if (oldValue === 0) return newValue > 0 ? '+100%' : '0%';
+    const change = ((newValue - oldValue) / oldValue) * 100;
+    const sign = change >= 0 ? '+' : '';
+    return `${sign}${Math.round(change)}%`;
+}
+
+// Export functions for use in dashboard manager
+window.updateMetric = updateMetric;
+window.calculateTrend = calculateTrend;
+</script>
+{% endmacro %} 

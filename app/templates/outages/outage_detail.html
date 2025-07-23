@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}{{ outage.title }} - Outage{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+.outage-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+}
+
+.outage-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.outage-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.outage-status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.outage-status.active {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+}
+
+.outage-status.resolved {
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+}
+
+.outage-status.scheduled {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+}
+
+.outage-meta {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.outage-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.outage-content {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.7;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.outage-details {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.outage-details h3 {
+    color: #fff;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+}
+
+.detail-value {
+    color: #fff;
+    text-align: right;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #007bff;
+    text-decoration: none;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.back-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .outage-container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+    
+    .outage-title {
+        font-size: 1.5rem;
+    }
+    
+    .outage-content {
+        font-size: 1rem;
+    }
+    
+    .detail-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .detail-value {
+        text-align: left;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="outage-container">
+    <a href="{{ url_for('outages.outages') }}" class="back-link">
+        <i class="bi bi-arrow-left"></i>
+        Back to Outages
+    </a>
+    
+    <div class="outage-header">
+        <h1 class="outage-title">{{ outage.title }}</h1>
+        <div class="outage-status {{ outage.status }}">
+            {{ outage.status | title }}
+        </div>
+        <div class="outage-meta">
+            {% if outage.created_at %}
+            <span><i class="bi bi-calendar"></i> Created: {{ outage.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+            {% endif %}
+            {% if outage.updated_at %}
+            <span><i class="bi bi-clock"></i> Updated: {{ outage.updated_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+            {% endif %}
+            {% if outage.severity %}
+            <span><i class="bi bi-exclamation-triangle"></i> Severity: {{ outage.severity | title }}</span>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="outage-content">
+        {% if outage.description %}
+        <div class="outage-description">
+            {{ outage.description | safe }}
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="outage-details">
+        <h3>Outage Details</h3>
+        
+        {% if outage.affected_systems %}
+        <div class="detail-item">
+            <span class="detail-label">Affected Systems:</span>
+            <span class="detail-value">{{ outage.affected_systems }}</span>
+        </div>
+        {% endif %}
+        
+        {% if outage.ticket_id %}
+        <div class="detail-item">
+            <span class="detail-label">Ticket ID:</span>
+            <span class="detail-value">{{ outage.ticket_id }}</span>
+        </div>
+        {% endif %}
+        
+        {% if outage.estimated_resolution %}
+        <div class="detail-item">
+            <span class="detail-label">Estimated Resolution:</span>
+            <span class="detail-value">{{ outage.estimated_resolution }}</span>
+        </div>
+        {% endif %}
+        
+        {% if outage.created_by %}
+        <div class="detail-item">
+            <span class="detail-label">Reported By:</span>
+            <span class="detail-value">{{ outage.created_by }}</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

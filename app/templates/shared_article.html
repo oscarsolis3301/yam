@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css') }}">
+<style>
+body {
+  background: #181a1a;
+  color: #fff;
+}
+.shared-article {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #23272f;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+}
+.shared-article h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #fff;
+}
+.shared-article .meta {
+  color: #b0b0b0;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #333;
+}
+.shared-article .content {
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+.shared-article .attachments {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #333;
+}
+.shared-article .attachments a {
+  display: inline-block;
+  margin-right: 1rem;
+  margin-bottom: 0.5rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="shared-article">
+  <h1>{{ article.title }}</h1>
+  
+  <div class="meta">
+    <p>
+      <strong>Author:</strong> {{ article.author or 'Unknown' }} &nbsp;
+      <strong>Created:</strong> {{ article.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+    </p>
+    {% if article.category %}
+    <p><strong>Category:</strong> {{ article.category }}</p>
+    {% endif %}
+    {% if article.tags %}
+    <p><strong>Tags:</strong> {{ article.tags }}</p>
+    {% endif %}
+  </div>
+  
+  {% if article.description %}
+  <div class="description mb-4">
+    <h5>Description</h5>
+    <p class="text-muted">{{ article.description }}</p>
+  </div>
+  {% endif %}
+  
+  <div class="content">
+    {{ article.content|safe }}
+  </div>
+  
+  {% if article.notes %}
+  <div class="notes mb-4">
+    <h5>Notes</h5>
+    <p class="text-muted">{{ article.notes }}</p>
+  </div>
+  {% endif %}
+  
+  {% if article.attachments %}
+  <div class="attachments">
+    <h5>Attachments</h5>
+    <div>
+      {% for attachment in article.attachments %}
+      <a href="/api/kb/attachments/{{ attachment.id }}" class="btn btn-sm btn-outline-info" target="_blank">
+        <i class="bi bi-paperclip"></i> {{ attachment.filename }}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %} 

@@ -1,0 +1,233 @@
+<!-- YAM Data Scripts - SIMPLIFIED AND ERROR FREE -->
+<script>
+// YAM Data Management - Simplified Version
+window.yamData = {
+    cache: new Map(),
+    refreshIntervals: new Map(),
+    
+    // Cache management
+    set(key, value, ttl = 300000) { // 5 minutes default TTL
+        this.cache.set(key, {
+            value: value,
+            timestamp: Date.now(),
+            ttl: ttl
+        });
+    },
+    
+    get(key) {
+        const item = this.cache.get(key);
+        if (!item) return null;
+        
+        if (Date.now() - item.timestamp > item.ttl) {
+            this.cache.delete(key);
+            return null;
+        }
+        
+        return item.value;
+    },
+    
+    clear() {
+        this.cache.clear();
+    },
+    
+    // Refresh management
+    startRefresh(key, callback, interval = 30000) {
+        this.stopRefresh(key);
+        
+        const intervalId = setInterval(() => {
+            try {
+                callback();
+            } catch (error) {
+                console.error(`Error in refresh callback for ${key}:`, error);
+            }
+        }, interval);
+        
+        this.refreshIntervals.set(key, intervalId);
+    },
+    
+    stopRefresh(key) {
+        const intervalId = this.refreshIntervals.get(key);
+        if (intervalId) {
+            clearInterval(intervalId);
+            this.refreshIntervals.delete(key);
+        }
+    },
+    
+    stopAll() {
+        for (const intervalId of this.refreshIntervals.values()) {
+            clearInterval(intervalId);
+        }
+        this.refreshIntervals.clear();
+    }
+};
+
+// Data refresh utilities
+window.yamDataRefresh = {
+    intervals: new Map(),
+    
+    startRefresh: function(key, callback, interval = 30000) {
+        this.stopRefresh(key);
+        
+        const intervalId = setInterval(() => {
+            try {
+                callback();
+            } catch (error) {
+                console.error(`Error in refresh callback for ${key}:`, error);
+            }
+        }, interval);
+        
+        this.intervals.set(key, intervalId);
+    },
+    
+    stopRefresh: function(key) {
+        const intervalId = this.intervals.get(key);
+        if (intervalId) {
+            clearInterval(intervalId);
+            this.intervals.delete(key);
+        }
+    },
+    
+    stopAll: function() {
+        for (const intervalId of this.intervals.values()) {
+            clearInterval(intervalId);
+        }
+        this.intervals.clear();
+    }
+};
+
+// Simple performance monitoring - No conflicts
+window.yamSimplePerformance = {
+    metrics: {},
+    
+    startTimer: function(name) {
+        this.metrics[name] = performance.now();
+    },
+    
+    endTimer: function(name) {
+        if (this.metrics[name]) {
+            const duration = performance.now() - this.metrics[name];
+            console.log(`${name} took ${duration.toFixed(2)}ms`);
+            
+            // Send to analytics if available
+            if (window.gtag) {
+                window.gtag('event', 'performance', {
+                    metric_name: name,
+                    duration: Math.round(duration)
+                });
+            }
+            
+            delete this.metrics[name];
+            return duration;
+        }
+        return 0;
+    },
+    
+    measureAsync: async function(name, asyncFunction) {
+        this.startTimer(name);
+        try {
+            const result = await asyncFunction();
+            this.endTimer(name);
+            return result;
+        } catch (error) {
+            this.endTimer(name);
+            throw error;
+        }
+    }
+};
+
+// Initialize components safely when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait a bit for other scripts to load
+    setTimeout(() => {
+        // Initialize components that might have been missed
+        const components = [
+            'dailyAnalytics',
+            'systemMonitor', 
+            'userAnalytics',
+            'userPresenceMap',
+            'teamCollaboration'
+        ];
+        
+        components.forEach(componentName => {
+            if (window[componentName] && typeof window[componentName].init === 'function') {
+                window.safeInitComponent(componentName, () => window[componentName].init());
+            }
+        });
+    }, 1000);
+});
+
+// Safe event listener wrapper
+window.safeAddEventListener = function(element, event, handler) {
+    try {
+        if (element && typeof element.addEventListener === 'function') {
+            element.addEventListener(event, handler);
+            return true;
+        } else {
+            console.warn('Element not found or addEventListener not available:', element);
+            return false;
+        }
+    } catch (error) {
+        console.error('Error adding event listener:', error);
+        return false;
+    }
+};
+
+// Safe component initialization wrapper
+window.safeInitComponent = function(componentName, initFunction) {
+    try {
+        if (typeof initFunction === 'function') {
+            initFunction();
+            console.log(`${componentName} component initialized`);
+        } else {
+            console.warn(`${componentName} init function not found`);
+        }
+    } catch (error) {
+        console.error(`Error initializing ${componentName}:`, error);
+    }
+};
+
+// API error handling
+window.handleApiError = function(error, context) {
+    console.error(`API Error in ${context}:`, error);
+    
+    // Show user-friendly error message if needed
+    if (window.showNotification) {
+        window.showNotification('Error', `Failed to load ${context}. Please try again.`, 'error');
+    }
+};
+
+// Network status monitoring
+window.networkStatus = {
+    isOnline: navigator.onLine,
+    
+    init() {
+        window.addEventListener('online', () => {
+            this.isOnline = true;
+            console.log('Network: Back online');
+            this.handleOnline();
+        });
+        
+        window.addEventListener('offline', () => {
+            this.isOnline = false;
+            console.log('Network: Gone offline');
+            this.handleOffline();
+        });
+    },
+    
+    handleOnline() {
+        // Refresh data when back online
+        if (window.yamDataRefresh) {
+            // Trigger refresh of critical data
+            console.log('Network: Refreshing data after reconnection');
+        }
+    },
+    
+    handleOffline() {
+        // Show offline indicator
+        console.log('Network: Showing offline indicator');
+    }
+};
+
+// Initialize network monitoring
+window.networkStatus.init();
+</script> 

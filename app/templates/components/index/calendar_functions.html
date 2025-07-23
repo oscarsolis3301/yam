@@ -1,0 +1,489 @@
+{% macro render_calendar_functions() %}
+<script>
+// Calendar functionality
+function initializeCalendar() {
+    console.log('Initializing calendar...');
+    const calendar = {
+        currentDate: new Date(),
+        events: [],
+        view: 'month' // 'month' or 'day'
+    };
+
+    // Sample schedule data for testing
+    const scheduleData = [
+        {
+            department: 'DSC',
+            name: 'Anthony Risker',
+            startTime: '4:00 AM',
+            endTime: '1:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'DSC',
+            name: 'Ralph Rosalin',
+            startTime: '4:00 AM',
+            endTime: '1:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'AJ Mercado',
+            startTime: '5:00 AM',
+            endTime: '2:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'DSC',
+            name: 'Nick Gutierrez',
+            startTime: '5:00 AM',
+            endTime: '2:00 PM',
+            workDays: 'Sun - Thurs, off Fri & Sat'
+        },
+        {
+            department: 'DSC',
+            name: 'Jarrod Woodson',
+            startTime: '5:00 AM',
+            endTime: '2:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'DSC',
+            name: 'Rhonda Robinson',
+            startTime: '6:00 AM',
+            endTime: '3:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'DSC',
+            name: 'Christopher Bush',
+            startTime: '6:00 AM',
+            endTime: '3:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'DSC',
+            name: 'Mayra Lopez',
+            startTime: '6:00 AM',
+            endTime: '3:00 PM',
+            workDays: 'Tues - Sat, off Sun & Mon'
+        },
+        {
+            department: 'Remote',
+            name: 'Staci Valko',
+            startTime: '6:00 AM',
+            endTime: '3:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'Doug Spohn',
+            startTime: '6:30 AM',
+            endTime: '3:30 PM',
+            workDays: 'Tues - Sat, off Sun & Mon'
+        },
+        {
+            department: 'DSC',
+            name: 'Jayson Barker',
+            startTime: '7:00 AM',
+            endTime: '4:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'Nathan Bui',
+            startTime: '7:00 AM',
+            endTime: '4:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'Jabin Dejesa',
+            startTime: '8:00 AM',
+            endTime: '5:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'Samuel Nightingale',
+            startTime: '8:00 AM',
+            endTime: '5:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'Oscar Solis',
+            startTime: '8:00 AM',
+            endTime: '5:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'Jonathan Nguyen',
+            startTime: '8:00 AM',
+            endTime: '5:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'JZ Miranda',
+            startTime: '8:30 AM',
+            endTime: '5:30 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'Richard Nguyen',
+            startTime: '9:00 AM',
+            endTime: '6:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'Pietro Vue',
+            startTime: '11:00 AM',
+            endTime: '8:00 PM',
+            workDays: 'Mon - Fri'
+        }
+    ];
+
+    // Function to parse work days string into actual dates
+    function parseWorkDays(workDays) {
+        console.log('Parsing work days:', workDays);
+        const days = [];
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth();
+
+        // Get all days in the current month
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        // Parse work days string
+        let workDayPatterns = [];
+        if (workDays.includes('Mon - Fri')) {
+            workDayPatterns = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+        } else if (workDays.includes('Tues - Sat')) {
+            workDayPatterns = ['Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        } else if (workDays.includes('Sun - Thurs')) {
+            workDayPatterns = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu'];
+        } else if (workDays.includes('Sun - Thurs, off Fri & Sat')) {
+            workDayPatterns = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu'];
+        } else if (workDays.includes('Tues - Sat, off Sun & Mon')) {
+            workDayPatterns = ['Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        } else {
+            // Handle individual days
+            workDayPatterns = workDays.split(',').map(d => d.trim().substring(0, 3));
+        }
+        
+        console.log('Work day patterns:', workDayPatterns);
+        
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
+            const shortWeekday = weekday.substring(0, 3);
+            
+            if (workDayPatterns.includes(shortWeekday)) {
+                days.push(`${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
+            }
+        }
+
+        console.log('Generated dates:', days);
+        return days;
+    }
+
+    // Process schedule data into calendar events
+    function processScheduleData(data) {
+        console.log('Processing schedule data:', data);
+        const events = [];
+        
+        data.forEach(schedule => {
+            const days = parseWorkDays(schedule.workDays);
+            days.forEach(day => {
+                events.push({
+                    date: day,
+                    title: `${schedule.name} - Shift`,
+                    user: schedule.name,
+                    time: `${schedule.startTime} - ${schedule.endTime}`,
+                    type: 'shift',
+                    department: schedule.department
+                });
+            });
+        });
+
+        console.log('Generated events:', events);
+        return events;
+    }
+
+    // Initialize calendar with sample data
+    calendar.events = processScheduleData(scheduleData);
+    console.log('Calendar initialized with events:', calendar.events);
+
+    function renderCalendar() {
+        console.log('Rendering calendar with events:', calendar.events);
+        const year = calendar.currentDate.getFullYear();
+        const month = calendar.currentDate.getMonth();
+        const day = calendar.currentDate.getDate();
+        
+        const currentDateElement = document.getElementById('currentDate');
+        if (currentDateElement) {
+            if (calendar.view === 'month') {
+                currentDateElement.textContent = 
+                    `${calendar.currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
+            } else {
+                currentDateElement.textContent = 
+                    `${calendar.currentDate.toLocaleString('default', { 
+                        weekday: 'long',
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                    })}`;
+            }
+        }
+
+        const calendarGrid = document.getElementById('calendarGrid');
+        if (!calendarGrid) return;
+
+        if (calendar.view === 'month') {
+            renderMonthView(calendarGrid, year, month);
+        } else {
+            renderDayView(calendarGrid, year, month, day);
+        }
+    }
+
+    function renderMonthView(container, year, month) {
+        console.log('Rendering month view for:', { year, month });
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const startingDay = firstDay.getDay();
+
+        let calendarHTML = '<div class="calendar-month-view active">';
+        
+        // Add day headers
+        const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        weekdays.forEach(day => {
+            calendarHTML += `<div class="calendar-day-header">${day}</div>`;
+        });
+        
+        // Add empty cells for days before the first day of the month
+        for (let i = 0; i < startingDay; i++) {
+            calendarHTML += '<div class="calendar-day"></div>';
+        }
+
+        // Add days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const dayEvents = calendar.events.filter(event => event.date === date);
+            console.log(`Day ${day} events:`, dayEvents);
+            
+            calendarHTML += `
+                <div class="calendar-day ${dayEvents.length > 0 ? 'has-event' : ''}">
+                    <span>${day}</span>
+                    ${dayEvents.map(event => `
+                        <div class="calendar-event ${event.type}" 
+                             onclick="showShiftModal(${JSON.stringify(event).replace(/"/g, '&quot;')})"
+                             title="${event.user}: ${event.time}">
+                            <div class="event-title">${event.user}</div>
+                            <div class="event-time">${event.time}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        calendarHTML += '</div>';
+        container.innerHTML = calendarHTML;
+    }
+
+    function renderDayView(container, year, month, day) {
+        const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayEvents = calendar.events.filter(event => event.date === date);
+        console.log('Day view events:', dayEvents);
+
+        let calendarHTML = `
+            <div class="calendar-day-view active">
+                <div class="day-header">
+                    <h4>${calendar.currentDate.toLocaleString('default', { 
+                        weekday: 'long',
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                    })}</h4>
+                </div>
+                <div class="day-events">
+                    ${dayEvents.length > 0 ? dayEvents.map(event => `
+                        <div class="day-event ${event.type}" 
+                             onclick="showShiftModal(${JSON.stringify(event).replace(/"/g, '&quot;')})">
+                            <h5>${event.user}</h5>
+                            <p class="mb-1">${event.department} - ${event.title}</p>
+                            <small class="text-muted">${event.time}</small>
+                        </div>
+                    `).join('') : '<div class="text-center text-muted">No shifts scheduled for this day</div>'}
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = calendarHTML;
+    }
+
+    // Add event listeners for navigation
+    const prevDateBtn = document.getElementById('prevDate');
+    const nextDateBtn = document.getElementById('nextDate');
+    const monthViewBtn = document.getElementById('monthViewBtn');
+    const dayViewBtn = document.getElementById('dayViewBtn');
+    const weekViewBtn = document.getElementById('weekViewBtn');
+    
+    if (prevDateBtn) {
+        prevDateBtn.addEventListener('click', () => {
+            if (calendar.view === 'month') {
+                calendar.currentDate.setMonth(calendar.currentDate.getMonth() - 1);
+            } else {
+                calendar.currentDate.setDate(calendar.currentDate.getDate() - 1);
+            }
+            renderCalendar();
+        });
+    }
+    
+    if (nextDateBtn) {
+        nextDateBtn.addEventListener('click', () => {
+            if (calendar.view === 'month') {
+                calendar.currentDate.setMonth(calendar.currentDate.getMonth() + 1);
+            } else {
+                calendar.currentDate.setDate(calendar.currentDate.getDate() + 1);
+            }
+            renderCalendar();
+        });
+    }
+
+    if (monthViewBtn && dayViewBtn && weekViewBtn) {
+        monthViewBtn.addEventListener('click', () => {
+            calendar.view = 'month';
+            monthViewBtn.classList.add('active');
+            dayViewBtn.classList.remove('active');
+            weekViewBtn.classList.remove('active');
+            renderCalendar();
+        });
+
+        dayViewBtn.addEventListener('click', () => {
+            calendar.view = 'day';
+            dayViewBtn.classList.add('active');
+            monthViewBtn.classList.remove('active');
+            weekViewBtn.classList.remove('active');
+            renderCalendar();
+        });
+
+        weekViewBtn.addEventListener('click', () => {
+            calendar.view = 'week';
+            weekViewBtn.classList.add('active');
+            monthViewBtn.classList.remove('active');
+            dayViewBtn.classList.remove('active');
+            renderCalendar();
+        });
+    }
+
+    // Initial render
+    renderCalendar();
+}
+
+// Initialize calendar when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing calendar...');
+    initializeCalendar();
+    
+    // Handle outage banner dynamic positioning
+    handleOutageBannerPositioning();
+});
+
+// Function to handle outage banner positioning
+function handleOutageBannerPositioning() {
+    const outageBanner = document.getElementById('outageBanner');
+    const mainContent = document.querySelector('.admin-main-content');
+    
+    if (outageBanner && mainContent) {
+        // Check if outage banner is visible
+        const isOutageVisible = () => {
+            return outageBanner.style.display !== 'none' && 
+                   outageBanner.offsetHeight > 0;
+        };
+        
+        // Update main content padding based on outage banner visibility
+        const updatePadding = () => {
+            if (isOutageVisible()) {
+                mainContent.classList.add('with-outage-banner');
+            } else {
+                mainContent.classList.remove('with-outage-banner');
+            }
+        };
+        
+        // Initial check
+        updatePadding();
+        
+        // Watch for changes in outage banner visibility
+        const observer = new MutationObserver(updatePadding);
+        observer.observe(outageBanner, {
+            attributes: true,
+            attributeFilter: ['style', 'class'],
+            childList: true,
+            subtree: true
+        });
+        
+        // Also check on window resize
+        window.addEventListener('resize', updatePadding);
+        
+        // Check periodically for dynamic changes
+        setInterval(updatePadding, 1000);
+    }
+}
+
+// Add modal HTML to the page
+const modalHTML = `
+    <div class="shift-modal" id="shiftModal">
+        <div class="shift-modal-content">
+            <button class="shift-modal-close" onclick="closeShiftModal()">&times;</button>
+            <div class="shift-card">
+                <div class="shift-card-header">
+                    <div class="shift-card-title" id="modalUserName"></div>
+                    <div class="shift-card-subtitle" id="modalShiftType"></div>
+                </div>
+                <div class="shift-card-details">
+                    <div class="shift-card-detail">
+                        <i class="fas fa-clock"></i>
+                        <span id="modalShiftTime"></span>
+                    </div>
+                    <div class="shift-card-detail">
+                        <i class="fas fa-calendar"></i>
+                        <span id="modalShiftDate"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+`;
+document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+// Add modal functions
+window.showShiftModal = function(event) {
+    const modal = document.getElementById('shiftModal');
+    const userName = document.getElementById('modalUserName');
+    const shiftType = document.getElementById('modalShiftType');
+    const shiftTime = document.getElementById('modalShiftTime');
+    const shiftDate = document.getElementById('modalShiftDate');
+
+    userName.textContent = event.user;
+    shiftType.textContent = event.title;
+    shiftTime.textContent = event.time;
+    shiftDate.textContent = new Date(event.date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    modal.classList.add('active');
+};
+
+window.closeShiftModal = function() {
+    const modal = document.getElementById('shiftModal');
+    modal.classList.remove('active');
+};
+</script>
+{% endmacro %} 

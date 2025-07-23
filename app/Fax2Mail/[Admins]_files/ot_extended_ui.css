@@ -1,0 +1,1330 @@
+.ot-SuggestBox {
+	padding: 2px;
+}
+
+.ot-SuggestBoxPopup {
+	margin-left: 3px;
+	Background-color: #FFFFFF;
+	border: 1px solid #99B2C2;
+	border-radius: 0.35em;
+	box-shadow: 0px 1px 4px rgba(0, 63, 103, 0.2);
+}
+
+/* .ot-SuggestBoxPopup > div > table {
+	border: none;
+	border: 1px solid #99B2C2;
+	border-radius: 0.35em;
+	box-shadow: 0px 1px 4px rgba(0,63,103,0.2);
+} */
+.ot-SuggestBoxPopup .item {
+	padding: 2px 6px;
+	color: #424242;
+	cursor: default;
+	border: 1px solid #FFFFFF;
+	background-color: #FFFFFF;
+	border-radius: .15em;
+	-webkit-border-radius: .15em;
+	-moz-border-radius: .15em;
+}
+
+.ot-SuggestBoxPopup .item-selected {
+	background-color: #EAF6FC;
+	box-shadow: 0px 0px 0px 2px #99DBF0;
+}
+
+.ot-SuggestBoxPopup .suggestPopupContent {
+	background: white;
+}
+
+.ot-SuggestBoxPopup .suggestPopupMiddleCenter {
+	padding: 2px 1px 2px 1px;
+}
+
+/* .ot-SuggestBoxPopup .suggestPopupTopCenter {
+  background: url(images/hborder.png) repeat-x;
+}
+.ot-SuggestBoxPopup .suggestPopupBottomCenter {
+  background: url(images/hborder.png) repeat-x 0px -4px;
+  -background: url(images/hborder_ie6.png) repeat-x 0px -4px;
+}
+.ot-SuggestBoxPopup .suggestPopupMiddleLeft {
+  background: url(images/vborder.png) repeat-y;
+}
+.ot-SuggestBoxPopup .suggestPopupMiddleRight {
+  background: url(images/vborder.png) repeat-y -4px 0px;
+  -background: url(images/vborder_ie6.png) repeat-y -4px 0px;
+}
+
+.ot-SuggestBoxPopup .suggestPopupTopLeftInner {
+  width: 1px;
+  height: 1px;
+  zoom: 1;
+}
+.ot-SuggestBoxPopup .suggestPopupTopRightInner {
+  width: 1px;
+  height: 1px;
+  zoom: 1;
+}
+.ot-SuggestBoxPopup .suggestPopupBottomLeftInner {
+  width: 1px;
+  height: 1px;
+  zoom: 1;
+}
+.ot-SuggestBoxPopup .suggestPopupBottomRightInner {
+  width: 1px;
+  height: 1px;
+  zoom: 1;
+}
+
+.ot-SuggestBoxPopup .suggestPopupTopLeft {
+  background: url(images/corner.png) no-repeat 0px -23px;
+  -background: url(images/corner_ie6.png) no-repeat 0px -23px;
+}
+.ot-SuggestBoxPopup .suggestPopupTopRight {
+  background: url(images/corner.png) no-repeat -5px -23px;
+  -background: url(images/corner_ie6.png) no-repeat -5px -23px;
+}
+.ot-SuggestBoxPopup .suggestPopupBottomLeft {
+  background: url(images/corner.png) no-repeat 0px -28px;
+  -background: url(images/corner_ie6.png) no-repeat 0px -28px;
+}
+.ot-SuggestBoxPopup .suggestPopupBottomRight {
+  background: url(images/corner.png) no-repeat -5px -28px;
+  -background: url(images/corner_ie6.png) no-repeat -5px -28px;
+}
+
+* html .ot-SuggestBoxPopup .suggestPopupTopLeftInner {
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+* html .ot-SuggestBoxPopup .suggestPopupTopRightInner {
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+* html .ot-SuggestBoxPopup .suggestPopupBottomLeftInner {
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+* html .ot-SuggestBoxPopup .suggestPopupBottomRightInner {
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+} */
+.ot-IconToggleButton-up,.ot-IconToggleButton-up-hovering,.ot-IconToggleButton-up-disabled,.ot-IconToggleButton-down,.ot-IconToggleButton-down-hovering,.ot-IconToggleButton-down-disabled
+{
+	outline: none;
+}
+
+.ot-IconToggleButton-up,.ot-IconToggleButton-up-hovering,.ot-IconToggleButton-up-disabled
+{
+}
+
+.ot-IconToggleButton-up {
+}
+
+.ot-IconToggleButton-up-hovering {
+}
+
+.ot-IconToggleButton-up-disabled {
+}
+
+.ot-IconToggleButton-down,.ot-IconToggleButton-down-hovering,.ot-IconToggleButton-down-disabled
+{
+}
+
+.ot-IconToggleButton-down {
+}
+
+.ot-IconToggleButton-down-hovering {
+}
+
+.ot-IconToggleButton-down-disabled {
+}
+
+.ot-SearchBox {
+	border: 1px solid #99B2C2;
+	background-color: #FFFFFF;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	-moz-box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	-webkit-box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	float: left;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
+
+.ot-SearchBox .searchText {
+	background-position: 100% 0;
+	border: 0;
+	height: 14px;
+	margin: 1px 1px 1px 1px;
+	padding: 3px 0 3px 3px;
+	outline: none;
+	left: 0;
+	width: auto;
+	vertical-align: middle;
+}
+
+.ot-SearchBox .searchButton {
+	border: none;
+	background: url(images/search18_sprite.png) 0 0;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	margin: 0 2px 0 2px;
+	width: 18px;
+	height: 18px;
+	vertical-align: middle;
+}
+
+.ot-SearchBox .searchButton:hover {
+	background: url(images/search18_sprite.png) 0 -18px;
+}
+
+.ot-SearchBox .searchButton:active {
+	background: url(images/search18_sprite.png) 0 -36px;
+}
+
+.ot-ComboBox {
+	border: 1px solid #111B58;
+	background-color: #FFFFFF;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	-moz-box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	-webkit-box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	float: left;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
+
+.ot-ComboBox .textBox {
+	background-position: 100% 0;
+	border: 0;
+	height: 20px;
+	outline: none;
+	left: 0;
+	width: auto;
+	vertical-align: middle;
+}
+
+.ot-ComboBox .textBox:focus {
+	box-shadow: none;
+}
+
+.ot-ComboBox .verticalDivider {
+	vertical-align: middle;
+}
+
+.ot-ComboBox .dropButton {
+	border: none;
+	background: url(images/button_dropdown20_sprite.png) 0 0;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	width: 20px;
+	height: 20px;
+	outline: none;
+	vertical-align: middle;
+}
+
+.ot-ComboBox .dropButton:hover {
+	background: url(images/button_dropdown20_sprite.png) 0 -20px;
+}
+
+.ot-ComboBox .dropButton:active {
+	background: url(images/button_dropdown20_sprite.png) 0 -40px;
+}
+
+.ot-ComboBoxPopup {
+	
+}
+
+.ot-ComboBoxPopup .popupContent {
+	
+}
+
+.ot-ComboBoxPopup .picker {
+	Background-color: #FFFFFF;
+	border: 1px solid #111B58;
+	border-radius: 2px;
+	box-shadow: 0px 1px 4px rgba(0, 63, 103, 0.2);
+}
+
+.ot-DatePickerBox {
+	border: 1px solid #99B2C2;
+	background-color: #FFFFFF;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	-moz-box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	-webkit-box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	float: left;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
+
+.ot-DatePickerBox .textBox {
+	background-position: 100% 0;
+	border: 0;
+	height: 14px;
+	margin: 1px 1px 1px 1px;
+	padding: 3px 0 3px 3px;
+	outline: none;
+	left: 0;
+	width: auto;
+	vertical-align: middle;
+}
+
+.ot-DatePickerBox .verticalDivider {
+	vertical-align: middle;
+}
+
+.ot-DatePickerBox .dropButton {
+	border: none;
+	background: url(images/calendar18_sprite.png) 0 0;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	margin: 0 2px 0 2px;
+	width: 18px;
+	height: 18px;
+	outline: none;
+	vertical-align: middle;
+}
+
+.ot-DatePickerBox .dropButton:hover {
+	background: url(images/calendar18_sprite.png) 0 -18px;
+}
+
+.ot-DatePickerBox .dropButton:active {
+	background: url(images/calendar18_sprite.png) 0 -36px;
+}
+
+.ot-DatePickerBox input {
+	width: 9em;
+}
+
+.ot-DatePickerBox .dateBoxFormatError {
+	background: #ffcccc;
+}
+
+.ot-DatePickerBoxPopup {
+	
+}
+
+.ot-DatePickerBoxPopup .popupContent {
+	
+}
+
+.ot-DatePickerBoxPopup .datePicker {
+	width: 11.25em;
+	height: 11.563em;
+	border: 1px solid #99B2C2;
+	background-color: #FFFFFF;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	shadow: 0px 1px 4px rgba(0, 63, 103, 0.2);
+	-moz-box-shadow: 0px 1px 4px rgba(0, 63, 103, 0.2);
+	-webkit-box-shadow: 0px 1px 4px rgba(0, 63, 103, 0.2);
+}
+
+.ot-DatePickerBoxPopup .gwt-DatePicker td,.ot-DatePickerBoxPopup .datePickerMonthSelector td:focus
+	{ /* outline: none */
+	
+}
+
+.ot-DatePickerBoxPopup .datePickerDays {
+	width: 98%;
+	background: white;
+	margin: 2px;
+}
+
+.ot-DatePickerBoxPopup .datePickerDay,.ot-DatePickerBoxPopup .datePickerWeekdayLabel,.ot-DatePickerBoxPopup .datePickerWeekendLabel
+	{ /* font-size: 75%; */
+	text-align: center;
+	padding: 4px;
+	outline: none;
+}
+
+.ot-DatePickerBoxPopup .datePickerWeekdayLabel,.ot-DatePickerBoxPopup .datePickerWeekendLabel
+	{
+	background: #FFFFFF;
+	padding: 0px 4px 2px;
+	cursor: default;
+	font-weight: bold;
+}
+
+.ot-DatePickerBoxPopup .datePickerDay {
+	padding: 4px;
+	cursor: hand;
+	cursor: pointer;
+}
+
+.ot-DatePickerBoxPopup .datePickerDayIsToday {
+	/*border: 1px solid black;
+  padding: 3px; */ /* size: 0.75em; */
+	padding: 1px;
+	font-weight: bold;
+	color: #000000;
+}
+
+.ot-DatePickerBoxPopup .datePickerDayIsWeekend {
+	background: #FFFFFF;
+}
+
+.ot-DatePickerBoxPopup .datePickerDayIsFiller {
+	color: #D8D7D7;
+}
+
+.ot-DatePickerBoxPopup .datePickerDayIsValue {
+	border: 1px solid #99B2C2;
+	padding: 1px;
+	background-color: #e8f4fa;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	-moz-box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	-webkit-box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+}
+
+.ot-DatePickerBoxPopup .datePickerDayIsDisabled {
+	color: #AAAAAA;
+	font-style: italic;
+}
+
+.ot-DatePickerBoxPopup .datePickerDayIsHighlighted {
+	border: 1px solid #ecda71;
+	padding: 1px;
+	background-color: #ffffd9;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	-moz-box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	-webkit-box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+}
+
+.ot-DatePickerBoxPopup .datePickerDayIsValueAndHighlighted {
+	background: #c3ceef;
+}
+
+.ot-DatePickerBoxPopup .datePickerMonthSelector {
+	background: #FFFFFF;
+	/* width: 97%; */
+	border-bottom: 1px solid #CCD9E1;
+	margin: 2px;
+}
+
+.ot-DatePickerBoxPopup td.datePickerMonth {
+	text-align: center;
+	vertical-align: center;
+	white-space: nowrap;
+	/* font-size: 70%; */
+	font-weight: bold;
+	color: #0072AC;
+}
+
+.ot-DatePickerBoxPopup .datePickerPreviousButton {
+	border: none;
+	background: url(images/calendar_previous16_sprite.png) 0 0;
+	background-repeat: no-repeat;
+	width: 16px;
+	height: 16px;
+	outline: none;
+}
+
+.ot-DatePickerBoxPopup .datePickerPreviousButton:hover {
+	background: url(images/calendar_previous16_sprite.png) 0 -16px;
+}
+
+.ot-DatePickerBoxPopup .datePickerPreviousButton:active {
+	background: url(images/calendar_previous16_sprite.png) 0 -32px;
+}
+
+.ot-DatePickerBoxPopup .datePickerPreviousButton .html-face {
+	display: none;
+}
+
+.ot-DatePickerBoxPopup .datePickerNextButton {
+	border: none;
+	background: url(images/calendar_next16_sprite.png) 0 0;
+	background-repeat: no-repeat;
+	width: 16px;
+	height: 16px;
+	outline: none;
+}
+
+.ot-DatePickerBoxPopup .datePickerNextButton:hover {
+	background: url(images/calendar_next16_sprite.png) 0 -16px;
+}
+
+.ot-DatePickerBoxPopup .datePickerNextButton:active {
+	background: url(images/calendar_next16_sprite.png) 0 -32px;
+}
+
+.ot-DatePickerBoxPopup .datePickerNextButton .html-face {
+	display: none;
+}
+
+.ot-TimePickerBox {
+	border: 1px solid #99B2C2;
+	background-color: #FFFFFF;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	-moz-box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	-webkit-box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	float: left;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
+
+.ot-TimePickerBox .textBox {
+	background-position: 100% 0;
+	border: 0;
+	height: 14px;
+	margin: 1px 1px 1px 1px;
+	padding: 3px 0 3px 3px;
+	outline: none;
+	left: 0;
+	width: auto;
+	vertical-align: middle;
+}
+
+.ot-TimePickerBox .verticalDivider {
+	vertical-align: middle;
+}
+
+.ot-TimePickerBox .dropButton {
+	border: none;
+	background: url(images/clock18_sprite.png) 0 0;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	margin: 0 2px 0 2px;
+	width: 28px;
+	height: 28px;
+	outline: none;
+	vertical-align: middle;
+}
+
+.ot-TimePickerBox .dropButton:hover {
+	background: url(images/clock18_sprite.png) 0 -28px;
+}
+
+.ot-TimePickerBox .dropButton:active {
+	background: url(images/clock18_sprite.png) 0 -56px;
+}
+
+.ot-TimePickerBox input {
+	width: 9em;
+}
+
+.ot-TimePickerBox .timeBoxFormatError {
+	background: #ffcccc;
+}
+
+.ot-TimePickerBoxPopup {
+	
+}
+
+.ot-TimePickerBoxPopup .popupContent {
+}
+
+.ot-TimePickerBoxPopup .timePicker {
+	width: 11.25em;
+	height: 11.563em;
+	border: 1px solid #99B2C2;
+	background-color: #FFFFFF;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	shadow: 0px 1px 4px rgba(0, 63, 103, 0.2);
+	-moz-box-shadow: 0px 1px 4px rgba(0, 63, 103, 0.2);
+	-webkit-box-shadow: 0px 1px 4px rgba(0, 63, 103, 0.2);
+}
+
+/*
+.ot-TimePickerBoxPopup ::-webkit-scrollbar {
+	width: 16px;
+	height: 16px;
+	cursor: pointer;
+	background: blue;
+}
+
+.ot-TimePickerBoxPopup ::-webkit-scrollbar-track {
+	background-color: #ddd;
+	-webkit-border-radius: 2px;
+	-webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.75);
+}
+
+.ot-TimePickerBoxPopup ::-webkit-scrollbar-thumb {
+	background-color: blue;
+	-webkit-border-radius: 2px;
+}
+*/
+
+.ot-URLBox {
+	border: 1px solid #99B2C2;
+	background-color: #FFFFFF;
+	border-radius: 2px;
+/*
+	padding: 1px 2px 1px 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	-moz-box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	-webkit-box-shadow: 0px 1px 1px rgba(0, 63, 103, 0.2);
+	float: left;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+*/
+}
+.ot-URLBoxFocus {
+	outline: 2px solid #9bdaef;
+}
+.ot-URLBox .textBox {
+/*
+	height: 1.5625em;
+*/
+	height: 18px;
+	width: auto;
+	border: none;
+	font-size: 0.75em;
+	color: #333333;
+	outline: none;
+/*
+	background-position: 100% 0;
+	border: 0;
+	outline: none;
+	left: 0;
+	width: auto;
+	vertical-align: middle;
+*/
+}
+.ot-URLBox .verticalDivider {
+	height: 18px;
+	vertical-align: middle;
+}
+.ot-URLBox .dropButton {
+	border: none;
+	background: url(images/button_edit_secondary16.png) 0 0;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	margin: 0 2px 0 2px;
+	outline: none;
+	width: 16px;
+	height: 16px;
+	vertical-align: middle;
+}
+.ot-URLBox .dropButton:hover {
+	background: url(images/button_edit_secondary16.png) 0 -16px;
+}
+.ot-URLBox .dropButton:active {
+	background: url(images/button_edit_secondary16.png) 0 -32px;
+}
+.ot-URLBox input {
+	width: 9em;
+}
+.ot-URLBoxPopup {
+	border: 1px solid #99B2C2;
+	background-color: white;
+}
+.ot-URLBoxPopupContent {
+	margin: 5px 5px 5px 5px;
+}
+.ot-URLBoxUserBox {
+	margin-left: 5px;
+	margin-right: 8px;
+}
+.ot-URLBoxPasswordBox {
+	width: 7em;
+	margin-left: 5px;
+	margin-right: 8px;
+}
+.ot-URLBoxHostBox {
+	margin-left: 5px;
+	margin-right: 8px;
+}
+.ot-URLBoxPortBox {
+	width: 7em;
+	margin-left: 5px;
+	margin-right: 8px;
+}
+.ot-URLBoxPathBox {
+	width: 25em;
+	margin-left: 5px;
+}
+
+.ot-AddButton, .DecoratedFileUpload-button {
+	color: #0071A9;
+	border: none;
+	box-shadow:none;
+	background: url(images/add_sprite16.png) 0 0;
+	background-repeat: no-repeat;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	width: 14px;
+	height: 15px;
+	outline: none;
+}
+
+.ot-AddButton:hover, .DecoratedFileUpload-button:hover {
+	background: url(images/add_sprite16.png) 0 -15px;
+	border: none;
+	box-shadow: none;
+	
+}
+.ot-AddButton:active, .DecoratedFileUpload-button:active {
+	background: url(images/add_sprite16.png) 0 -30px;
+	border: none;
+	box-shadow: none;
+}
+.ot-RemoveButton {
+	border: none;
+	background: url(images/remove_sprite16.png) 0;
+	background-repeat: no-repeat;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border-radius: 2px;
+	width: 28px;
+	height: 28px;
+	outline: none;
+	padding: 0px;
+	box-sizing: content-box;
+}
+
+/************************************************************************************/
+/** Add css rules here for your application. */
+.ot-gridAdd {
+	border: none;
+	background: url(images/add_sprite16.png) 0 0px;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	margin-right: 1px;
+	width: 14px;
+	height: 14px;
+	vertical-align: middle;
+}
+
+.ot-gridAdd:hover {
+	background: url(images/add_sprite16.png) 0 -15px;
+}
+
+.ot-gridAdd:active {
+	background: url(images/add_sprite16.png) 0 -30px;
+}
+
+.ot-gridDelete {
+	border: none;
+	background: url(images/dialogue_icon_delete.png) 0 0px;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	margin-right: 1px;
+	width: 14px;
+	height: 14px;
+	vertical-align: middle;
+	margin-bottom: 3px;
+}
+
+.ot-gridDelete:hover {
+	background: url(images/dialogue_icon_delete.png) 0 -15px;
+}
+
+.ot-gridDelete:active {
+	background: url(images/dialogue_icon_delete.png) 0 -15px;
+}
+
+.ot-gridEdit {
+	border: none;
+	background: url(images/dashboard_icon_edit.png) 0 -42px;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	margin-right: 1px;
+	width: 20px;
+	height: 20px;
+	vertical-align: middle;
+}
+
+.ot-gridEdit:hover {
+	background: url(images/dashboard_icon_edit.png) 0 -21px;
+}
+
+.ot-gridEdit:active {
+	background: url(images/dashboard_icon_edit.png) 0 -42px;
+}
+
+.ot-gridPlay {
+	border: none;
+	background: url(images/dialogue_icon_play.png) 0 -42px;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	margin-right: 1px;
+	width: 20px;
+	height: 20px;
+	vertical-align: middle;
+}
+
+.ot-gridPlay:hover {
+	background: url(images/dialogue_icon_play.png) 0 -21px;
+}
+
+.ot-gridPlay:active {
+	background: url(images/dialogue_icon_play.png) 0 -42px;
+}
+
+.ot-gridDuplicate {
+	border: none;
+	background: url(images/dialogue_icon_duplicate.png) 0 -42px;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	margin-right: 1px;
+	width: 20px;
+	height: 20px;
+	vertical-align: middle;
+}
+
+.ot-gridDuplicate:hover {
+	background: url(images/dialogue_icon_duplicate.png) 0 -21px;
+}
+
+.ot-gridDuplicate:active {
+	background: url(images/dialogue_icon_duplicate.png) 0 -42px;
+}
+
+.ot-gridDownload {
+	border: none;
+	background: url(images/download-archive_log_file.png) 0 -42px;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	margin-right: 1px;
+	width: 20px;
+	height: 20px;
+	vertical-align: middle;
+}
+
+.ot-gridDownload:hover {
+	background: url(images/download-archive_log_file.png) 0 -21px;
+}
+
+.ot-gridDownload:active {
+	background: url(images/download-archive_log_file.png) 0 -42px;
+}
+
+.ot-gridClose {
+	border: none;
+	background: url(images/dialogue_icon_close.png) 0 -42px;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	margin-right: 1px;
+	width: 20px;
+	height: 20px;
+	vertical-align: middle;
+}
+
+.ot-gridClose:hover {
+	background: url(images/dialogue_icon_close.png) 0 -21px;
+}
+
+.ot-gridClose:active {
+	background: url(images/dialogue_icon_close.png) 0 -42px;
+}
+
+.ot-gridRefresh {
+	border: none;
+	background: url(images/dialogue_icon_refresh.png) 0 -42px;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	margin-right: 1px;
+	width: 20px;
+	height: 20px;
+	vertical-align: middle;
+}
+
+.ot-gridRefresh:hover {
+	background: url(images/dialogue_icon_refresh.png) 0 -21px;
+}
+
+.ot-gridRefresh:active {
+	background: url(images/dialogue_icon_refresh.png) 0 -42px;
+}
+
+.ot-gridSearch {
+	border: none;
+	background: url(images/dialogue_search20_sprite.png) 0 -40px;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	margin-right: 1px;
+	width: 20px;
+	height: 20px;
+	vertical-align: middle;
+}
+
+.ot-gridSearch:hover {
+	background: url(images/dialogue_search20_sprite.png) 0 -20px;
+}
+
+.ot-gridSearch:active {
+	background: url(images/dialogue_search20_sprite.png) 0 -40px;
+}
+
+/***********************************************************************************/
+/* @group content panel */
+.content_panel{
+	margin: 0.5em 1em 0.5em 1em;
+}
+
+.page_title{
+	font-size: 1.5em;
+	line-height: 1em;
+	color: #333333;
+	text-align: left;
+	vertical-align: top;
+	font-weight: bold;
+}
+
+.content_title {
+	font-family: Arial, Helvetica, Segoe UI, Tahoma, Sans Serif;
+	font-size:1em;
+	line-height:1.25em;
+	color: #0072AA;
+	text-align: left;
+}
+
+.content_subheading {
+	font-size: 14px;
+	line-height: 16.41px;
+	color: #333333;
+	text-align: left;
+}
+
+
+.content_table {
+  	border-spacing: 8px;
+}
+
+/* @group general */
+input:focus {
+	box-shadow: 0px 0px 0px 1px #333 inset;
+	background-color: #ffffff;
+	color: #333333;
+}
+
+input[type='radio'] {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  outline: none;
+  box-shadow: 0 0 0 1px #111B58;
+  margin-left: 5px;
+  margin-right: 3px;
+}
+
+input[type='radio']:checked {
+  box-shadow: 0 0 0 1px #111B58;
+}
+
+input[type='radio']:before {
+  content: '';
+  display: block;
+  width: 60%;
+  height: 60%;
+  margin: 20% auto;
+  border-radius: 50%;
+}
+
+input[type='radio']:checked:before {
+  background: #111B58;  
+}
+ 
+
+.div_visible {
+	visibility: visible;
+}
+
+.div_invisible {
+	visibility: hidden;
+}
+
+.div_no_display {
+	display: none;
+}
+
+.div_inline {
+	display: inline;
+}
+
+.div_block {
+	display: block;
+}
+
+.label_column {
+	vertical-align:middle;
+}	
+
+.number_label {
+  font-size: 0.75em;
+  color: #333333;
+}
+
+fieldset {
+	border: 1px solid #CCD9E1;
+	/* 1-27-2015 add more margin to caption panels*/ 
+	margin-top: 1.0em;
+}
+
+legend {
+	font-size: 0.75em;
+	/* 1-27-2015 make caption label bold */ 
+	font-weight: bold;
+	color: #333333;
+}
+
+.ot-ListBox {
+	Background-color: #FFFFFF;
+	border: 1px solid #99B2C2;
+	border-radius: 2px;
+	box-shadow: 0px 1px 4px rgba(0, 63, 103, 0.2);
+}
+
+.spinnerImage {
+	background-repeat: no-repeat;
+	background-position: center;
+	background: gray;
+	text-align: center;
+	/* position: absolute; */
+	top: 0;
+	left: 0;
+	width: 100%;
+	/*height: 100%;*/
+	z-index: 9999;
+}
+
+.disabledText {
+    color: #cccccc !important;
+}
+
+.redText {
+    color: red !important;
+}
+
+.ot-DropdownButton {
+	/*
+	background-color: #0072aa;
+	border-radius: 0.188em;
+	font-family: "Helvetica Neue", "HelveticaNeue", "Helvetica", "Arial", "Segoe UI", "Tahoma", "Sans Serif";
+	font-size: 0.75em;
+	line-height: 0.75em;
+	color: #ffffff;
+	-moz-border-radius: 0.188em;
+	-webkit-border-radius: 0.188em;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	border: none;
+	padding: 0.5em;
+	*/
+}
+
+.ot-DropdownButton:hover {
+	background-color: #e08e18;
+}
+
+.ot-DropdownButton:active {
+	background-color: #004b71;
+}
+
+.ot-DropdownButton:focus {
+  background-color: #004b71;
+}
+
+.ot-DropdownButton:disabled {
+	background-color: #ffffff;
+	border: 1px solid #cccccc;
+	color: #999999;
+}
+
+.ot-DropdownButtonPopup {
+	background-color: #ffffff;
+	border: 1px solid #999999;
+}
+
+.ot-DropdownButtonPopup .popupContent {
+}
+
+.ot-DropdownButtonPopup .picker {
+}
+
+.ot-DropdownButtonPopup .menuItem {
+	color: #333333;
+	font-size: 14px;
+	vertical-align: middle;
+	padding: 0.5em;
+	height: 1.5em;
+	cursor: pointer;
+}
+
+.ot-DropdownButtonPopup .menuItem:hover {
+	color: #333333;
+	background-color: #b2bec5;
+	border-top: 1px solid #ffffff;
+	border-bottom: 1px solid #ffffff;
+}
+
+.ot-DropdownButtonPopup .menuItem:active {
+	color: #333333;
+	background-color: #98a8b2
+	border-top: 1px solid #ffffff;
+	border-bottom: 1px solid #ffffff;
+}
+
+.ot-DropdownButtonPopup .menuItem:disabled {
+	color: #999999;
+	background-color: #ffffff;
+	border-top: none;
+	border-bottom: none;
+}
+
+.upperCase{
+	text-transform: uppercase;
+}
+.signInMsg{
+	align-self: center;
+	height: 80px;
+	font-size:20px;
+	line-height: 26px;
+		/* or 130% */
+	display: flex;
+	align-items: center;
+	text-align: center;
+
+	/* White */
+
+	color: #FFFFFF;
+}
+
+.serverMessages {
+	font-family: OpenText Sans;
+	font-size: 20px;
+	line-height: 26px;
+	/* or 130% */
+	display: flex;
+	align-items: center;
+	/* White */
+	color: #FFFFFF;
+}
+
+.userNameTextBox, .passwordTextBox {
+	width: 464px;
+	height: 46px;
+	background: #ffffff;
+	border-radius: 4px;
+	padding: 1px 2px 1px 14px;
+	font-size: 24px;
+	line-height: 24px;
+	outline: none;
+}
+
+.loginErrormessages {
+	color: #FFFFFF;
+	font-size: 20px;
+}
+
+.inlineMessageContainer, .inlineProgressContainer,
+	.inlineWarningContainer, .inlineConfirmationContainer,
+	.inlineErrorContainer, .inlineInformationContainer {
+	padding: 0.1em 0.3em 0.1em 0.3em;
+	color: #FFFFFF;
+	font-size: 0.85em;
+	line-height: 1.25em;
+	text-align: left;
+}
+
+.inlineMessageContainer {
+	background-color: #FFF6DA;;
+}
+
+.inlineProgressContainer {
+	background-color: #EAF6FC;
+}
+
+.inlineWarningContainer {
+	background-color: #FFE99B;
+}
+
+.inlineConfirmationContainer {
+	background-color: #00856A;
+}
+
+.inlineErrorContainer {
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 4px;
+}
+
+.inlineInformationContainer {
+	background-color: #0072AA;
+}
+
+.messageText {
+	font-family: "OpenText Sans";
+	font-size: 20px;
+	text-align: left;
+	vertical-align: middle;
+	padding: 0 24px 0 17px;
+	color: #ffffff;
+}
+
+.forgotPassword {
+	height: 26px;
+	font-family: OpenText Sans;
+	font-size: 16px;
+	line-height:
+	26px;
+	/* identical to box height, or 162% */
+	display: flex;
+	align-items:
+	center;
+	text-align: center;
+	/* White */
+	color: #FFFFFF;
+}
+
+.copyright {
+	font-family: OpenText Sans;
+	color: #FFFFFF;
+	font-size: 12px;
+	line-height: 12px;
+	text-align: center;
+	display: inline;
+}
+
+.signIn_button{
+	width: 141px;
+	height: 3em;
+	font-family: OpenText Sans;
+	font-size: 1.125em;
+	line-height: 18px;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	border-radius: 1.5em;
+	box-sizing: border-box;
+	background-color: #ffffff;
+	border: 1px solid #ffffff;
+	color: #232e72;
+	outline: none;
+	cursor: pointer;
+}
+.signIn_button:hover:enabled {
+	background-color: #232e72;
+	border: 1px solid #ffffff;
+	color: #ffffff;
+}
+.signIn_button:focus:enabled {
+	background-color: #171f4c;
+	border: 2px solid #ffffff;
+	color: #ffffff;
+	outline: none;
+}
+.signIn_button:active:enabled {
+	background-color: #171f4c;
+	border: 2px solid #ffffff;
+	color: #ffffff;
+	outline: none;
+}
+.signIn_button:disabled {
+	background:none;
+	border: 1px solid #5864AD;
+	outline: none;
+	color: #5864AD;
+	}
+.login_logo {
+	margin-top: 8em;
+}
+
+.progressLoader {
+	z-index: 3;
+	background-color:transparent;
+	border: none;	
+}
+
+.outer-border {
+	border: 8px solid #fff;
+	border-radius: 100%;
+	width: 67px;
+    height: 67px;
+	background: radial-gradient(circle,transparent 14px,#fff 5px);
+	z-index: 999;
+}
+
+.loader {
+	border: 12px solid #d6d5e8;
+	border-radius: 100%;
+	border-top: 12px solid #2e3d98;
+	width: 43px;
+	height: 43px;
+	-webkit-animation: spin 2s linear infinite; /* Safari */
+	animation: spin 1s linear infinite;
+}
+
+	/* Safari */
+@-webkit-keyframes spin {
+	0% { -webkit-transform: rotate(0deg); }
+	100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+.progressIndicator {
+	min-height: 66px;
+	max-width: 60%;
+	z-index: 3;
+	Background: #fff;
+	border-bottom: #2e3d98 4px solid;
+	width: auto;
+	height: auto;
+	margin: auto;
+}
+
+.progress-indicator-loader {
+	border: 5px solid #C3E5F6;
+	border-radius: 100%;
+	border-top: 5px solid #2e3d98;
+	width: 24px;
+	height: 24px;
+	-webkit-animation: spin 2s linear infinite; /* Safari */
+	animation: spin 1s linear infinite;
+	float: left;
+	margin: 1em;
+}
+.headerBar {
+	width: 100%;
+	border-collapse: collapse;
+	padding: 0;
+}
+
+.userName, .userId{
+	font-size: 12px;
+	line-height: 16px;
+	color: #ffffff;
+	text-align: left;
+	display: inline-block;
+	background: transparent;
+}
+
+.productName {
+	height: 24px;
+	margin: 14px 5px 14px 16px;
+	float: right;
+}

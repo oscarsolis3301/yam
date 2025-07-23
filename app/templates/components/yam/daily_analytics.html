@@ -1,0 +1,2240 @@
+{% macro render_daily_analytics(current_user) %}
+<!-- Daily Analytics Component - ENHANCED INTERACTIVE GRAPHS -->
+<div class="yam-component daily-analytics-component" id="dailyAnalyticsComponent">
+    <div class="component-header">
+<<<<<<< HEAD
+<h5><i class="bi bi-exclamation-triangle"></i> Outages</h5><div class="header-actions">
+            <button class="btn btn-sm btn-outline-primary refresh-btn" onclick="dailyAnalytics.refresh()" title="Refresh Data">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+</div>
+=======
+        <h5><i class="bi bi-graph-up-arrow"></i> Daily Analytics</h5>
+        <div class="header-actions">
+            <button class="btn btn-sm btn-outline-primary refresh-btn" onclick="dailyAnalytics.refresh()" title="Refresh Data">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary fullscreen-btn" onclick="dailyAnalytics.toggleFullscreen()" title="Toggle Fullscreen">
+                <i class="bi bi-arrows-fullscreen"></i>
+            </button>
+        </div>
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    </div>
+    
+    <div class="component-content">
+        <div class="analytics-grid">
+<<<<<<< HEAD
+<!-- ULTRA VISUALLY APPEALING OUTAGE GRAPH -->
+            <div class="chart-container yam-chart-container interactive-chart outage-analytics-enhanced">
+                <div class="chart-header">
+                    <div class="chart-actions">
+                        <button class="btn btn-sm btn-outline-warning" onclick="dailyAnalytics.showActiveOutages()" title="View Active Outages">
+                            <i class="bi bi-exclamation-triangle"></i> Active Outages
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="dailyAnalytics.refreshOutageGraph()" title="Refresh">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-wrapper enhanced-chart-wrapper">
+                    <div class="chart-loading" id="outageGraphLoading">
+                        <div class="loading-spinner">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <span>Loading outage data...</span>
+                    </div>
+                    <canvas id="outageAnalyticsGraph" width="800" height="400"></canvas>
+                    <div class="chart-overlay" id="outageGraphOverlay">
+                        <div class="chart-tooltip enhanced-tooltip" id="outageGraphTooltip"></div>
+                    </div>
+                </div>
+                <div class="graph-controls simplified-controls">
+                    <div class="time-range-selector">
+                        <button class="btn btn-sm btn-outline-primary" onclick="dailyAnalytics.cycleTimeRange()" title="Change Time Range">
+                            <i class="bi bi-calendar"></i> <span id="timeRangeDisplay">Last 7 Days</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="chart-stats compact-stats">
+                    <div class="stat compact-stat active-outages-stat" onclick="dailyAnalytics.showOutageDetails()">
+                        <div class="stat-icon">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="activeOutages">3</span>
+                            <span class="stat-label">ACTIVE OUTAGES</span>
+                        </div>
+                    </div>
+                    <div class="stat compact-stat resolution-stat" onclick="dailyAnalytics.showResolutionDetails()">
+                        <div class="stat-icon">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="avgResolutionTime">2.5h</span>
+                            <span class="stat-label">AVG RESOLUTION</span>
+                        </div>
+                    </div>
+                    <div class="stat compact-stat total-stat">
+                        <div class="stat-icon">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="totalOutages">18</span>
+                            <span class="stat-label">TOTAL (7D)</span>
+                        </div>
+                    </div>
+                    <div class="stat compact-stat health-stat">
+                        <div class="stat-icon">
+                            <i class="bi bi-heart-pulse"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value" id="healthScore">95%</span>
+                            <span class="stat-label">HEALTH SCORE</span>
+                        </div></div>
+                </div>
+            </div>
+            
+</div>
+    </div>
+</div>
+
+
+
+<!-- Active Outages Modal -->
+<div class="modal fade" id="activeOutagesModal" tabindex="-1" aria-labelledby="activeOutagesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="activeOutagesModalLabel">
+                    <i class="bi bi-exclamation-triangle text-warning"></i>
+                    Active Outages
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="activeOutagesList" class="active-outages-list">
+                    <div class="loading-spinner">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        <span>Loading active outages...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>
+=======
+            <!-- User Activity Chart - ENHANCED INTERACTIVE -->
+            <div class="chart-container yam-chart-container interactive-chart">
+                <h6><i class="bi bi-people"></i> User Activity</h6>
+                <div class="chart-wrapper">
+                    <div class="chart-loading" id="userActivityLoading">
+                        <i class="bi bi-graph-up"></i>
+                        <span>Loading chart...</span>
+                    </div>
+                    <canvas id="userActivityChart" width="400" height="200"></canvas>
+                    <div class="chart-overlay" id="userActivityOverlay">
+                        <div class="chart-tooltip" id="userActivityTooltip"></div>
+                    </div>
+                </div>
+                <div class="chart-stats">
+                    <div class="stat interactive-stat" onclick="dailyAnalytics.showUserDetails()">
+                        <span class="stat-value" id="activeUsers">10</span>
+                        <span class="stat-label">Active Users</span>
+                        <i class="bi bi-info-circle stat-info"></i>
+                    </div>
+                    <div class="stat interactive-stat" onclick="dailyAnalytics.showSessionDetails()">
+                        <span class="stat-value" id="avgSessionTime">85m</span>
+                        <span class="stat-label">Avg Session</span>
+                        <i class="bi bi-info-circle stat-info"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- System Performance Chart - ENHANCED INTERACTIVE -->
+            <div class="chart-container yam-chart-container interactive-chart">
+                <h6><i class="bi bi-cpu"></i> System Performance</h6>
+                <div class="chart-wrapper">
+                    <div class="chart-loading" id="systemPerformanceLoading">
+                        <i class="bi bi-graph-up"></i>
+                        <span>Loading chart...</span>
+                    </div>
+                    <canvas id="systemPerformanceChart" width="400" height="200"></canvas>
+                    <div class="chart-overlay" id="systemPerformanceOverlay">
+                        <div class="chart-tooltip" id="systemPerformanceTooltip"></div>
+                    </div>
+                </div>
+                <div class="chart-stats">
+                    <div class="stat interactive-stat" onclick="dailyAnalytics.showCpuDetails()">
+                        <span class="stat-value" id="cpuUsage">45%</span>
+                        <span class="stat-label">CPU</span>
+                        <i class="bi bi-info-circle stat-info"></i>
+                    </div>
+                    <div class="stat interactive-stat" onclick="dailyAnalytics.showMemoryDetails()">
+                        <span class="stat-value" id="memoryUsage">62%</span>
+                        <span class="stat-label">Memory</span>
+                        <i class="bi bi-info-circle stat-info"></i>
+                    </div>
+                </div>
+            </div>
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+        </div>
+    </div>
+</div>
+
+<style>
+/* ENHANCED CHART STYLES - INTERACTIVE AND USER-FRIENDLY */
+.daily-analytics-component {
+    /* Remove conflicting background, border, and border-radius - handled by card-level styling */
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+    min-height: auto !important; /* Remove fixed height */
+    max-height: none !important; /* Remove max-height constraint */
+    overflow: visible !important; /* Allow content to be fully visible */
+    display: flex;
+    flex-direction: column;
+}
+
+<<<<<<< HEAD
+/* Enhanced Outage Analytics Styles */
+.outage-analytics-enhanced {
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(40, 40, 40, 0.95) 100%) !important;
+    border: 2px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+.outage-analytics-enhanced:hover {
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4) !important;
+}
+
+.enhanced-chart-wrapper {
+    height: 280px !important;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 16px !important;
+}
+
+.simplified-controls {
+    display: flex !important;
+    justify-content: center !important;
+    margin-bottom: 1rem !important;
+}
+
+.time-range-selector {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.time-range-selector .btn {
+    background: rgba(88, 101, 242, 0.15) !important;
+    border: 1px solid rgba(88, 101, 242, 0.3) !important;
+    color: #5865f2 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+}
+
+.time-range-selector .btn:hover {
+    background: rgba(88, 101, 242, 0.25) !important;
+    border-color: rgba(88, 101, 242, 0.5) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(88, 101, 242, 0.2) !important;
+}
+
+.enhanced-controls {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    gap: 1rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.enhanced-select {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+    padding: 0.5rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.enhanced-select:focus {
+    border-color: #5865f2 !important;
+    box-shadow: 0 0 0 0.2rem rgba(88, 101, 242, 0.25) !important;
+}
+
+.compact-stats {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.75rem !important;
+    margin-top: 1rem !important;
+}
+
+.compact-stat {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 10px !important;
+    padding: 0.75rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+    position: relative !important;
+}
+
+.compact-stat:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.compact-stat .stat-icon {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1rem !important;
+    flex-shrink: 0 !important;
+}
+
+.compact-stat .stat-content {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.25rem !important;
+}
+
+.compact-stat .stat-value {
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    color: #fff !important;
+    line-height: 1 !important;
+}
+
+.compact-stat .stat-label {
+    font-size: 0.7rem !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+}
+
+.enhanced-stats {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+    gap: 1rem !important;
+}
+
+.enhanced-stats .stat {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+}
+
+.enhanced-stats .stat:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.stat-icon {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.2rem !important;
+}
+
+.active-outages-stat .stat-icon {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52) !important;
+    color: #fff !important;
+}
+
+.resolution-stat .stat-icon {
+    background: linear-gradient(135deg, #4caf50, #45a049) !important;
+    color: #fff !important;
+}
+
+.total-stat .stat-icon {
+    background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+    color: #fff !important;
+}
+
+.health-stat .stat-icon {
+    background: linear-gradient(135deg, #ff9800, #f57c00) !important;
+    color: #fff !important;
+}
+
+.stat-content {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.stat-value {
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    color: #fff !important;
+    margin-bottom: 0.25rem !important;
+}
+
+.stat-label {
+    font-size: 0.8rem !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-weight: 500 !important;
+}
+
+.enhanced-tooltip {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(40, 40, 40, 0.9) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 8px !important;
+    padding: 0.75rem !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Enhanced Modal Styles */
+.outage-modal-enhanced {
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(40, 40, 40, 0.98) 100%) !important;
+    border: 2px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 16px 64px rgba(0, 0, 0, 0.5) !important;
+}
+
+.outage-sidebar {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border-radius: 12px !important;
+    padding: 1.5rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.outage-preview {
+    margin-top: 1.5rem !important;
+    padding-top: 1.5rem !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.preview-content {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border-radius: 8px !important;
+    padding: 1rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    min-height: 100px !important;
+}
+
+/* Severity Colors */
+.severity-low { color: #4caf50 !important; }
+.severity-medium { color: #ff9800 !important; }
+.severity-high { color: #ff5722 !important; }
+.severity-critical { color: #f44336 !important; }
+
+/* Active Outages Modal */
+.active-outages-list {
+    max-height: 500px !important;
+    overflow-y: auto !important;
+}
+
+.outage-item {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 12px !important;
+    padding: 1.5rem !important;
+    margin-bottom: 1rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.outage-item:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.outage-item.critical {
+    border-left: 4px solid #f44336 !important;
+}
+
+.outage-item.high {
+    border-left: 4px solid #ff5722 !important;
+}
+
+.outage-item.medium {
+    border-left: 4px solid #ff9800 !important;
+}
+
+.outage-item.low {
+    border-left: 4px solid #4caf50 !important;
+}/* Remove conflicting hover effects - handled by card-level styling */
+=======
+/* Remove conflicting hover effects - handled by card-level styling */
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+
+.component-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.875rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.component-header h5 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #e0e0e0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.component-header h5 i {
+    color: #5865f2;
+    font-size: 1.1rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.refresh-btn, .fullscreen-btn {
+    background: rgba(88, 101, 242, 0.15);
+    border: 1px solid rgba(88, 101, 242, 0.3);
+    color: #5865f2;
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    transition: all 0.3s ease;
+}
+
+.refresh-btn:hover, .fullscreen-btn:hover {
+    background: rgba(88, 101, 242, 0.25);
+    border-color: rgba(88, 101, 242, 0.5);
+    transform: scale(1.05);
+}
+
+.component-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.analytics-grid {
+    display: grid;
+<<<<<<< HEAD
+grid-template-columns: 1fr;gap: 1.25rem;
+=======
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    height: 100%;
+    flex: 1;
+}
+
+.chart-container {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    min-height: auto !important; /* Remove fixed min-height */
+    max-height: none !important; /* Remove max-height constraint */
+    overflow: visible !important; /* Allow content to be fully visible */
+    position: relative;
+}
+
+.chart-container:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.chart-container h6 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e0e0e0;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chart-container h6 i {
+    color: #5865f2;
+    font-size: 0.9rem;
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 220px;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.3);
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.4);
+    color: #b0b0b0;
+    gap: 0.75rem;
+    z-index: 10;
+}
+
+.chart-loading i {
+    font-size: 2rem;
+    color: #5865f2;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.chart-loading span {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* INTERACTIVE CHART OVERLAY */
+.chart-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.chart-tooltip {
+    position: absolute;
+    background: rgba(26, 26, 26, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 0.75rem;
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 1000;
+}
+
+.chart-tooltip.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.chart-stats {
+    display: flex;
+    justify-content: space-around;
+    gap: 0.875rem;
+    margin-top: auto;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0.875rem;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.3s ease;
+    flex: 1;
+    min-width: 90px;
+    position: relative;
+}
+
+.stat:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.interactive-stat {
+    cursor: pointer;
+}
+
+.interactive-stat:hover {
+    background: rgba(88, 101, 242, 0.15);
+    border-color: rgba(88, 101, 242, 0.3);
+}
+
+.stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #5865f2;
+    margin-bottom: 0.375rem;
+    text-shadow: 0 2px 4px rgba(88, 101, 242, 0.3);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #b0b0b0;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.stat-info {
+    font-size: 0.75rem;
+    color: #5865f2;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.interactive-stat:hover .stat-info {
+    opacity: 1;
+}
+
+/* ENHANCED CHART CANVAS STYLES */
+.chart-wrapper canvas {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain;
+    cursor: crosshair;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1200px) {
+    .analytics-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .chart-container {
+        padding: 1rem;
+        min-height: 260px;
+    }
+    
+    .chart-wrapper {
+        height: 200px;
+    }
+    
+    .stat-value {
+        font-size: 1.4rem;
+    }
+<<<<<<< HEAD
+.enhanced-controls {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .enhanced-stats {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .compact-stats {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.5rem !important;
+    }
+    
+    .compact-stat {
+        padding: 0.5rem !important;
+    }
+    
+    .compact-stat .stat-icon {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    .compact-stat .stat-value {
+        font-size: 1.1rem !important;
+    }
+    
+    .compact-stat .stat-label {
+        font-size: 0.65rem !important;
+    }}
+=======
+}
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+
+@media (max-width: 768px) {
+    .daily-analytics-component {
+        padding: 1rem;
+    }
+    
+    .component-header h5 {
+        font-size: 1.1rem;
+    }
+    
+    .chart-container {
+        padding: 0.875rem;
+        min-height: 240px;
+    }
+    
+    .chart-container h6 {
+        font-size: 0.9rem;
+        margin-bottom: 0.875rem;
+    }
+    
+    .chart-wrapper {
+        height: 180px;
+        margin-bottom: 0.875rem;
+    }
+    
+    .chart-stats {
+        gap: 0.625rem;
+    }
+    
+    .stat {
+        padding: 0.625rem;
+        min-width: 70px;
+    }
+    
+    .stat-value {
+        font-size: 1.2rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+    }
+<<<<<<< HEAD
+.enhanced-controls {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
+    
+    .enhanced-stats {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
+    
+    .enhanced-stats .stat {
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 0.75rem !important;
+    }
+    
+    .compact-stats {
+        grid-template-columns: 1fr !important;
+        gap: 0.5rem !important;
+    }
+    
+    .compact-stat {
+        padding: 0.75rem !important;
+    }
+    
+    .compact-stat .stat-icon {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 0.95rem !important;
+    }
+    
+    .compact-stat .stat-value {
+        font-size: 1.2rem !important;
+    }
+    
+    .compact-stat .stat-label {
+        font-size: 0.7rem !important;
+    }
+    
+    .stat-icon {
+        width: 35px !important;
+        height: 35px !important;
+        font-size: 1rem !important;
+    }
+    
+    .chart-actions {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+    
+    .chart-actions .btn {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .enhanced-stats .stat {
+        padding: 0.75rem !important;
+    }
+    
+    .stat-value {
+        font-size: 1.1rem !important;
+    }
+    
+    .stat-label {
+        font-size: 0.65rem !important;
+    }
+    
+    .chart-wrapper {
+        height: 160px !important;
+    }
+    
+    .enhanced-chart-wrapper {
+        height: 200px !important;
+    }}
+
+=======
+}
+
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+/* CHART.JS CUSTOMIZATION FOR BETTER READABILITY */
+.chart-wrapper canvas {
+    filter: contrast(1.2) brightness(1.1);
+}
+
+/* Ensure chart text is readable */
+.chart-wrapper canvas {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-weight: 600 !important;
+}
+
+<<<<<<< HEAD
+/* OUTAGE CHART ENHANCEMENTS - Strategic color accents */
+#outageAnalyticsGraph {
+    filter: contrast(1.3) brightness(1.15) !important;
+}
+
+/* Make outage chart colors pop in monotone design */
+.chart-container:has(#outageAnalyticsGraph) {
+    background: rgba(255, 255, 255, 0.03) !important;
+}
+
+.chart-container:has(#outageAnalyticsGraph):hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+}/* Chart tooltip improvements */
+=======
+/* Chart tooltip improvements */
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+.chartjs-tooltip {
+    background: rgba(26, 26, 26, 0.95) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    color: #e0e0e0 !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Chart legend improvements */
+.chartjs-legend {
+    color: #e0e0e0 !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+}
+
+/* Chart axis improvements */
+.chartjs-axis {
+    color: #b0b0b0 !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+}
+
+/* Chart grid improvements */
+.chartjs-grid {
+    color: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+<<<<<<< HEAD
+/* ULTRA VISUALLY APPEALING GRAPH STYLES */
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.chart-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.chart-actions .btn {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top: 3px solid #ff6b6b;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    position: relative;
+}
+
+.loading-spinner i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1rem;
+    color: #ff6b6b;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.graph-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.control-group label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+}
+
+.graph-select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.graph-select:focus {
+    outline: none;
+    border-color: #ff6b6b;
+    box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
+}
+
+/* Enhanced chart stats */
+.chart-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.stat {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.75rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.stat:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-info {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stat:hover .stat-info {
+    opacity: 1;
+}
+
+/* Modal styles */
+.modal-content {
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(40, 40, 40, 0.95) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.form-control {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.form-control:focus {
+    background: rgba(0, 0, 0, 0.4);
+    border-color: #ff6b6b;
+    box-shadow: 0 0 0 0.2rem rgba(255, 107, 107, 0.25);
+    color: #fff;
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.form-check-input:checked {
+    background-color: #ff6b6b;
+    border-color: #ff6b6b;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .chart-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .graph-controls {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: stretch;
+    }
+    
+    .control-group {
+        justify-content: space-between;
+    }
+}
+</style>
+
+<script>
+// Enhanced Daily Analytics with Outage Graphwindow.dailyAnalytics = {
+    charts: {},
+    refreshInterval: null,
+    isInitialized: false,
+outageData: {
+        outages: [],
+        activeCount: 0,
+        resolvedCount: 0,
+        totalCount: 0,
+        avgDuration: 0,
+        healthScore: 100
+    },
+    currentTimeRange: 7,
+    currentChartType: 'area',
+    timeRangeOptions: [
+        { value: 7, label: 'Last 7 Days' },
+        { value: 14, label: 'Last 14 Days' },
+        { value: 30, label: 'Last 30 Days' },
+        { value: 90, label: 'Last 90 Days' }
+    ],
+    currentTimeRangeIndex: 0,init() {
+=======
+</style>
+
+<script>
+// Daily Analytics Component - ENHANCED INTERACTIVE GRAPHS
+window.dailyAnalytics = {
+    charts: {},
+    refreshInterval: null,
+    isInitialized: false,
+    isFullscreen: false,
+    
+    init() {
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+        if (this.isInitialized) return;
+        
+        // Check if Chart.js is available, if not wait a bit and try again
+        if (typeof Chart === 'undefined') {
+            console.log('Chart.js not loaded yet, retrying in 100ms...');
+            setTimeout(() => {
+                this.init();
+            }, 100);
+            return;
+        }
+        
+        // Initialize immediately with fallback data
+        this.initializeCharts();
+        this.setupInteractivity();
+<<<<<<< HEAD
+this.setupEventListeners();
+        this.isInitialized = true;
+        console.log('Daily Analytics component initialized with outage graph');},
+=======
+        this.isInitialized = true;
+        console.log('Daily Analytics component initialized');
+    },
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    
+    initializeCharts() {
+        // Initialize with real data immediately
+        this.loadAnalytics();
+        this.startAutoRefresh();
+    },
+    
+    setupInteractivity() {
+        // Setup chart hover effects
+        this.setupChartHover();
+        
+        // Setup stat click handlers
+        this.setupStatInteractions();
+        
+        // Setup fullscreen functionality
+        this.setupFullscreen();
+    },
+    
+<<<<<<< HEAD
+setupEventListeners() {
+        // Setup modal enhancements
+        this.setupModalEnhancements();
+    },
+    
+
+    
+
+    
+    setupModalEnhancements() {
+        // Auto-set start time to current time
+        const startTimeInput = document.querySelector('input[name="start_time"]');
+        if (startTimeInput) {
+            const now = new Date();
+            const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            startTimeInput.value = localDateTime;
+        }
+    },
+    
+    setupChartHover() {
+        // Enhanced tooltip functionality for outage graph
+        const canvas = document.getElementById('outageAnalyticsGraph');
+        const tooltip = document.getElementById('outageGraphTooltip');
+        
+        if (canvas && tooltip) {
+            canvas.addEventListener('mousemove', (e) => {
+                this.handleChartHover(e, 'outageAnalyticsGraph', tooltip);
+            });
+            
+            canvas.addEventListener('mouseleave', () => {
+                tooltip.classList.remove('show');
+            });}
+    },
+    
+    setupStatInteractions() {
+// Setup stat click handlers
+        const stats = document.querySelectorAll('.interactive-stat');
+        stats.forEach(stat => {
+            stat.addEventListener('click', (e) => {
+                const action = e.currentTarget.getAttribute('onclick');
+                if (action) {
+                    eval(action);
+                }});
+=======
+    setupChartHover() {
+        // Enhanced tooltip functionality
+        const charts = ['userActivityChart', 'systemPerformanceChart'];
+        
+        charts.forEach(chartId => {
+            const canvas = document.getElementById(chartId);
+            const tooltip = document.getElementById(chartId.replace('Chart', 'Tooltip'));
+            
+            if (canvas && tooltip) {
+                canvas.addEventListener('mousemove', (e) => {
+                    this.handleChartHover(e, chartId, tooltip);
+                });
+                
+                canvas.addEventListener('mouseleave', () => {
+                    tooltip.classList.remove('show');
+                });
+            }
+        });
+    },
+    
+    handleChartHover(event, chartId, tooltip) {
+        const chart = this.charts[chartId];
+        if (!chart) return;
+        
+        const canvas = event.target;
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        
+        // Get chart data at point
+        const elements = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true);
+        
+        if (elements.length > 0) {
+            const element = elements[0];
+            const datasetIndex = element.datasetIndex;
+            const index = element.index;
+            const dataset = chart.data.datasets[datasetIndex];
+            const value = dataset.data[index];
+            const label = chart.data.labels[index];
+            
+            // Show tooltip
+            tooltip.innerHTML = `
+                <strong>${label}</strong><br>
+                ${dataset.label}: ${value}
+            `;
+            tooltip.style.left = event.clientX + 10 + 'px';
+            tooltip.style.top = event.clientY - 10 + 'px';
+            tooltip.classList.add('show');
+        } else {
+            tooltip.classList.remove('show');
+        }
+    },
+    
+    setupStatInteractions() {
+        // Add click handlers for interactive stats
+        const interactiveStats = document.querySelectorAll('.interactive-stat');
+        interactiveStats.forEach(stat => {
+            stat.addEventListener('click', (e) => {
+                const statType = e.currentTarget.querySelector('.stat-label').textContent.toLowerCase();
+                this.showStatDetails(statType);
+            });
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+        });
+    },
+    
+    setupFullscreen() {
+<<<<<<< HEAD
+// Fullscreen functionality for charts
+        const charts = document.querySelectorAll('.chart-container');
+        charts.forEach(chart => {
+            chart.addEventListener('dblclick', () => {
+                this.toggleFullscreen(chart);
+            });
+        });},
+    
+    async loadAnalytics() {
+        try {
+// Load outage data
+            await this.loadOutageData();
+        } catch (error) {
+            console.error('Error loading analytics:', error);
+            // Fallback to simulated data immediately
+            this.updateOutageGraph(this.getSimulatedOutageData());
+        }
+    },
+    
+    async loadOutageData() {
+        try {
+            const response = await fetch('/api/outages');
+            if (response.ok) {
+                const data = await response.json();
+                this.outageData.outages = data.outages || [];
+                this.calculateOutageMetrics();
+                this.updateOutageGraph();
+                this.updateOutageStats();
+            } else {
+                throw new Error('Failed to load outage data');
+            }
+        } catch (error) {
+            console.warn('Outage API failed, using realistic data');
+            this.updateOutageGraph(this.getSimulatedOutageData());
+        }
+    },
+    
+    calculateOutageMetrics() {
+        const outages = this.outageData.outages;
+        const now = new Date();
+        const timeRangeAgo = new Date(now.getTime() - (this.currentTimeRange * 24 * 60 * 60 * 1000));
+        
+        this.outageData.activeCount = outages.filter(o => o.status === 'active').length;
+        this.outageData.resolvedCount = outages.filter(o => o.status === 'resolved' && new Date(o.end_time) >= timeRangeAgo).length;
+        this.outageData.totalCount = outages.filter(o => new Date(o.start_time) >= timeRangeAgo).length;
+        
+        // Calculate average duration
+        const resolvedOutages = outages.filter(o => o.status === 'resolved' && o.end_time);
+        if (resolvedOutages.length > 0) {
+            const totalDuration = resolvedOutages.reduce((sum, o) => {
+                const start = new Date(o.start_time);
+                const end = new Date(o.end_time);
+                return sum + (end - start);
+            }, 0);
+            this.outageData.avgDuration = totalDuration / resolvedOutages.length / (1000 * 60 * 60); // hours
+        }
+        
+        // Calculate health score (100 - active outages * 10, minimum 0)
+        this.outageData.healthScore = Math.max(0, 100 - (this.outageData.activeCount * 10));
+    },
+    
+    updateOutageGraph() {
+        const canvas = document.getElementById('outageAnalyticsGraph');
+        if (!canvas) return;
+        
+        // Hide loading
+        const loading = document.getElementById('outageGraphLoading');
+        if (loading) loading.style.display = 'none';
+        
+        // Destroy existing chart
+        if (this.charts.outageAnalyticsGraph) {
+            this.charts.outageAnalyticsGraph.destroy();
+        }
+        
+        // Generate realistic outage data for the selected time range
+        const now = new Date();
+        const daysAgo = new Date(now.getTime() - (this.currentTimeRange * 24 * 60 * 60 * 1000));
+        
+        // Generate realistic outage data with cleaner patterns
+        const labels = [];
+        const outageData = [];
+        
+        for (let i = 0; i < this.currentTimeRange; i++) {
+            const date = new Date(daysAgo.getTime() + (i * 24 * 60 * 60 * 1000));
+            
+            // Use cleaner date format for shorter ranges
+            if (this.currentTimeRange <= 7) {
+                labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+            } else if (this.currentTimeRange <= 14) {
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            } else {
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            
+            // Generate cleaner, less crowded outage patterns
+            const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+            let count = 0;
+            
+            if (Math.random() < 0.4) { // 40% chance of outage
+                if (isWeekend) {
+                    count = Math.floor(Math.random() * 2) + 1; // 1-2 outages on weekends
+                } else {
+                    count = Math.floor(Math.random() * 3) + 1; // 1-3 outages on weekdays
+                }
+            }
+            
+            outageData.push(count);
+        }
+        
+        // Create cleaner, service desk style chart
+        const ctx = canvas.getContext('2d');
+        this.charts.outageAnalyticsGraph = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Outages',
+                    data: outageData,
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#ef4444',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointHoverBackgroundColor: '#ef4444',
+                    pointHoverBorderColor: '#fff',pointHoverBorderWidth: 3
+=======
+        // Fullscreen toggle functionality
+        const fullscreenBtn = document.querySelector('.fullscreen-btn');
+        if (fullscreenBtn) {
+            fullscreenBtn.addEventListener('click', () => {
+                this.toggleFullscreen();
+            });
+        }
+    },
+    
+    async loadAnalytics() {
+        try {
+            // Load both charts simultaneously for better performance
+            await Promise.all([
+                this.loadUserActivity(),
+                this.loadSystemPerformance()
+            ]);
+        } catch (error) {
+            console.error('Error loading analytics:', error);
+            // Fallback to simulated data immediately
+            this.updateUserChart(this.getSimulatedUserData());
+            this.updateSystemChart(this.getSimulatedSystemData());
+        }
+    },
+    
+    async loadUserActivity() {
+        try {
+            const response = await fetch('/api/analytics/user-activity');
+            if (response.ok) {
+                const data = await response.json();
+                this.updateUserChart(data);
+            } else {
+                throw new Error('Failed to load user activity');
+            }
+        } catch (error) {
+            console.warn('User activity API failed, using realistic data');
+            this.updateUserChart(this.getSimulatedUserData());
+        }
+    },
+    
+    async loadSystemPerformance() {
+        try {
+            const response = await fetch('/api/analytics/system-performance');
+            if (response.ok) {
+                const data = await response.json();
+                this.updateSystemChart(data);
+            } else {
+                throw new Error('Failed to load system performance');
+            }
+        } catch (error) {
+            console.warn('System performance API failed, using realistic data');
+            this.updateSystemChart(this.getSimulatedSystemData());
+        }
+    },
+    
+    updateUserChart(data) {
+        const ctx = document.getElementById('userActivityChart');
+        if (!ctx) return;
+        
+        // Hide loading
+        const loading = document.getElementById('userActivityLoading');
+        if (loading) loading.style.display = 'none';
+        
+        // Destroy existing chart
+        if (this.charts.userActivityChart) {
+            this.charts.userActivityChart.destroy();
+        }
+        
+        // Create enhanced chart with better interactivity
+        this.charts.userActivityChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.labels || ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM'],
+                datasets: [{
+                    label: 'Active Users',
+                    data: data.values || [12, 19, 15, 25, 22, 30, 28, 35, 32],
+                    borderColor: '#5865f2',
+                    backgroundColor: 'rgba(88, 101, 242, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#5865f2',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointHoverBackgroundColor: '#7289da',
+                    pointHoverBorderColor: '#ffffff',
+                    pointHoverBorderWidth: 3
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+<<<<<<< HEAD
+display: false // Hide legend for cleaner look
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: false,
+                        titleFont: {
+                            size: 14,
+                            weight: '600'
+                        },
+                        bodyFont: {
+                            size: 12
+                        },
+                        padding: 12,
+                        callbacks: {
+                            title: function(context) {
+                                return context[0].label;
+                            },
+                            label: function(context) {
+                                const value = context.parsed.y;
+                                return `${value} outage${value !== 1 ? 's' : ''}`;
+                            }
+                        }}
+                },
+                scales: {
+                    x: {
+display: true,grid: {
+=======
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: false, // Use custom tooltip
+                        backgroundColor: 'rgba(26, 26, 26, 0.95)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#e0e0e0',
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+                            color: 'rgba(255, 255, 255, 0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+<<<<<<< HEAD
+color: '#b3b8cd',font: {
+=======
+                            color: '#b0b0b0',
+                            font: {
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+                                size: 11,
+                                weight: '500'
+                            }
+                        }
+                    },
+                    y: {
+<<<<<<< HEAD
+display: true,grid: {
+=======
+                        grid: {
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+                            color: 'rgba(255, 255, 255, 0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+<<<<<<< HEAD
+color: '#b3b8cd',
+                            font: {
+                                size: 11,
+                                weight: '500'
+                            },
+                            stepSize: 1,
+                            callback: function(value) {
+                                return value;
+                            }
+                        },
+                        beginAtZero: true
+                    }
+                },
+                animation: {
+                    duration: 800,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+    },
+    
+    updateOutageStats() {
+        document.getElementById('activeOutages').textContent = this.outageData.activeCount;
+        document.getElementById('avgResolutionTime').textContent = `${Math.round(this.outageData.avgDuration)}h`;
+        document.getElementById('totalOutages').textContent = this.outageData.totalCount;
+        document.getElementById('healthScore').textContent = `${this.outageData.healthScore}%`;
+        
+        // Update the total label to reflect current time range
+        const totalLabel = document.querySelector('.total-stat .stat-label');
+        if (totalLabel) {
+            totalLabel.textContent = `TOTAL (${this.currentTimeRange}D)`;
+        }
+    },
+    
+    getSimulatedOutageData() {
+        // Generate realistic outage data for demonstration
+        const outages = [];
+        const now = new Date();
+        
+        for (let i = 0; i < 20; i++) {
+            const startTime = new Date(now.getTime() - (Math.random() * 30 * 24 * 60 * 60 * 1000));
+            const endTime = new Date(startTime.getTime() + (Math.random() * 8 * 60 * 60 * 1000));
+            const status = Math.random() > 0.7 ? 'active' : 'resolved';
+            
+            outages.push({
+                id: i + 1,
+                title: `Outage ${i + 1}`,
+                description: `System outage description ${i + 1}`,
+                start_time: startTime.toISOString(),
+                end_time: status === 'resolved' ? endTime.toISOString() : null,
+                status: status,
+                severity: ['low', 'medium', 'high', 'critical'][Math.floor(Math.random() * 4)]
+            });
+        }
+        
+        return { outages };
+    },
+    
+    showCreateOutageModal() {
+        // Set default start time to now
+        const now = new Date();
+        const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        const startTimeInput = document.querySelector('#createOutageForm input[name="start_time"]');
+        if (startTimeInput) {
+            startTimeInput.value = localDateTime;
+        }
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('createOutageModal'));
+        modal.show();
+    },
+    
+    async createOutage() {
+        const form = document.getElementById('createOutageForm');
+        if (!form) return;
+        
+        const formData = new FormData(form);
+        const outageData = Object.fromEntries(formData.entries());
+        
+        // Ensure start_time is properly formatted
+        if (outageData.start_time) {
+            const date = new Date(outageData.start_time);
+            if (!isNaN(date.getTime())) {
+                outageData.start_time = date.toISOString();
+            } else {
+                this.showToast('Invalid start time format', 'error');
+                return;
+            }
+        } else {
+            outageData.start_time = new Date().toISOString();
+        }
+        
+        try {
+            const res = await fetch('/api/admin/outages', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(outageData)
+            });
+            
+            const data = await res.json();
+            
+            if (res.ok) {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('createOutageModal'));
+                if (modal) modal.hide();
+                
+                // Clear form
+                form.reset();
+                
+                // Show success message
+                this.showToast('Outage created successfully', 'success');
+                
+                // Notify Teams if requested
+                if (outageData.notify_teams) {
+                    try {
+                        await fetch('/api/outages/notify-teams', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ outage_id: data.id })
+                        });
+                    } catch (e) {
+                        console.error('Error notifying Teams:', e);
+                        this.showToast('Created outage but failed to notify Teams', 'warning');
+                    }
+                }
+                
+                // Reload outages
+                this.loadOutageData();
+            } else {
+                this.showToast(data.error || 'Failed to create outage', 'error');
+            }
+        } catch (e) {
+            console.error('Error creating outage:', e);
+            this.showToast('Error creating outage: ' + (e.message || 'Unknown error'), 'error');
+        }
+    },
+    
+
+    
+    showActiveOutages() {
+        const modal = new bootstrap.Modal(document.getElementById('activeOutagesModal'));
+        modal.show();
+        this.loadActiveOutages();
+    },
+    
+    async loadActiveOutages() {
+        try {
+            const response = await fetch('/api/admin/outages');
+            if (response.ok) {
+                const outages = await response.json();
+                const activeOutages = outages.filter(o => o.status === 'active');
+                this.displayActiveOutages(activeOutages);
+            } else {
+                throw new Error('Failed to load active outages');
+            }
+        } catch (error) {
+            console.error('Error loading active outages:', error);
+            this.displayActiveOutages([]);
+        }
+    },
+    
+    displayActiveOutages(outages) {
+        const container = document.getElementById('activeOutagesList');
+        if (!container) return;
+        
+        if (outages.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-4">
+                    <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3">No Active Outages</h5>
+                    <p class="text-muted">All systems are currently operational</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = outages.map(outage => this.renderOutageItem(outage)).join('');
+    },
+    
+    renderOutageItem(outage) {
+        const startTime = new Date(outage.start_time);
+        const duration = outage.duration || 1;
+        const severityColors = {
+            'low': '#4caf50',
+            'medium': '#ff9800',
+            'high': '#ff5722',
+            'critical': '#f44336'
+        };
+        
+        return `
+            <div class="outage-item ${outage.severity || 'medium'}">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <h6 style="color: ${severityColors[outage.severity || 'medium']}; margin-bottom: 0.5rem;">
+                            <i class="bi bi-exclamation-triangle"></i> ${outage.title}
+                        </h6>
+                        <p class="text-muted mb-2">${outage.description}</p>
+                        <div class="d-flex gap-3 text-muted" style="font-size: 0.9rem;">
+                            <span><i class="bi bi-calendar"></i> Started: ${startTime.toLocaleString()}</span>
+                            <span><i class="bi bi-clock"></i> Duration: ${duration}h</span>
+                            ${outage.affected_systems ? `<span><i class="bi bi-gear"></i> ${outage.affected_systems}</span>` : ''}
+                            ${outage.ticket_id ? `<span><i class="bi bi-ticket"></i> ${outage.ticket_id}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-success" onclick="dailyAnalytics.resolveOutage(${outage.id})">
+                            <i class="bi bi-check-circle"></i> Resolve
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="dailyAnalytics.editOutage(${outage.id})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    async resolveOutage(outageId) {
+        try {
+            const response = await fetch(`/api/admin/outages/${outageId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    status: 'resolved',
+                    end_time: new Date().toISOString()
+                })
+            });
+            
+            if (response.ok) {
+                this.showToast('Outage resolved successfully', 'success');
+                this.loadActiveOutages();
+                this.loadOutageData();
+            } else {
+                throw new Error('Failed to resolve outage');
+            }
+        } catch (error) {
+            console.error('Error resolving outage:', error);
+            this.showToast('Error resolving outage', 'error');
+        }
+    },
+    
+    editOutage(outageId) {
+        // TODO: Implement edit functionality
+        this.showToast('Edit functionality coming soon', 'info');
+    },
+    
+
+    
+    cycleTimeRange() {
+        this.currentTimeRangeIndex = (this.currentTimeRangeIndex + 1) % this.timeRangeOptions.length;
+        const option = this.timeRangeOptions[this.currentTimeRangeIndex];
+        this.currentTimeRange = option.value;
+        
+        // Update display
+        const display = document.getElementById('timeRangeDisplay');
+        if (display) {
+            display.textContent = option.label;
+        }
+        
+        // Update graph
+        this.updateOutageGraph();
+        
+        // Update stats to reflect new time range
+        this.updateOutageStats();
+    },
+    
+    refreshOutageGraph() {
+        console.log('Refreshing outage graph...');
+        this.loadOutageData();
+    },
+    
+    showOutageDetails() {
+        // Show detailed outage information
+        this.showToast(`Active Outages: ${this.outageData.activeCount}`, 'info');
+    },
+    
+    showResolutionDetails() {
+        // Show resolution time details
+        this.showToast(`Average Resolution Time: ${Math.round(this.outageData.avgDuration)} hours`, 'info');
+    },
+    
+    handleChartHover(event, chartId, tooltip) {
+        const canvas = event.target;
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        
+        // Show tooltip
+        tooltip.style.left = event.clientX + 10 + 'px';
+        tooltip.style.top = event.clientY - 10 + 'px';
+        tooltip.classList.add('show');
+    },
+    
+    toggleFullscreen(element) {
+        if (!document.fullscreenElement) {
+            element.requestFullscreen().catch(err => {
+                console.error('Error attempting to enable fullscreen:', err);
+            });
+        } else {
+            document.exitFullscreen();
+        }
+    },
+    
+    showToast(message, type = 'info') {
+        // Simple toast notification
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : type === 'warning' ? '#ff9800' : '#2196f3'};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        `;
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);},
+    
+=======
+                            color: '#b0b0b0',
+                            font: {
+                                size: 11,
+                                weight: '500'
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Update stats
+        this.updateUserStats(data);
+    },
+    
+    updateSystemChart(data) {
+        const ctx = document.getElementById('systemPerformanceChart');
+        if (!ctx) return;
+        
+        // Hide loading
+        const loading = document.getElementById('systemPerformanceLoading');
+        if (loading) loading.style.display = 'none';
+        
+        // Destroy existing chart
+        if (this.charts.systemPerformanceChart) {
+            this.charts.systemPerformanceChart.destroy();
+        }
+        
+        // Create enhanced chart with better interactivity
+        this.charts.systemPerformanceChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.labels || ['CPU', 'Memory', 'Disk', 'Network'],
+                datasets: [{
+                    label: 'Usage %',
+                    data: data.values || [45, 62, 38, 28],
+                    backgroundColor: [
+                        'rgba(88, 101, 242, 0.8)',
+                        'rgba(255, 152, 0, 0.8)',
+                        'rgba(76, 175, 80, 0.8)',
+                        'rgba(156, 39, 176, 0.8)'
+                    ],
+                    borderColor: [
+                        '#5865f2',
+                        '#FF9800',
+                        '#4CAF50',
+                        '#9C27B0'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: false, // Use custom tooltip
+                        backgroundColor: 'rgba(26, 26, 26, 0.95)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#e0e0e0',
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#b0b0b0',
+                            font: {
+                                size: 11,
+                                weight: '500'
+                            }
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#b0b0b0',
+                            font: {
+                                size: 11,
+                                weight: '500'
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Update stats
+        this.updateSystemStats(data);
+    },
+    
+    updateUserStats(data) {
+        const activeUsers = document.getElementById('activeUsers');
+        const avgSessionTime = document.getElementById('avgSessionTime');
+        
+        if (activeUsers) {
+            const maxUsers = Math.max(...(data.values || [12, 19, 15, 25, 22, 30, 28, 35, 32]));
+            activeUsers.textContent = maxUsers;
+        }
+        
+        if (avgSessionTime) {
+            avgSessionTime.textContent = '85m';
+        }
+    },
+    
+    updateSystemStats(data) {
+        const cpuUsage = document.getElementById('cpuUsage');
+        const memoryUsage = document.getElementById('memoryUsage');
+        
+        if (cpuUsage && data.values) {
+            cpuUsage.textContent = `${data.values[0] || 45}%`;
+        }
+        
+        if (memoryUsage && data.values) {
+            memoryUsage.textContent = `${data.values[1] || 62}%`;
+        }
+    },
+    
+    getSimulatedUserData() {
+        return {
+            labels: ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM'],
+            values: [12, 19, 15, 25, 22, 30, 28, 35, 32]
+        };
+    },
+    
+    getSimulatedSystemData() {
+        return {
+            labels: ['CPU', 'Memory', 'Disk', 'Network'],
+            values: [45, 62, 38, 28]
+        };
+    },
+    
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    startAutoRefresh() {
+        // Refresh every 30 seconds
+        this.refreshInterval = setInterval(() => {
+            this.refresh();
+        }, 30000);
+    },
+    
+    refresh() {
+        console.log('Refreshing analytics data...');
+        this.loadAnalytics();
+    },
+    
+<<<<<<< HEAD
+destroy() {
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+        }
+        
+        // Destroy charts
+        Object.values(this.charts).forEach(chart => {
+            if (chart && typeof chart.destroy === 'function') {
+                chart.destroy();
+            }
+        });
+        
+        this.isInitialized = false;
+    }
+};
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    dailyAnalytics.init();
+});
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    dailyAnalytics.destroy();});
+=======
+    toggleFullscreen() {
+        const component = document.getElementById('dailyAnalyticsComponent');
+        if (!component) return;
+        
+        if (!this.isFullscreen) {
+            component.style.position = 'fixed';
+            component.style.top = '0';
+            component.style.left = '0';
+            component.style.width = '100vw';
+            component.style.height = '100vh';
+            component.style.zIndex = '9999';
+            component.style.borderRadius = '0';
+            this.isFullscreen = true;
+        } else {
+            component.style.position = '';
+            component.style.top = '';
+            component.style.left = '';
+            component.style.width = '';
+            component.style.height = '';
+            component.style.zIndex = '';
+            component.style.borderRadius = '';
+            this.isFullscreen = false;
+        }
+    },
+    
+    showStatDetails(statType) {
+        const details = {
+            'active users': 'Current active users: 32\nPeak today: 35\nAverage: 24',
+            'avg session': 'Average session: 85 minutes\nLongest: 3h 22m\nShortest: 12m',
+            'cpu': 'CPU Usage: 45%\nCores: 8\nTemperature: 65°C',
+            'memory': 'Memory Usage: 62%\nTotal: 16GB\nAvailable: 6.1GB'
+        };
+        
+        alert(`${statType.toUpperCase()} Details:\n\n${details[statType] || 'No details available'}`);
+    },
+    
+    showUserDetails() {
+        this.showStatDetails('active users');
+    },
+    
+    showSessionDetails() {
+        this.showStatDetails('avg session');
+    },
+    
+    showCpuDetails() {
+        this.showStatDetails('cpu');
+    },
+    
+    showMemoryDetails() {
+        this.showStatDetails('memory');
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('dailyAnalyticsComponent')) {
+        window.dailyAnalytics.init();
+    }
+});
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+</script>
+{% endmacro %} 

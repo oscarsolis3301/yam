@@ -1,0 +1,1674 @@
+<!-- Universal Search Page Script Component -->
+<script>
+class UniversalSearchPage {
+    constructor() {
+        this.query = new URLSearchParams(window.location.search).get('q') || '';
+        this.currentPage = 1;
+        this.resultsPerPage = 10000; // Increased to show all results without pagination
+        this.totalResults = 0;
+        this.currentFilters = {
+            contentTypes: [],
+            sections: []
+        };
+        
+        this.initializePage();
+        this.setupEventListeners();
+    }
+    
+    async initializePage() {
+        if (!this.query) {
+            this.showNoResults();
+            return;
+        }
+        
+        this.showLoading();
+        await this.loadFilters();
+        await this.performSearch();
+    }
+    
+    async loadFilters() {
+        try {
+            const [contentTypesResponse, sectionsResponse] = await Promise.all([
+                fetch('/api/universal-search/content-types'),
+                fetch('/api/universal-search/sections')
+            ]);
+            
+            const contentTypesData = await contentTypesResponse.json();
+            const sectionsData = await sectionsResponse.json();
+            
+            this.contentTypes = contentTypesData.content_types;
+            this.sections = sectionsData.sections;
+            this.populateFilterModal();
+        } catch (error) {
+            console.error('Failed to load filters:', error);
+        }
+    }
+    
+    populateFilterModal() {
+        const contentTypeFilters = document.getElementById('modal-content-type-filters');
+        const sectionFilters = document.getElementById('modal-section-filters');
+        
+        // Populate content type filters
+        contentTypeFilters.innerHTML = '';
+        this.contentTypes.forEach(type => {
+            const filter = document.createElement('div');
+            filter.className = 'filter-option';
+            filter.innerHTML = `<i class="${type.icon}"></i><span>${type.name}</span>`;
+            filter.dataset.type = 'contentTypes';
+            filter.dataset.value = type.id;
+            filter.dataset.name = type.name;
+            filter.addEventListener('click', () => this.toggleModalFilter(filter));
+            contentTypeFilters.appendChild(filter);
+        });
+        
+        // Populate section filters
+        sectionFilters.innerHTML = '';
+        this.sections.forEach(section => {
+            const filter = document.createElement('div');
+            filter.className = 'filter-option';
+            filter.innerHTML = `<i class="${section.icon}"></i><span>${section.name}</span>`;
+            filter.dataset.type = 'sections';
+            filter.dataset.value = section.id;
+            filter.dataset.name = section.name;
+            filter.addEventListener('click', () => this.toggleModalFilter(filter));
+            sectionFilters.appendChild(filter);
+        });
+        
+        // Set up filter button click handler
+        document.getElementById('open-filter-modal').addEventListener('click', () => {
+            this.openFilterModal();
+        });
+        
+        // Set up apply filters button
+        document.getElementById('apply-filters').addEventListener('click', () => {
+            this.applyFilters();
+        });
+    }
+    
+    setupEventListeners() {
+        // Set up create note button
+        const createNoteBtn = document.getElementById('create-note-btn');
+        if (createNoteBtn) {
+            createNoteBtn.addEventListener('click', () => {
+                this.createNewNote();
+            });
+        }
+    }
+    
+    async createNewNote() {
+        try {
+            // Create a new note with the current search query as the title
+            const noteData = {
+                title: this.query || 'New Note',
+                content: JSON.stringify({
+                    ops: [
+                        { insert: this.query ? `Note created from search: "${this.query}"\n\n` : 'New note content...\n' }
+                    ]
+                }),
+                is_public: true, // Default to public
+                tags: this.query ? `search,${this.query.replace(/\s+/g, ',')}` : 'search'
+            };
+            
+            const response = await fetch('/notes/api/notes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(noteData)
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to create note: ${response.status} ${response.statusText}`);
+            }
+            
+            const newNote = await response.json();
+            
+            // Show success message
+            this.showToast('Note created successfully!', 'success');
+            
+            // Open the note in edit mode
+            this.showNoteEditableModal(newNote);
+            
+        } catch (error) {
+            console.error('Error creating note:', error);
+            this.showToast('Failed to create note. Please try again.', 'error');
+        }
+    }
+    
+    showToast(message, type = 'info') {
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#007bff'};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10000;
+            font-size: 0.95rem;
+            font-weight: 500;
+            max-width: 300px;
+            word-wrap: break-word;
+        `;
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        // Remove toast after 3 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 3000);
+    }
+    
+    toggleModalFilter(filterElement) {
+        filterElement.classList.toggle('active');
+    }
+    
+    openFilterModal() {
+        const modal = document.getElementById('universalSearchFilterModal');
+        const overlay = document.getElementById('universalSearchFilterModalOverlay');
+        
+        // Update modal filters to reflect current state
+        this.updateModalFilterStates();
+        
+        modal.classList.add('active');
+        overlay.classList.add('active');
+    }
+    
+    updateModalFilterStates() {
+        // Update content type filters
+        document.querySelectorAll('#modal-content-type-filters .filter-option').forEach(filter => {
+            const value = filter.dataset.value;
+            if (this.currentFilters.contentTypes.includes(value)) {
+                filter.classList.add('active');
+            } else {
+                filter.classList.remove('active');
+            }
+        });
+        
+        // Update section filters
+        document.querySelectorAll('#modal-section-filters .filter-option').forEach(filter => {
+            const value = filter.dataset.value;
+            if (this.currentFilters.sections.includes(value)) {
+                filter.classList.add('active');
+            } else {
+                filter.classList.remove('active');
+            }
+        });
+    }
+    
+    applyFilters() {
+        // Clear current filters
+        this.currentFilters.contentTypes = [];
+        this.currentFilters.sections = [];
+        
+        // Get active filters from modal
+        document.querySelectorAll('#modal-content-type-filters .filter-option.active').forEach(filter => {
+            this.currentFilters.contentTypes.push(filter.dataset.value);
+        });
+        
+        document.querySelectorAll('#modal-section-filters .filter-option.active').forEach(filter => {
+            this.currentFilters.sections.push(filter.dataset.value);
+        });
+        
+        // Update filter display
+        this.updateFilterDisplay();
+        
+        // Close modal
+        document.getElementById('universalSearchFilterModal').classList.remove('active');
+        document.getElementById('universalSearchFilterModalOverlay').classList.remove('active');
+        
+        // Reset to first page and perform new search
+        this.currentPage = 1;
+        this.performSearch();
+    }
+    
+    updateFilterDisplay() {
+        const display = document.getElementById('active-filters-display');
+        const count = document.getElementById('filter-count');
+        
+        const totalFilters = this.currentFilters.contentTypes.length + this.currentFilters.sections.length;
+        
+        if (totalFilters === 0) {
+            display.textContent = 'All content types';
+            count.style.display = 'none';
+        } else {
+            const activeFilters = [];
+            
+            // Add content type names
+            this.currentFilters.contentTypes.forEach(id => {
+                const type = this.contentTypes.find(t => t.id === id);
+                if (type) activeFilters.push(type.name);
+            });
+            
+            // Add section names
+            this.currentFilters.sections.forEach(id => {
+                const section = this.sections.find(s => s.id === id);
+                if (section) activeFilters.push(section.name);
+            });
+            
+            display.textContent = activeFilters.slice(0, 2).join(', ') + (activeFilters.length > 2 ? ` +${activeFilters.length - 2} more` : '');
+            count.textContent = totalFilters;
+            count.style.display = 'flex';
+        }
+    }
+    
+    async performSearch() {
+        this.showLoading();
+        
+        try {
+            const startTime = Date.now();
+            
+            const params = new URLSearchParams({
+                q: this.query,
+                limit: 10000, // Increased to get all results
+                page: this.currentPage
+            });
+            
+            if (this.currentFilters.contentTypes.length > 0) {
+                params.append('content_types', this.currentFilters.contentTypes.join(','));
+            }
+            
+            if (this.currentFilters.sections.length > 0) {
+                params.append('sections', this.currentFilters.sections.join(','));
+            }
+            
+            const response = await fetch(`/api/universal-search?${params}`);
+            const data = await response.json();
+            
+            const searchTime = Date.now() - startTime;
+            
+            if (data.results && data.results.length > 0) {
+                this.displayResults(data, searchTime);
+            } else {
+                this.showNoResults();
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+            this.showError();
+        } finally {
+            this.hideLoading();
+        }
+        
+        // Update filter display
+        this.updateFilterDisplay();
+    }
+    
+    displayResults(data, searchTime) {
+        this.totalResults = data.total;
+        
+        // Update search stats
+        document.getElementById('total-results').textContent = this.totalResults;
+        document.getElementById('search-time').textContent = `(${(searchTime / 1000).toFixed(2)}s)`;
+        
+        // Display results
+        const resultsContainer = document.getElementById('search-results');
+        resultsContainer.innerHTML = '';
+        
+        // Group results by content type
+        const grouped = data.grouped_results || {};
+        
+        Object.entries(grouped).forEach(([contentType, results]) => {
+            const groupElement = this.createResultGroup(contentType, results);
+            resultsContainer.appendChild(groupElement);
+        });
+        
+        // Show pagination if needed
+        this.updatePagination();
+        
+        // Hide no results
+        document.getElementById('no-results').style.display = 'none';
+        document.getElementById('search-results').style.display = 'grid';
+    }
+    
+    createResultGroup(contentType, results) {
+        const group = document.createElement('div');
+        group.className = 'result-group';
+        
+        const icon = this.getContentTypeIcon(contentType);
+        const title = this.getContentTypeTitle(contentType);
+        
+        group.innerHTML = `
+            <div class="result-group-header">
+                <div class="result-group-icon">
+                    <i class="${icon}"></i>
+                </div>
+                <div class="result-group-title">${title}</div>
+                <div class="result-group-count">${results.length}</div>
+            </div>
+            <div class="result-group-items">
+            </div>
+        `;
+        
+        // Append result items with proper event listeners
+        const itemsContainer = group.querySelector('.result-group-items');
+        results.forEach(result => {
+            const resultItem = this.createResultItem(result);
+            itemsContainer.appendChild(resultItem);
+        });
+        
+        return group;
+    }
+    
+    createResultItem(result) {
+        const item = document.createElement('div');
+        item.className = 'result-item';
+        
+        const meta = this.createResultMeta(result);
+        
+        item.innerHTML = `
+            <div class="result-content">
+                <div class="result-title">
+                    ${result.highlighted_title || result.title}
+                    <i class="bi bi-box-arrow-up-right result-click-indicator"></i>
+                </div>
+                <div class="result-description">${result.highlighted_content || result.description}</div>
+                <div class="result-meta">${meta}</div>
+                <span class="result-url">${result.url}</span>
+            </div>
+        `;
+        
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.navigateToResult(result);
+        });
+        return item;
+    }
+    
+    createResultMeta(result) {
+        const meta = [];
+        
+        if (result.author) {
+            meta.push(`<span class="result-meta-item"><i class="bi bi-person"></i>${result.author}</span>`);
+        }
+        
+        if (result.created_at) {
+            const date = new Date(result.created_at).toLocaleDateString();
+            meta.push(`<span class="result-meta-item"><i class="bi bi-calendar"></i>${date}</span>`);
+        }
+        
+        if (result.tags) {
+            meta.push(`<span class="result-meta-item"><i class="bi bi-tags"></i>${result.tags}</span>`);
+        }
+        
+        if (result.category) {
+            meta.push(`<span class="result-meta-item"><i class="bi bi-folder"></i>${result.category}</span>`);
+        }
+        
+        return meta.join('');
+    }
+    
+    getContentTypeIcon(contentType) {
+        const icons = {
+            'kb_article': 'bi-journal-text',
+            'outage': 'bi-exclamation-triangle',
+            'user': 'bi-person',
+            'office': 'bi-building',
+            'workstation': 'bi-laptop',
+            'document': 'bi-file-earmark-text',
+            'note': 'bi-sticky'
+        };
+        return icons[contentType] || 'bi-file-earmark';
+    }
+    
+    getContentTypeTitle(contentType) {
+        const titles = {
+            'kb_article': 'Knowledge Base Articles',
+            'outage': 'Outages',
+            'user': 'Users',
+            'office': 'Offices',
+            'workstation': 'Workstations',
+            'document': 'Documents',
+            'note': 'Notes'
+        };
+        return titles[contentType] || 'Other';
+    }
+    
+    navigateToResult(result) {
+        // Persist search context for downstream highlighting / analytics
+        sessionStorage.setItem('searchContext', JSON.stringify({
+            query: this.query,
+            resultId: result.id,
+            timestamp: Date.now()
+        }));
+
+        // Determine navigation behaviour based on content type
+        const url = result.url;
+        const type = result.content_type || '';
+
+        // Handle different content types with appropriate actions
+        if (type === 'document' || this.isPdfUrl(url)) {
+            this.openPdfModal(result);
+            return;
+        }
+
+        if (type === 'note') {
+            this.openNoteModal(result);
+            return;
+        }
+
+        if (type === 'kb_article' && this.isPdfUrl(url)) {
+            this.openPdfModal(result);
+            return;
+        }
+
+        // For all other resources use a standard in-app navigation so the
+        // browser's back button remains functional.
+        window.location.href = url;
+    }
+
+    isPdfUrl(url) {
+        return url && (url.toLowerCase().endsWith('.pdf') || url.includes('/static/docs/'));
+    }
+
+    // Note Modal Functions
+    async openNoteModal(result) {
+        console.log('openNoteModal called with:', result);
+        try {
+            // Extract note ID from the result - try multiple sources
+            let noteId = result.id;
+            
+            // If the ID has the "note_" prefix, extract the numeric part
+            if (noteId && typeof noteId === 'string' && noteId.startsWith('note_')) {
+                noteId = noteId.replace('note_', '');
+            }
+            
+            // If no direct ID, try to extract from URL
+            if (!noteId && result.url) {
+                noteId = this.extractNoteIdFromUrl(result.url);
+            }
+            
+            // If still no ID, try to extract from other result fields
+            if (!noteId && result.note_id) {
+                noteId = result.note_id;
+            }
+            
+            // If still no ID, try to parse from result data
+            if (!noteId && result.data && result.data.id) {
+                noteId = result.data.id;
+            }
+            
+            console.log('Final note ID:', noteId);
+            
+            if (!noteId) {
+                console.error('Could not determine note ID from result:', result);
+                // Show a user-friendly error modal instead of failing silently
+                this.showNoteErrorModal(result, 'Could not identify note ID');
+                return;
+            }
+
+            console.log('Fetching note data for ID:', noteId);
+            
+            // First try to fetch as owner
+            let response = await fetch(`/notes/api/notes/${noteId}`);
+            
+            console.log('Owner fetch response status:', response.status);
+            
+            if (response.status === 403) {
+                // User doesn't own this note - try public endpoint
+                console.log('User not owner, trying public endpoint');
+                response = await fetch(`/notes/api/notes/public/${noteId}`);
+                
+                console.log('Public fetch response status:', response.status);
+                
+                if (response.status === 403) {
+                    // Note is private and user doesn't own it
+                    this.showNoteAccessDeniedModal(result);
+                    return;
+                }
+                
+                if (response.status === 404) {
+                    this.showNoteErrorModal(result, 'Note not found');
+                    return;
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch public note: ${response.status} ${response.statusText}`);
+                }
+                
+                const noteData = await response.json();
+                console.log('Public note data received:', noteData);
+                // Show view-only modal for public notes from other users
+                this.showNoteViewOnlyModal(result, noteData);
+                return;
+            }
+            
+            if (response.status === 404) {
+                this.showNoteErrorModal(result, 'Note not found');
+                return;
+            }
+            
+            if (!response.ok) {
+                throw new Error(`Failed to fetch note: ${response.status} ${response.statusText}`);
+            }
+            
+            const noteData = await response.json();
+            console.log('Owner note data received:', noteData);
+            
+            // User owns this note - show editable modal
+            this.showNoteEditableModal(noteData);
+            
+        } catch (error) {
+            console.error('Error opening note modal:', error);
+            this.showNoteErrorModal(result, `Error loading note: ${error.message}`);
+        }
+    }
+
+    extractNoteIdFromUrl(url) {
+        console.log('Extracting note ID from URL:', url);
+        
+        // Extract note ID from various URL patterns
+        const patterns = [
+            /\/notes\/(\d+)/,           // /notes/123
+            /\/note\/(\d+)/,            // /note/123
+            /note_id=(\d+)/,            // ?note_id=123
+            /noteId=(\d+)/,             // ?noteId=123
+            /id=(\d+)/,                 // ?id=123
+            /notes.*\/(\d+)/,           // /notes/anything/123
+            /\/(\d+)$/                  // ends with /123
+        ];
+        
+        for (const pattern of patterns) {
+            const match = url.match(pattern);
+            if (match) {
+                console.log('Note ID extracted:', parseInt(match[1]));
+                return parseInt(match[1]);
+            }
+        }
+        
+        console.log('Could not extract note ID from URL:', url);
+        return null;
+    }
+
+    showNoteViewOnlyModal(result, noteData) {
+        const modal = document.getElementById('universalSearchNoteModal');
+        const overlay = document.getElementById('universalSearchNoteModalOverlay');
+        const content = document.getElementById('universalSearchNoteModalContent');
+        const titleEl = document.getElementById('universalSearchNoteModalTitle');
+        const editBtn = document.getElementById('universalSearchNoteEditBtn');
+        
+        if (!modal || !overlay || !content || !titleEl) {
+            // Fallback to regular navigation if modal elements don't exist
+            window.location.href = result.url;
+            return;
+        }
+
+        // Use note data if provided, otherwise use result data
+        const displayData = noteData || result;
+        
+        titleEl.textContent = displayData.title || 'Note';
+        
+        // Hide edit button for view-only mode
+        if (editBtn) {
+            editBtn.style.display = 'none';
+        }
+        
+        // Parse and display content with proper formatting
+        let displayContent = '';
+        if (noteData) {
+            // Use full note data from API
+            try {
+                if (noteData.content) {
+                    const content = JSON.parse(noteData.content);
+                    if (content.ops && Array.isArray(content.ops)) {
+                        // Process Quill.js Delta format
+                        displayContent = content.ops
+                            .filter(op => op.insert && typeof op.insert === 'string')
+                            .map(op => {
+                                let text = op.insert;
+                                // Convert newlines to proper HTML
+                                text = text.replace(/\n/g, '<br>');
+                                // Apply basic formatting if attributes exist
+                                if (op.attributes) {
+                                    if (op.attributes.bold) text = `<strong>${text}</strong>`;
+                                    if (op.attributes.italic) text = `<em>${text}</em>`;
+                                    if (op.attributes.underline) text = `<u>${text}</u>`;
+                                }
+                                return text;
+                            })
+                            .join('');
+                    } else {
+                        // Fallback for other JSON formats
+                        displayContent = JSON.stringify(content, null, 2).replace(/\n/g, '<br>');
+                    }
+                }
+            } catch (e) {
+                displayContent = noteData.content ? noteData.content.replace(/\n/g, '<br>') : '';
+            }
+        } else {
+            // Use search result description as fallback
+            displayContent = result.highlighted_description || result.description || 'No content available';
+        }
+        
+        // Ensure we have some content to display
+        if (!displayContent || displayContent.trim() === '') {
+            displayContent = '<em style="color: rgba(255, 255, 255, 0.5);">This note appears to be empty.</em>';
+        }
+        
+        // Show note content in read-only format
+        content.innerHTML = `
+            <div class="note-view-only" style="max-height: calc(100vh - 200px); overflow-y: auto;">
+                <div class="note-content-display" style="background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <div class="note-text-content" style="color: #fff; line-height: 1.6; font-size: 1rem;">${displayContent}</div>
+                </div>
+                <div class="note-meta-info" style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1rem;">
+                    ${noteData && noteData.tags ? `<div class="note-tags" style="margin-bottom: 0.75rem;">${this.renderNoteTags(noteData.tags)}</div>` : ''}
+                    <div class="note-metadata" style="display: flex; flex-wrap: wrap; gap: 1rem; color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">
+                        ${noteData && noteData.author ? `<div class="note-author"><i class="bi bi-person" style="margin-right: 0.25rem;"></i> ${noteData.author.username}</div>` : ''}
+                        ${noteData ? `<div class="note-dates"><i class="bi bi-calendar" style="margin-right: 0.25rem;"></i> ${new Date(noteData.updated_at).toLocaleDateString()}</div>` : ''}
+                        <div class="note-access-info">
+                            <i class="bi bi-eye" style="margin-right: 0.25rem; color: #ffc107;"></i> View Only
+                        </div>
+                        ${noteData && noteData.is_public ? '<div class="note-visibility"><i class="bi bi-unlock" style="margin-right: 0.25rem; color: #28a745;"></i> Public</div>' : '<div class="note-visibility"><i class="bi bi-lock" style="margin-right: 0.25rem; color: #dc3545;"></i> Private</div>'}
+                    </div>
+                </div>
+            </div>`;
+        
+        modal.classList.add('active');
+        overlay.classList.add('active');
+    }
+
+    showNoteAccessDeniedModal(result) {
+        const modal = document.getElementById('universalSearchNoteModal');
+        const overlay = document.getElementById('universalSearchNoteModalOverlay');
+        const content = document.getElementById('universalSearchNoteModalContent');
+        const titleEl = document.getElementById('universalSearchNoteModalTitle');
+        const editBtn = document.getElementById('universalSearchNoteEditBtn');
+        
+        if (!modal || !overlay || !content || !titleEl) {
+            return;
+        }
+
+        titleEl.textContent = result.title || 'Private Note';
+        
+        // Hide edit button
+        if (editBtn) {
+            editBtn.style.display = 'none';
+        }
+        
+        content.innerHTML = `
+            <div class="note-access-denied">
+                <div class="access-denied-icon">
+                    <i class="bi bi-lock-fill" style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;"></i>
+                </div>
+                <h4 style="color: #fff; margin-bottom: 1rem;">Access Denied</h4>
+                <p style="color: rgba(255, 255, 255, 0.7); text-align: center; line-height: 1.6;">
+                    This note is private and you don't have permission to view it.
+                    Only the note owner can access private notes.
+                </p>
+            </div>`;
+        
+        modal.classList.add('active');
+        overlay.classList.add('active');
+    }
+
+    showNoteErrorModal(result, errorMessage) {
+        const modal = document.getElementById('universalSearchNoteModal');
+        const overlay = document.getElementById('universalSearchNoteModalOverlay');
+        const content = document.getElementById('universalSearchNoteModalContent');
+        const titleEl = document.getElementById('universalSearchNoteModalTitle');
+        const editBtn = document.getElementById('universalSearchNoteEditBtn');
+        
+        if (!modal || !overlay || !content || !titleEl) {
+            // Fallback: show alert and try to navigate to notes page
+            alert(`Note Error: ${errorMessage}`);
+            window.location.href = '/notes';
+            return;
+        }
+
+        titleEl.textContent = result.title || 'Note Error';
+        
+        // Hide edit button
+        if (editBtn) {
+            editBtn.style.display = 'none';
+        }
+        
+        content.innerHTML = `
+            <div class="note-error" style="text-align: center; padding: 2rem;">
+                <div class="error-icon">
+                    <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem; color: #ffc107; margin-bottom: 1rem;"></i>
+                </div>
+                <h4 style="color: #fff; margin-bottom: 1rem;">Unable to Load Note</h4>
+                <p style="color: rgba(255, 255, 255, 0.7); text-align: center; line-height: 1.6; margin-bottom: 1.5rem;">
+                    ${errorMessage}
+                </p>
+                <div class="error-actions">
+                    <button class="btn btn-primary me-2" onclick="window.location.href='/notes'">
+                        <i class="bi bi-journal-text"></i> Go to Notes
+                    </button>
+                    <button class="btn btn-secondary" onclick="
+                        document.getElementById('universalSearchNoteModal').classList.remove('active');
+                        document.getElementById('universalSearchNoteModalOverlay').classList.remove('active');
+                    ">
+                        <i class="bi bi-x"></i> Close
+                    </button>
+                </div>
+            </div>`;
+        
+        modal.classList.add('active');
+        overlay.classList.add('active');
+    }
+
+    showNoteEditableModal(noteData) {
+        const modal = document.getElementById('universalSearchNoteModal');
+        const overlay = document.getElementById('universalSearchNoteModalOverlay');
+        const content = document.getElementById('universalSearchNoteModalContent');
+        const titleEl = document.getElementById('universalSearchNoteModalTitle');
+        const editBtn = document.getElementById('universalSearchNoteEditBtn');
+        
+        if (!modal || !overlay || !content || !titleEl) {
+            // Fallback to notes page if modal elements don't exist
+            window.location.href = '/notes';
+            return;
+        }
+
+        titleEl.textContent = noteData.title || 'Untitled Note';
+        
+        // Show edit button for owners
+        if (editBtn) {
+            editBtn.style.display = 'inline-flex';
+            editBtn.onclick = () => {
+                if (window.searchPageInstance && window.searchPageInstance.enableNoteEditing) {
+                    window.searchPageInstance.enableNoteEditing(noteData);
+                } else {
+                    console.error('Note editing not available');
+                    alert('Note editing is not available. Please try refreshing the page.');
+                }
+            };
+        }
+        
+        // Parse and display content with proper formatting
+        let displayContent = '';
+        try {
+            if (noteData.content) {
+                const content = JSON.parse(noteData.content);
+                if (content.ops && Array.isArray(content.ops)) {
+                    // Process Quill.js Delta format
+                    displayContent = content.ops
+                        .filter(op => op.insert && typeof op.insert === 'string')
+                        .map(op => {
+                            let text = op.insert;
+                            // Convert newlines to proper HTML
+                            text = text.replace(/\n/g, '<br>');
+                            // Apply basic formatting if attributes exist
+                            if (op.attributes) {
+                                if (op.attributes.bold) text = `<strong>${text}</strong>`;
+                                if (op.attributes.italic) text = `<em>${text}</em>`;
+                                if (op.attributes.underline) text = `<u>${text}</u>`;
+                            }
+                            return text;
+                        })
+                        .join('');
+                } else {
+                    // Fallback for other JSON formats
+                    displayContent = JSON.stringify(content, null, 2).replace(/\n/g, '<br>');
+                }
+            }
+        } catch (e) {
+            // Fallback for plain text content
+            displayContent = noteData.content ? noteData.content.replace(/\n/g, '<br>') : '';
+        }
+        
+        // Ensure we have some content to display
+        if (!displayContent || displayContent.trim() === '') {
+            displayContent = '<em style="color: rgba(255, 255, 255, 0.5);">This note appears to be empty.</em>';
+        }
+        
+        // Show note content with edit option
+        content.innerHTML = `
+            <div class="note-editable-view" style="max-height: calc(100vh - 200px); overflow-y: auto;">
+                <div class="note-content-display" style="background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <div class="note-text-content" style="color: #fff; line-height: 1.6; font-size: 1rem;">${displayContent || '<em style="color: rgba(255, 255, 255, 0.5);">No content</em>'}</div>
+                </div>
+                <div class="note-meta-info" style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1rem;">
+                    ${noteData.tags ? `<div class="note-tags" style="margin-bottom: 0.75rem;">${this.renderNoteTags(noteData.tags)}</div>` : ''}
+                    <div class="note-metadata" style="display: flex; flex-wrap: wrap; gap: 1rem; color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">
+                        <div class="note-privacy">
+                            <i class="bi ${noteData.is_public ? 'bi-unlock' : 'bi-lock-fill'}" style="margin-right: 0.25rem; color: ${noteData.is_public ? '#28a745' : '#dc3545'};"></i>
+                            ${noteData.is_public ? 'Public' : 'Private'}
+                        </div>
+                        <div class="note-dates">
+                            <i class="bi bi-calendar" style="margin-right: 0.25rem;"></i>
+                            Updated: ${new Date(noteData.updated_at).toLocaleDateString()}
+                        </div>
+                        <div class="note-owner-info">
+                            <i class="bi bi-person-check" style="margin-right: 0.25rem; color: #007bff;"></i> You own this note
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        
+        modal.classList.add('active');
+        overlay.classList.add('active');
+    }
+
+    renderNoteTags(tagsString) {
+        if (!tagsString) return '';
+        
+        const tags = tagsString.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+        return tags.map(tag => `
+            <span class="note-tag" style="
+                display: inline-block;
+                background: rgba(0, 123, 255, 0.2);
+                color: #007bff;
+                padding: 0.25rem 0.75rem;
+                border-radius: 15px;
+                font-size: 0.8rem;
+                margin: 0.125rem;
+                border: 1px solid rgba(0, 123, 255, 0.3);
+            ">
+                <i class="bi bi-tag" style="margin-right: 0.25rem;"></i>${tag}
+            </span>
+        `).join('');
+    }
+
+    updatePagination() {
+        // Since we're showing all results, hide pagination
+        const paginationContainer = document.getElementById('pagination-container');
+        paginationContainer.style.display = 'none';
+    }
+    
+    showLoading() {
+        document.getElementById('loading-container').style.display = 'block';
+        document.getElementById('search-results').style.display = 'none';
+        document.getElementById('no-results').style.display = 'none';
+        document.getElementById('pagination-container').style.display = 'none';
+    }
+    
+    hideLoading() {
+        document.getElementById('loading-container').style.display = 'none';
+    }
+    
+    async showNoResults() {
+        // Check if the query is a clock ID (1-5 digits)
+        if (/^\d{1,5}$/.test(this.query.trim())) {
+            await this.showClockIdSuggestion();
+            return;
+        }
+        
+        document.getElementById('no-results-query').textContent = this.query;
+        document.getElementById('no-results').style.display = 'block';
+        document.getElementById('search-results').style.display = 'none';
+        document.getElementById('pagination-container').style.display = 'none';
+        document.getElementById('total-results').textContent = '0';
+        document.getElementById('search-time').textContent = '';
+        this.fetchSuggestions();
+    }
+    
+    async showClockIdSuggestion() {
+        const padded = this.query.trim().padStart(5, '0');
+        
+        // Hide the regular no results section
+        document.getElementById('no-results').style.display = 'none';
+        document.getElementById('search-results').style.display = 'none';
+        document.getElementById('pagination-container').style.display = 'none';
+        
+        // Update search stats to show clock ID info
+        document.getElementById('total-results').textContent = '0';
+        document.getElementById('search-time').textContent = '';
+        
+        // Try to get cached user data for personalized display
+        let cachedUser = null;
+        let personalizedContent = '';
+        
+        try {
+            const cacheRes = await fetch(`/users/cache/${padded}`);
+            if (cacheRes.ok) {
+                const cached = await cacheRes.json();
+                if (cached && cached.success && cached.first_name) {
+                    cachedUser = cached;
+                    const fullName = `${cached.first_name} ${cached.last_name || ''}`.trim();
+                    personalizedContent = `
+                        <div style="
+                            background: rgba(255,255,255,0.1);
+                            border-radius: 12px;
+                            padding: 1rem;
+                            margin: 1rem 0;
+                            border: 1px solid rgba(255,255,255,0.2);
+                        ">
+                            <h4 style="
+                                color: white;
+                                margin-bottom: 0.5rem;
+                                font-weight: 600;
+                            ">${fullName}</h4>
+                            <p style="
+                                color: rgba(255,255,255,0.8);
+                                margin-bottom: 0.5rem;
+                                font-size: 0.9rem;
+                            ">Clock ID: ${padded}</p>
+                            ${cached.job_title ? `<p style="color: rgba(255,255,255,0.7); font-size: 0.85rem; margin: 0;">${cached.job_title}</p>` : ''}
+                        </div>
+                    `;
+                }
+            }
+        } catch (_) { /* ignore cache errors */ }
+        
+        // Create and show clock ID suggestion
+        const resultsContainer = document.getElementById('search-results');
+        resultsContainer.innerHTML = `
+            <div class="clock-id-suggestion" style="
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 16px;
+                padding: 2rem;
+                text-align: center;
+                color: white;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+                margin: 2rem 0;
+                border: 1px solid rgba(255,255,255,0.1);
+            ">
+                <div class="clock-id-icon" style="
+                    font-size: 3rem;
+                    margin-bottom: 1rem;
+                    color: rgba(255,255,255,0.9);
+                ">
+                    <i class="bi bi-person-badge"></i>
+                </div>
+                <h3 style="
+                    margin-bottom: 1rem;
+                    font-weight: 600;
+                    color: white;
+                ">${cachedUser ? 'User Found' : 'Clock ID Detected'}</h3>
+                ${cachedUser ? personalizedContent : `
+                    <p style="
+                        margin-bottom: 1.5rem;
+                        color: rgba(255,255,255,0.9);
+                        font-size: 1.1rem;
+                    ">We detected that "<strong>${this.query}</strong>" might be a Clock ID.</p>
+                    <p style="
+                        margin-bottom: 2rem;
+                        color: rgba(255,255,255,0.8);
+                        font-size: 0.95rem;
+                    ">Would you like to search for a user with Clock ID <strong>${padded}</strong>?</p>
+                `}
+                <button class="btn btn-light btn-lg" onclick="window.searchPageInstance.lookupClockId('${padded}')" style="
+                    background: rgba(255,255,255,0.9);
+                    color: #667eea;
+                    border: none;
+                    padding: 0.75rem 2rem;
+                    font-weight: 600;
+                    border-radius: 8px;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                " onmouseover="this.style.background='rgba(255,255,255,1)'" onmouseout="this.style.background='rgba(255,255,255,0.9)'">
+                    <i class="bi bi-search" style="margin-right: 0.5rem;"></i>
+                    ${cachedUser ? `View ${cachedUser.first_name}'s Full Profile` : `Lookup User ${padded}`}
+                </button>
+                <div style="
+                    margin-top: 1.5rem;
+                    padding-top: 1.5rem;
+                    border-top: 1px solid rgba(255,255,255,0.2);
+                ">
+                    <p style="
+                        color: rgba(255,255,255,0.7);
+                        font-size: 0.9rem;
+                        margin-bottom: 0.5rem;
+                    ">Or try a different search:</p>
+                    <button class="btn btn-outline-light btn-sm" onclick="window.searchPageInstance.showRegularNoResults()" style="
+                        border: 1px solid rgba(255,255,255,0.3);
+                        color: rgba(255,255,255,0.8);
+                        background: transparent;
+                        padding: 0.5rem 1rem;
+                        border-radius: 6px;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                        <i class="bi bi-arrow-left" style="margin-right: 0.5rem;"></i>
+                        Show Regular Search Results
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        resultsContainer.style.display = 'block';
+    }
+    
+    showRegularNoResults() {
+        document.getElementById('no-results-query').textContent = this.query;
+        document.getElementById('no-results').style.display = 'block';
+        document.getElementById('search-results').style.display = 'none';
+        document.getElementById('pagination-container').style.display = 'none';
+        document.getElementById('total-results').textContent = '0';
+        document.getElementById('search-time').textContent = '';
+        this.fetchSuggestions();
+    }
+    
+    async lookupClockId(clockId) {
+        try {
+            // Show loading state
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.innerHTML = `
+                <div class="clock-id-loading" style="
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    border-radius: 16px;
+                    padding: 2rem;
+                    text-align: center;
+                    color: white;
+                    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+                    margin: 2rem 0;
+                    border: 1px solid rgba(255,255,255,0.1);
+                ">
+                    <div class="loading-icon" style="
+                        font-size: 2rem;
+                        margin-bottom: 1rem;
+                        color: rgba(255,255,255,0.9);
+                    ">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                    <h3 style="
+                        margin-bottom: 1rem;
+                        font-weight: 600;
+                        color: white;
+                    ">Looking up user...</h3>
+                    <p style="
+                        color: rgba(255,255,255,0.8);
+                        font-size: 0.95rem;
+                    ">Searching for user with Clock ID <strong>${clockId}</strong></p>
+                    <div class="spinner-border text-light mt-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            `;
+            resultsContainer.style.display = 'block';
+            
+            // Attempt to personalize loader using cache
+            let personalizedMessage = 'Searching for user account...';
+            try {
+                const cacheRes = await fetch(`/users/cache/${clockId}`);
+                if (cacheRes.ok) {
+                    const cached = await cacheRes.json();
+                    if (cached && cached.first_name) {
+                        const personalized = [
+                            `Fetching ${cached.first_name}'s account information...`,
+                            `Grabbing ${cached.first_name}'s credentials...`,
+                            `Preparing ${cached.first_name}'s profile...`
+                        ];
+                        personalizedMessage = personalized[Math.floor(Math.random() * personalized.length)];
+                        
+                        // Update loading message
+                        const loadingText = resultsContainer.querySelector('p');
+                        if (loadingText) {
+                            loadingText.innerHTML = `<strong>${personalizedMessage}</strong>`;
+                        }
+                    }
+                }
+            } catch (_) { /* cache miss or error – keep generic */ }
+
+            // Perform PowerShell lookup
+            const psResponse = await fetch('/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user: clockId })
+            });
+
+            if (!psResponse.ok) {
+                throw new Error(`Lookup failed (HTTP ${psResponse.status})`);
+            }
+
+            const data = await psResponse.json();
+
+            if (!data || data.success === false || data.error) {
+                this.showClockIdError(clockId, data.error || `No user found for Clock ID ${clockId}`);
+                return;
+            }
+
+            // Map AD/PowerShell output to modal-friendly keys
+            const mapped = {
+                username: data.Username || data.username || clockId,
+                full_name: data.FullName || data.full_name || '',
+                email: data.Email || data.email || '',
+                role: data.Title || 'User',
+                title: data.Title || '',
+                clock_id: data.ClockID || clockId,
+                profile_picture: null,
+                phone: data.Phone || '',
+                password_last_reset: data.PasswordLastReset || data.password_last_reset || '',
+                account_status: data.AccountStatus || data.account_status || '',
+                locked_out: data.LockedOut ?? data.locked_out,
+                password_expired: data.PasswordExpired ?? data.password_expired,
+                email_license: data.EmailLicense || data.Email_License || data.email_license || null,
+                department: data.Department || data.department || '',
+                epic_status: data.EpicStatus || data.epic_status || '',
+                epic_block: data.EpicBlock || data.epic_block || '',
+                immutable_id: data.ImmutableID || data.immutable_id || '',
+                not_locked_out: data.NotLockedOut ?? data.not_locked_out,
+                password_not_expired: data.PasswordNotExpired ?? data.password_not_expired,
+                group_membership: data.GroupMembership || data.group_membership || [],
+                password_expiration_date: data.PasswordExpirationDate || data.password_expiration_date || '',
+                mfa_status: data.MFAStatus || data.mfa_status || '',
+                device_logon_history: data.DeviceLogonHistory || data.device_logon_history || []
+            };
+
+            // Show user modal
+            if (window.showClockIdUserModal) {
+                window.showClockIdUserModal(mapped);
+            } else {
+                // Fallback if modal function doesn't exist
+                this.showClockIdSuccess(clockId, mapped);
+            }
+
+        } catch (err) {
+            console.error('Clock ID lookup error:', err);
+            this.showClockIdError(clockId, 'Clock ID lookup failed.');
+        }
+    }
+    
+    showClockIdError(clockId, errorMessage) {
+        const resultsContainer = document.getElementById('search-results');
+        resultsContainer.innerHTML = `
+            <div class="clock-id-error" style="
+                background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+                border-radius: 16px;
+                padding: 2rem;
+                text-align: center;
+                color: white;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+                margin: 2rem 0;
+                border: 1px solid rgba(255,255,255,0.1);
+            ">
+                <div class="error-icon" style="
+                    font-size: 3rem;
+                    margin-bottom: 1rem;
+                    color: rgba(255,255,255,0.9);
+                ">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <h3 style="
+                    margin-bottom: 1rem;
+                    font-weight: 600;
+                    color: white;
+                ">User Not Found</h3>
+                <p style="
+                    margin-bottom: 1.5rem;
+                    color: rgba(255,255,255,0.9);
+                    font-size: 1.1rem;
+                ">${errorMessage}</p>
+                <button class="btn btn-light btn-lg" onclick="window.searchPageInstance.showClockIdSuggestion()" style="
+                    background: rgba(255,255,255,0.9);
+                    color: #dc3545;
+                    border: none;
+                    padding: 0.75rem 2rem;
+                    font-weight: 600;
+                    border-radius: 8px;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                " onmouseover="this.style.background='rgba(255,255,255,1)'" onmouseout="this.style.background='rgba(255,255,255,0.9)'">
+                    <i class="bi bi-arrow-left" style="margin-right: 0.5rem;"></i>
+                    Try Again
+                </button>
+            </div>
+        `;
+        resultsContainer.style.display = 'block';
+    }
+    
+    showClockIdSuccess(clockId, userData) {
+        const resultsContainer = document.getElementById('search-results');
+        resultsContainer.innerHTML = `
+            <div class="clock-id-success" style="
+                background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                border-radius: 16px;
+                padding: 2rem;
+                text-align: center;
+                color: white;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+                margin: 2rem 0;
+                border: 1px solid rgba(255,255,255,0.1);
+            ">
+                <div class="success-icon" style="
+                    font-size: 3rem;
+                    margin-bottom: 1rem;
+                    color: rgba(255,255,255,0.9);
+                ">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <h3 style="
+                    margin-bottom: 1rem;
+                    font-weight: 600;
+                    color: white;
+                ">User Found!</h3>
+                <p style="
+                    margin-bottom: 1.5rem;
+                    color: rgba(255,255,255,0.9);
+                    font-size: 1.1rem;
+                ">Successfully found user with Clock ID <strong>${clockId}</strong></p>
+                <div style="
+                    background: rgba(255,255,255,0.1);
+                    border-radius: 8px;
+                    padding: 1rem;
+                    margin-bottom: 1.5rem;
+                    text-align: left;
+                ">
+                    <p><strong>Name:</strong> ${userData.full_name || 'N/A'}</p>
+                    <p><strong>Username:</strong> ${userData.username || 'N/A'}</p>
+                    <p><strong>Email:</strong> ${userData.email || 'N/A'}</p>
+                    <p><strong>Title:</strong> ${userData.title || 'N/A'}</p>
+                </div>
+                <button class="btn btn-light btn-lg" onclick="window.searchPageInstance.showClockIdSuggestion()" style="
+                    background: rgba(255,255,255,0.9);
+                    color: #28a745;
+                    border: none;
+                    padding: 0.75rem 2rem;
+                    font-weight: 600;
+                    border-radius: 8px;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                " onmouseover="this.style.background='rgba(255,255,255,1)'" onmouseout="this.style.background='rgba(255,255,255,0.9)'">
+                    <i class="bi bi-search" style="margin-right: 0.5rem;"></i>
+                    Search Another Clock ID
+                </button>
+            </div>
+        `;
+        resultsContainer.style.display = 'block';
+    }
+    
+    async fetchSuggestions() {
+        try {
+            const resp = await fetch(`/api/universal-search/suggestions?q=${encodeURIComponent(this.query)}&limit=12`);
+            const data = await resp.json();
+            const container = document.getElementById('no-results-did-you-mean');
+            const list = document.getElementById('suggestions-list');
+            
+            if(data.suggestions && data.suggestions.length){
+                // Process suggestions to handle special patterns
+                const processedSuggestions = this.processSuggestions(data.suggestions);
+                
+                // Group suggestions by type
+                const groupedSuggestions = this.groupSuggestions(processedSuggestions);
+                
+                let suggestionsHtml = '';
+                
+                // Add pattern suggestions first
+                if (groupedSuggestions.patterns.length > 0) {
+                    suggestionsHtml += '<div class="suggestion-group"><h5>Quick Actions</h5>';
+                    suggestionsHtml += groupedSuggestions.patterns.map(s => {
+                        const icon = this.getSuggestionIcon(s);
+                        return `<li class="suggestion-item pattern-suggestion" data-suggestion="${s}">
+                            <i class="${icon}"></i> ${s}
+                        </li>`;
+                    }).join('');
+                    suggestionsHtml += '</div>';
+                }
+                
+                // Add related searches
+                if (groupedSuggestions.related.length > 0) {
+                    suggestionsHtml += '<div class="suggestion-group"><h5>Related Searches</h5>';
+                    suggestionsHtml += groupedSuggestions.related.map(s => {
+                        const icon = this.getSuggestionIcon(s);
+                        return `<li class="suggestion-item" data-suggestion="${s}">
+                            <i class="${icon}"></i> ${s}
+                        </li>`;
+                    }).join('');
+                    suggestionsHtml += '</div>';
+                }
+                
+                // Add popular searches
+                if (groupedSuggestions.popular.length > 0) {
+                    suggestionsHtml += '<div class="suggestion-group"><h5>Popular Searches</h5>';
+                    suggestionsHtml += groupedSuggestions.popular.map(s => {
+                        const icon = this.getSuggestionIcon(s);
+                        return `<li class="suggestion-item" data-suggestion="${s}">
+                            <i class="${icon}"></i> ${s}
+                        </li>`;
+                    }).join('');
+                    suggestionsHtml += '</div>';
+                }
+                
+                list.innerHTML = suggestionsHtml;
+                
+                container.style.display='block';
+                list.querySelectorAll('.suggestion-item').forEach(el => el.addEventListener('click', () => {
+                    // Clear all filters before searching
+                    this.currentFilters.contentTypes = [];
+                    this.currentFilters.sections = [];
+                    this.updateFilterDisplay();
+
+                    const suggestion = el.dataset.suggestion;
+                    // Handle pattern suggestions specially
+                    if (suggestion.startsWith('Search for Clock ID') || suggestion.startsWith('Find employee')) {
+                        // Extract the number and search for it
+                        const match = suggestion.match(/\d+/);
+                        if (match) {
+                            this.query = match[0];
+                            document.getElementById('search-query').textContent = this.query;
+                            this.currentPage = 1;
+                            this.performSearch();
+                        }
+                    } else if (suggestion.startsWith('Search for') || suggestion.startsWith('Find')) {
+                        // Extract the actual search term
+                        const searchTerm = suggestion.replace(/^(Search for|Find)\s+/i, '');
+                        this.query = searchTerm;
+                        document.getElementById('search-query').textContent = this.query;
+                        this.currentPage = 1;
+                        this.performSearch();
+                    } else {
+                        // Regular suggestion
+                        this.query = suggestion;
+                        document.getElementById('search-query').textContent = this.query;
+                        this.currentPage = 1;
+                        this.performSearch();
+                    }
+                }));
+            } else {
+                container.style.display='none';
+                // Show fallback content when no suggestions are available
+                document.getElementById('no-results-fallback').style.display = 'block';
+            }
+        } catch(err){
+            console.error('Suggestion fetch failed', err);
+            // Show fallback content when suggestions fail to load
+            document.getElementById('no-results-fallback').style.display = 'block';
+        }
+    }
+    
+    groupSuggestions(suggestions) {
+        const groups = {
+            patterns: [],
+            related: [],
+            popular: []
+        };
+        
+        suggestions.forEach(suggestion => {
+            if (suggestion.startsWith('Search for') || suggestion.startsWith('Find')) {
+                groups.patterns.push(suggestion);
+            } else if (suggestion.includes('error') || suggestion.includes('issue') || suggestion.includes('problem')) {
+                groups.related.push(suggestion);
+            } else {
+                groups.popular.push(suggestion);
+            }
+        });
+        
+        return groups;
+    }
+    
+    processSuggestions(suggestions) {
+        // Remove duplicates and prioritize pattern suggestions
+        const uniqueSuggestions = [];
+        const seen = new Set();
+        
+        for (const suggestion of suggestions) {
+            if (!seen.has(suggestion)) {
+                seen.add(suggestion);
+                uniqueSuggestions.push(suggestion);
+            }
+        }
+        
+        // Sort pattern suggestions first
+        return uniqueSuggestions.sort((a, b) => {
+            const aIsPattern = a.startsWith('Search for') || a.startsWith('Find');
+            const bIsPattern = b.startsWith('Search for') || b.startsWith('Find');
+            
+            if (aIsPattern && !bIsPattern) return -1;
+            if (!aIsPattern && bIsPattern) return 1;
+            return 0;
+        });
+    }
+    
+    getSuggestionIcon(suggestion) {
+        if (suggestion.includes('Clock ID') || suggestion.includes('employee')) {
+            return 'bi bi-person-badge';
+        } else if (suggestion.includes('IP') || suggestion.includes('network')) {
+            return 'bi bi-hdd-network';
+        } else if (suggestion.includes('MAC') || suggestion.includes('device')) {
+            return 'bi bi-laptop';
+        } else if (suggestion.includes('ticket') || suggestion.includes('case')) {
+            return 'bi bi-ticket-detailed';
+        } else if (suggestion.includes('email') || suggestion.includes('contact')) {
+            return 'bi bi-envelope';
+        } else if (suggestion.includes('phone') || suggestion.includes('call')) {
+            return 'bi bi-telephone';
+        } else if (suggestion.includes('users')) {
+            return 'bi bi-people';
+        } else if (suggestion.includes('offices')) {
+            return 'bi bi-building';
+        } else if (suggestion.includes('workstations')) {
+            return 'bi bi-laptop';
+        } else if (suggestion.includes('knowledge base')) {
+            return 'bi bi-journal-text';
+        } else if (suggestion.includes('outages')) {
+            return 'bi bi-exclamation-triangle';
+        } else {
+            return 'bi bi-search';
+        }
+    }
+    
+    showError() {
+        document.getElementById('search-results').innerHTML = `
+            <div class="no-results">
+                <i class="bi bi-exclamation-triangle"></i>
+                <h3>Search Error</h3>
+                <p>Unable to perform search. Please try again.</p>
+            </div>
+        `;
+        document.getElementById('search-results').style.display = 'grid';
+    }
+}
+
+// Initialize search page when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInstance = new UniversalSearchPage();
+    
+    // Add note editing functionality to the instance
+    searchInstance.enableNoteEditing = function(noteData) {
+        this.loadQuillAndEnableEditing(noteData);
+    };
+    
+    searchInstance.loadQuillAndEnableEditing = function(noteData) {
+        // Load Quill if not already loaded
+        if (typeof window.Quill === 'undefined') {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.quilljs.com/1.3.6/quill.min.js';
+            script.onload = () => {
+                this.showEditableNoteModal(noteData);
+            };
+            script.onerror = () => {
+                console.error('Failed to load Quill editor');
+                alert('Failed to load the editor. Please try again.');
+            };
+            document.head.appendChild(script);
+        } else {
+            this.showEditableNoteModal(noteData);
+        }
+    };
+    
+    searchInstance.showEditableNoteModal = function(noteData) {
+        const content = document.getElementById('universalSearchNoteModalContent');
+        const titleEl = document.getElementById('universalSearchNoteModalTitle');
+        const editBtn = document.getElementById('universalSearchNoteEditBtn');
+        
+        if (!content || !titleEl) return;
+        
+        // Update modal title to show editing mode
+        titleEl.textContent = `Edit: ${noteData.title || 'Untitled Note'}`;
+        
+        // Hide edit button and show save/cancel
+        if (editBtn) {
+            editBtn.style.display = 'none';
+        }
+        
+        // Parse note content
+        let initialContent;
+        try {
+            initialContent = noteData.content ? JSON.parse(noteData.content) : { ops: [] };
+        } catch (e) {
+            initialContent = { ops: [{ insert: noteData.content || '' }] };
+        }
+        
+        // Create edit interface
+        content.innerHTML = `
+            <div class="note-edit-mode">
+                <input type="text" class="note-title-edit" id="editNoteTitle" value="${(noteData.title || '').replace(/"/g, '&quot;')}" placeholder="Note title...">
+                <div class="note-editor-container">
+                    <div id="editNoteEditor"></div>
+                </div>
+                <div class="note-edit-actions">
+                    <button class="note-edit-btn secondary" onclick="window.searchPageInstance.cancelNoteEdit('${noteData.id}')">
+                        <i class="bi bi-x"></i> Cancel
+                    </button>
+                    <button class="note-edit-btn primary" onclick="window.searchPageInstance.saveNoteEdit('${noteData.id}')">
+                        <i class="bi bi-save"></i> Save
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Initialize Quill editor
+        setTimeout(() => {
+            try {
+                const toolbarOptions = [
+                    ['bold', 'italic', 'underline'],
+                    [{ 'header': [1, 2, 3, false] }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['blockquote', 'code-block'],
+                    ['clean']
+                ];
+                
+                this.noteEditor = new Quill('#editNoteEditor', {
+                    theme: 'snow',
+                    modules: {
+                        toolbar: toolbarOptions
+                    },
+                    placeholder: 'Start writing your note...'
+                });
+                
+                // Set initial content
+                this.noteEditor.setContents(initialContent);
+                
+                // Focus the editor
+                this.noteEditor.focus();
+                
+                // Store original data for cancel functionality
+                this.originalNoteData = noteData;
+                
+            } catch (error) {
+                console.error('Error initializing note editor:', error);
+                alert('Failed to initialize the editor. Please try again.');
+            }
+        }, 100);
+    };
+    
+    searchInstance.saveNoteEdit = async function(noteId) {
+        const titleInput = document.getElementById('editNoteTitle');
+        
+        if (!this.noteEditor || !titleInput) {
+            alert('Editor not initialized properly');
+            return;
+        }
+        
+        try {
+            const title = titleInput.value.trim() || 'Untitled Note';
+            const content = JSON.stringify(this.noteEditor.getContents());
+            
+            // Show saving state
+            const saveBtn = document.querySelector('.note-edit-btn.primary');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="bi bi-hourglass"></i> Saving...';
+            saveBtn.disabled = true;
+            
+            const response = await fetch(`/notes/api/notes/${noteId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: title,
+                    content: content
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Failed to save note: ${response.status} ${response.statusText}`);
+            }
+            
+            const updatedNote = await response.json();
+            
+            // Show success and close modal after a short delay
+            saveBtn.innerHTML = '<i class="bi bi-check"></i> Saved!';
+            saveBtn.style.background = '#28a745';
+            
+            setTimeout(() => {
+                // Close the modal
+                const modal = document.getElementById('universalSearchNoteModal');
+                const overlay = document.getElementById('universalSearchNoteModalOverlay');
+                if (modal && overlay) {
+                    modal.classList.remove('active');
+                    overlay.classList.remove('active');
+                }
+                
+                // Clean up editor
+                this.noteEditor = null;
+                this.originalNoteData = null;
+                
+                // Show toast notification
+                this.showToast('Note saved successfully!', 'success');
+            }, 1000);
+            
+        } catch (error) {
+            console.error('Error saving note:', error);
+            alert(`Failed to save note: ${error.message}`);
+            
+            // Restore save button
+            const saveBtn = document.querySelector('.note-edit-btn.primary');
+            saveBtn.innerHTML = '<i class="bi bi-save"></i> Save';
+            saveBtn.disabled = false;
+            saveBtn.style.background = '#007bff';
+        }
+    };
+    
+    searchInstance.cancelNoteEdit = function(noteId) {
+        if (this.originalNoteData) {
+            // Restore the original view
+            this.showNoteEditableModal(this.originalNoteData);
+            
+            // Clean up
+            this.noteEditor = null;
+            this.originalNoteData = null;
+        }
+    };
+    
+    searchInstance.showToast = function(message, type = 'info') {
+        // Simple toast notification
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#007bff'};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 11200;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        `;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        // Animate in
+        setTimeout(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(0)';
+        }, 100);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 300);
+        }, 3000);
+    };
+    
+    // Make instance globally available for callbacks
+    window.searchPageInstance = searchInstance;
+});
+</script> 

@@ -1,0 +1,660 @@
+{% macro render_yam_utils() %}
+<!-- YAM Dashboard Utilities -->
+<script>
+// YAM Dashboard Utility Functions
+window.yamUtils = {
+    // Date and Time Utilities
+    formatDateTime(date) {
+        return date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    },
+    
+    formatRelativeTime(date) {
+        const now = new Date();
+        const diff = now - date;
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(diff / 3600000);
+        const days = Math.floor(diff / 86400000);
+        
+        if (minutes < 1) return 'Just now';
+        if (minutes < 60) return `${minutes}m ago`;
+        if (hours < 24) return `${hours}h ago`;
+        if (days < 7) return `${days}d ago`;
+        return this.formatDateTime(date);
+    },
+    
+    // Data Formatting Utilities
+    formatNumber(num) {
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+        if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+        return num.toString();
+    },
+    
+    formatPercentage(value, total) {
+        if (total === 0) return '0%';
+        return Math.round((value / total) * 100) + '%';
+    },
+    
+    formatBytes(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    },
+    
+    // Color Utilities
+    getStatusColor(status) {
+        const colors = {
+            'online': '#4CAF50',
+            'offline': '#f44336',
+            'away': '#ff9800',
+            'busy': '#9c27b0',
+            'error': '#f44336',
+            'warning': '#ff9800',
+            'success': '#4CAF50',
+            'info': '#2196F3'
+        };
+        return colors[status] || '#757575';
+    },
+    
+    // Animation Utilities
+    animateElement(element, animation, duration = 300) {
+        element.style.animation = `${animation} ${duration}ms ease-in-out`;
+        setTimeout(() => {
+            element.style.animation = '';
+        }, duration);
+    },
+    
+    // Storage Utilities
+    setLocalStorage(key, value) {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+        } catch (e) {
+            console.warn('Failed to save to localStorage:', e);
+        }
+    },
+    
+    getLocalStorage(key, defaultValue = null) {
+        try {
+            const item = localStorage.getItem(key);
+            return item ? JSON.parse(item) : defaultValue;
+        } catch (e) {
+            console.warn('Failed to read from localStorage:', e);
+            return defaultValue;
+        }
+    },
+    
+    // Validation Utilities
+    isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    },
+    
+    isValidUrl(url) {
+        try {
+            new URL(url);
+            return true;
+        } catch {
+            return false;
+        }
+    },
+    
+    // DOM Utilities
+    createElement(tag, className, innerHTML = '') {
+        const element = document.createElement(tag);
+        if (className) element.className = className;
+        if (innerHTML) element.innerHTML = innerHTML;
+        return element;
+    },
+    
+    addEventListeners(element, events) {
+        Object.entries(events).forEach(([event, handler]) => {
+            element.addEventListener(event, handler);
+        });
+    },
+    
+    // API Utilities
+    async fetchWithTimeout(url, options = {}, timeout = 5000) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
+        
+        try {
+            const response = await fetch(url, {
+                ...options,
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            return response;
+        } catch (error) {
+            clearTimeout(timeoutId);
+            throw error;
+        }
+    },
+    
+    // Debounce Utility
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    },
+    
+    // Throttle Utility
+    throttle(func, limit) {
+        let inThrottle;
+        return function() {
+            const args = arguments;
+            const context = this;
+            if (!inThrottle) {
+                func.apply(context, args);
+                inThrottle = true;
+                setTimeout(() => inThrottle = false, limit);
+            }
+        };
+    },
+    
+    // Error Handling
+    handleError(error, context = 'YAM Dashboard') {
+        console.error(`${context} Error:`, error);
+        if (window.yamDashboardEnhanced) {
+            window.yamDashboardEnhanced.showError(error.message || 'An error occurred');
+        }
+    },
+    
+    // Performance Utilities
+    measurePerformance(name, fn) {
+        const start = performance.now();
+        const result = fn();
+        const end = performance.now();
+        console.log(`${name} took ${(end - start).toFixed(2)}ms`);
+        return result;
+    },
+    
+    // Accessibility Utilities
+    setAriaLabel(element, label) {
+        element.setAttribute('aria-label', label);
+    },
+    
+    setAriaDescribedBy(element, descriptionId) {
+        element.setAttribute('aria-describedby', descriptionId);
+    },
+    
+    // Responsive Utilities
+    isMobile() {
+        return window.innerWidth <= 768;
+    },
+    
+    isTablet() {
+        return window.innerWidth > 768 && window.innerWidth <= 1024;
+    },
+    
+    isDesktop() {
+        return window.innerWidth > 1024;
+    },
+    
+    // Theme Utilities
+    getTheme() {
+        return this.getLocalStorage('yam-theme', 'dark');
+    },
+    
+    setTheme(theme) {
+        this.setLocalStorage('yam-theme', theme);
+        document.documentElement.setAttribute('data-theme', theme);
+    },
+    
+    // Notification Utilities
+    showNotification(message, type = 'info', duration = 3000) {
+        if (window.showToast) {
+            window.showToast(message, type);
+        } else {
+            console.log(`${type.toUpperCase()}: ${message}`);
+        }
+    },
+    
+    // Loading State Utilities
+    showLoading(element, message = 'Loading...') {
+        element.innerHTML = `
+            <div class="loading-state">
+                <i class="bi bi-arrow-clockwise"></i>
+                <span>${message}</span>
+            </div>
+        `;
+    },
+    
+    hideLoading(element) {
+        const loadingState = element.querySelector('.loading-state');
+        if (loadingState) {
+            loadingState.remove();
+        }
+    },
+    
+    // Empty State Utilities
+    showEmptyState(element, message = 'No data available', icon = 'bi-inbox') {
+        element.innerHTML = `
+            <div class="yam-empty-state">
+                <i class="bi ${icon}"></i>
+                <h4>${message}</h4>
+                <p>Data will appear here when available</p>
+            </div>
+        `;
+    },
+    
+    // Error State Utilities
+    showErrorState(element, message = 'An error occurred', icon = 'bi-exclamation-triangle') {
+        element.innerHTML = `
+            <div class="error-state">
+                <i class="bi ${icon}"></i>
+                <h4>Error</h4>
+                <p>${message}</p>
+            </div>
+        `;
+    }
+};
+
+// Initialize utilities when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    // Set initial theme
+    const theme = window.yamUtils.getTheme();
+    window.yamUtils.setTheme(theme);
+    
+    console.log('YAM Dashboard Utilities initialized');
+});
+</script>
+{% endmacro %}
+
+{# YAM Modal Utility Component #}
+{% macro render_yam_modal_system() %}
+<!-- YAM Modal System -->
+<div class="yam-modal-overlay" id="yamModalOverlay">
+    <div class="yam-modal-container" id="yamModalContainer">
+        <div class="yam-modal-header">
+            <h3 id="yamModalTitle">Modal Title</h3>
+            <button class="yam-modal-close" onclick="yamModals.closeModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="yam-modal-content" id="yamModalContent">
+            <!-- Modal content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<style>
+/* Enhanced Modal Styles */
+.yam-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.yam-modal-container {
+    background: white;
+    border-radius: 20px;
+    max-width: 90vw;
+    max-height: 90vh;
+    width: 100%;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+    position: relative;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.yam-modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.yam-modal-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.yam-modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.yam-modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.yam-modal-content {
+    padding: 2rem;
+    max-height: calc(90vh - 100px);
+    overflow-y: auto;
+    background: #f8f9fa;
+    scrollbar-width: thin;
+    scrollbar-color: #667eea #f1f3f4;
+}
+
+.yam-modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.yam-modal-content::-webkit-scrollbar-track {
+    background: #f1f3f4;
+    border-radius: 4px;
+}
+
+.yam-modal-content::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 4px;
+}
+
+.yam-modal-content::-webkit-scrollbar-thumb:hover {
+    background: #5a6fd8;
+}
+
+/* Modal Content Styling */
+.yam-modal-content .yam-component {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.yam-modal-content .component-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1rem 1.5rem;
+    border-radius: 12px 12px 0 0;
+}
+
+.yam-modal-content .component-header h5 {
+    color: #495057;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.yam-modal-content .component-content {
+    padding: 1.5rem;
+}
+
+/* Responsive Modal */
+@media (max-width: 768px) {
+    .yam-modal-overlay {
+        padding: 1rem;
+    }
+    
+    .yam-modal-container {
+        max-width: 95vw;
+        max-height: 95vh;
+    }
+    
+    .yam-modal-header {
+        padding: 1rem 1.5rem;
+    }
+    
+    .yam-modal-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    .yam-modal-content {
+        padding: 1rem;
+        max-height: calc(95vh - 80px);
+    }
+}
+
+/* Loading State */
+.yam-modal-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: #667eea;
+}
+
+.yam-modal-loading i {
+    font-size: 2rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+</style>
+
+<script>
+// Enhanced YAM Modal System
+window.yamModals = {
+    currentModal: null,
+    modalHistory: [],
+    
+    openModal(modalId, options = {}) {
+        const overlay = document.getElementById('yamModalOverlay');
+        const container = document.getElementById('yamModalContainer');
+        const content = document.getElementById('yamModalContent');
+        const title = document.getElementById('yamModalTitle');
+        
+        // Show loading state
+        content.innerHTML = '<div class="yam-modal-loading"><i class="bi bi-arrow-clockwise"></i> Loading...</div>';
+        overlay.style.display = 'flex';
+        
+        // Get modal content
+        const modalContent = document.getElementById(modalId + 'Content');
+        if (!modalContent) {
+            console.error('Modal content not found:', modalId);
+            content.innerHTML = '<div class="yam-modal-loading">Content not found</div>';
+            return;
+        }
+        
+        // Set modal title
+        const modalTitles = {
+            'userPresenceModal': 'User Presence Map',
+            'userAnalyticsModal': 'User Analytics',
+            'activityHeatmapModal': 'Activity Heatmap',
+            'advancedStatusModal': 'Advanced User Status',
+            'systemMonitorModal': 'System Monitor',
+            'systemHealthModal': 'System Health Monitor',
+            'teamPerformanceModal': 'Team Performance Analytics',
+            'teamCollaborationModal': 'Team Collaboration',
+            'recentActivityModal': 'Recent Activity',
+            'activityTrackerModal': 'User Activity Tracker',
+            'notificationsModal': 'Notifications',
+            'teamChatModal': 'Team Chat'
+        };
+        
+        title.textContent = options.title || modalTitles[modalId] || 'Modal';
+        
+        // Set modal content with delay for smooth transition
+        setTimeout(() => {
+            content.innerHTML = modalContent.innerHTML;
+            this.currentModal = modalId;
+            
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+            
+            // Initialize components in modal
+            this.initializeModalComponents(modalId);
+            
+            // Add to history
+            this.modalHistory.push(modalId);
+        }, 300);
+    },
+    
+    closeModal() {
+        const overlay = document.getElementById('yamModalOverlay');
+        
+        // Add closing animation
+        overlay.style.animation = 'modalFadeOut 0.2s ease-in forwards';
+        
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            overlay.style.animation = '';
+            this.currentModal = null;
+            
+            // Restore body scroll
+            document.body.style.overflow = 'auto';
+            
+            // Remove from history
+            if (this.modalHistory.length > 0) {
+                this.modalHistory.pop();
+            }
+        }, 200);
+    },
+    
+    goBack() {
+        if (this.modalHistory.length > 1) {
+            this.modalHistory.pop(); // Remove current
+            const previousModal = this.modalHistory[this.modalHistory.length - 1];
+            this.openModal(previousModal);
+        } else {
+            this.closeModal();
+        }
+    },
+    
+    initializeModalComponents(modalId) {
+        // Initialize specific components based on modal type
+        setTimeout(() => {
+            switch(modalId) {
+                case 'userPresenceModal':
+                    if (window.userPresenceMap && window.userPresenceMap.init) {
+                        window.userPresenceMap.init();
+                    }
+                    break;
+                case 'userAnalyticsModal':
+                    if (window.userAnalytics && window.userAnalytics.init) {
+                        window.userAnalytics.init();
+                    }
+                    break;
+                case 'systemMonitorModal':
+                    if (window.systemMonitor && window.systemMonitor.init) {
+                        window.systemMonitor.init();
+                    }
+                    break;
+                case 'systemHealthModal':
+                    if (window.systemHealthMonitor && window.systemHealthMonitor.init) {
+                        window.systemHealthMonitor.init();
+                    }
+                    break;
+                case 'teamPerformanceModal':
+                    if (window.teamPerformanceAnalytics && window.teamPerformanceAnalytics.init) {
+                        window.teamPerformanceAnalytics.init();
+                    }
+                    break;
+                case 'teamCollaborationModal':
+                    if (window.teamCollaboration && window.teamCollaboration.init) {
+                        window.teamCollaboration.init();
+                    }
+                    break;
+                case 'recentActivityModal':
+                    if (window.recentActivity && window.recentActivity.init) {
+                        window.recentActivity.init();
+                    }
+                    break;
+                case 'activityTrackerModal':
+                    if (window.userActivityTracker && window.userActivityTracker.init) {
+                        window.userActivityTracker.init();
+                    }
+                    break;
+                case 'notificationsModal':
+                    if (window.notifications && window.notifications.init) {
+                        window.notifications.init();
+                    }
+                    break;
+                case 'teamChatModal':
+                    if (window.teamChat && window.teamChat.init) {
+                        window.teamChat.init();
+                    }
+                    break;
+            }
+        }, 100);
+    }
+};
+
+// Enhanced modal event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const overlay = document.getElementById('yamModalOverlay');
+    if (overlay) {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) {
+                yamModals.closeModal();
+            }
+        });
+    }
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && yamModals.currentModal) {
+            yamModals.closeModal();
+        }
+        
+        // Back button support
+        if (e.key === 'Backspace' && e.ctrlKey && yamModals.currentModal) {
+            e.preventDefault();
+            yamModals.goBack();
+        }
+    });
+    
+    console.log('YAM Modal System initialized');
+});
+</script>
+{% endmacro %} 

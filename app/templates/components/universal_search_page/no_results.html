@@ -1,0 +1,52 @@
+<!-- Universal Search Page No Results Component -->
+<div id="no-results" class="no-results" style="display: none;">
+    <i class="bi bi-emoji-frown"></i>
+    <h3>No results found</h3>
+    <p>We couldn't find any content matching "<span id="no-results-query"></span>"</p>
+    <p class="no-results-suggestions">Try different keywords, check your spelling, or browse our content sections</p>
+    
+    <!-- Suggestions from API -->
+    <div id="no-results-did-you-mean" class="didy-mean-container" style="display:none;">
+        <h4>Did you mean...</h4>
+        <ul id="suggestions-list"></ul>
+    </div>
+    
+    <!-- Fallback helpful content when no suggestions available -->
+    <div id="no-results-fallback" class="fallback-content compact-fallback" style="display:none;">
+        <h4>Explore Our Content</h4>
+        <div class="explore-sections compact-explore-sections">
+            <div class="explore-section compact-explore-card">
+                <h5><i class="bi bi-journal-text"></i> Knowledge Base</h5>
+                <a href="/kb" class="explore-link">Knowledge Base</a>
+            </div>
+            <div class="explore-section compact-explore-card">
+                <h5><i class="bi bi-exclamation-triangle"></i> Outages</h5>
+                <a href="/outages" class="explore-link">Outages</a>
+            </div>
+            <div class="explore-section compact-explore-card">
+                <h5><i class="bi bi-people"></i> Users</h5>
+                <a href="/users" class="explore-link">Users</a>
+            </div>
+            <div class="explore-section compact-explore-card">
+                <h5><i class="bi bi-building"></i> Offices</h5>
+                <a href="/offices" class="explore-link">Offices</a>
+            </div>
+            <div class="explore-section compact-explore-card">
+                <h5><i class="bi bi-laptop"></i> Workstations</h5>
+                <a href="/workstations" class="explore-link">Workstations</a>
+            </div>
+            <div class="explore-section compact-explore-card">
+                <h5><i class="bi bi-sticky"></i> Notes</h5>
+                <a href="/notes" class="explore-link">Notes</a>
+            </div>
+        </div>
+        <div class="search-tips compact-search-tips">
+            <h5>Search Tips</h5>
+            <ul>
+                <li>Use fewer or different keywords</li>
+                <li>Try specific terms (e.g. "Clock ID", "IP address")</li>
+                <li>Check spelling</li>
+            </ul>
+        </div>
+    </div>
+</div> 

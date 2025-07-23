@@ -1,0 +1,156 @@
+<!-- Sticky Notes Widget -->
+<div id="stickyNote" class="sticky-note" style="display: none;">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span>Quick Note</span>
+      <div>
+        <button class="btn btn-sm btn-success" onclick="saveNote()">
+          <i class="bi bi-save"></i>
+        </button>
+        <button class="btn btn-sm btn-secondary" onclick="toggleNote()">
+          <i class="bi bi-dash"></i>
+        </button>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <textarea id="noteContent" class="form-control border-0" style="resize: none; height: 200px;"></textarea>
+    </div>
+  </div>
+</div>
+
+<style>
+.sticky-note {
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  width: 300px;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease;
+}
+
+.sticky-note.minimized {
+  transform: translateY(calc(-100% + 40px));
+}
+
+.sticky-note .card {
+  background: #ffd700;
+  border: none;
+}
+
+.sticky-note .card-header {
+  background: #e6c200;
+  border-bottom: 1px solid #d4b000;
+  cursor: move;
+}
+
+.sticky-note textarea {
+  background: #ffd700;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 10px;
+}
+
+.sticky-note textarea:focus {
+  outline: none;
+  box-shadow: none;
+}
+</style>
+
+<script>
+class StickyNote {
+  constructor() {
+    this.note = document.getElementById('stickyNote');
+    this.content = document.getElementById('noteContent');
+    this.isMinimized = false;
+    this.isDragging = false;
+    this.dragOffset = { x: 0, y: 0 };
+    
+    this.loadNote();
+    this.setupDragAndDrop();
+    this.setupAutoSave();
+  }
+
+  loadNote() {
+    const savedNote = localStorage.getItem('stickyNote');
+    if (savedNote) {
+      this.content.value = savedNote;
+    }
+  }
+
+  saveNote() {
+    localStorage.setItem('stickyNote', this.content.value);
+    this.showSaveIndicator();
+  }
+
+  showSaveIndicator() {
+    const saveBtn = this.note.querySelector('.btn-success');
+    const originalHTML = saveBtn.innerHTML;
+    saveBtn.innerHTML = '<i class="bi bi-check"></i>';
+    setTimeout(() => {
+      saveBtn.innerHTML = originalHTML;
+    }, 1000);
+  }
+
+  toggleNote() {
+    this.isMinimized = !this.isMinimized;
+    this.note.classList.toggle('minimized', this.isMinimized);
+  }
+
+  setupDragAndDrop() {
+    const header = this.note.querySelector('.card-header');
+    
+    header.addEventListener('mousedown', (e) => {
+      if (e.target.tagName === 'BUTTON') return;
+      
+      this.isDragging = true;
+      const rect = this.note.getBoundingClientRect();
+      this.dragOffset = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!this.isDragging) return;
+      
+      const x = e.clientX - this.dragOffset.x;
+      const y = e.clientY - this.dragOffset.y;
+      
+      this.note.style.left = `${x}px`;
+      this.note.style.top = `${y}px`;
+      this.note.style.right = 'auto';
+    });
+
+    document.addEventListener('mouseup', () => {
+      this.isDragging = false;
+    });
+  }
+
+  setupAutoSave() {
+    let saveTimeout;
+    this.content.addEventListener('input', () => {
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(() => this.saveNote(), 1000);
+    });
+  }
+}
+
+// Initialize the sticky note
+const stickyNote = new StickyNote();
+
+// Global functions for button clicks
+function saveNote() {
+  stickyNote.saveNote();
+}
+
+function toggleNote() {
+  stickyNote.toggleNote();
+}
+
+// Show the note when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+  stickyNote.note.style.display = 'block';
+});
+</script> 

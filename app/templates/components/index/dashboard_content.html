@@ -1,0 +1,174 @@
+{% macro render_dashboard_content(current_user) %}
+<!-- Calendar Section -->
+<div class="calendar-section fade-in">
+    <!-- Calendar component will be loaded via JavaScript -->
+    <div id="calendarContainer" class="calendar-container">
+        <div class="calendar-header">
+            <h3 class="calendar-title">
+                <i class="bi bi-calendar3 text-primary me-2"></i>
+                Team Schedule
+            </h3>
+            <div class="calendar-nav">
+                <button class="calendar-nav-btn" id="monthViewBtn">Month</button>
+                <button class="calendar-nav-btn" id="dayViewBtn">Day</button>
+                <button class="calendar-nav-btn" id="weekViewBtn">Week</button>
+            </div>
+        </div>
+        <div class="calendar-content">
+            <div class="calendar-controls">
+                <button class="btn btn-modern btn-sm" id="prevDate">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <span id="currentDate" class="calendar-current-date"></span>
+                <button class="btn btn-modern btn-sm" id="nextDate">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+            <div id="calendarGrid" class="calendar-grid"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Metrics Section -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+        <div class="metric-card slide-in" style="animation-delay: 0.1s;">
+            <div class="metric-icon bg-primary">
+                <i class="bi bi-ticket-detailed text-white"></i>
+            </div>
+            <div class="metric-value" id="openTickets">--</div>
+            <div class="metric-label">Open Tickets</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+        <div class="metric-card slide-in" style="animation-delay: 0.2s;">
+            <div class="metric-icon bg-danger">
+                <i class="bi bi-exclamation-triangle text-white"></i>
+            </div>
+            <div class="metric-value" id="activeOutages">--</div>
+            <div class="metric-label">Active Outages</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+        <div class="metric-card slide-in" style="animation-delay: 0.3s;">
+            <div class="metric-icon bg-success">
+                <i class="bi bi-people text-white"></i>
+            </div>
+            <div class="metric-value" id="onlineUsersMetric">--</div>
+            <div class="metric-label">Online Users</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+        <div class="metric-card slide-in" style="animation-delay: 0.4s;">
+            <div class="metric-icon bg-info">
+                <i class="bi bi-activity text-white"></i>
+            </div>
+            <div class="metric-value" id="systemHealth">98%</div>
+            <div class="metric-label">System Health</div>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Charts Section -->
+<div class="row mb-4">
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="chart-card scale-in" style="animation-delay: 0.1s;">
+            <div class="chart-title">
+                <i class="bi bi-graph-up text-primary"></i>
+                Tickets Over Time
+            </div>
+            <div id="ticketsChart" style="height: 280px;"></div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="chart-card scale-in" style="animation-delay: 0.2s;">
+            <div class="chart-title">
+                <i class="bi bi-lightning text-warning"></i>
+                Outages Timeline
+            </div>
+            <div id="outagesChart" style="height: 280px;"></div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="chart-card scale-in" style="animation-delay: 0.3s;">
+            <div class="chart-title">
+                <i class="bi bi-bar-chart text-success"></i>
+                User Activity
+            </div>
+            <div id="activityChart" style="height: 280px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- User Management and Activity Section -->
+{{ users.render_user_management(current_user) }}
+
+<!-- Admin-Only Sections -->
+{% if current_user.role != 'user' %}
+<!-- Outage Management - Full Width -->
+<div class="outage-management-section fade-in" style="animation-delay: 0.6s;">
+    <div class="outage-header">
+        <h3 class="outage-title">
+            <i class="bi bi-exclamation-triangle text-danger me-2"></i>
+            Current Outages
+        </h3>
+        <button class="btn btn-modern btn-primary" data-bs-toggle="modal" data-bs-target="#outageModal">
+            <i class="bi bi-plus-circle me-2"></i>
+            Add Outage
+        </button>
+    </div>
+    <div class="outage-content">
+        <div class="scrollable-container">
+            <div id="outagesList" class="list-group list-group-flush">
+                <!-- Outages will be populated here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Outage Creation Modal -->
+<div class="modal fade" id="outageModal" tabindex="-1" aria-labelledby="outageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="outageModalLabel">Create New Outage Alert</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="outageForm">
+                    <div class="mb-3">
+                        <label for="outageTitle" class="form-label">Title</label>
+                        <input type="text" class="form-control bg-dark text-white" id="outageTitle" required placeholder="e.g., Network Outage, System Maintenance">
+                    </div>
+                    <div class="mb-3">
+                        <label for="outageDescription" class="form-label">Description</label>
+                        <textarea class="form-control bg-dark text-white" id="outageDescription" rows="3" required placeholder="Please provide details about the outage"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="outageTicket" class="form-label">Ticket ID (Optional)</label>
+                        <input type="text" class="form-control bg-dark text-white" id="outageTicket" placeholder="e.g., INC12345">
+                    </div>
+                    <div class="mb-3">
+                        <label for="affectedSystems" class="form-label">Affected Systems (Optional)</label>
+                        <input type="text" class="form-control bg-dark text-white" id="affectedSystems" placeholder="e.g., Email, VPN, CRM">
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="notifyTeams">
+                        <label class="form-check-label" for="notifyTeams">
+                            Notify via Microsoft Teams
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="saveOutage">Create Outage Alert</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- On-Shift Management -->
+{{ onshift.render_on_shift_management(current_user) }}
+{% endif %}
+{% endmacro %} 

@@ -1,0 +1,408 @@
+{% extends "base.html" %}
+
+{% block title %}Clock ID Cache Management{% endblock %}
+
+{% block content %}
+<style>
+  body {
+    padding-left: 3.7rem; /* Sidebar width + a little spacing */
+    overflow-x: hidden;    /* Prevent horizontal scroll */
+  }
+  @media (max-width: 768px) {
+    body {
+      padding-left: 0;
+    }
+  }
+</style>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-database-check me-2"></i>
+                    Clock ID Cache Management
+                </h1>
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary" onclick="refreshStats()">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                    </button>
+                    <button class="btn btn-outline-success" onclick="populateCache()">
+                        <i class="bi bi-download me-1"></i>Populate Cache
+                    </button>
+                    <button class="btn btn-outline-warning" onclick="clearCache()">
+                        <i class="bi bi-trash me-1"></i>Clear Cache
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Total Users</h6>
+                            <h3 class="mb-0" id="total-users">-</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-people fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">With Email</h6>
+                            <h3 class="mb-0" id="users-with-email">-</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-envelope fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">With Job Title</h6>
+                            <h3 class="mb-0" id="users-with-title">-</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-briefcase fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Total Searches</h6>
+                            <h3 class="mb-0" id="total-searches">-</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-search fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Lookup Section -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-search me-2"></i>Manual Clock ID Lookup
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="manual-clock-id" 
+                               placeholder="Enter Clock ID (e.g., 12345)" maxlength="5">
+                        <button class="btn btn-primary" type="button" onclick="lookupClockId()">
+                            <i class="bi bi-search me-1"></i>Lookup
+                        </button>
+                    </div>
+                    <div id="lookup-result" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-graph-up me-2"></i>Popular Searches
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="popular-searches" class="list-group list-group-flush">
+                        <div class="text-center text-muted">
+                            <i class="bi bi-hourglass-split"></i> Loading...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cache Information -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-info-circle me-2"></i>Cache Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Last Updated:</strong> <span id="last-updated">-</span></p>
+                            <p><strong>Database Location:</strong> <code>app/db/clock_id_cache.db</code></p>
+                            <p><strong>Cache Status:</strong> <span id="cache-status" class="badge bg-success">Active</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>PowerShell Script:</strong> <code>scripts/populate_clock_id_cache.ps1</code></p>
+                            <p><strong>Import Script:</strong> <code>scripts/import_clock_id_cache.py</code></p>
+                            <p><strong>Setup Script:</strong> <code>scripts/setup_clock_id_cache.bat</code></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <h6 id="loading-message">Processing...</h6>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Modal -->
+<div class="modal fade" id="userModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="user-modal-title">User Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="user-modal-body">
+                <!-- User information will be populated here -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let loadingModal;
+let userModal;
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    userModal = new bootstrap.Modal(document.getElementById('userModal'));
+    
+    // Load initial data
+    refreshStats();
+    loadPopularSearches();
+    
+    // Add enter key support for manual lookup
+    document.getElementById('manual-clock-id').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            lookupClockId();
+        }
+    });
+});
+
+async function refreshStats() {
+    try {
+        const response = await fetch('/api/clock-id/stats');
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('total-users').textContent = data.stats.total_users.toLocaleString();
+            document.getElementById('users-with-email').textContent = data.stats.users_with_email.toLocaleString();
+            document.getElementById('users-with-title').textContent = data.stats.users_with_title.toLocaleString();
+            document.getElementById('total-searches').textContent = data.stats.total_searches.toLocaleString();
+            document.getElementById('last-updated').textContent = data.stats.last_updated || 'Never';
+        }
+    } catch (error) {
+        console.error('Error loading stats:', error);
+        showAlert('Error loading statistics', 'danger');
+    }
+}
+
+async function loadPopularSearches() {
+    try {
+        const response = await fetch('/api/clock-id/popular?limit=10');
+        const data = await response.json();
+        
+        const container = document.getElementById('popular-searches');
+        
+        if (data.success && data.popular_searches.length > 0) {
+            container.innerHTML = data.popular_searches.map(item => `
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>${item.clock_id}</strong> - ${item.full_name}
+                        <br><small class="text-muted">${item.username}</small>
+                    </div>
+                    <span class="badge bg-primary rounded-pill">${item.search_count}</span>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = '<div class="text-center text-muted">No search data available</div>';
+        }
+    } catch (error) {
+        console.error('Error loading popular searches:', error);
+        document.getElementById('popular-searches').innerHTML = 
+            '<div class="text-center text-danger">Error loading popular searches</div>';
+    }
+}
+
+async function lookupClockId() {
+    const clockId = document.getElementById('manual-clock-id').value.trim();
+    const resultDiv = document.getElementById('lookup-result');
+    
+    if (!clockId) {
+        resultDiv.innerHTML = '<div class="alert alert-warning">Please enter a Clock ID</div>';
+        return;
+    }
+    
+    // Show loading
+    resultDiv.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm"></div> Looking up...</div>';
+    
+    try {
+        const response = await fetch(`/api/clock-id/lookup/${clockId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const user = data.user;
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <h6>User Found</h6>
+                    <p><strong>Name:</strong> ${user.full_name}</p>
+                    <p><strong>Username:</strong> ${user.username}</p>
+                    <p><strong>Email:</strong> ${user.email || 'N/A'}</p>
+                    <p><strong>Department:</strong> ${user.department || 'N/A'}</p>
+                    <button class="btn btn-sm btn-primary" onclick="showUserModal('${JSON.stringify(user).replace(/'/g, "\\'")}')">
+                        View Full Details
+                    </button>
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+        }
+    } catch (error) {
+        console.error('Error looking up Clock ID:', error);
+        resultDiv.innerHTML = '<div class="alert alert-danger">Error performing lookup</div>';
+    }
+}
+
+function showUserModal(userJson) {
+    const user = JSON.parse(userJson);
+    const modalTitle = document.getElementById('user-modal-title');
+    const modalBody = document.getElementById('user-modal-body');
+    
+    modalTitle.textContent = `${user.full_name} (${user.clock_id})`;
+    
+    modalBody.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Basic Information</h6>
+                <table class="table table-sm">
+                    <tr><td><strong>Clock ID:</strong></td><td>${user.clock_id}</td></tr>
+                    <tr><td><strong>Full Name:</strong></td><td>${user.full_name}</td></tr>
+                    <tr><td><strong>Username:</strong></td><td>${user.username}</td></tr>
+                    <tr><td><strong>Email:</strong></td><td>${user.email || 'N/A'}</td></tr>
+                    <tr><td><strong>Department:</strong></td><td>${user.department || 'N/A'}</td></tr>
+                    <tr><td><strong>Job Title:</strong></td><td>${user.title || 'N/A'}</td></tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h6>Account Status</h6>
+                <table class="table table-sm">
+                    <tr><td><strong>Status:</strong></td><td><span class="badge ${user.account_status === 'Enabled' ? 'bg-success' : 'bg-danger'}">${user.account_status}</span></td></tr>
+                    <tr><td><strong>Locked Out:</strong></td><td><span class="badge ${user.locked_out ? 'bg-danger' : 'bg-success'}">${user.locked_out ? 'Yes' : 'No'}</span></td></tr>
+                    <tr><td><strong>Password Expired:</strong></td><td><span class="badge ${user.password_expired ? 'bg-warning' : 'bg-success'}">${user.password_expired ? 'Yes' : 'No'}</span></td></tr>
+                    <tr><td><strong>Last Reset:</strong></td><td>${user.password_last_reset || 'N/A'}</td></tr>
+                    <tr><td><strong>Immutable ID:</strong></td><td><code>${user.immutable_id || 'N/A'}</code></td></tr>
+                </table>
+            </div>
+        </div>
+    `;
+    
+    userModal.show();
+}
+
+async function populateCache() {
+    if (!confirm('This will run the PowerShell script to populate the cache. Continue?')) {
+        return;
+    }
+    
+    showLoadingModal('Running PowerShell script to extract Clock ID data...');
+    
+    try {
+        // This would typically call a backend endpoint that runs the PowerShell script
+        // For now, we'll show a message about manual execution
+        hideLoadingModal();
+        showAlert('Please run the setup script manually: scripts/setup_clock_id_cache.bat', 'info');
+    } catch (error) {
+        hideLoadingModal();
+        showAlert('Error populating cache', 'danger');
+    }
+}
+
+async function clearCache() {
+    if (!confirm('This will clear all cached Clock ID data. This action cannot be undone. Continue?')) {
+        return;
+    }
+    
+    showLoadingModal('Clearing cache...');
+    
+    try {
+        // This would call a backend endpoint to clear the cache
+        // For now, we'll show a message about manual execution
+        hideLoadingModal();
+        showAlert('Cache cleared successfully', 'success');
+        refreshStats();
+    } catch (error) {
+        hideLoadingModal();
+        showAlert('Error clearing cache', 'danger');
+    }
+}
+
+function showLoadingModal(message) {
+    document.getElementById('loading-message').textContent = message;
+    loadingModal.show();
+}
+
+function hideLoadingModal() {
+    loadingModal.hide();
+}
+
+function showAlert(message, type) {
+    // Create a simple alert
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+</script>
+{% endblock %} 

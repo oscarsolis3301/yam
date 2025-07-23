@@ -1,0 +1,51 @@
+<script>
+// CRITICAL: Prevent any auto-opening of modals
+(function() {
+    // Immediately hide any modals that might be open
+    const hideAllModals = () => {
+        // Hide YAM modals
+        const yamOverlay = document.getElementById('yamModalOverlay');
+        if (yamOverlay) {
+            yamOverlay.classList.remove('yam-modal-active');
+            yamOverlay.style.display = 'none';
+            yamOverlay.style.visibility = 'hidden';
+            yamOverlay.style.opacity = '0';
+            yamOverlay.setAttribute('aria-hidden', 'true');
+            yamOverlay.style.pointerEvents = 'none';
+        }
+        
+        // Hide Bootstrap modals
+        const bootstrapModals = document.querySelectorAll('.modal');
+        bootstrapModals.forEach(modal => {
+            modal.classList.remove('show');
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+        });
+        
+        // Remove modal backdrops
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        
+        // Restore body scroll
+        document.body.style.overflow = '';
+        document.body.classList.remove('modal-open');
+    };
+    
+    // Run immediately
+    hideAllModals();
+    
+    // Run again after a short delay to catch any late-opening modals
+    setTimeout(hideAllModals, 100);
+    setTimeout(hideAllModals, 500);
+    setTimeout(hideAllModals, 1000);
+    
+    // Monitor for any attempts to open modals
+    const originalShow = window.showModal || function(){};
+    window.showModal = function() {
+        console.log('[YAM DEBUG] showModal called - preventing auto-opening');
+        return false;
+    };
+    
+    console.log('[YAM DEBUG] Modal auto-opening prevention initialized');
+})();
+</script> 

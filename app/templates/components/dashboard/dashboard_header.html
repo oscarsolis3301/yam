@@ -1,0 +1,52 @@
+{% macro render_dashboard_header(current_user) %}
+<div class="dashboard-header">
+    <div class="header-left">
+        <div>
+            <h1 class="header-title">Enterprise Dashboard</h1>
+            <p class="header-subtitle">Welcome back, {{ current_user.username if current_user and current_user.username else 'User' }} • {{ current_user.role if current_user and current_user.role else 'User' }}</p>
+        </div>
+        
+        <!-- Universal Search Bar -->
+        <div class="header-search">
+            <i class="bi bi-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Search tickets, users, systems..." id="dashboardSearchInput">
+            <button class="search-clear-btn" id="searchClearBtn" style="display: none;">
+                <i class="bi bi-x"></i>
+            </button>
+            <div class="search-loading" id="searchLoading" style="display: none;">
+                <i class="bi bi-arrow-clockwise rotating"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="header-right">
+        <!-- Notifications -->
+        <button class="notification-btn" id="notificationBtn" title="Notifications">
+            <i class="bi bi-bell"></i>
+            <span class="notification-badge">3</span>
+        </button>
+        
+        <!-- User Profile -->
+        <div class="user-profile" id="userProfile" title="User Profile">
+            <img src="{{ url_for('static', filename='uploads/profile_pictures/' + (current_user.profile_picture if current_user and current_user.profile_picture else 'boy.png')) }}" 
+                 alt="Profile" class="user-avatar"
+                 onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/PFP/boy.png') }}';">
+            <div class="user-info">
+                <div class="user-name">{{ current_user.username if current_user and current_user.username else 'User' }}</div>
+                <div class="user-role">{{ current_user.role if current_user and current_user.role else 'User' }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard Search Results -->
+<div id="dashboardSearchResults" class="dashboard-search-results" style="display: none;">
+    <div id="dashboardResultsContent" class="dashboard-results-content"></div>
+    <div id="dashboardResultsCount" class="dashboard-results-count"></div>
+</div>
+
+<!-- Dashboard Search Suggestions -->
+<div id="dashboardSearchSuggestions" class="dashboard-search-suggestions" style="display: none;">
+    <div id="dashboardSuggestionsContent" class="dashboard-suggestions-content"></div>
+</div>
+{% endmacro %} 

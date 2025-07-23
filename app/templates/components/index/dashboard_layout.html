@@ -1,0 +1,14 @@
+{% macro render_dashboard_layout() %}
+<!-- Include outage banner component -->
+{% include 'components/outage_banner.html' %}
+
+<div class="dashboard-container">
+    <!-- Main Dashboard Content -->
+    <div class="admin-main-content w-100 {{ 'user-mode' if current_user and current_user.is_authenticated and current_user.role == 'user' else '' }}">
+        {{ caller() }}
+    </div>
+</div>
+
+<!-- Toast container for notifications -->
+<div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+{% endmacro %} 

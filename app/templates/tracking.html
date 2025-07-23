@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="../static/CSS/style.css">
+<link rel="stylesheet" href="../static/CSS/search.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/socket.io-client/dist/socket.io.min.js"></script>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/Y.ico') }}">
+<style>
+    .tracking-container {
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        color: #e0e0e0;
+        position: relative;
+    }
+    .device-list {
+        background: #1e1e1e;
+        padding: 20px;
+        border-radius: 16px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .device-item {
+        background: #2d2d2d;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        transition: transform 0.2s ease;
+    }
+    .device-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    .map-container {
+        height: 500px;
+        border-radius: 16px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        display: none;
+    }
+    .map-container.active {
+        display: block;
+    }
+    .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+    }
+    .status-online {
+        background-color: #4CAF50;
+        box-shadow: 0 0 8px #4CAF50;
+    }
+    .status-offline {
+        background-color: #f44336;
+        box-shadow: 0 0 8px #f44336;
+    }
+    .device-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .device-actions {
+        display: flex;
+        gap: 10px;
+    }
+    .action-button {
+        background: #3d3d3d;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 8px;
+        color: #e0e0e0;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+    .action-button:hover {
+        background: #4d4d4d;
+    }
+    .device-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #3d3d3d;
+    }
+    .stat-item {
+        background: #3d3d3d;
+        padding: 10px;
+        border-radius: 8px;
+        text-align: center;
+    }
+    .toggle-map {
+        background: #3d3d3d;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 12px;
+        color: #e0e0e0;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+    .toggle-map:hover {
+        background: #4d4d4d;
+    }
+    .device-search {
+        width: 100%;
+        padding: 12px;
+        border-radius: 12px;
+        background: #2d2d2d;
+        border: 1px solid #3d3d3d;
+        color: #e0e0e0;
+        margin-bottom: 20px;
+    }
+    .device-search:focus {
+        outline: none;
+        border-color: #4CAF50;
+    }
+    .battery-indicator {
+        width: 100%;
+        height: 6px;
+        background: #3d3d3d;
+        border-radius: 3px;
+        margin-top: 5px;
+    }
+    .battery-level {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+    .battery-high {
+        background: #4CAF50;
+    }
+    .battery-medium {
+        background: #FFC107;
+    }
+    .battery-low {
+        background: #f44336;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tracking-container with-outage-banner">
+    <h1>Tracking</h1>
+    <button class="toggle-map" onclick="toggleMap()">Toggle Map View</button>
+    
+    <input type="text" class="device-search" placeholder="Search devices..." id="deviceSearch">
+    
+    
+    <div id="map" class="map-container"></div>
+    
+    <div class="device-list">
+        <h2>Connected Devices</h2>
+        <div class="device-item">
+            <div class="device-header">
+                <div>
+                    <span class="status-indicator status-online"></span>
+                    <strong>iPhone 13 Pro</strong>
+                </div>
+                <div class="device-actions">
+                    <button class="action-button" onclick="playSound('iPhone 13 Pro')">Play Sound</button>
+                    <button class="action-button" onclick="lockDevice('iPhone 13 Pro')">Lock Device</button>
+                    <button class="action-button" onclick="locateDevice('iPhone 13 Pro')">Locate</button>
+                </div>
+            </div>
+            <div>Last seen: 2 minutes ago</div>
+            <div>Location: San Francisco, CA</div>
+            <div>Battery: 85%</div>
+            <div class="battery-indicator">
+                <div class="battery-level battery-high" style="width: 85%"></div>
+            </div>
+            <div class="device-stats">
+                <div class="stat-item">
+                    <div>Storage</div>
+                    <div>128GB / 256GB</div>
+                </div>
+                <div class="stat-item">
+                    <div>Memory</div>
+                    <div>4.2GB / 6GB</div>
+                </div>
+                <div class="stat-item">
+                    <div>CPU Usage</div>
+                    <div>32%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="device-item">
+            <div class="device-header">
+                <div>
+                    <span class="status-indicator status-online"></span>
+                    <strong>iPad Pro 12.9"</strong>
+                </div>
+                <div class="device-actions">
+                    <button class="action-button" onclick="playSound('iPad Pro')">Play Sound</button>
+                    <button class="action-button" onclick="lockDevice('iPad Pro')">Lock Device</button>
+                    <button class="action-button" onclick="locateDevice('iPad Pro')">Locate</button>
+                </div>
+            </div>
+            <div>Last seen: 5 minutes ago</div>
+            <div>Location: New York, NY</div>
+            <div>Battery: 92%</div>
+            <div class="battery-indicator">
+                <div class="battery-level battery-high" style="width: 92%"></div>
+            </div>
+            <div class="device-stats">
+                <div class="stat-item">
+                    <div>Storage</div>
+                    <div>256GB / 512GB</div>
+                </div>
+                <div class="stat-item">
+                    <div>Memory</div>
+                    <div>5.8GB / 8GB</div>
+                </div>
+                <div class="stat-item">
+                    <div>CPU Usage</div>
+                    <div>45%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="device-item">
+            <div class="device-header">
+                <div>
+                    <span class="status-indicator status-offline"></span>
+                    <strong>iPhone 14</strong>
+                </div>
+                <div class="device-actions">
+                    <button class="action-button" onclick="playSound('iPhone 14')">Play Sound</button>
+                    <button class="action-button" onclick="lockDevice('iPhone 14')">Lock Device</button>
+                    <button class="action-button" onclick="locateDevice('iPhone 14')">Locate</button>
+                </div>
+            </div>
+            <div>Last seen: 1 hour ago</div>
+            <div>Location: Los Angeles, CA</div>
+            <div>Battery: 15%</div>
+            <div class="battery-indicator">
+                <div class="battery-level battery-low" style="width: 15%"></div>
+            </div>
+            <div class="device-stats">
+                <div class="stat-item">
+                    <div>Storage</div>
+                    <div>64GB / 128GB</div>
+                </div>
+                <div class="stat-item">
+                    <div>Memory</div>
+                    <div>3.1GB / 4GB</div>
+                </div>
+                <div class="stat-item">
+                    <div>CPU Usage</div>
+                    <div>28%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize map
+    const map = L.map('map').setView([37.7749, -122.4194], 4);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Dummy device locations
+    const devices = [
+        { name: 'iPhone 13 Pro', lat: 37.7749, lng: -122.4194, battery: 85 },
+        { name: 'iPad Pro', lat: 40.7128, lng: -74.0060, battery: 92 },
+        { name: 'iPhone 14', lat: 34.0522, lng: -118.2437, battery: 15 }
+    ];
+
+    // Add markers for each device
+    const markers = {};
+    devices.forEach(device => {
+        markers[device.name] = L.marker([device.lat, device.lng])
+            .bindPopup(`
+                <strong>${device.name}</strong><br>
+                Battery: ${device.battery}%<br>
+                Last updated: ${new Date().toLocaleTimeString()}
+            `)
+            .addTo(map);
+    });
+
+    // Toggle map visibility
+    function toggleMap() {
+        const mapContainer = document.getElementById('map');
+        mapContainer.classList.toggle('active');
+        if (mapContainer.classList.contains('active')) {
+            map.invalidateSize();
+        }
+    }
+
+    // Device actions
+    function playSound(deviceName) {
+        alert(`Playing sound on ${deviceName}`);
+    }
+
+    function lockDevice(deviceName) {
+        alert(`Locking ${deviceName}`);
+    }
+
+    function locateDevice(deviceName) {
+        const device = devices.find(d => d.name === deviceName);
+        if (device) {
+            map.setView([device.lat, device.lng], 12);
+            markers[deviceName].openPopup();
+            toggleMap();
+        }
+    }
+
+    // Search functionality
+    document.getElementById('deviceSearch').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const deviceItems = document.querySelectorAll('.device-item');
+        
+        deviceItems.forEach(item => {
+            const deviceName = item.querySelector('strong').textContent.toLowerCase();
+            item.style.display = deviceName.includes(searchTerm) ? 'block' : 'none';
+        });
+    });
+
+    // Simulate real-time updates
+    setInterval(() => {
+        devices.forEach(device => {
+            // Add small random movement
+            device.lat += (Math.random() - 0.5) * 0.01;
+            device.lng += (Math.random() - 0.5) * 0.01;
+            device.battery = Math.max(0, device.battery - Math.random() * 0.1);
+            
+            // Update marker position
+            markers[device.name].setLatLng([device.lat, device.lng]);
+            
+            // Update battery indicator
+            const batteryLevel = document.querySelector(`.device-item:has(strong:contains('${device.name}')) .battery-level`);
+            if (batteryLevel) {
+                batteryLevel.style.width = `${device.battery}%`;
+                batteryLevel.className = 'battery-level ' + 
+                    (device.battery > 50 ? 'battery-high' : 
+                     device.battery > 20 ? 'battery-medium' : 'battery-low');
+            }
+        });
+    }, 5000);
+</script>
+{% endblock %}
+

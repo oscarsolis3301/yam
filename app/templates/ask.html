@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta http-equiv="pragma" content="no-cache">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/Y.ico') }}">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../static/CSS/style.css">
+    <link href="../static/css/sidebars.css" rel="stylesheet">
+
+    <style>
+      /* allow page scrolling */
+      body, html {
+        height: 100%;
+        overflow: auto;
+      }
+
+      /* centered before search */
+      #mainContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 20%;
+        transition: padding-top 0.5s ease;
+        min-height: 100vh;
+      }
+
+      /* after search: pull up and stick */
+      #mainContainer.scrolled {
+        padding-top: 20px;
+      }
+      #mainContainer.scrolled .input-container {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
+      /* search bar styling */
+      .input-container { 
+        width: 100%; 
+        max-width: 800px; 
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .search-bar {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+      }
+      
+      .search-bar input {
+        flex: 1;
+        padding: 28px 20px 18px 20px;
+        font-size: 20px;
+        font-weight: 600;
+        border-radius: 12px;
+        border: 2px solid #ccc;
+        box-sizing: border-box;
+        outline: none;
+        height: 60px;
+        background-color: #fff;
+        color: #000;
+      }
+
+      .file-upload {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        border: 2px dashed #ccc;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .file-upload:hover {
+        border-color: #fff;
+        background-color: rgba(255,255,255,0.1);
+      }
+
+      .file-upload input[type="file"] {
+        display: none;
+      }
+
+      .file-upload-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #ccc;
+        font-size: 16px;
+        margin: 0;
+      }
+
+      .file-preview {
+        max-width: 200px;
+        max-height: 200px;
+        margin-top: 10px;
+        border-radius: 8px;
+        display: none;
+      }
+
+      /* spinner */
+      #spinner { position: absolute; top: 50%; right: 16px; transform: translateY(-50%); display: none; }
+      #spinner .spinner { border: 3px solid #444; border-top: 3px solid #f1f1f1; border-radius: 50%; width: 18px; height: 18px; animation: spin 0.7s linear infinite; }
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+      /* suggestions dropdown */
+      #suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #1e1e1e;
+        border: 2px solid #444;
+        border-top: none;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+        font-size: 18px;
+        color: #f1f1f1;
+        border-radius: 0 0 12px 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+      }
+
+      /* result styling */
+      #result {
+        margin-top: 20px;
+        width: 100%;
+        max-width: 800px;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+
+  <body class="d-flex flex-nowrap">
+    {% include "sidebar.html" %}
+
+    <div id="mainContainer" class="mx-auto" style="width: 1000px;">
+      <div class="container">
+        <!-- Input Container -->
+        <div class="input-container">
+          <!-- Text Input -->
+          <form id="searchForm" class="search-bar" autocomplete="off">
+            <input type="text" id="animated-input" name="t" placeholder="Ask a question..." required autocomplete="off">
+            <button type="submit" class="btn btn-primary" style="height: 60px; min-width: 60px;">
+              <i class="bi bi-send"></i>
+            </button>
+          </form>
+
+          <!-- File Upload -->
+          <div class="file-upload">
+            <input type="file" id="fileInput" accept="image/*,.pdf,.txt">
+            <label for="fileInput" class="file-upload-label">
+              <i class="bi bi-cloud-upload"></i>
+              <span>Drop a file or click to upload</span>
+            </label>
+          </div>
+          <img id="filePreview" class="file-preview">
+
+          <!-- Loading Spinner -->
+          <div id="spinner"><div class="spinner"></div></div>
+          
+          <!-- Suggestions -->
+          <ul id="suggestions"></ul>
+        </div>
+
+        <!-- Results -->
+        <div id="result"></div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client/dist/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="../static/js/sidebars.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const input = document.getElementById('animated-input');
+          const suggestions = document.getElementById('suggestions');
+          const spinner = document.getElementById('spinner');
+          const searchForm = document.getElementById('searchForm');
+          const resultDiv = document.getElementById('result');
+          const mainContainer = document.getElementById('mainContainer');
+          const fileInput = document.getElementById('fileInput');
+          const filePreview = document.getElementById('filePreview');
+      
+          const commonQuestions = [
+            "How to find EPIC username?",
+            "How to reset my password?",
+            "How to update my profile?",
+            "What is the refund policy?",
+            "How to contact support?"
+          ];
+      
+          // File upload preview
+          fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (file.type.startsWith('image/')) {
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                filePreview.src = e.target.result;
+                filePreview.style.display = 'block';
+              };
+              reader.readAsDataURL(file);
+            } else {
+              filePreview.style.display = 'none';
+            }
+
+            // Automatically upload when file is selected
+            const formData = new FormData();
+            formData.append('file', file);
+
+            mainContainer.classList.add('scrolled');
+            spinner.style.display = 'block';
+            resultDiv.innerHTML = '';
+
+            fetch('/upload', {
+              method: 'POST',
+              body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+              const alertDiv = document.createElement('div');
+              alertDiv.className = 'alert alert-light';
+              alertDiv.style.whiteSpace = 'pre-wrap';
+              resultDiv.appendChild(alertDiv);
+
+              // Display extracted text if available
+              if (data.extracted_text) {
+                const extractedDiv = document.createElement('div');
+                extractedDiv.className = 'alert alert-secondary mb-3';
+                extractedDiv.textContent = data.extracted_text;
+                resultDiv.appendChild(extractedDiv);
+              }
+
+              // Animate the summary
+              const summary = data.summary || '';
+              let idx = 0, speed = 1;
+              (function typeChar(){
+                if (idx <= summary.length) {
+                  alertDiv.textContent = summary.slice(0, idx++);
+                  setTimeout(typeChar, speed);
+                }
+              })();
+            })
+            .catch(err => {
+              resultDiv.innerHTML = `
+                <div class="alert alert-danger" role="alert">
+                  Error: ${err.message}
+                </div>`;
+            })
+            .finally(() => {
+              spinner.style.display = 'none';
+            });
+          });
+      
+          // Text input suggestions
+          input.addEventListener('input', () => {
+            const q = input.value.trim().toLowerCase();
+            suggestions.innerHTML = '';
+            if (!q) return suggestions.style.display = 'none';
+            
+            commonQuestions
+              .filter(qs => qs.toLowerCase().includes(q))
+              .forEach(qs => {
+                const li = document.createElement('li');
+                li.textContent = qs;
+                Object.assign(li.style, {padding: '10px 16px', cursor: 'pointer'});
+                li.onmouseover = () => li.style.backgroundColor = '#333';
+                li.onmouseout  = () => li.style.backgroundColor = '#1e1e1e';
+                li.onclick     = () => {
+                  input.value = qs;
+                  suggestions.style.display = 'none';
+                  searchForm.dispatchEvent(new Event('submit', {cancelable:true}));
+                };
+                suggestions.appendChild(li);
+              });
+            suggestions.style.display = 'block';
+          });
+      
+          // Text input submission
+          searchForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            mainContainer.classList.add('scrolled');
+            spinner.style.display = 'block';
+            suggestions.style.display = 'none';
+            resultDiv.innerHTML = '';
+            input.disabled = true;
+      
+            try {
+              const url = window.location.origin + '/ask';
+              const res = await fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ prompt: input.value.trim() })
+              });
+      
+              if (!res.ok) {
+                throw new Error(res.statusText);
+              }
+
+              const data = await res.json();
+              const summary = data.summary || '';
+      
+              const alertDiv = document.createElement('div');
+              alertDiv.className = 'alert alert-light';
+              alertDiv.style.whiteSpace = 'pre-wrap';
+              resultDiv.appendChild(alertDiv);
+      
+              let idx = 0, speed = 1;
+              (function typeChar(){
+                if (idx <= summary.length) {
+                  alertDiv.textContent = summary.slice(0, idx++);
+                  setTimeout(typeChar, speed);
+                } else {
+                  input.disabled = false;
+                }
+              })();
+      
+            } catch(err) {
+              console.error(err);
+              resultDiv.innerHTML = `
+                <div class="alert alert-danger" role="alert">
+                  Error: ${err.message}
+                </div>`;
+              input.disabled = false;
+            } finally {
+              spinner.style.display = 'none';
+            }
+          });
+
+          // Drag and drop support
+          const fileUpload = document.querySelector('.file-upload');
+          
+          ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileUpload.addEventListener(eventName, preventDefaults, false);
+          });
+
+          function preventDefaults (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+
+          ['dragenter', 'dragover'].forEach(eventName => {
+            fileUpload.addEventListener(eventName, highlight, false);
+          });
+
+          ['dragleave', 'drop'].forEach(eventName => {
+            fileUpload.addEventListener(eventName, unhighlight, false);
+          });
+
+          function highlight(e) {
+            fileUpload.classList.add('border-primary');
+          }
+
+          function unhighlight(e) {
+            fileUpload.classList.remove('border-primary');
+          }
+
+          fileUpload.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const file = dt.files[0];
+            fileInput.files = dt.files;
+            fileInput.dispatchEvent(new Event('change'));
+          });
+        });
+    </script>
+  </body>
+</html>

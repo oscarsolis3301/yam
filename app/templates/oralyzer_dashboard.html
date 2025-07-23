@@ -1,0 +1,671 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-wrapper with-outage-banner">
+  <div class="container-fluid dashboard-container">
+      <div class="row g-4 mt-4">
+          <!-- Main Dashboard Content -->
+          <div class="col-lg-8 col-md-12">
+              <!-- Statistics Cards Row 1 -->
+              <div class="row g-3 mb-4">
+                  <div class="col-md-3">
+                      <div class="card dashboard-card bg-primary text-white animate__animated animate__fadeIn">
+                          <div class="card-body p-3">
+                              <h5 class="card-title">Total Tickets</h5>
+                              <h2 class="display-4 mb-2">{{ total_tickets }}</h2>
+                              <p class="mb-0"><i class="fas fa-arrow-up"></i> 12% from last week</p>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-3">
+                      <div class="card dashboard-card bg-success text-white animate__animated animate__fadeIn" style="animation-delay: 0.2s">
+                          <div class="card-body p-3">
+                              <h5 class="card-title">Active Tickets</h5>
+                              <h2 class="display-4 mb-2">{{ active_tickets }}</h2>
+                              <p class="mb-0"><i class="fas fa-clock"></i> 8 need attention</p>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-3">
+                      <div class="card dashboard-card bg-info text-white animate__animated animate__fadeIn" style="animation-delay: 0.4s">
+                          <div class="card-body p-3">
+                              <h5 class="card-title">Resolved Today</h5>
+                              <h2 class="display-4 mb-2">{{ resolved_tickets }}</h2>
+                              <p class="mb-0"><i class="fas fa-check"></i> 85% success rate</p>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-3">
+                      <div class="card dashboard-card bg-warning text-white animate__animated animate__fadeIn" style="animation-delay: 0.6s">
+                          <div class="card-body p-3">
+                              <h5 class="card-title">Avg. Response</h5>
+                              <h2 class="display-4 mb-2">15m</h2>
+                              <p class="mb-0"><i class="fas fa-tachometer-alt"></i> 5m faster than last week</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Charts Row -->
+              <div class="row g-3 mb-4">
+                  <div class="col-md-6">
+                      <div class="card dashboard-card animate__animated animate__fadeInUp h-100">
+                          <div class="card-header d-flex justify-content-between align-items-center">
+                              <h5 class="mb-0">Ticket Trends</h5>
+                              <div class="btn-group">
+                                  <button class="btn btn-sm btn-outline-secondary active" onclick="updateChartPeriod('week')">Week</button>
+                                  <button class="btn btn-sm btn-outline-secondary" onclick="updateChartPeriod('month')">Month</button>
+                              </div>
+                          </div>
+                          <div class="card-body">
+                              <div id="ticketTrendsChart"></div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-6">
+                      <div class="card dashboard-card animate__animated animate__fadeInUp h-100" style="animation-delay: 0.2s">
+                          <div class="card-header d-flex justify-content-between align-items-center">
+                              <h5 class="mb-0">Ticket Categories</h5>
+                              <button class="btn btn-sm btn-outline-primary" onclick="exportData()">
+                                  <i class="fas fa-download"></i> Export
+                              </button>
+                          </div>
+                          <div class="card-body">
+                              <div id="ticketCategoriesChart"></div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Recent Tickets Table -->
+              <div class="card dashboard-card animate__animated animate__fadeInUp" style="animation-delay: 0.4s">
+                  <div class="card-header d-flex justify-content-between align-items-center">
+                      <h5 class="mb-0">Recent Tickets</h5>
+                      <div class="d-flex gap-2">
+                          <div class="input-group input-group-sm" style="width: 200px;">
+                              <input type="text" class="form-control" placeholder="Search tickets...">
+                              <button class="btn btn-outline-secondary" type="button">
+                                  <i class="fas fa-search"></i>
+                              </button>
+                          </div>
+                          <button class="btn btn-sm btn-primary">
+                              <i class="fas fa-plus"></i> New Ticket
+                          </button>
+                      </div>
+                  </div>
+                  <div class="card-body p-0">
+                      <div class="table-responsive">
+                          <table class="table table-hover dashboard-table mb-0">
+                              <thead>
+                                  <tr>
+                                      <th>ID</th>
+                                      <th>Title</th>
+                                      <th>Status</th>
+                                      <th>Priority</th>
+                                      <th>Created</th>
+                                      <th>Actions</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  {% for ticket in tickets %}
+                                  <tr class="animate__animated animate__fadeIn">
+                                      <td>#{{ ticket.id }}</td>
+                                      <td>
+                                          <div class="d-flex align-items-center">
+                                              <span class="ticket-icon me-2">
+                                                  <i class="fas fa-ticket-alt"></i>
+                                              </span>
+                                              {{ ticket.title }}
+                                          </div>
+                                      </td>
+                                      <td>
+                                          <span class="badge bg-{{ 'success' if ticket.status == 'active' else 'warning' }}">
+                                              {{ ticket.status }}
+                                          </span>
+                                      </td>
+                                      <td>
+                                          <span class="badge bg-{{ 'danger' if ticket.priority == 'high' else 'info' }}">
+                                              {{ ticket.priority }}
+                                          </span>
+                                      </td>
+                                      <td>{{ ticket.created_at }}</td>
+                                      <td>
+                                          <div class="btn-group">
+                                              <button class="btn btn-sm btn-outline-primary">
+                                                  <i class="fas fa-eye"></i>
+                                              </button>
+                                              <button class="btn btn-sm btn-outline-success">
+                                                  <i class="fas fa-edit"></i>
+                                              </button>
+                                          </div>
+                                      </td>
+                                  </tr>
+                                  {% endfor %}
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Sidebar Widgets -->
+          <div class="col-lg-4 col-md-12 d-flex flex-column gap-4">
+              <!-- Team Activity Widget -->
+              <div class="card dashboard-card animate__animated animate__fadeInRight" style="animation-delay: 0.2s">
+                  <div class="card-header">
+                      <h5 class="mb-0">Team Activity</h5>
+                  </div>
+                  <div class="card-body">
+                      <div class="activity-feed">
+                          <div class="activity-item">
+                              <div class="activity-icon bg-primary">
+                                  <i class="fas fa-ticket-alt"></i>
+                              </div>
+                              <div class="activity-content">
+                                  <p class="mb-0">John resolved ticket #1234</p>
+                                  <small class="text-muted">2 minutes ago</small>
+                              </div>
+                          </div>
+                          <div class="activity-item">
+                              <div class="activity-icon bg-success">
+                                  <i class="fas fa-user"></i>
+                              </div>
+                              <div class="activity-content">
+                                  <p class="mb-0">Sarah created new ticket</p>
+                                  <small class="text-muted">15 minutes ago</small>
+                              </div>
+                          </div>
+                          <div class="activity-item">
+                              <div class="activity-icon bg-info">
+                                  <i class="fas fa-comment"></i>
+                              </div>
+                              <div class="activity-content">
+                                  <p class="mb-0">Mike added comment to #1235</p>
+                                  <small class="text-muted">1 hour ago</small>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Oralyzer Widget -->
+              <div class="card dashboard-card oralyzer-card animate__animated animate__fadeInRight">
+                  <div class="card-header d-flex justify-content-between align-items-center">
+                      <h5 class="mb-0">Oralyzer Live View</h5>
+                      <button class="btn modern-btn btn-lg btn-outline-primary" onclick="toggleFullscreen()">
+                          <i class="fas fa-expand"></i> Fullscreen
+                      </button>
+                  </div>
+                  <div class="card-body oralyzer-body">
+                      <iframe src="{{ url_for('oralyzer.oralyzer_clean') }}" 
+                              class="oralyzer-frame"
+                              id="oralyzerFrame"
+                              allowfullscreen>
+                      </iframe>
+                  </div>
+              </div>
+
+              <!-- Performance Metrics Widget -->
+              <div class="card dashboard-card animate__animated animate__fadeInRight" style="animation-delay: 0.4s">
+                  <div class="card-header">
+                      <h5 class="mb-0">Performance Metrics</h5>
+                  </div>
+                  <div class="card-body">
+                      <div class="metric-item">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                              <span>First Response Time</span>
+                              <span class="badge bg-success">Good</span>
+                          </div>
+                          <div class="progress" style="height: 8px;">
+                              <div class="progress-bar bg-success" style="width: 85%"></div>
+                          </div>
+                      </div>
+                      <div class="metric-item mt-3">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                              <span>Resolution Rate</span>
+                              <span class="badge bg-warning">Average</span>
+                          </div>
+                          <div class="progress" style="height: 8px;">
+                              <div class="progress-bar bg-warning" style="width: 65%"></div>
+                          </div>
+                      </div>
+                      <div class="metric-item mt-3">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                              <span>Customer Satisfaction</span>
+                              <span class="badge bg-primary">Excellent</span>
+                          </div>
+                          <div class="progress" style="height: 8px;">
+                              <div class="progress-bar bg-primary" style="width: 92%"></div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Add required CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<!-- Add required JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize ApexCharts
+    const ticketTrendsOptions = {
+        series: [{
+            name: 'New Tickets',
+            data: [12, 19, 15, 17, 22, 18, 14]
+        }, {
+            name: 'Resolved',
+            data: [8, 15, 12, 14, 18, 15, 12]
+        }],
+        chart: {
+            type: 'area',
+            height: 350,
+            toolbar: {
+                show: false
+            },
+            background: 'transparent'
+        },
+        colors: ['#0d6efd', '#198754'],
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.7,
+                opacityTo: 0.2,
+                stops: [0, 90, 100]
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            curve: 'smooth',
+            width: 2
+        },
+        grid: {
+            borderColor: 'rgba(255,255,255,0.1)',
+            strokeDashArray: 4,
+            xaxis: {
+                lines: {
+                    show: true
+                }
+            }
+        },
+        xaxis: {
+            categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            labels: {
+                style: {
+                    colors: '#fff'
+                }
+            }
+        },
+        yaxis: {
+            labels: {
+                style: {
+                    colors: '#fff'
+                }
+            }
+        },
+        legend: {
+            position: 'top',
+            labels: {
+                colors: '#fff'
+            }
+        },
+        tooltip: {
+            theme: 'dark'
+        }
+    };
+
+    const ticketCategoriesOptions = {
+        series: [35, 25, 20, 15, 5],
+        chart: {
+            type: 'donut',
+            height: 350,
+            background: 'transparent'
+        },
+        labels: ['Technical', 'Access', 'Hardware', 'Software', 'Other'],
+        colors: ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#6c757d'],
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '70%',
+                    labels: {
+                        show: true,
+                        name: {
+                            show: true,
+                            color: '#fff'
+                        },
+                        value: {
+                            show: true,
+                            color: '#fff'
+                        },
+                        total: {
+                            show: true,
+                            label: 'Total',
+                            color: '#fff'
+                        }
+                    }
+                }
+            }
+        },
+        legend: {
+            position: 'bottom',
+            labels: {
+                colors: '#fff'
+            }
+        },
+        dataLabels: {
+            enabled: false
+        }
+    };
+
+    const ticketTrendsChart = new ApexCharts(document.querySelector("#ticketTrendsChart"), ticketTrendsOptions);
+    const ticketCategoriesChart = new ApexCharts(document.querySelector("#ticketCategoriesChart"), ticketCategoriesOptions);
+    
+    ticketTrendsChart.render();
+    ticketCategoriesChart.render();
+
+    // Add hover effects to cards
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px) scale(1.02)';
+            this.style.transition = 'transform 0.3s cubic-bezier(.4,2,.3,1)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+});
+
+function updateChartPeriod(period) {
+    // Dummy function to update chart period
+    console.log('Updating chart period to:', period);
+}
+
+function exportData() {
+    // Dummy function to export data
+    console.log('Exporting data...');
+}
+
+function toggleFullscreen() {
+    const frame = document.getElementById('oralyzerFrame');
+    if (frame.requestFullscreen) {
+        frame.requestFullscreen();
+    } else if (frame.webkitRequestFullscreen) {
+        frame.webkitRequestFullscreen();
+    } else if (frame.msRequestFullscreen) {
+        frame.msRequestFullscreen();
+    }
+}
+</script>
+
+<style>
+.dashboard-wrapper {
+    min-height: 100vh;
+    background: #1a1a1f;
+    padding: 1rem;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.dashboard-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    align-items: flex-start;
+}
+
+.card, .dashboard-card {
+    border-radius: 1.25rem !important;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+    border: none;
+    background-clip: padding-box;
+    background: #23242b;
+    color: #fff;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.card-header {
+    border-radius: 1.25rem 1.25rem 0 0 !important;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 1rem 1.5rem;
+}
+
+.card-body {
+    border-radius: 0 0 1.25rem 1.25rem !important;
+    background: transparent;
+    padding: 1.5rem;
+}
+
+.dashboard-table {
+    color: #fff;
+    margin-bottom: 0;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+    border-top: none;
+    padding: 1rem;
+    border-color: rgba(255,255,255,0.05);
+}
+
+.table thead th {
+    background: rgba(255,255,255,0.03);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.7);
+}
+
+.table tbody tr:hover {
+    background: rgba(255,255,255,0.03);
+}
+
+.badge {
+    font-size: 0.8em;
+    padding: 0.5em 0.8em;
+    border-radius: 1em;
+    font-weight: 500;
+}
+
+.btn-group .btn {
+    border-radius: 0.5rem;
+    margin: 0 2px;
+}
+
+.btn-outline-primary, .btn-outline-secondary {
+    border-color: rgba(255,255,255,0.2);
+    color: #fff;
+}
+
+.btn-outline-primary:hover, .btn-outline-secondary:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+
+.activity-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    transition: background-color 0.3s ease;
+}
+
+.activity-item:hover {
+    background: rgba(255,255,255,0.03);
+}
+
+.activity-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.metric-item {
+    margin-bottom: 1rem;
+}
+
+.progress {
+    background: rgba(255,255,255,0.05);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.progress-bar {
+    border-radius: 1rem;
+}
+
+.ticket-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .dashboard-container {
+        padding: 0.5rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .dashboard-wrapper {
+        padding: 0.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-wrapper {
+        padding: 0.25rem;
+    }
+    .col-lg-8, .col-lg-4, .col-md-12 {
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+}
+
+.oralyzer-card {
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    margin-top: 20px;
+}
+
+.oralyzer-body {
+    width: 100%;
+    height: 320px;
+    padding: 0;
+    background: linear-gradient(135deg, #23242b 60%, #2c2c3e 100%);
+    border-radius: 0 0 1.5rem 1.5rem !important;
+    overflow: hidden;
+    display: flex;
+}
+
+.oralyzer-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 1.25rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    background: #23242b;
+    display: block;
+}
+
+.modern-btn {
+    border-radius: 2rem !important;
+    padding: 0.5rem 1.5rem !important;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(13,110,253,0.08);
+    transition: all 0.3s ease;
+}
+
+.modern-btn.btn-outline-primary {
+    border: 2px solid #0d6efd;
+    color: #0d6efd;
+    background: transparent;
+}
+
+.modern-btn.btn-outline-primary:hover {
+    background: #0d6efd;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(13,110,253,0.15);
+    transform: translateY(-2px);
+}
+
+/* Add glass morphism effect */
+.glass-effect {
+    background: rgba(35, 36, 43, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Ensure all dashboard cards are the same height in their row */
+.dashboard-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Make sidebar widgets stack with equal spacing */
+.col-lg-4.d-flex.flex-column.gap-4 > .dashboard-card {
+    margin-bottom: 0;
+}
+
+/* Ensure chart containers fill their card */
+#ticketTrendsChart, #ticketCategoriesChart {
+    min-height: 300px;
+    width: 100%;
+}
+</style>
+{% endblock %} 

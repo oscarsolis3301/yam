@@ -28,7 +28,7 @@ from app.utils.ai_helpers import (
 from app.utils.ai_utils import process_document
 from app.utils.models import get_model, get_embedder, FallbackModel
 from app.utils.kb_import import import_docs_folder
-from log import log_upload, get_user_history
+from app.utils.log import log_upload, get_user_history
 
 from . import bp  # Blueprint instance
 

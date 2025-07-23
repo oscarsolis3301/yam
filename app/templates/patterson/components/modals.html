@@ -1,0 +1,440 @@
+﻿<!-- Patterson Dashboard Modals Component -->
+<!-- Modals will be added here -->
+
+<!-- New Ticket Modal -->
+<div class="modal fade" id="newTicketModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New Patterson Dispatch Ticket</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newTicketForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Office</label>
+                                <select class="form-control" id="office-select" required>
+                                    <option value="">Select Office</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Technician</label>
+                                <select class="form-control" id="technician-select" required>
+                                    <option value="">Select Technician</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Scheduled Date</label>
+                                <input type="date" class="form-control" id="scheduled-date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Scheduled Time</label>
+                                <input type="time" class="form-control" id="scheduled-time" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Priority</label>
+                                <select class="form-control" id="priority-select">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium" selected>Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Urgent">Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Estimated Duration</label>
+                                <select class="form-control" id="duration-select">
+                                    <option value="1 hour">1 hour</option>
+                                    <option value="1.5 hours" selected>1.5 hours</option>
+                                    <option value="2 hours">2 hours</option>
+                                    <option value="3 hours">3 hours</option>
+                                    <option value="4 hours">4 hours</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="description" rows="4" placeholder="Describe the work to be performed..." required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary-patterson" onclick="createTicket()">
+                    <span id="create-btn-text">Create Ticket</span>
+                    <span id="create-btn-spinner" class="loading-spinner" style="display: none;"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Ticket Modal -->
+<div class="modal fade" id="editTicketModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Patterson Dispatch Ticket</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editTicketForm">
+                    <input type="hidden" id="edit-ticket-id">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Office</label>
+                                <select class="form-control" id="edit-office-select" required>
+                                    <option value="">Select Office</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Technician</label>
+                                <select class="form-control" id="edit-technician-select" required>
+                                    <option value="">Select Technician</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Scheduled Date</label>
+                                <input type="date" class="form-control" id="edit-scheduled-date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Scheduled Time</label>
+                                <input type="time" class="form-control" id="edit-scheduled-time" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Priority</label>
+                                <select class="form-control" id="edit-priority-select">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Urgent">Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Estimated Duration</label>
+                                <select class="form-control" id="edit-duration-select">
+                                    <option value="1 hour">1 hour</option>
+                                    <option value="1.5 hours">1.5 hours</option>
+                                    <option value="2 hours">2 hours</option>
+                                    <option value="3 hours">3 hours</option>
+                                    <option value="4 hours">4 hours</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="edit-description" rows="4" placeholder="Describe the work to be performed..." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Stage</label>
+                        <select class="form-control" id="edit-stage-select">
+                            <option value="in_progress">In Progress</option>
+                            <option value="scheduled">Scheduled</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" onclick="deleteTicket()" id="delete-ticket-btn">
+                    <i class="bi bi-trash"></i> Delete Ticket
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary-patterson" onclick="updateTicket()">
+                    <span id="update-btn-text">Update Ticket</span>
+                    <span id="update-btn-spinner" class="loading-spinner" style="display: none;"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ticket Details Modal -->
+<div class="modal fade" id="ticketDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ticket Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="ticket-details-content">
+                <!-- Ticket details will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Mappings Modal -->
+<div class="modal fade" id="userMappingModal" tabindex="-1" aria-labelledby="userMappingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl user-mapping-modal-wide">
+        <div class="modal-content user-mapping-modal-content">
+            <div class="modal-header user-mapping-modal__header">
+                <div class="d-flex align-items-center">
+                    <div class="header-icon me-3">
+                        <i class="bi bi-person-lines-fill"></i>
+                    </div>
+                    <div>
+                        <h4 class="modal-title user-mapping-modal__title mb-0" id="userMappingModalLabel">
+                            User ID Mappings Management
+                        </h4>
+                        <small class="text-white-50">Manage technician mappings and system integrations</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body user-mapping-modal__body">
+                <!-- Clean Statistics Dashboard -->
+                <div class="stats-dashboard-compact">
+                    <div class="container-fluid">
+                        <div class="row g-2">
+                            <div class="col-lg-3 col-md-6">
+                                <div class="stat-card-compact bg-gradient-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Total users with a linked system account">
+                                    <div class="stat-icon-compact">
+                                        <i class="bi bi-person-check-fill"></i>
+                                    </div>
+                                    <div class="stat-content-compact">
+                                        <div class="stat-number-compact" id="mapped-users-count">0</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="stat-card-compact bg-gradient-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Total Freshworks users without a linked system account">
+                                    <div class="stat-icon-compact">
+                                        <i class="bi bi-person-x-fill"></i>
+                                    </div>
+                                    <div class="stat-content-compact">
+                                        <div class="stat-number-compact" id="unmapped-users-count">0</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+<div class="stat-card-compact bg-gradient-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Active tickets currently assigned to technicians"><div class="stat-icon-compact">
+                                        <i class="bi bi-ticket-detailed-fill"></i>
+                                    </div>
+                                    <div class="stat-content-compact">
+<div class="stat-number-compact" id="assigned-tickets-count">0</div></div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="stat-card-compact bg-gradient-info" data-bs-toggle="tooltip" data-bs-placement="top" title="Percentage of users that are mapped">
+                                    <div class="stat-icon-compact">
+                                        <i class="bi bi-pie-chart-fill"></i>
+                                    </div>
+                                    <div class="stat-content-compact">
+                                        <div class="stat-number-compact" id="mapping-coverage">0%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content Area -->
+                <div class="main-content-area-compact">
+                    <div class="container-fluid h-100">
+                        <!-- Clean Tab Navigation -->
+                        <div class="modern-tab-navigation-compact mb-3 d-flex justify-content-center align-items-center">
+                            <div class="nav nav-pills nav-fill" id="mappingTabs" role="tablist">
+                                <button class="nav-link active" id="add-edit-tab" onclick="switchUserMappingView('edit')" type="button" data-tooltip="Add or edit user mappings">
+                                    <i class="bi bi-plus-circle"></i>
+                                </button>
+                                <button class="nav-link" id="mappings-table-tab" onclick="switchUserMappingView('mapped')" type="button" data-tooltip="View current user mappings">
+                                    <i class="bi bi-list-check"></i>
+                                </button>
+                                <button class="nav-link" id="unmapped-users-tab" onclick="switchUserMappingView('unmapped')" type="button" data-tooltip="View unmapped users">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                </button>
+                            </div>
+<!-- <button class="btn btn-sm btn-outline-info ms-2" onclick="testUnmappedUsers()" data-bs-toggle="tooltip" title="Test unmapped users functionality">
+                                <i class="bi bi-bug"></i>
+                            </button> --></div>
+                        
+                        <!-- Tab Content -->
+                        <div class="tab-content tab-content-compact flex-grow-1">
+                            <!-- Add/Edit Pane -->
+                            <div class="tab-pane fade show active" id="add-edit-pane" role="tabpanel">
+                                <div class="form-card-compact">
+                                    <div class="form-card-header-compact">
+                                        <h5><i class="bi bi-pencil-square me-2"></i>Edit User Mapping</h5>
+                                    </div>
+                                    <form id="user-mapping-form" class="mt-3">
+                                        <input type="hidden" id="mapping-id">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="unmapped-user-select" class="form-label">Unmapped Freshworks ID</label>
+                                                <select id="unmapped-user-select" class="form-select">
+                                                    <option value="">Select Unmapped User</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="user-name" class="form-label">Display Name</label>
+                                                <input type="text" id="user-name" class="form-control" placeholder="e.g., John Doe">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="user-email" class="form-label">Email</label>
+                                                <input type="email" id="user-email" class="form-control" placeholder="e.g., john.doe@example.com">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="linked-user-select" class="form-label">Link to System Account</label>
+                                                <select id="linked-user-select" class="form-select">
+                                                    <option value="">Select User Account</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="user-role" class="form-label">Role</label>
+                                                <select id="user-role" class="form-select">
+                                                    <option value="technician">Technician</option>
+                                                    <option value="coordinator">Coordinator</option>
+                                                    <option value="manager">Manager</option>
+                                                    <option value="admin">Admin</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="user-region" class="form-label">Region</label>
+                                                <input type="text" id="user-region" class="form-control" placeholder="e.g., West Coast">
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="user-notes" class="form-label">Notes</label>
+                                                <textarea id="user-notes" class="form-control" rows="3"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-end mt-4">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary me-2" onclick="clearMappingForm()">Clear</button>
+                                            <button type="submit" class="btn btn-sm btn-primary">Save Mapping</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <!-- Mapped Users Table Pane -->
+                            <div class="tab-pane fade" id="mappings-table-pane" role="tabpanel">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="text-white">Current Mappings</h5>
+                                    <input type="search" id="mapped-users-search" class="form-control form-control-sm" placeholder="Search mapped users...">
+                                </div>
+                                <div class="table-responsive-wrapper">
+                                    <table class="table table-modern-compact" id="mapped-users-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Display Name</th>
+                                                <th>Freshworks ID</th>
+                                                <th>Email</th>
+                                                <th>Role</th>
+                                                <th>Tickets</th>
+                                                <th>Last Seen</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="mappings-table-body">
+                                            <!-- Mapped users will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- Unmapped Users Pane -->
+                            <div class="tab-pane fade" id="unmapped-users-pane" role="tabpanel">
+                               <div class="d-flex justify-content-between align-items-center mb-3">
+                                     <h5 class="text-white">Unmapped Users</h5>
+                                    <input type="search" id="unmapped-users-search" class="form-control form-control-sm" placeholder="Search unmapped users...">
+                                </div>
+                                <div class="table-responsive-wrapper">
+                                     <table class="table table-modern-compact" id="unmapped-users-table">
+                                         <thead>
+                                             <tr>
+                                                 <th>Freshworks ID</th>
+                                                 <th>Detected Name</th>
+                                                 <th>Ticket Count</th>
+                                                 <th>Last Seen</th>
+                                                 <th>Actions</th>
+                                             </tr>
+                                         </thead>
+                                         <tbody id="unmapped-table-body">
+                                             <!-- Unmapped users will be loaded here -->
+                                         </tbody>
+                                     </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer user-mapping-modal__footer">
+                <div class="d-flex justify-content-between w-100 align-items-center">
+                    <span class="footer-info">Last Updated: <span id="last-update-time">Never</span></span>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshMappingData()">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                        <button type="button" class="btn btn-sm btn-primary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Day Tickets Modal -->
+<div class="modal fade" id="dayTicketsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dayTicketsModalTitle">Tickets for...</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="day-tickets-list">
+                <!-- Ticket list will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Initializer Output Modal -->
+<div class="modal fade" id="initializerOutputModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Database Initialization Output</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <pre id="initializer-output" style="background:#222;color:#eee;padding:1em;min-height:300px;max-height:500px;overflow:auto;font-size:1em;"></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

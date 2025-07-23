@@ -1,0 +1,158 @@
+{% import 'components/yam/system_monitor.html' as yam_system_monitor %}
+{% import 'components/yam/system_health_monitor.html' as yam_system_health_monitor %}
+{% import 'components/yam/team_performance_analytics.html' as yam_team_performance_analytics %}
+{% import 'components/yam/team_collaboration.html' as yam_team_collaboration %}
+{% macro render_system_section(current_user) %}
+<!-- System Monitoring & Collaboration Section - FIXED LAYOUT -->
+<div class="yam-full-width-section" id="yamSystemSection">
+    <div class="yam-component-header">
+        <h3 class="yam-component-title">
+            <i class="bi bi-gear-fill"></i>
+            System Monitoring & Collaboration
+        </h3>
+        <div class="yam-component-controls">
+            <button class="yam-control-btn" id="refreshSystemBtn" title="Refresh">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <button class="yam-control-btn" id="toggleSystemBtn" title="Toggle View">
+                <i class="bi bi-grid-3x3"></i>
+            </button>
+        </div>
+    </div>
+    <div class="yam-scrollable-content" id="yamSystemContent">
+        <div class="yam-component-grid" id="yamSystemGrid">
+            <!-- System Monitor Component -->
+            <div class="yam-component-item yam-system-monitor-container" id="yamSystemMonitorContainer">
+                <div class="yam-data-content">
+                    {{ yam_system_monitor.render_system_monitor(current_user) }}
+                </div>
+            </div>
+            
+            <!-- System Health Monitor Component -->
+            <div class="yam-component-item yam-system-health-container" id="yamSystemHealthContainer">
+                <div class="yam-data-content">
+                    {{ yam_system_health_monitor.render_system_health_monitor(current_user) }}
+                </div>
+            </div>
+            
+            <!-- Team Performance Analytics Component -->
+            <div class="yam-component-item yam-team-performance-container" id="yamTeamPerformanceContainer">
+                <div class="yam-data-content">
+                    {{ yam_team_performance_analytics.render_team_performance_analytics(current_user) }}
+                </div>
+            </div>
+            
+            <!-- Team Collaboration Component -->
+            <div class="yam-component-item yam-team-collaboration-container" id="yamTeamCollaborationContainer">
+                <div class="yam-data-content">
+                    {{ yam_team_collaboration.render_team_collaboration(current_user) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Specific styles for system section */
+#yamSystemSection {
+    min-height: 500px;
+    height: auto;
+    overflow: visible;
+}
+
+#yamSystemContent {
+    min-height: 400px;
+    height: auto;
+    overflow-y: auto;
+    overflow-x: visible;
+}
+
+#yamSystemGrid {
+    min-height: 350px;
+    height: auto;
+    overflow: visible;
+}
+
+.yam-system-monitor-container,
+.yam-system-health-container,
+.yam-team-performance-container,
+.yam-team-collaboration-container {
+    min-height: 250px;
+    height: auto;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+}
+
+.yam-system-monitor-container .yam-data-content,
+.yam-system-health-container .yam-data-content,
+.yam-team-performance-container .yam-data-content,
+.yam-team-collaboration-container .yam-data-content {
+    min-height: 200px;
+    height: auto;
+    overflow: visible;
+    flex: 1;
+}
+
+/* Ensure system monitor components are properly sized */
+.yam-system-monitor,
+.yam-system-health-monitor,
+.yam-team-performance-analytics,
+.yam-team-collaboration {
+    min-height: 200px;
+    height: auto;
+    overflow: visible;
+    width: 100%;
+}
+</style>
+
+<script>
+// Ensure system section components are properly visible
+document.addEventListener('DOMContentLoaded', function() {
+    const systemSection = document.getElementById('yamSystemSection');
+    const systemContent = document.getElementById('yamSystemContent');
+    const systemGrid = document.getElementById('yamSystemGrid');
+    
+    if (systemSection) {
+        systemSection.style.height = 'auto';
+        systemSection.style.minHeight = '500px';
+        systemSection.style.overflow = 'visible';
+    }
+    
+    if (systemContent) {
+        systemContent.style.height = 'auto';
+        systemContent.style.minHeight = '400px';
+        systemContent.style.overflowY = 'auto';
+        systemContent.style.overflowX = 'visible';
+    }
+    
+    if (systemGrid) {
+        systemGrid.style.height = 'auto';
+        systemGrid.style.minHeight = '350px';
+        systemGrid.style.overflow = 'visible';
+    }
+    
+    // Ensure all container components are visible
+    const containers = ['yamSystemMonitorContainer', 'yamSystemHealthContainer', 'yamTeamPerformanceContainer', 'yamTeamCollaborationContainer'];
+    containers.forEach(containerId => {
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.style.display = 'flex';
+            container.style.flexDirection = 'column';
+            container.style.height = 'auto';
+            container.style.minHeight = '250px';
+            container.style.overflow = 'visible';
+        }
+    });
+    
+    // Ensure system monitor components are properly sized
+    const systemComponents = document.querySelectorAll('.yam-system-monitor, .yam-system-health-monitor, .yam-team-performance-analytics, .yam-team-collaboration');
+    systemComponents.forEach(component => {
+        component.style.minHeight = '200px';
+        component.style.height = 'auto';
+        component.style.overflow = 'visible';
+        component.style.width = '100%';
+    });
+});
+</script>
+{% endmacro %} 

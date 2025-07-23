@@ -1,0 +1,227 @@
+<!-- VNC Viewer Component for Browser-based Remote Access -->
+<div id="vncViewerContainer" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.9); z-index: 10001; justify-content: center; align-items: center;">
+    <div id="vncViewerContent" style="background: #222; padding: 1rem; border-radius: 8px; max-width: 95vw; max-height: 95vh; width: 1200px; height: 800px; position: relative;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; color: white;">
+            <h3 id="vncViewerTitle">Remote Session</h3>
+            <button onclick="closeVNCViewer()" style="background: #f44336; color: white; border: none; border-radius: 4px; padding: 0.5rem 1rem; cursor: pointer;">Close</button>
+        </div>
+        
+        <div id="vncViewerStatus" style="margin-bottom: 1rem; padding: 0.5rem; background: #333; border-radius: 4px; color: white;">
+            <span id="vncStatusText">Connecting...</span>
+            <button onclick="refreshVNCConnection()" style="background: #2196F3; color: white; border: none; border-radius: 4px; padding: 0.3rem 0.8rem; margin-left: 1rem; cursor: pointer;">Refresh</button>
+        </div>
+        
+        <div id="vncViewerCanvas" style="width: 100%; height: calc(100% - 120px); background: #000; border-radius: 4px; position: relative; overflow: hidden;">
+            <canvas id="vncCanvas" style="width: 100%; height: 100%; cursor: crosshair;"></canvas>
+            <div id="vncLoading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">🔄</div>
+                <div>Connecting to remote device...</div>
+            </div>
+        </div>
+        
+        <div id="vncControls" style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: center;">
+            <button onclick="sendVNCKey('Ctrl+Alt+Del')" style="background: #607D8B; color: white; border: none; border-radius: 4px; padding: 0.5rem 1rem; cursor: pointer;">Ctrl+Alt+Del</button>
+            <button onclick="sendVNCKey('Ctrl+Alt+Esc')" style="background: #607D8B; color: white; border: none; border-radius: 4px; padding: 0.5rem 1rem; cursor: pointer;">Task Manager</button>
+            <button onclick="toggleVNCFullscreen()" style="background: #607D8B; color: white; border: none; border-radius: 4px; padding: 0.5rem 1rem; cursor: pointer;">Fullscreen</button>
+            <button onclick="captureVNCScreenshot()" style="background: #607D8B; color: white; border: none; border-radius: 4px; padding: 0.5rem 1rem; cursor: pointer;">Screenshot</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// VNC Viewer functionality
+let vncConnection = null;
+let vncTarget = null;
+let vncCanvas = null;
+let vncContext = null;
+
+function openVNCViewer(hostname, ip) {
+    vncTarget = hostname || ip;
+    if (!vncTarget) {
+        alert('No valid hostname or IP address provided');
+        return;
+    }
+    
+    const container = document.getElementById('vncViewerContainer');
+    const title = document.getElementById('vncViewerTitle');
+    const statusText = document.getElementById('vncStatusText');
+    const loading = document.getElementById('vncLoading');
+    
+    title.textContent = `Remote Session - ${vncTarget}`;
+    statusText.textContent = 'Connecting...';
+    loading.style.display = 'block';
+    
+    container.style.display = 'flex';
+    
+    // Initialize canvas
+    vncCanvas = document.getElementById('vncCanvas');
+    vncContext = vncCanvas.getContext('2d');
+    
+    // Set canvas size
+    const canvasContainer = document.getElementById('vncViewerCanvas');
+    vncCanvas.width = canvasContainer.offsetWidth;
+    vncCanvas.height = canvasContainer.offsetHeight;
+    
+    // Start VNC connection
+    startVNCConnection(vncTarget);
+}
+
+function closeVNCViewer() {
+    if (vncConnection) {
+        vncConnection.close();
+        vncConnection = null;
+    }
+    
+    document.getElementById('vncViewerContainer').style.display = 'none';
+    vncTarget = null;
+}
+
+function startVNCConnection(target) {
+    const statusText = document.getElementById('vncStatusText');
+    const loading = document.getElementById('vncLoading');
+    
+    try {
+        // Try to establish WebSocket connection to VNC proxy
+        const wsUrl = `ws://${window.location.hostname}:5900/ws/${target}`;
+        vncConnection = new WebSocket(wsUrl);
+        
+        vncConnection.onopen = function() {
+            statusText.textContent = 'Connected';
+            statusText.style.color = '#4CAF50';
+            loading.style.display = 'none';
+            
+            // Start receiving VNC data
+            vncConnection.onmessage = function(event) {
+                handleVNCMessage(event.data);
+            };
+        };
+        
+        vncConnection.onerror = function(error) {
+            statusText.textContent = 'Connection failed';
+            statusText.style.color = '#f44336';
+            loading.style.display = 'none';
+            console.error('VNC connection error:', error);
+        };
+        
+        vncConnection.onclose = function() {
+            statusText.textContent = 'Disconnected';
+            statusText.style.color = '#FF9800';
+            loading.style.display = 'none';
+        };
+        
+    } catch (error) {
+        statusText.textContent = 'VNC not available';
+        statusText.style.color = '#f44336';
+        loading.style.display = 'none';
+        
+        // Show fallback message
+        setTimeout(() => {
+            alert(`VNC connection to ${target} is not available.\n\nPlease use Dameware or RDP for remote access.`);
+            closeVNCViewer();
+        }, 1000);
+    }
+}
+
+function handleVNCMessage(data) {
+    // Handle incoming VNC data
+    // This would decode VNC protocol data and render to canvas
+    // For now, we'll show a placeholder
+    if (vncContext) {
+        vncContext.fillStyle = '#000';
+        vncContext.fillRect(0, 0, vncCanvas.width, vncCanvas.height);
+        
+        vncContext.fillStyle = '#fff';
+        vncContext.font = '16px Arial';
+        vncContext.textAlign = 'center';
+        vncContext.fillText('VNC Connection Active', vncCanvas.width / 2, vncCanvas.height / 2);
+        vncContext.fillText(`Connected to: ${vncTarget}`, vncCanvas.width / 2, vncCanvas.height / 2 + 30);
+        vncContext.fillText('Mouse and keyboard input would be captured here', vncCanvas.width / 2, vncCanvas.height / 2 + 60);
+    }
+}
+
+function refreshVNCConnection() {
+    if (vncTarget) {
+        if (vncConnection) {
+            vncConnection.close();
+        }
+        startVNCConnection(vncTarget);
+    }
+}
+
+function sendVNCKey(keyCombo) {
+    if (vncConnection && vncConnection.readyState === WebSocket.OPEN) {
+        vncConnection.send(JSON.stringify({
+            type: 'key',
+            key: keyCombo
+        }));
+    }
+}
+
+function toggleVNCFullscreen() {
+    const container = document.getElementById('vncViewerContainer');
+    if (container.requestFullscreen) {
+        container.requestFullscreen();
+    } else if (container.webkitRequestFullscreen) {
+        container.webkitRequestFullscreen();
+    } else if (container.msRequestFullscreen) {
+        container.msRequestFullscreen();
+    }
+}
+
+function captureVNCScreenshot() {
+    if (vncCanvas) {
+        const link = document.createElement('a');
+        link.download = `screenshot-${vncTarget}-${new Date().toISOString().slice(0, 19)}.png`;
+        link.href = vncCanvas.toDataURL();
+        link.click();
+    }
+}
+
+// Mouse and keyboard event handlers for VNC
+document.addEventListener('DOMContentLoaded', function() {
+    const vncCanvas = document.getElementById('vncCanvas');
+    if (vncCanvas) {
+        vncCanvas.addEventListener('mousedown', handleVNCMouse);
+        vncCanvas.addEventListener('mouseup', handleVNCMouse);
+        vncCanvas.addEventListener('mousemove', handleVNCMouse);
+        vncCanvas.addEventListener('wheel', handleVNCMouse);
+        vncCanvas.addEventListener('keydown', handleVNCKeyboard);
+        vncCanvas.addEventListener('keyup', handleVNCKeyboard);
+    }
+});
+
+function handleVNCMouse(event) {
+    if (vncConnection && vncConnection.readyState === WebSocket.OPEN) {
+        const rect = vncCanvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        
+        vncConnection.send(JSON.stringify({
+            type: 'mouse',
+            event: event.type,
+            x: x,
+            y: y,
+            button: event.button,
+            wheel: event.deltaY
+        }));
+    }
+}
+
+function handleVNCKeyboard(event) {
+    if (vncConnection && vncConnection.readyState === WebSocket.OPEN) {
+        vncConnection.send(JSON.stringify({
+            type: 'keyboard',
+            event: event.type,
+            key: event.key,
+            keyCode: event.keyCode,
+            ctrlKey: event.ctrlKey,
+            altKey: event.altKey,
+            shiftKey: event.shiftKey
+        }));
+    }
+}
+
+// Global function to open VNC viewer from modal
+window.openVNCViewer = openVNCViewer;
+window.closeVNCViewer = closeVNCViewer;
+</script> 

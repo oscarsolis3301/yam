@@ -1,0 +1,212 @@
+<!-- YAM Animation Styles - Subtle and Smooth Animations -->
+<style>
+/* Animation Keyframes */
+@keyframes yamFadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes yamSlideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes yamSlideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes yamHoverLift {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-2px);
+    }
+}
+
+@keyframes yamPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.01);
+    }
+}
+
+@keyframes yamGlow {
+    0%, 100% {
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    }
+    50% {
+        box-shadow: 0 12px 40px rgba(88, 101, 242, 0.15);
+    }
+}
+
+@keyframes yamBorderGlow {
+    0%, 100% {
+        border-color: rgba(88, 101, 242, 0.2);
+    }
+    50% {
+        border-color: rgba(88, 101, 242, 0.4);
+    }
+}
+
+/* Animation Classes */
+.yam-fade-in-up {
+    opacity: 0;
+    animation: yamFadeInUp 0.8s ease-out forwards;
+}
+
+.yam-slide-in-left {
+    opacity: 0;
+    animation: yamSlideInLeft 0.8s ease-out forwards;
+}
+
+.yam-slide-in-right {
+    opacity: 0;
+    animation: yamSlideInRight 0.8s ease-out forwards;
+}
+
+.yam-hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.yam-hover-lift:hover {
+<<<<<<< HEAD
+/* animation: yamHoverLift 0.3s ease-out forwards; */
+    /* box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35); */}
+=======
+    animation: yamHoverLift 0.3s ease-out forwards;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+}
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+
+/* Staggered Animation Delays */
+.yam-fade-in-up[data-delay="0"] { animation-delay: 0s; }
+.yam-fade-in-up[data-delay="200"] { animation-delay: 0.2s; }
+.yam-fade-in-up[data-delay="400"] { animation-delay: 0.4s; }
+.yam-fade-in-up[data-delay="600"] { animation-delay: 0.6s; }
+.yam-fade-in-up[data-delay="800"] { animation-delay: 0.8s; }
+.yam-fade-in-up[data-delay="1000"] { animation-delay: 1s; }
+
+.yam-slide-in-left[data-delay="400"] { animation-delay: 0.4s; }
+.yam-slide-in-right[data-delay="600"] { animation-delay: 0.6s; }
+
+/* Micro-interactions */
+.yam-card-enhanced {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.yam-card-enhanced:hover {
+<<<<<<< HEAD
+/* transform: translateY(-1px); */
+    /* box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35); */}
+=======
+    transform: translateY(-1px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+}
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+
+/* Button hover effects */
+.yam-action-btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.yam-action-btn:hover {
+<<<<<<< HEAD
+/* transform: translateY(-2px) scale(1.01); */
+    /* box-shadow: 0 8px 25px rgba(88, 101, 242, 0.25); */}
+=======
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 8px 25px rgba(88, 101, 242, 0.25);
+}
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+
+/* Loading animations */
+.yam-loading {
+    animation: yamPulse 2s ease-in-out infinite;
+}
+
+.yam-loading-dots::after {
+    content: '';
+    animation: yamLoadingDots 1.5s infinite;
+}
+
+@keyframes yamLoadingDots {
+    0%, 20% { content: ''; }
+    40% { content: '.'; }
+    60% { content: '..'; }
+    80%, 100% { content: '...'; }
+}
+
+/* Status indicators */
+.yam-status-online {
+    animation: yamPulse 2s ease-in-out infinite;
+}
+
+.yam-status-busy {
+    animation: yamGlow 2s ease-in-out infinite;
+}
+
+/* Chart animations */
+.yam-chart-container {
+    transition: all 0.3s ease;
+}
+
+.yam-chart-container:hover {
+<<<<<<< HEAD
+/* transform: scale(1.005); */}
+=======
+    transform: scale(1.005);
+}
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+
+/* Smooth scrolling */
+.yam-dashboard-full {
+    scroll-behavior: smooth;
+}
+
+/* Focus animations for accessibility */
+.yam-card-enhanced:focus-within {
+    animation: yamBorderGlow 2s ease-in-out infinite;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    .yam-fade-in-up,
+    .yam-slide-in-left,
+    .yam-slide-in-right,
+    .yam-hover-lift,
+    .yam-loading,
+    .yam-status-online,
+    .yam-status-busy {
+        animation: none;
+        transition: none;
+    }
+    
+    .yam-card-enhanced:hover,
+    .yam-action-btn:hover,
+    .yam-chart-container:hover {
+        transform: none;
+    }
+}
+</style> 

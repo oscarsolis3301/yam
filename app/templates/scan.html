@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Real-Time IP & AP Scan</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/socket.io-client/dist/socket.io.min.js"></script>
+  <style>
+    body { background: #f8f9fa; }
+    .badge-ap { background-color: #fd7e14; } /* orange for AP flag */
+  </style>
+</head>
+<body class="py-4">
+  <div class="container">
+    <h2 class="mb-3">Live IP & AP Scanner</h2>
+    <form id="scanForm" class="row g-2 mb-3">
+      <div class="col-auto">
+        <input type="text" id="subnet" class="form-control"
+               placeholder="Enter subnet (e.g. 10.0.0)" required>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Scan All</button>
+      </div>
+      <div class="col-auto">
+        <button type="button" id="scanAPBtn" class="btn btn-warning">
+          Check APs (.17 & .18)
+        </button>
+      </div>
+      <div class="col-auto">
+        <button type="button" id="sortBtn" class="btn btn-secondary">
+          Sort by Status
+        </button>
+      </div>
+      <div class="col-auto">
+        <button type="button" id="exportBtn" class="btn btn-success">
+          Export CSV
+        </button>
+      </div>
+    </form>
+
+    <div class="table-responsive mb-4">
+      <table class="table table-striped" id="resultsTable">
+        <thead class="table-dark">
+          <tr>
+            <th>IP</th>
+            <th>Hostname</th>
+            <th>Status</th>
+            <th>AP?</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <canvas id="statusChart" height="100"></canvas>
+  </div>
+
+  <script>
+    const socket     = io();
+    const form       = document.getElementById('scanForm');
+    const subnetIn   = document.getElementById('subnet');
+    const scanAPBtn  = document.getElementById('scanAPBtn');
+    const sortBtn    = document.getElementById('sortBtn');
+    const exportBtn  = document.getElementById('exportBtn');
+    const tableBody  = document.querySelector('#resultsTable tbody');
+    const ctx        = document.getElementById('statusChart').getContext('2d');
+    let chart;
+    let sortOnlineFirst = true;  // toggle for sorting
+
+    function initChart() {
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Online (1) / Offline (0)',
+            data: [],
+            backgroundColor: []
+          }]
+        },
+        options: {
+          scales: {
+            y: { suggestedMin: 0, suggestedMax: 1, ticks: { stepSize: 1 } }
+          }
+        }
+      });
+    }
+
+    function clearResults() {
+      tableBody.innerHTML = '';
+      initChart();
+    }
+
+    // sort table rows by their data-online attribute
+    function sortByStatus() {
+      const rows = Array.from(tableBody.querySelectorAll('tr'));
+      rows.sort((a, b) => {
+        const oa = parseInt(a.dataset.online, 10);
+        const ob = parseInt(b.dataset.online, 10);
+        return sortOnlineFirst ? ob - oa : oa - ob;
+      });
+      rows.forEach(r => tableBody.appendChild(r));
+      sortOnlineFirst = !sortOnlineFirst;
+    }
+
+    // export table to CSV
+    function exportToCSV() {
+      const headers = ['IP','Hostname','Status','AP'];
+      const lines = [headers.join(',')];
+      tableBody.querySelectorAll('tr').forEach(tr => {
+        const cols = tr.querySelectorAll('td');
+        const ip = cols[0].textContent;
+        const host = cols[1].textContent;
+        const status = cols[2].textContent.trim();
+        const ap = cols[3].textContent.trim() ? 'Yes' : 'No';
+        lines.push([ip, host, status, ap].map(v => `"${v}"`).join(','));
+      });
+      const blob = new Blob([lines.join('\r\n')], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `scan_${subnetIn.value.trim()}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Full scan
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      clearResults();
+      socket.emit('start_scan', { subnet: subnetIn.value.trim() });
+    });
+
+    // AP-specific scan
+    scanAPBtn.addEventListener('click', () => {
+      clearResults();
+      socket.emit('start_scan_aps', { subnet: subnetIn.value.trim() });
+    });
+
+    sortBtn.addEventListener('click', sortByStatus);
+    exportBtn.addEventListener('click', exportToCSV);
+
+    socket.on('scan_result', ({ ip, hostname, online, isAP }) => {
+      // append to table
+      const row = document.createElement('tr');
+      row.dataset.online = online ? '1' : '0';
+      row.innerHTML = `
+        <td>${ip}</td>
+        <td>${hostname || '—'}</td>
+        <td>
+          <span class="badge bg-${online? 'success':'danger'}">
+            ${online? 'Online':'Offline'}
+          </span>
+        </td>
+        <td>
+          ${isAP
+            ? '<span class="badge badge-ap text-white">AP</span>'
+            : ''}
+        </td>`;
+      tableBody.appendChild(row);
+
+      // update chart
+      chart.data.labels.push(ip);
+      chart.data.datasets[0].data.push(online ? 1 : 0);
+      chart.data.datasets[0].backgroundColor.push(
+        online ? 'rgba(40,167,69,0.7)' : 'rgba(220,53,69,0.7)'
+      );
+      chart.update();
+    });
+
+    socket.on('scan_complete', () => {
+      console.log('Scan complete');
+    });
+
+    socket.on('scan_error', err => {
+      alert('Error: ' + err.message);
+    });
+
+    // initialize on load
+    initChart();
+  </script>
+</body>
+</html>

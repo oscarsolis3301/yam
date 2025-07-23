@@ -1,0 +1,21 @@
+{% macro render_on_shift_management(current_user) %}
+{% if current_user.role != 'user' %}
+<div class="dashboard-row">
+    <div class="dashboard-list-card w-100" style="min-width: 0;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="dashboard-section-title mb-0">Currently On Shift</div>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-primary active" data-filter="all">All</button>
+                <button type="button" class="btn btn-outline-primary" data-filter="dsc">DSC</button>
+                <button type="button" class="btn btn-outline-primary" data-filter="isc">ISC</button>
+            </div>
+        </div>
+        <div class="d-flex flex-column gap-3">
+            <div id="onShiftUsers" class="on-shift-container d-flex flex-wrap gap-3 justify-content-start align-items-stretch" style="width:100%; background: #1a1a1a; padding: 1rem; border-radius: 8px;"></div>
+            <div class="dashboard-section-title mt-3">Not On Shift</div>
+            <div id="offShiftUsers" class="on-shift-container d-flex flex-wrap gap-3 justify-content-start align-items-stretch" style="width:100%; background: #1a1a1a; padding: 1rem; border-radius: 8px;"></div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endmacro %} 

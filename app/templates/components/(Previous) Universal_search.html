@@ -1,0 +1,4446 @@
+<!-- Quill Rich Text Editor CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<!-- Universal Search Component -->
+<div id="universalSearchContainer" class="universal-search-container" style="display: none;">
+    <div class="search-bar-wrapper">
+        <div class="search-input-group">
+            <div class="search-icon">
+                <i class="bi bi-search"></i>
+            </div>
+            <input 
+                type="text" 
+                id="universalSearchInput" 
+                class="search-input" 
+                placeholder="Search everything... (Ctrl+K)"
+                autocomplete="off"
+                spellcheck="false"
+            >
+            <button id="searchClearBtn" class="search-clear-btn" style="display: none;">
+                <i class="bi bi-x"></i>
+            </button>
+            <div id="searchLoading" class="search-loading" style="display: none;">
+                <!-- Custom SVG Water Loader -->
+                <svg id="waterLoader" width="28" height="28" viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="18" stroke="#007bff" stroke-width="3" fill="none"/>
+                  <path id="waterPath" fill="#007bff" fill-opacity="0.5">
+                    <animate attributeName="d" dur="1.2s" repeatCount="indefinite"
+                      values="M2,20 Q20,10 38,20 Q20,30 2,20 Z;M2,22 Q20,12 38,22 Q20,32 2,22 Z;M2,20 Q20,10 38,20 Q20,30 2,20 Z"/>
+                  </path>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Search Filters -->
+        <div class="search-filters" id="searchFilters" style="display: none;">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-type="all">
+                    <i class="bi bi-grid"></i>
+                    All
+                </button>
+                <button class="filter-btn" data-type="kb_article">
+                    <i class="bi bi-journal-text"></i>
+                    KB
+                </button>
+                <button class="filter-btn" data-type="outage">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Outages
+                </button>
+                <button class="filter-btn" data-type="user">
+                    <i class="bi bi-person"></i>
+                    Users
+                </button>
+                <button class="filter-btn" data-type="office">
+                    <i class="bi bi-building"></i>
+                    Offices
+                </button>
+                <button class="filter-btn" data-type="workstation">
+                    <i class="bi bi-laptop"></i>
+                    Devices
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Search Results Dropdown -->
+    <div id="searchResults" class="search-results-dropdown" style="display: none;">
+        <div class="results-header">
+            <div class="results-count">
+                <span id="resultsCount">0</span> results
+            </div>
+            <div class="results-actions">
+                <button class="btn btn-sm btn-outline-secondary" id="viewAllResults">
+                    View All
+                </button>
+            </div>
+        </div>
+        <div class="results-content" id="resultsContent">
+            <!-- Results will be populated here -->
+        </div>
+    </div>
+    
+    <!-- Search Suggestions -->
+    <div id="searchSuggestions" class="search-suggestions" style="display: none;">
+        <div class="suggestions-header">
+            <i class="bi bi-lightbulb"></i>
+            Suggestions
+        </div>
+        <div class="suggestions-content" id="suggestionsContent">
+            <!-- Suggestions will be populated here -->
+        </div>
+    </div>
+</div>
+
+<!-- Background Blur Overlay -->
+<div id="searchBlurOverlay" class="search-blur-overlay"></div>
+
+<style>
+/* Background Blur Effect */
+.search-blur-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 9999; /* one layer below the search container */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+}
+
+.search-blur-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.universal-search-container {
+    /* Centre the Spotlight-style panel horizontally & vertically */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    max-width: 90vw;
+    z-index: 10000;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+    transition: opacity .3s ease, transform .35s cubic-bezier(.4,0,.2,1);
+}
+
+/* Remove the micro-jump that occurred on :focus-within */
+.search-bar-wrapper:focus-within {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    /* Eliminated translateY to avoid jarring movement */
+    border-color: rgba(0, 123, 255, 0.3);
+}
+
+/* Subtler hover / focus scale effect instead of translate */
+.search-bar-wrapper {
+    transition: box-shadow .2s ease;
+}
+
+.search-bar-wrapper:hover {
+    /* transform: scale(1.02);  (disabled) */
+}
+
+/* Smooth show / hide controlled via a helper class – keeps JS simple */
+.universal-search-container.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -60%);
+}
+
+.search-bar-wrapper {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.search-input-group {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    position: relative;
+}
+
+.search-icon {
+    color: #6c757d;
+    margin-right: 12px;
+    font-size: 18px;
+    transition: color 0.2s ease;
+}
+
+.search-bar-wrapper:focus-within .search-icon {
+    color: #007bff;
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.search-input::placeholder {
+    color: #6c757d;
+    font-weight: 400;
+    opacity: 0.8;
+}
+
+.search-clear-btn {
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    margin-left: 8px;
+    transition: all 0.2s ease;
+}
+
+.search-clear-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #333;
+}
+
+.search-loading {
+    margin-left: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.loading-dots { display: none; } /* Hide old dots loader */
+
+.search-filters {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 12px 16px;
+    background: rgba(248, 249, 250, 0.8);
+    overflow-x: hidden;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.filter-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+.filter-btn.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.search-results-dropdown {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 8px;
+    max-height: 600px; /* Increased to accommodate more results */
+    overflow: hidden;
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(248, 249, 250, 0.8);
+}
+
+.results-count {
+    font-size: 14px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.results-content {
+    max-height: 500px; /* Allow more results before additional scrolling */
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.result-item {
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.result-item:hover {
+    background: rgba(0, 123, 255, 0.05);
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+.result-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: white;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.result-icon.kb_article { background: #28a745; }
+.result-icon.outage { background: #dc3545; }
+.result-icon.user { background: #17a2b8; }
+.result-icon.office { background: #6f42c1; }
+.result-icon.workstation { background: #fd7e14; }
+.result-icon.document { background: #20c997; }
+.result-icon.note { background: #ffc107; }
+
+.result-content {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.result-title {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+    line-height: 1.3;
+    font-size: 15px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.result-title mark {
+    background: #fff3cd;
+    color: #856404;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+.result-description {
+    font-size: 13px;
+    color: #6c757d;
+    line-height: 1.4;
+    margin-bottom: 6px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.result-description mark {
+    background: #fff3cd;
+    color: #856404;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+.result-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 11px;
+    color: #adb5bd;
+    flex-wrap: wrap;
+}
+
+.result-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.search-suggestions {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.suggestions-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(248, 249, 250, 0.8);
+    font-size: 14px;
+    color: #6c757d;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.suggestion-category {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.suggestion-category:last-child {
+    border-bottom: none;
+}
+
+.category-title {
+    padding: 8px 16px 4px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(248, 249, 250, 0.5);
+}
+
+.suggestion-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+.suggestion-item:hover {
+    background: rgba(0, 123, 255, 0.08);
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #6c757d;
+    background: rgba(0, 0, 0, 0.04);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.suggestion-item:hover .suggestion-icon {
+    background: rgba(0, 123, 255, 0.15);
+    color: #007bff;
+}
+
+.suggestion-content {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.suggestion-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #2c3e50;
+    line-height: 1.3;
+    margin-bottom: 2px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.suggestion-subtitle {
+    font-size: 12px;
+    color: #7f8c8d;
+    line-height: 1.2;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.suggestion-action {
+    opacity: 0;
+    color: #6c757d;
+    font-size: 12px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.suggestion-item:hover .suggestion-action {
+    opacity: 1;
+    color: #007bff;
+}
+
+.suggestion-item.selected,
+.result-item.selected {
+    background: rgba(0, 123, 255, 0.12);
+    border-left: 3px solid #007bff;
+}
+
+.suggestion-item.selected .suggestion-icon,
+.result-item.selected .result-icon {
+    background: rgba(0, 123, 255, 0.2);
+    color: #007bff;
+}
+
+.suggestion-item.selected .suggestion-action {
+    opacity: 1;
+    color: #007bff;
+}
+
+/* Dark theme support */
+[data-bs-theme="dark"] .search-bar-wrapper {
+    background: rgba(33, 37, 41, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .search-input {
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .search-input::placeholder {
+    color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .search-filters {
+    background: rgba(52, 58, 64, 0.8);
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .filter-btn {
+    background: rgba(52, 58, 64, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .filter-btn:hover {
+    background: rgba(73, 80, 87, 0.8);
+}
+
+[data-bs-theme="dark"] .search-results-dropdown,
+[data-bs-theme="dark"] .search-suggestions {
+    background: rgba(33, 37, 41, 0.98);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .results-header,
+[data-bs-theme="dark"] .suggestions-header {
+    background: rgba(52, 58, 64, 0.8);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .result-item {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .result-item:hover {
+    background: rgba(0, 123, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .result-title {
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .result-description {
+    color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .suggestion-item {
+    color: #fff;
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .suggestion-item:hover {
+    background: rgba(0, 123, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .suggestion-text {
+    color: #ecf0f1;
+}
+
+[data-bs-theme="dark"] .suggestion-subtitle {
+    color: #bdc3c7;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .universal-search-container {
+        width: 95vw;
+        top: 10px;
+    }
+    
+    .search-input-group {
+        padding: 10px 12px;
+    }
+    
+    .search-input {
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+    
+    .filter-buttons {
+        gap: 6px;
+    }
+    
+    .filter-btn {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+}
+
+/* --- Added avatar animation --- */
+.user-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    object-fit: cover;
+    animation: avatarFloat 4s ease-in-out infinite;
+}
+
+@keyframes avatarFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+.user-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.user-role {
+    margin: 0;
+    color: #6e6e73;
+    font-size: 0.9rem;
+}
+
+[data-bs-theme="dark"] .user-role { color: #b5b5b9; }
+</style>
+
+<style>
+.profile-actions{display:flex;gap:.5rem;align-items:center;margin-top:.25rem}
+.icon-btn{padding:.25rem .5rem;font-size:1rem;line-height:1;border-radius:6px;min-width:32px}
+#toastContainer{position:fixed;top:20px;right:20px;z-index:11000;display:flex;flex-direction:column;gap:12px}
+.toast-msg{background:rgba(255,255,255,0.9);backdrop-filter:blur(10px);border:1px solid rgba(0,0,0,0.1);border-radius:12px;padding:.75rem 1rem;min-width:200px;box-shadow:0 4px 10px rgba(0,0,0,0.15);animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+[data-bs-theme="dark"] .toast-msg{background:rgba(50,50,50,0.9);color:#fff;border-color:rgba(255,255,255,0.15)}
+</style>
+
+<script>
+// --- State Machine for Search Bar Visibility ---
+(function() {
+    let searchState = 'hidden';
+    const container = document.getElementById('universalSearchContainer');
+    const input = document.getElementById('universalSearchInput');
+    const blurOverlay = document.getElementById('searchBlurOverlay');
+    
+    function flyOutSearchBar() {
+        if (container && searchState === 'visible') {
+            container.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.8, 0.2, 1), opacity 0.5s';
+            container.style.transform = 'translate(-50%, -60%) scale(0.95)';
+            container.style.opacity = '0';
+            setTimeout(() => {
+                container.style.display = 'none';
+                container.style.transform = 'translate(-50%, -50%) scale(1)';
+                container.style.opacity = '1';
+                searchState = 'hidden';
+                // Remove blur effect
+                if (blurOverlay) {
+                    blurOverlay.classList.remove('active');
+                }
+                // Notify listeners (e.g., sidebar icon) of close action
+                window.dispatchEvent(new CustomEvent('universalSearchToggled', { detail: 'close' }));
+            }, 600);
+        }
+    }
+    
+    function flyInSearchBar() {
+        if (container && searchState === 'hidden') {
+            container.style.display = 'block';
+            container.style.opacity = '0';
+            container.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.8, 0.2, 1), opacity 0.5s';
+            container.offsetHeight;
+            container.style.transform = 'translate(-50%, -50%) scale(1)';
+            container.style.opacity = '1';
+            setTimeout(() => {
+                searchState = 'visible';
+                if (input) input.focus();
+                // Add blur effect
+                if (blurOverlay) {
+                    blurOverlay.classList.add('active');
+                }
+                // Notify listeners of open action
+                window.dispatchEvent(new CustomEvent('universalSearchToggled', { detail: 'open' }));
+            }, 600);
+        }
+    }
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            if (searchState === 'visible') {
+                flyOutSearchBar();
+            } else if (searchState === 'hidden') {
+                flyInSearchBar();
+            }
+        }
+    });
+
+    // Expose global helpers so other components (e.g., sidebar) can toggle the panel
+    window.openUniversalSearchBar = flyInSearchBar;
+    window.closeUniversalSearchBar = flyOutSearchBar;
+    window.isUniversalSearchOpen = () => searchState === 'visible';
+
+    // Close the search bar when the blurred overlay itself is clicked
+    if (blurOverlay) {
+        blurOverlay.addEventListener('click', function () {
+            if (searchState === 'visible') {
+                flyOutSearchBar();
+            }
+        });
+    }
+})();
+
+// --- Modal for Office/Workstation Details ---
+(function() {
+    // Create modal container
+    let modal = document.getElementById('universalSearchDetailModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'universalSearchDetailModal';
+        modal.style.display = 'none';
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100vw';
+        modal.style.height = '100vh';
+        modal.style.background = 'rgba(0,0,0,0.5)';
+        modal.style.zIndex = '10000';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        // macOS-style container (visual styling handled via CSS below)
+        modal.innerHTML = '<div id="universalSearchDetailContent" class="macos-modal" role="dialog" aria-modal="true"></div>';
+        document.body.appendChild(modal);
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) modal.style.display = 'none';
+        });
+    }
+    
+    // Ping functionality
+    async function pingDevice(hostname) {
+        try {
+            const response = await fetch('/api/ping', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ hostname: hostname })
+            });
+            return await response.json();
+        } catch (error) {
+            return { error: 'Ping failed', details: error.message };
+        }
+    }
+    
+    // Enhanced connectivity check
+    async function checkDeviceConnectivity(hostname, ip) {
+        try {
+            const response = await fetch('/api/remote/connectivity', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ hostname: hostname, ip_address: ip })
+            });
+            return await response.json();
+        } catch (error) {
+            return { error: 'Connectivity check failed', details: error.message };
+        }
+    }
+    
+    // Get remote access options
+    async function getRemoteAccessOptions(hostname, ip) {
+        try {
+            const response = await fetch('/api/remote/options', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ hostname: hostname, ip_address: ip })
+            });
+            return await response.json();
+        } catch (error) {
+            return { error: 'Failed to get remote options', details: error.message };
+        }
+    }
+    
+    // Launch Dameware via API
+    async function launchDamewareViaAPI(hostname, ip) {
+        try {
+            const response = await fetch('/api/remote/launch-dameware', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ hostname: hostname, ip_address: ip })
+            });
+            return await response.json();
+        } catch (error) {
+            return { error: 'Dameware launch failed', details: error.message };
+        }
+    }
+    
+    // Launch RDP via API
+    async function launchRDPViaAPI(hostname, ip) {
+        try {
+            const response = await fetch('/api/remote/launch-rdp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ hostname: hostname, ip_address: ip })
+            });
+            return await response.json();
+        } catch (error) {
+            return { error: 'RDP launch failed', details: error.message };
+        }
+    }
+    
+    // Launch Dameware session
+    function launchDamewareSession(hostname, ip) {
+        const target = hostname || ip;
+        if (!target) {
+            alert('No valid hostname or IP address available');
+            return false;
+        }
+        
+        try {
+            // Try multiple Dameware URL schemes for better compatibility
+            const schemes = [
+                `dwrcc://full-control?machine=${target}`,
+                `dwrcc://${target}`,
+                `dameware://${target}`
+            ];
+            
+            let launched = false;
+            for (const scheme of schemes) {
+                try {
+                    window.open(scheme, '_blank');
+                    launched = true;
+                    break;
+                } catch (e) {
+                    console.warn(`Failed to launch ${scheme}:`, e);
+                }
+            }
+            
+            if (!launched) {
+                // Fallback: show installation guide
+                showDamewareInstallGuide();
+            }
+            
+            return launched;
+        } catch (error) {
+            console.error('Dameware launch failed:', error);
+            showDamewareInstallGuide();
+            return false;
+        }
+    }
+    
+    // Show Dameware installation guide
+    function showDamewareInstallGuide() {
+        const guide = `
+            <div style="background:#333;padding:1rem;border-radius:8px;margin-top:1rem;">
+                <h4>🔧 Dameware Not Found</h4>
+                <p>Dameware Remote Support is not installed or not accessible.</p>
+                <div style="margin:1rem 0;">
+                    <strong>Installation Options:</strong>
+                    <ul style="margin:0.5rem 0;padding-left:1.5rem;">
+                        <li>Download from SolarWinds website</li>
+                        <li>Contact IT Support for installation</li>
+                        <li>Use alternative remote tools (RDP, VNC)</li>
+                    </ul>
+                </div>
+                <button onclick="window.open('https://www.solarwinds.com/dameware-remote-support', '_blank')" 
+                        style="background:#007bff;color:white;border:none;padding:0.5rem 1rem;border-radius:4px;cursor:pointer;">
+                    Download Dameware
+                </button>
+            </div>
+        `;
+        
+        // Find the modal content and append the guide
+        const content = document.getElementById('universalSearchDetailContent');
+        const existingGuide = content.querySelector('.dameware-guide');
+        if (!existingGuide) {
+            const guideDiv = document.createElement('div');
+            guideDiv.className = 'dameware-guide';
+            guideDiv.innerHTML = guide;
+            content.appendChild(guideDiv);
+        }
+    }
+    
+    // Enhanced workstation modal with real-time features
+    function createWorkstationModal(data) {
+        const isDamewareAvailable = checkDamewareAvailability();
+        const hostname = data.name || data['Computer Name'] || '';
+        const ip = data.ip || data['IPv4Address'] || '';
+
+        return `
+            <button class="modal-close-btn" aria-label="Close" onclick="document.getElementById('universalSearchDetailModal').style.display='none'">×</button>
+            <h3 class="modal-title">💻 ${hostname}</h3>
+
+            <section class="modal-section device-info">
+                <h4>Device Information</h4>
+                <div class="info-grid">
+                    <div class="info-label">Hostname</div><div class="info-value">${hostname}</div>
+                    <div class="info-label">IP Address</div><div class="info-value">${ip || 'N/A'}</div>
+                    <div class="info-label">User</div><div class="info-value">${data.user || data['User Name'] || 'N/A'}</div>
+                    <div class="info-label">OS</div><div class="info-value">${data.os || data['OS'] || 'N/A'}</div>
+                    <div class="info-label">OS Version</div><div class="info-value">${data.os_version || data['OS Version'] || 'N/A'}</div>
+                    <div class="info-label">Managed By</div><div class="info-value">${data.managed_by || data['Managed By'] || 'N/A'}</div>
+                    <div class="info-label">Compliance</div><div class="info-value">${data.compliance || data['Compliance'] || 'N/A'}</div>
+                </div>
+            </section>
+
+            <section class="modal-section realtime-status">
+                <h4>Real-time Status</h4>
+                <div class="status-row" id="pingStatus">
+                    <button class="macos-btn outline" onclick="pingDeviceFromModal('${hostname}')">Ping Device</button>
+                    <span id="pingResult" class="status-text"></span>
+                    <span id="statusIndicator" class="status-text muted">Checking…</span>
+                </div>
+            </section>
+
+            <section class="modal-section remote-access">
+                <h4>Remote Access</h4>
+                <div class="button-group">
+                    <button class="macos-btn" onclick="launchDamewareFromModal('${hostname}', '${ip}')">Dameware</button>
+                    <button class="macos-btn" onclick="launchRDPFromModal('${hostname}', '${ip}')">RDP</button>
+                    <button class="macos-btn" onclick="launchBrowserRemoteFromModal('${hostname}', '${ip}')">Browser Remote</button>
+                </div>
+                ${!isDamewareAvailable ? '<p class="warning-text">⚠️ Dameware may not be installed</p>' : ''}
+            </section>
+
+            <section class="modal-section quick-actions">
+                <h4>Quick Actions</h4>
+                <div class="button-group wrap">
+                    <button class="macos-btn lite" onclick="openDeviceManager('${hostname}')">Device Manager</button>
+                    <button class="macos-btn lite" onclick="openServices('${hostname}')">Services</button>
+                    <button class="macos-btn lite" onclick="openEventViewer('${hostname}')">Event Viewer</button>
+                    <button class="macos-btn lite" onclick="copyDeviceInfo('${hostname}', '${ip}')">Copy Info</button>
+                </div>
+            </section>
+        `;
+    }
+    
+    // --- User profile modal ---
+    function createUserProfileModal(data) {
+        const avatarUrl = data.profile_picture ? `/static/uploads/profile_pictures/${data.profile_picture}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username)}&background=random&bold=true`;
+
+        const locked = data.locked_out === true;
+        const disabled = (data.account_status || '').toString().toLowerCase().includes('disabled');
+        const pwdExpired = data.password_expired === true;
+
+        const badge = (txt, cls) => `<span class="status-badge ${cls}">${txt}</span>`;
+        const lockedBadge = locked ? badge('Locked', 'badge-locked') : badge('Unlocked', 'badge-ok');
+        const accountBadge = disabled ? badge('Disabled', 'badge-disabled') : badge('Enabled', 'badge-ok');
+        const pwdBadge = pwdExpired ? badge('Expired', 'badge-password-expired') : badge('Valid', 'badge-ok');
+
+        // Calculate time since password reset
+        function getPasswordResetTimeAgo(dateString) {
+            if (!dateString || dateString === 'N/A') return 'N/A';
+            try {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                if (diffDays === 0) return 'Today';
+                if (diffDays === 1) return '1 day ago';
+                return `${diffDays} days ago`;
+            } catch (e) {
+                return 'N/A';
+            }
+        }
+
+        const passwordResetDisplay = data.password_last_reset && data.password_last_reset !== 'N/A' 
+            ? `${data.password_last_reset} (${getPasswordResetTimeAgo(data.password_last_reset)})`
+            : 'N/A';
+
+        return `
+            <button class="modal-close-btn" aria-label="Close" onclick="document.getElementById('universalSearchDetailModal').style.display='none'">×</button>
+            <div class="user-profile-header">
+                <img src="${avatarUrl}" alt="Avatar" class="user-avatar" />
+                <div class="user-basic-info">
+                    <h3 class="modal-title">${data.full_name || data.username}</h3>
+                    <p class="user-role">${data.role || data.title || 'User'}</p>
+                    <div class="profile-actions">
+                        <button class="macos-btn icon-btn" title="Create Ticket" onclick="openTicketModal('${data.username}','${data.email}','${data.full_name || data.username}')">➕</button>
+                        <button class="macos-btn icon-btn" title="Reset Password" onclick="openPasswordResetModal('${data.username}','${data.email}','${data.full_name || data.username}')">🔑</button>
+                    </div>
+                </div>
+            </div>
+
+            <section class="modal-section user-info">
+                <h4>Contact Information</h4>
+                <div class="info-grid">
+                    <div class="info-label">Email</div><div class="info-value"><a href="mailto:${data.email}">${data.email}</a></div>
+                    ${data.phone ? `<div class="info-label">Phone</div><div class="info-value"><a href="tel:${data.phone}">${data.phone}</a></div>` : ''}
+                    ${data.clock_id ? `<div class="info-label">Clock ID</div><div class="info-value">${data.clock_id}</div>` : ''}
+                </div>
+            </section>
+
+            <section class="modal-section account-activity">
+                <h4>Password Information</h4>
+                <div class="info-grid">
+                    <div class="info-label">Last Password Reset</div><div class="info-value">${passwordResetDisplay}</div>
+                </div>
+            </section>
+
+            <section class="modal-section account-status">
+                <h4>Account Status</h4>
+                <div class="info-grid">
+                    <div class="info-label">Account</div><div class="info-value">${accountBadge}</div>
+                    <div class="info-label">Lock Status</div><div class="info-value">${lockedBadge}</div>
+                    <div class="info-label">Password</div><div class="info-value">${pwdBadge}</div>
+                    <div class="info-label">Bad Logon Count</div><div class="info-value">${data.bad_logon_count ?? '0'}</div>
+                </div>
+            </section>
+        `;
+    }
+    
+    // Global functions for modal actions
+    window.pingDeviceFromModal = async function(hostname) {
+        const pingResult = document.getElementById('pingResult');
+        const statusIndicator = document.getElementById('statusIndicator');
+        
+        pingResult.innerHTML = '<span style="color:#FF9800;">Pinging...</span>';
+        statusIndicator.textContent = 'Pinging...';
+        statusIndicator.style.color = '#FF9800';
+        
+        try {
+            const result = await pingDevice(hostname);
+            if (result.success) {
+                pingResult.innerHTML = `<span style="color:#4CAF50;">✅ Online (${result.latency}ms)</span>`;
+                statusIndicator.textContent = 'Online';
+                statusIndicator.style.color = '#4CAF50';
+            } else {
+                pingResult.innerHTML = `<span style="color:#f44336;">❌ Offline</span>`;
+                statusIndicator.textContent = 'Offline';
+                statusIndicator.style.color = '#f44336';
+            }
+        } catch (error) {
+            pingResult.innerHTML = `<span style="color:#f44336;">❌ Error: ${error.message}</span>`;
+            statusIndicator.textContent = 'Error';
+            statusIndicator.style.color = '#f44336';
+        }
+    };
+    
+    window.refreshStatus = function(hostname) {
+        pingDeviceFromModal(hostname);
+    };
+    
+    window.launchDamewareFromModal = async function(hostname, ip) {
+        const button = event.target;
+        const originalText = button.innerHTML;
+        button.innerHTML = '🔄 Launching...';
+        button.disabled = true;
+        
+        try {
+            // Try API first
+            const apiResult = await launchDamewareViaAPI(hostname, ip);
+            if (apiResult.success) {
+                button.innerHTML = '✅ Launched';
+                button.style.background = '#4CAF50';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = '#FF9800';
+                    button.disabled = false;
+                }, 2000);
+                return;
+            }
+            
+            // Fallback to URL scheme
+            const success = launchDamewareSession(hostname, ip);
+            if (success) {
+                button.innerHTML = '✅ Launched';
+                button.style.background = '#4CAF50';
+            } else {
+                button.innerHTML = '❌ Failed';
+                button.style.background = '#f44336';
+                showDamewareInstallGuide();
+            }
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.background = '#FF9800';
+                button.disabled = false;
+            }, 2000);
+            
+        } catch (error) {
+            button.innerHTML = '❌ Error';
+            button.style.background = '#f44336';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.background = '#FF9800';
+                button.disabled = false;
+            }, 2000);
+        }
+    };
+    
+    window.launchRDPFromModal = async function(hostname, ip) {
+        const button = event.target;
+        const originalText = button.innerHTML;
+        button.innerHTML = '🔄 Launching...';
+        button.disabled = true;
+        
+        try {
+            const apiResult = await launchRDPViaAPI(hostname, ip);
+            if (apiResult.success) {
+                button.innerHTML = '✅ Launched';
+                button.style.background = '#4CAF50';
+            } else {
+                // Fallback to direct launch
+                const target = hostname || ip;
+                if (target) {
+                    try {
+                        window.open(`mstsc /v:${target}`, '_blank');
+                        button.innerHTML = '✅ Launched';
+                        button.style.background = '#4CAF50';
+                    } catch (error) {
+                        button.innerHTML = '❌ Failed';
+                        button.style.background = '#f44336';
+                        alert('RDP launch failed. Please use Remote Desktop Connection manually.');
+                    }
+                }
+            }
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.background = '#2196F3';
+                button.disabled = false;
+            }, 2000);
+            
+        } catch (error) {
+            button.innerHTML = '❌ Error';
+            button.style.background = '#f44336';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.background = '#2196F3';
+                button.disabled = false;
+            }, 2000);
+        }
+    };
+    
+    window.launchBrowserRemoteFromModal = async function(hostname, ip) {
+        const button = event.target;
+        const originalText = button.innerHTML;
+        button.innerHTML = '🔄 Checking...';
+        button.disabled = true;
+        
+        try {
+            // Check connectivity and available options
+            const connectivity = await checkDeviceConnectivity(hostname, ip);
+            const options = await getRemoteAccessOptions(hostname, ip);
+            
+            if (connectivity.success && options.success) {
+                // Check if VNC is available
+                if (connectivity.vnc_available) {
+                    // Launch the VNC viewer
+                    openVNCViewer(hostname, ip);
+                    button.innerHTML = '✅ VNC Launched';
+                    button.style.background = '#4CAF50';
+                } else {
+                    // Show available options
+                    const availableMethods = Object.entries(options.remote_access_methods)
+                        .filter(([key, method]) => method.available)
+                        .map(([key, method]) => method.description)
+                        .join(', ');
+                    
+                    alert(`Available remote access methods: ${availableMethods || 'None detected'}\n\nPlease use Dameware or RDP for now.`);
+                    button.innerHTML = 'ℹ️ Check Options';
+                    button.style.background = '#FF9800';
+                }
+            } else {
+                button.innerHTML = '❌ Unavailable';
+                button.style.background = '#f44336';
+                alert('Browser-based remote session is not available for this device.');
+            }
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.background = '#9C27B0';
+                button.disabled = false;
+            }, 3000);
+            
+        } catch (error) {
+            button.innerHTML = '❌ Error';
+            button.style.background = '#f44336';
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.background = '#9C27B0';
+                button.disabled = false;
+            }, 2000);
+        }
+    };
+    
+    window.openDeviceManager = function(hostname) {
+        try {
+            window.open(`dwrcc://device-manager?machine=${hostname}`, '_blank');
+        } catch (error) {
+            alert('Device Manager launch failed. Please use Dameware manually.');
+        }
+    };
+    
+    window.openServices = function(hostname) {
+        try {
+            window.open(`dwrcc://services?machine=${hostname}`, '_blank');
+        } catch (error) {
+            alert('Services launch failed. Please use Dameware manually.');
+        }
+    };
+    
+    window.openEventViewer = function(hostname) {
+        try {
+            window.open(`dwrcc://event-viewer?machine=${hostname}`, '_blank');
+        } catch (error) {
+            alert('Event Viewer launch failed. Please use Dameware manually.');
+        }
+    };
+    
+    window.copyDeviceInfo = function(hostname, ip) {
+        const info = `Hostname: ${hostname}\nIP: ${ip}\nTimestamp: ${new Date().toLocaleString()}`;
+        navigator.clipboard.writeText(info).then(() => {
+            alert('Device information copied to clipboard!');
+        }).catch(() => {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = info;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('Device information copied to clipboard!');
+        });
+    };
+    
+    window.showUniversalSearchDetail = function(type, idOrName) {
+        modal.style.display = 'flex';
+        const content = document.getElementById('universalSearchDetailContent');
+        content.innerHTML = '<div style="text-align:center;padding:2rem;">Loading...</div>';
+        let url = '';
+        if (type === 'office') {
+            url = `/offices/detail?name=${encodeURIComponent(idOrName)}`;
+        } else if (type === 'workstation') {
+            url = `/api/workstations/detail?name=${encodeURIComponent(idOrName)}`;
+        } else if (type === 'user') {
+            url = `/users/api/users/${encodeURIComponent(idOrName)}`;
+        } else {
+            content.innerHTML = '<div style="color:#f66;">Unknown type.</div>';
+            return;
+        }
+        
+        fetch(url).then(r => r.json()).then(data => {
+            if (!data || data.error) {
+                content.innerHTML = `<div style='color:#f66;'>Not found or error: ${data && data.error ? data.error : 'No data.'}</div>`;
+                return;
+            }
+            
+            if (type === 'office') {
+                content.innerHTML = `<h3>🏢 ${data['Internal Name'] || data.name}</h3>
+                <table style='width:100%;margin-top:1rem;'>
+                    <tr><td><b>Location</b></td><td>${data.Location || ''}</td></tr>
+                    <tr><td><b>Phone</b></td><td>${data.Phone || ''}</td></tr>
+                    <tr><td><b>Manager</b></td><td>${data.Manager || data['Operations Manager'] || ''}</td></tr>
+                    <tr><td><b>Mnemonic</b></td><td>${data.Mnemonic || ''}</td></tr>
+                    <tr><td><b>IP</b></td><td>${data.IP || ''}</td></tr>
+                    <tr><td><b>Number</b></td><td>${data.Number || ''}</td></tr>
+                </table>`;
+            } else if (type === 'workstation') {
+                content.innerHTML = createWorkstationModal(data);
+ 
+                // Auto-ping the device when modal opens
+                setTimeout(() => {
+                    if (data.name) {
+                        pingDeviceFromModal(data.name);
+                    }
+                }, 500);
+            } else if (type === 'user') {
+                content.innerHTML = createUserProfileModal(data);
+            }
+        }).catch(err => {
+            content.innerHTML = `<div style='color:#f66;'>Failed to load details: ${err.message}</div>`;
+        });
+    };
+
+    // Helper to render user profile modal from Clock ID lookup
+    window.showClockIdUserModal = function(userData) {
+        modal.style.display = 'flex';
+        const content = document.getElementById('universalSearchDetailContent');
+        content.innerHTML = createUserProfileModal(userData);
+    };
+})();
+
+// Universal Search Component - Enhanced version with improved suggestion handling
+(function() {
+    'use strict';
+    
+    // Check if already initialized to prevent duplicate initialization
+    if (window.universalSearchInitialized) {
+        return;
+    }
+    
+    class UniversalSearch {
+        constructor() {
+            // Get all required DOM elements
+            this.searchInput = document.getElementById('universalSearchInput');
+            this.clearBtn = document.getElementById('searchClearBtn');
+            this.loading = document.getElementById('searchLoading');
+            this.results = document.getElementById('searchResults');
+            this.resultsContent = document.getElementById('resultsContent');
+            this.resultsCount = document.getElementById('resultsCount');
+            this.suggestions = document.getElementById('searchSuggestions');
+            this.suggestionsContent = document.getElementById('suggestionsContent');
+            this.filters = document.getElementById('searchFilters');
+            this.viewAllBtn = document.getElementById('viewAllResults');
+            this.blurOverlay = document.getElementById('searchBlurOverlay');
+            
+            // Check if all required elements exist
+            if (!this.searchInput || !this.clearBtn || !this.loading || !this.results || 
+                !this.resultsContent || !this.resultsCount || !this.suggestions || 
+                !this.suggestionsContent || !this.filters || !this.viewAllBtn) {
+                console.warn('Universal search elements not found. Search functionality disabled.');
+                return;
+            }
+            
+            this.currentQuery = '';
+            this.searchTimeout = null;
+            this.suggestionsTimeout = null;
+            this.isSearching = false;
+            this.currentResults = []; // Store current search results
+            this.isInteractingWithSuggestions = false; // Track if user is interacting with suggestions
+            
+            // Buffer for suggestion HTML so we can merge with results later
+            this._suggestionsMarkup = '';
+            
+            this.init();
+        }
+        
+        init() {
+            // Event listeners
+            this.searchInput.addEventListener('input', this.handleInput.bind(this));
+            this.searchInput.addEventListener('focus', this.handleFocus.bind(this));
+            this.searchInput.addEventListener('blur', this.handleBlur.bind(this));
+            this.searchInput.addEventListener('keydown', this.handleKeydown.bind(this));
+            
+            this.clearBtn.addEventListener('click', this.clearSearch.bind(this));
+            this.viewAllBtn.addEventListener('click', this.viewAllResults.bind(this));
+            
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', this.handleFilterClick.bind(this));
+            });
+            
+            // Global keyboard shortcut
+            document.addEventListener('keydown', this.handleGlobalKeydown.bind(this));
+            
+            // Enhanced click outside handling
+            document.addEventListener('click', this.handleClickOutside.bind(this));
+            
+            // Mouse events for suggestions to prevent premature hiding
+            this.suggestions.addEventListener('mouseenter', () => {
+                this.isInteractingWithSuggestions = true;
+            });
+            
+            this.suggestions.addEventListener('mouseleave', () => {
+                this.isInteractingWithSuggestions = false;
+                // Only hide if not focused on input
+                if (!this.searchInput.matches(':focus')) {
+                    setTimeout(() => {
+                        if (!this.isInteractingWithSuggestions && !this.searchInput.matches(':focus')) {
+                            this.hideSuggestions();
+                        }
+                    }, 200); // Increased timeout to prevent premature hiding
+                }
+            });
+            
+            // Prevent suggestion hiding when clicking inside suggestions
+            this.suggestions.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+            
+            // Prevent result hiding when clicking inside results
+            this.results.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+        
+        handleInput(e) {
+            const query = e.target.value.trim();
+            this.currentQuery = query;
+            
+            // Show/hide clear button
+            this.clearBtn.style.display = query ? 'block' : 'none';
+            
+            // Clear previous timeouts
+            if (this.searchTimeout) {
+                clearTimeout(this.searchTimeout);
+            }
+            if (this.suggestionsTimeout) {
+                clearTimeout(this.suggestionsTimeout);
+            }
+            
+            if (query.length >= 2) {
+                // Show filters immediately for better UX
+                this.filters.style.display = 'block';
+                
+                // Get suggestions with very short delay for instant feel
+                this.suggestionsTimeout = setTimeout(() => {
+                    this.getSuggestions(query);
+                }, 100);
+                
+                // Perform search with optimized debouncing
+                this.searchTimeout = setTimeout(() => {
+                    this.performSearch(query);
+                }, 200);
+            } else {
+                this.hideResults();
+                this.hideSuggestions();
+                this.filters.style.display = 'none';
+            }
+        }
+        
+        handleFocus() {
+            if (this.currentQuery.length >= 2) {
+                this.filters.style.display = 'block';
+                if (this.suggestions.style.display === 'block') {
+                    this.suggestions.style.display = 'block';
+                }
+            }
+            // Ensure blur overlay is active when focused
+            if (this.blurOverlay) {
+                this.blurOverlay.classList.add('active');
+            }
+        }
+        
+        handleBlur() {
+            // Don't immediately hide - let the click outside handler manage this
+            // This prevents the suggestions from disappearing when clicking on them
+            // Add a small delay to allow for clicks on suggestions
+            setTimeout(() => {
+                if (!this.isInteractingWithSuggestions && !this.searchInput.matches(':focus')) {
+                    this.hideSuggestions();
+                }
+            }, 150);
+        }
+        
+        handleKeydown(e) {
+            if (e.key === 'Escape') {
+                this.clearSearch();
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+
+                const q = this.currentQuery.trim();
+                if (!q) return;
+
+                // ⇢ Open the standalone full-results page right away so users
+                // get the *complete* list for their query (matches Google-style
+                // behaviour). Any inline suggestions/results will be shown on
+                // that page, so there is no need to perform a local search here.
+                this.viewAllResults();
+                return;
+            } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                this.handleArrowNavigation(e.key);
+            }
+        }
+        
+        handleArrowNavigation(key) {
+            const suggestions = document.querySelectorAll('.suggestion-item');
+            const results = document.querySelectorAll('.result-item');
+            const allItems = [...suggestions, ...results];
+            
+            if (allItems.length === 0) return;
+            
+            const currentIndex = allItems.findIndex(item => item.classList.contains('selected'));
+            let newIndex;
+            
+            if (key === 'ArrowDown') {
+                newIndex = currentIndex < allItems.length - 1 ? currentIndex + 1 : 0;
+            } else {
+                newIndex = currentIndex > 0 ? currentIndex - 1 : allItems.length - 1;
+            }
+            
+            // Remove previous selection
+            allItems.forEach(item => item.classList.remove('selected'));
+            
+            // Add selection to new item
+            if (allItems[newIndex]) {
+                allItems[newIndex].classList.add('selected');
+                allItems[newIndex].scrollIntoView({ block: 'nearest' });
+            }
+        }
+        
+        handleGlobalKeydown(e) {
+            // Ctrl+K or Cmd+K to focus search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                this.searchInput.focus();
+            }
+        }
+        
+        handleClickOutside(e) {
+            // Check if click is outside the search interface
+            const searchContainer = document.getElementById('universalSearchContainer');
+            if (!searchContainer.contains(e.target)) {
+                this.hideResults();
+                this.hideSuggestions();
+                this.filters.style.display = 'none';
+
+                // NEW: also close the universal search overlay completely
+                if (window.closeUniversalSearchBar) {
+                    window.closeUniversalSearchBar();
+                }
+                // Remove blur effect when clicking outside
+                if (this.blurOverlay) {
+                    this.blurOverlay.classList.remove('active');
+                }
+            }
+        }
+        
+        handleFilterClick(e) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            e.target.closest('.filter-btn').classList.add('active');
+            
+            // Re-run search with new filter if there's a current query
+            if (this.currentQuery) {
+                this.performSearch(this.currentQuery);
+            }
+        }
+        
+        async performSearch(query) {
+            if (this.isSearching) return;
+            
+            this.isSearching = true;
+            this.showLoading(true);
+            
+            try {
+                // Get active filter
+                const activeFilter = document.querySelector('.filter-btn.active');
+                const contentType = activeFilter ? activeFilter.dataset.type : 'all';
+                
+                const params = new URLSearchParams({
+                    q: query,
+                    limit: 20 // Increased to show more high-quality results
+                });
+                
+                let contentTypes = null;
+                if (contentType !== 'all') {
+                    contentTypes = [contentType];
+                }
+                
+                if (contentTypes) {
+                    params.append('content_types', contentTypes.join(','));
+                }
+                
+                const response = await fetch(`/api/universal-search?${params}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.message || 'Search failed');
+                }
+                
+                this.displayResults(data.results, data.total);
+                
+            } catch (error) {
+                console.error('Search error:', error);
+                this.displayError(`Search failed: ${error.message}`);
+            } finally {
+                this.isSearching = false;
+                this.showLoading(false);
+            }
+        }
+        
+        async getSuggestions(query) {
+            try {
+                // Get text-based suggestions from universal search
+                const suggestionsResponse = await fetch(`/api/universal-search/suggestions?q=${encodeURIComponent(query)}&limit=5`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                
+                let textSuggestions = [];
+                if (suggestionsResponse.ok) {
+                    const suggestionsData = await suggestionsResponse.json();
+                    textSuggestions = suggestionsData.suggestions || [];
+                }
+                
+                // Get actual office and workstation data from unified search
+                const unifiedResponse = await fetch(`/unified_search?q=${encodeURIComponent(query)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                
+                let officeData = [];
+                let workstationData = [];
+                
+                if (unifiedResponse.ok) {
+                    const unifiedData = await unifiedResponse.json();
+                    officeData = unifiedData.offices || [];
+                    workstationData = unifiedData.workstations || [];
+                }
+                
+                let clockSuggestions = [];
+                if (/^\d+$/.test(query.trim())) {
+                    const padded = query.trim().padStart(5, '0');
+                    // Base suggestions
+                    clockSuggestions.push({
+                        text: `Find user ${padded}`,
+                        icon: 'bi bi-person',
+                        subtitle: 'Lookup user by Clock ID',
+                        type: 'clock_id',
+                        data: { clock_id: padded }
+                    });
+                    clockSuggestions.push({
+                        text: `Search for workstation matching ${padded}`,
+                        icon: 'bi bi-laptop',
+                        subtitle: 'Device search',
+                        type: 'text'
+                    });
+                    clockSuggestions.push({
+                        text: `Search for office number ${padded}`,
+                        icon: 'bi bi-building',
+                        subtitle: 'Office search',
+                        type: 'text'
+                    });
+                    // Attempt to personalise using cache
+                    try {
+                        const cacheRes = await fetch(`/users/cache/${padded}`);
+                        if (cacheRes.ok) {
+                            const cached = await cacheRes.json();
+                            if (cached && cached.first_name) {
+                                clockSuggestions.splice(1, 0, {
+                                    text: `View ${cached.first_name} ${cached.last_name || ''}`.trim(),
+                                    icon: 'bi bi-person-circle',
+                                    subtitle: 'Cached user profile',
+                                    type: 'clock_id',
+                                    data: { clock_id: padded }
+                                });
+                            }
+                        }
+                    } catch (_) { /* ignore */ }
+                }
+                
+                // Combine all suggestions
+                const allSuggestions = {
+                    textSuggestions: textSuggestions,
+                    offices: officeData,
+                    workstations: workstationData,
+                    clockSuggestions: clockSuggestions
+                };
+                
+                if (allSuggestions.textSuggestions.length > 0 || 
+                    allSuggestions.offices.length > 0 || 
+                    allSuggestions.workstations.length > 0 || 
+                    allSuggestions.clockSuggestions.length > 0) {
+                    this.displaySuggestions(allSuggestions);
+                } else {
+                    this.hideSuggestions();
+                }
+            } catch (error) {
+                console.error('Suggestions error:', error);
+                // Don't show error for suggestions - just hide them
+                this.hideSuggestions();
+            }
+        }
+        
+        displayResults(results, total) {
+            // Store current results for content type detection
+            this.currentResults = results || [];
+            
+            // Combine cached suggestions (if any) with actual results markup
+            const suggestionsTop = this._suggestionsMarkup || '';
+
+            // --- NEW LOGIC: Always surface smart suggestions when no result ---
+            if ((!results || results.length === 0) && suggestionsTop) {
+                // Show suggestions as standalone list so there is never a dead-end
+                this.resultsContent.innerHTML = suggestionsTop;
+                // Indicate suggestions are shown even if zero direct matches
+                this.resultsCount.textContent = `0+`;
+                // Add event listeners to suggestion items
+                this.attachResultEventListeners();
+            } else if (!results || results.length === 0) {
+                // Fallback – maintain existing "no results" placeholder
+                this.resultsContent.innerHTML = `
+                    <div class="result-item">
+                        <div class="result-content">
+                            <div class="result-title">No results found</div>
+                            <div class="result-description">Try adjusting your search terms or filters</div>
+                        </div>
+                    </div>
+                `;
+                this.resultsCount.textContent = '0';
+            } else {
+                const resultsHtml = results.map(result => this.createResultItem(result)).join('');
+                this.resultsContent.innerHTML = suggestionsTop + resultsHtml;
+                // Update counter – include + if we prefixed suggestions
+                this.resultsCount.textContent = total + (suggestionsTop ? '+' : '');
+                
+                // Add event listeners to result items
+                this.attachResultEventListeners();
+            }
+            
+            // Ensure dropdown is visible
+            this.results.style.display = 'block';
+            // Hide the secondary suggestion list (merged into main list)
+            this.hideSuggestions();
+        }
+        
+        attachResultEventListeners() {
+            // Add click event listeners to all result items
+            const resultItems = this.resultsContent.querySelectorAll('.result-item[data-result]');
+            console.log('Attaching result listeners to', resultItems.length, 'items');
+            resultItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    try {
+                        const resultData = JSON.parse(item.getAttribute('data-result'));
+                        this.navigateToResult(resultData);
+                    } catch (error) {
+                        console.error('Error parsing result data:', error);
+                        // Fallback to URL navigation if available
+                        const resultData = {
+                            url: item.querySelector('.result-url')?.textContent || '',
+                            title: item.querySelector('.result-title')?.textContent || '',
+                            content_type: 'unknown'
+                        };
+                        this.navigateToResult(resultData);
+                    }
+                });
+            });
+            
+            // Add click event listeners to suggestion items
+            const suggestionItems = this.resultsContent.querySelectorAll('.result-item[data-suggestion]');
+            console.log('Attaching suggestion listeners to', suggestionItems.length, 'items');
+            suggestionItems.forEach((item, index) => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log('Suggestion item clicked:', index, item);
+                    
+                    try {
+                        // Safely decode the JSON data from HTML attribute
+                        const rawData = item.getAttribute('data-suggestion');
+                        console.log('Raw suggestion data:', rawData);
+                        const decodedData = rawData.replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+                        console.log('Decoded suggestion data:', decodedData);
+                        const suggestionData = JSON.parse(decodedData);
+                        console.log('Parsed suggestion data:', suggestionData);
+                        this.selectSuggestion(suggestionData.text, suggestionData.type, suggestionData.data || {});
+                    } catch (error) {
+                        console.error('Error parsing suggestion data:', error, item.getAttribute('data-suggestion'));
+                    }
+                });
+            });
+        }
+        
+        createResultItem(result) {
+            const icon = this.getContentTypeIcon(result.content_type);
+            const section = this.getContentTypeTitle(result.content_type);
+            
+            // Create a unique ID for the result item
+            const resultId = `result-${Math.random().toString(36).substr(2, 9)}`;
+            
+            return `
+                <div class="result-item" id="${resultId}" data-result='${JSON.stringify(result).replace(/'/g, "&#39;")}'>
+                    <div class="result-icon ${result.content_type}">
+                        <i class="${icon}"></i>
+                    </div>
+                    <div class="result-content">
+                        <div class="result-title">${result.highlighted_title || result.title || 'Untitled'}</div>
+                        <div class="result-description">${result.highlighted_description || result.description || 'No description available'}</div>
+                        <div class="result-meta">
+                            <span><i class="bi bi-tag"></i> ${section}</span>
+                            ${result.author ? `<span><i class="bi bi-person"></i> ${result.author}</span>` : ''}
+                            ${result.created_at ? `<span><i class="bi bi-calendar"></i> ${this.formatDate(result.created_at)}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        displaySuggestions(allSuggestions) {
+            const categories = [];
+            
+            // Clock-ID (and other) smart suggestions first
+            if (allSuggestions.clockSuggestions && allSuggestions.clockSuggestions.length > 0) {
+                categories.push({
+                    title: 'Suggested actions',
+                    items: allSuggestions.clockSuggestions
+                });
+            }
+            
+            // Add offices if available
+            if (allSuggestions.offices && allSuggestions.offices.length > 0) {
+                categories.push({
+                    title: 'Offices',
+                    items: allSuggestions.offices.slice(0, 3).map(office => ({
+                        text: `${office['Internal Name']} (#${office.Number})`,
+                        icon: 'bi bi-building',
+                        subtitle: office.Mnemonic || office.Location || 'Office',
+                        type: 'office',
+                        data: office
+                    }))
+                });
+            }
+            
+            // Add workstations if available - FIX: Use lowercase field names from unified search
+            if (allSuggestions.workstations && allSuggestions.workstations.length > 0) {
+                const workstationItems = allSuggestions.workstations.slice(0, 3).map(ws => ({
+                    text: ws.name || 'Unknown Workstation', // Use lowercase 'name'
+                    icon: 'bi bi-laptop',
+                    subtitle: ws.user || 'No User', // Use lowercase 'user'
+                    type: 'workstation',
+                    data: ws
+                }));
+                
+                categories.push({
+                    title: 'Workstations',
+                    items: workstationItems
+                });
+            }
+            
+            // Add text-based suggestions if available
+            if (allSuggestions.textSuggestions && allSuggestions.textSuggestions.length > 0) {
+                const recentSearches = allSuggestions.textSuggestions.filter(s => s.toLowerCase().includes(this.currentQuery.toLowerCase()) && s.toLowerCase() !== this.currentQuery.toLowerCase()).slice(0, 3);
+                if (recentSearches.length > 0) {
+                    categories.push({
+                        title: 'Recent searches',
+                        items: recentSearches.map(text => ({
+                            text,
+                            icon: 'bi bi-clock-history',
+                            subtitle: 'Previously searched',
+                            type: 'text'
+                        }))
+                    });
+                }
+            }
+            
+            // Add smart suggestions based on query
+            const smartSuggestions = this.generateSmartSuggestions(this.currentQuery);
+            if (smartSuggestions.length > 0) {
+                categories.push({
+                    title: 'Try searching for',
+                    items: smartSuggestions
+                });
+            }
+            
+            // Add quick actions
+            const quickActions = this.generateQuickActions(this.currentQuery);
+            if (quickActions.length > 0) {
+                categories.push({
+                    title: 'Quick actions',
+                    items: quickActions
+                });
+            }
+            
+            // ----- Build HTML merged list -----
+            // Deduplicate suggestions across *all* categories based on the
+            // display text (case-insensitive) so we never show identical
+            // entries like "Find user" twice.
+            const seen = new Set();
+            const uniqueItems = [];
+            categories.forEach(cat => {
+                cat.items.forEach(item => {
+                    const key = (item.text || '').toLowerCase();
+                    if (!seen.has(key)) {
+                        seen.add(key);
+                        uniqueItems.push(item);
+                    }
+                });
+            });
+
+            this._suggestionsMarkup = uniqueItems.map(i => this.createSuggestionItem(i)).join('');
+
+            // Suggestions will be merged into the main results list once it
+            // arrives, ensuring we don't create duplicate items or separate
+            // scroll areas.
+            // --- If there are *no* search results rendered yet, show the
+            // suggestions immediately so users are never left with an empty
+            // state while typing (especially helpful for numeric Clock-ID
+            // look-ups).
+            if (this.results && this.results.style.display === 'block') {
+                const hasDirectResults = this.currentResults && this.currentResults.length > 0;
+                if (!hasDirectResults) {
+                    this.resultsContent.innerHTML = this._suggestionsMarkup;
+                    this.resultsCount.textContent = '0+';
+                    // Add event listeners to suggestion items
+                    this.attachResultEventListeners();
+                }
+            }
+        }
+        
+        generateSmartSuggestions(query) {
+            const suggestions = [];
+            const lowerQuery = query.toLowerCase();
+            
+            // Office-related suggestions
+            if (lowerQuery.includes('office') || lowerQuery.includes('location') || lowerQuery.includes('building')) {
+                suggestions.push({
+                    text: `${query} office locations`,
+                    icon: 'bi bi-building',
+                    subtitle: 'Find office information'
+                });
+            }
+            
+            // User-related suggestions
+            if (lowerQuery.includes('user') || lowerQuery.includes('person') || lowerQuery.includes('employee')) {
+                suggestions.push({
+                    text: `${query} users`,
+                    icon: 'bi bi-person',
+                    subtitle: 'Search user directory'
+                });
+            }
+            
+            // Workstation-related suggestions
+            if (lowerQuery.includes('computer') || lowerQuery.includes('workstation') || lowerQuery.includes('device')) {
+                suggestions.push({
+                    text: `${query} workstations`,
+                    icon: 'bi bi-laptop',
+                    subtitle: 'Find device information'
+                });
+            }
+            
+            // Knowledge base suggestions
+            if (lowerQuery.includes('how') || lowerQuery.includes('guide') || lowerQuery.includes('help')) {
+                suggestions.push({
+                    text: `${query} guides`,
+                    icon: 'bi bi-journal-text',
+                    subtitle: 'Knowledge base articles'
+                });
+            }
+            
+            // Outage-related suggestions
+            if (lowerQuery.includes('outage') || lowerQuery.includes('down') || lowerQuery.includes('issue')) {
+                suggestions.push({
+                    text: `${query} outages`,
+                    icon: 'bi bi-exclamation-triangle',
+                    subtitle: 'Check system status'
+                });
+            }
+            
+            return suggestions.slice(0, 3);
+        }
+        
+        generateQuickActions(query) {
+            const actions = [];
+            const lowerQuery = query.toLowerCase();
+            
+            // Clock-ID specific quick actions (all-digit queries)
+            if (/^\d+$/.test(query.trim())) {
+                const clockIdPadded = query.trim().padStart(5, '0');
+                actions.push({
+                    text: `Find user ${clockIdPadded}`,
+                    icon: 'bi bi-person',
+                    subtitle: 'Lookup user by Clock ID',
+                    type: 'clock_id',
+                    data: { clock_id: clockIdPadded }
+                });
+                actions.push({
+                    text: `Search for workstation matching ${query}`,
+                    icon: 'bi bi-laptop',
+                    subtitle: 'Device search',
+                    type: 'text'
+                });
+                actions.push({
+                    text: `Search for office number ${query}`,
+                    icon: 'bi bi-building',
+                    subtitle: 'Office search',
+                    type: 'text'
+                });
+            }
+
+            // If it looks like an office name, suggest direct office lookup
+            if (lowerQuery.length >= 3 && !lowerQuery.includes(' ')) {
+                actions.push({
+                    text: `Go to ${query} office`,
+                    icon: 'bi bi-building',
+                    subtitle: 'View office details'
+                });
+            }
+
+            // If it looks like a username, suggest user lookup
+            if (lowerQuery.length >= 2 && lowerQuery.match(/^[a-zA-Z]/)) {
+                actions.push({
+                    text: `Find user ${query}`,
+                    icon: 'bi bi-person',
+                    subtitle: 'Search user directory'
+                });
+            }
+
+            // General search action always at bottom
+            actions.push({
+                text: `Search for "${query}"`,
+                icon: 'bi bi-search',
+                subtitle: 'Full search results',
+                type: 'view_all'
+            });
+
+            return actions.slice(0, 5); // cap for cleanliness
+        }
+        
+        displayError(message) {
+            this.resultsContent.innerHTML = `
+                <div class="result-item">
+                    <div class="result-content">
+                        <div class="result-title">Error</div>
+                        <div class="result-description">${message}</div>
+                    </div>
+                </div>
+            `;
+            this.resultsCount.textContent = '0';
+            this.results.style.display = 'block';
+        }
+        
+        selectSuggestion(suggestion, type = 'text', data = {}) {
+            console.log('selectSuggestion called:', { suggestion, type, data });
+            
+            if (type === 'view_all') {
+                this.viewAllResults();
+                return;
+            }
+            if (type === 'clock_id') {
+                const cid = (data.clock_id || suggestion).toString().replace(/\D/g, '').padStart(5, '0');
+                console.log('Clock ID lookup:', cid);
+                if (cid) {
+                    this.lookupClockId(cid);
+                }
+                return;
+            } else if (type === 'office' && data) {
+                // Show office detail modal
+                console.log('Office detail:', data);
+                window.showUniversalSearchDetail('office', data['Internal Name'] || data.name || suggestion);
+                return;
+            } else if (type === 'workstation' && data) {
+                // Show workstation detail modal - FIX: Use lowercase field names
+                console.log('Workstation detail:', data);
+                window.showUniversalSearchDetail('workstation', data.name || suggestion);
+                return;
+            } else {
+                // Handle text-based suggestions as before
+                console.log('Text-based suggestion:', suggestion);
+                this.searchInput.value = suggestion;
+                this.currentQuery = suggestion;
+                this.clearBtn.style.display = 'block';
+                this.performSearch(suggestion);
+            }
+        }
+        
+            navigateToResult(result) {
+        // Store search context for highlighting
+        sessionStorage.setItem('searchContext', JSON.stringify({
+            query: this.currentQuery,
+            resultId: result.id,
+            timestamp: Date.now()
+        }));
+
+        // Handle different content types with appropriate actions
+        const url = result.url;
+        const type = result.content_type || '';
+
+        // Handle notes - open modal instead of navigation
+        if (type === 'note') {
+            this.openNoteModal(result);
+            return;
+        }
+
+        // Handle PDFs - open modal instead of new tab
+        if (type === 'document' || this.isPdfUrl(url)) {
+            this.openPdfModal(result);
+            return;
+        }
+
+        // Handle KB articles that are PDFs
+        if (type === 'kb_article' && this.isPdfUrl(url)) {
+            this.openPdfModal(result);
+            return;
+        }
+
+        // Intercept office/workstation URLs and show modal instead of redirect
+        if (url.startsWith('/users/')) {
+            const userId = url.split('/users/')[1];
+            window.showUniversalSearchDetail('user', userId);
+            return;
+        }
+
+        if (url.startsWith('/unified?q=')) {
+            const query = decodeURIComponent(url.split('q=')[1] || '');
+            // Find the result by URL in our stored results
+            const resultItem = this.currentResults.find(r => r.url === url);
+            if (resultItem) {
+                if (resultItem.content_type === 'office') {
+                    window.showUniversalSearchDetail('office', query);
+                    return;
+                } else if (resultItem.content_type === 'workstation') {
+                    window.showUniversalSearchDetail('workstation', query);
+                    return;
+                }
+            }
+        }
+        
+        // Animate search bar flying up and hide it
+        const container = document.getElementById('universalSearchContainer');
+        if (container) {
+            container.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.8, 0.2, 1), opacity 0.5s';
+            container.style.transform = 'translate(-50%, -60%) scale(0.95)';
+            container.style.opacity = '0';
+            setTimeout(() => {
+                container.style.display = 'none';
+                container.style.transform = 'translate(-50%, -50%) scale(1)';
+                container.style.opacity = '1';
+            }, 600);
+        }
+        
+        // Remove blur effect
+        if (this.blurOverlay) {
+            this.blurOverlay.classList.remove('active');
+        }
+        
+        if (!url) {
+            console.warn('No URL provided for navigation');
+            return;
+        }
+        
+        // For all other resources use standard navigation
+        if (url.startsWith('/')) {
+            window.location.href = url;
+        } else if (url.startsWith('http://') || url.startsWith('https://')) {
+            // External URL - open in new tab
+            window.open(url, '_blank');
+        } else {
+            // Assume it's a relative URL and add leading slash
+            window.location.href = '/' + url;
+        }
+    }
+    
+    isPdfUrl(url) {
+        return url && (url.toLowerCase().endsWith('.pdf') || url.includes('/static/docs/'));
+    }
+
+    async openNoteModal(result) {
+        console.log('openNoteModal called with:', result);
+        try {
+            // Extract note ID from the result - try multiple sources
+            let noteId = result.id;
+            
+            // If the ID has the "note_" prefix, extract the numeric part
+            if (noteId && typeof noteId === 'string' && noteId.startsWith('note_')) {
+                noteId = noteId.replace('note_', '');
+            }
+            
+            // If no direct ID, try to extract from URL
+            if (!noteId && result.url) {
+                noteId = this.extractNoteIdFromUrl(result.url);
+            }
+            
+            // If still no ID, try to extract from other result fields
+            if (!noteId && result.note_id) {
+                noteId = result.note_id;
+            }
+            
+            // If still no ID, try to parse from result data
+            if (!noteId && result.data && result.data.id) {
+                noteId = result.data.id;
+            }
+            
+            console.log('Final note ID:', noteId);
+            
+            if (!noteId) {
+                console.error('Could not determine note ID from result:', result);
+                this.showNoteErrorModal(result, 'Could not identify note ID');
+                return;
+            }
+
+            console.log('Fetching note data for ID:', noteId);
+            
+            // First try to fetch as owner
+            let response = await fetch(`/notes/api/notes/${noteId}`);
+            
+            console.log('Owner fetch response status:', response.status);
+            
+            if (response.status === 403) {
+                // User doesn't own this note - try public endpoint
+                console.log('User not owner, trying public endpoint');
+                response = await fetch(`/notes/api/notes/public/${noteId}`);
+                
+                console.log('Public fetch response status:', response.status);
+                
+                if (response.status === 403) {
+                    // Note is private and user doesn't own it
+                    this.showNoteAccessDeniedModal(result);
+                    return;
+                }
+                
+                if (response.status === 404) {
+                    this.showNoteErrorModal(result, 'Note not found');
+                    return;
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch public note: ${response.status} ${response.statusText}`);
+                }
+                
+                const noteData = await response.json();
+                console.log('Public note data received:', noteData);
+                // Show view-only modal for public notes from other users
+                this.showNoteViewOnlyModal(result, noteData);
+                return;
+            }
+            
+            if (response.status === 404) {
+                this.showNoteErrorModal(result, 'Note not found');
+                return;
+            }
+            
+            if (!response.ok) {
+                throw new Error(`Failed to fetch note: ${response.status} ${response.statusText}`);
+            }
+            
+            const noteData = await response.json();
+            console.log('Owner note data received:', noteData);
+            
+            // User owns this note - show editable modal
+            this.showNoteEditableModal(noteData);
+            
+        } catch (error) {
+            console.error('Error opening note modal:', error);
+            this.showNoteErrorModal(result, `Error loading note: ${error.message}`);
+        }
+    }
+
+    extractNoteIdFromUrl(url) {
+        console.log('Extracting note ID from URL:', url);
+        
+        // Extract note ID from various URL patterns
+        const patterns = [
+            /\/notes\/(\d+)/,           // /notes/123
+            /\/note\/(\d+)/,            // /note/123
+            /note_id=(\d+)/,            // ?note_id=123
+            /noteId=(\d+)/,             // ?noteId=123
+            /id=(\d+)/,                 // ?id=123
+            /notes.*\/(\d+)/,           // /notes/anything/123
+            /\/(\d+)$/                  // ends with /123
+        ];
+        
+        for (const pattern of patterns) {
+            const match = url.match(pattern);
+            if (match) {
+                console.log('Note ID extracted:', parseInt(match[1]));
+                return parseInt(match[1]);
+            }
+        }
+        
+        console.log('Could not extract note ID from URL:', url);
+        return null;
+    }
+
+    openPdfModal(result) {
+        const modal = this.getOrCreatePdfModal();
+        const overlay = document.getElementById('universalSearchPdfModalOverlay');
+        const content = document.getElementById('universalSearchPdfModalContent');
+        const titleEl = document.getElementById('universalSearchPdfModalTitle');
+        
+        if (!modal || !overlay || !content || !titleEl) {
+            // Fallback to opening in new tab if modal elements don't exist
+            window.open(result.url, '_blank');
+            return;
+        }
+
+        titleEl.textContent = result.title || 'Document';
+        
+        // Show loading state
+        content.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        
+        modal.classList.add('active');
+        overlay.classList.add('active');
+        
+        // Extract filename for PDF URLs
+        let pdfUrl = result.url;
+        if (result.url.includes('/static/docs/')) {
+            pdfUrl = result.url;
+        } else if (result.url.toLowerCase().endsWith('.pdf')) {
+            pdfUrl = result.url;
+        }
+        
+        // Add PDF viewer parameters for better display
+        if (pdfUrl.includes('?')) {
+            pdfUrl += '&toolbar=1&navpanes=0&scrollbar=1';
+        } else {
+            pdfUrl += '#toolbar=1&navpanes=0&scrollbar=1';
+        }
+        
+        // Load PDF with proper viewer
+        content.innerHTML = `
+            <div class="pdf-viewer-container" style="width:100%;height:calc(100vh - 80px);position:relative;background:#2c2c2c;">
+                <div class="pdf-toolbar" style="background:#1e1e1e;padding:8px 16px;border-bottom:1px solid #444;display:flex;align-items:center;justify-content:space-between;">
+                    <div class="pdf-controls">
+                        <button class="btn btn-sm btn-outline-light me-2" onclick="window.open('${pdfUrl}', '_blank')" title="Open in new tab">
+                            <i class="bi bi-box-arrow-up-right"></i> Open in New Tab
+                        </button>
+                        <button class="btn btn-sm btn-outline-light" onclick="this.closest('.pdf-viewer-container').querySelector('iframe').contentWindow.print()" title="Print">
+                            <i class="bi bi-printer"></i> Print
+                        </button>
+                    </div>
+                    <div class="pdf-title" style="color:#fff;font-weight:500;flex:1;text-align:center;margin:0 1rem;">
+                        ${result.title || 'Document'}
+                    </div>
+                    <div class="pdf-info" style="color:#aaa;font-size:0.8rem;">
+                        PDF Document
+                    </div>
+                </div>
+                <iframe src="${pdfUrl}#toolbar=1&navpanes=1&scrollbar=1&view=FitH" 
+                        style="width:100%;height:calc(100% - 60px);border:none;background:#fff;" 
+                        title="PDF Viewer"
+                        onerror="this.parentNode.innerHTML='<div class=\\'error-container\\' style=\\'display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#fff;\\'>\\
+                            <i class=\\'bi bi-file-earmark-x\\' style=\\'font-size:3rem;color:#dc3545;margin-bottom:1rem;\\'></i>\\
+                            <h4>PDF Failed to Load</h4>\\
+                            <p style=\\'color:#aaa;text-align:center;margin-bottom:1rem;\\'>The PDF document could not be displayed in the viewer.</p>\\
+                            <a href=\\'${pdfUrl}\\' target=\\'_blank\\' class=\\'btn btn-primary\\'>\\
+                                <i class=\\'bi bi-download\\' style=\\'margin-right:0.5rem;\\'></i>Download PDF\\
+                            </a>\\
+                        </div>';" 
+                        allowfullscreen>
+                </iframe>
+            </div>`;
+    }
+        
+        getOrCreatePdfModal() {
+            let modal = document.getElementById('universalSearchPdfModal');
+            if (!modal) {
+                // Create PDF modal elements
+                const modalHtml = `
+                    <div class="pdf-modal" id="universalSearchPdfModal">
+                        <div class="pdf-modal-header">
+                            <h3 class="pdf-modal-title" id="universalSearchPdfModalTitle">Document</h3>
+                            <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="
+                                document.getElementById('universalSearchPdfModal').classList.remove('active');
+                                document.getElementById('universalSearchPdfModalOverlay').classList.remove('active');
+                            "></button>
+                        </div>
+                        <div class="pdf-modal-content" id="universalSearchPdfModalContent"></div>
+                    </div>
+                    <div class="pdf-modal-overlay" id="universalSearchPdfModalOverlay"></div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                modal = document.getElementById('universalSearchPdfModal');
+                
+                // Add click-to-close functionality
+                const overlay = document.getElementById('universalSearchPdfModalOverlay');
+                if (overlay) {
+                    overlay.addEventListener('click', () => {
+                        modal.classList.remove('active');
+                        overlay.classList.remove('active');
+                    });
+                }
+            }
+            return modal;
+        }
+
+        getOrCreateNoteModal() {
+            let modal = document.getElementById('universalSearchNoteModal');
+            if (!modal) {
+                // Create note modal elements
+                const modalHtml = `
+                    <div class="note-modal" id="universalSearchNoteModal">
+                        <div class="note-modal-header">
+                            <h3 class="note-modal-title" id="universalSearchNoteModalTitle">Note</h3>
+                            <div class="note-modal-actions">
+                                <button type="button" class="btn btn-sm btn-primary" id="universalSearchNoteEditBtn" style="display: none;">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </button>
+                                <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="
+                                    document.getElementById('universalSearchNoteModal').classList.remove('active');
+                                    document.getElementById('universalSearchNoteModalOverlay').classList.remove('active');
+                                "></button>
+                            </div>
+                        </div>
+                        <div class="note-modal-content" id="universalSearchNoteModalContent"></div>
+                    </div>
+                    <div class="note-modal-overlay" id="universalSearchNoteModalOverlay"></div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                modal = document.getElementById('universalSearchNoteModal');
+                
+                // Add click-to-close functionality
+                const overlay = document.getElementById('universalSearchNoteModalOverlay');
+                if (overlay) {
+                    overlay.addEventListener('click', () => {
+                        modal.classList.remove('active');
+                        overlay.classList.remove('active');
+                    });
+                }
+            }
+            return modal;
+        }
+
+        showNoteViewOnlyModal(result, noteData) {
+            const modal = this.getOrCreateNoteModal();
+            const overlay = document.getElementById('universalSearchNoteModalOverlay');
+            const content = document.getElementById('universalSearchNoteModalContent');
+            const titleEl = document.getElementById('universalSearchNoteModalTitle');
+            const editBtn = document.getElementById('universalSearchNoteEditBtn');
+            
+            if (!modal || !overlay || !content || !titleEl) {
+                // Fallback to regular navigation if modal elements don't exist
+                window.location.href = result.url;
+                return;
+            }
+
+            // Use note data if provided, otherwise use result data
+            const displayData = noteData || result;
+            
+            titleEl.textContent = displayData.title || 'Note';
+            
+            // Hide edit button for view-only mode
+            if (editBtn) {
+                editBtn.style.display = 'none';
+            }
+            
+            // Parse and display content with proper formatting
+            let displayContent = '';
+            if (noteData) {
+                // Use full note data from API
+                try {
+                    if (noteData.content) {
+                        const content = JSON.parse(noteData.content);
+                        if (content.ops && Array.isArray(content.ops)) {
+                            // Process Quill.js Delta format
+                            displayContent = content.ops
+                                .filter(op => op.insert && typeof op.insert === 'string')
+                                .map(op => {
+                                    let text = op.insert;
+                                    // Convert newlines to proper HTML
+                                    text = text.replace(/\n/g, '<br>');
+                                    // Apply basic formatting if attributes exist
+                                    if (op.attributes) {
+                                        if (op.attributes.bold) text = `<strong>${text}</strong>`;
+                                        if (op.attributes.italic) text = `<em>${text}</em>`;
+                                        if (op.attributes.underline) text = `<u>${text}</u>`;
+                                    }
+                                    return text;
+                                })
+                                .join('');
+                        } else {
+                            // Fallback for other JSON formats
+                            displayContent = JSON.stringify(content, null, 2).replace(/\n/g, '<br>');
+                        }
+                    }
+                } catch (e) {
+                    displayContent = noteData.content ? noteData.content.replace(/\n/g, '<br>') : '';
+                }
+            } else {
+                // Use search result description as fallback
+                displayContent = result.highlighted_description || result.description || 'No content available';
+            }
+            
+            // Ensure we have some content to display
+            if (!displayContent || displayContent.trim() === '') {
+                displayContent = '<em style="color: rgba(255, 255, 255, 0.5);">This note appears to be empty.</em>';
+            }
+            
+            // Show note content in read-only format
+            content.innerHTML = `
+                <div class="note-view-only" style="max-height: calc(100vh - 200px); overflow-y: auto;">
+                    <div class="note-content-display" style="background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                        <div class="note-text-content" style="color: #fff; line-height: 1.6; font-size: 1rem;">${displayContent}</div>
+                    </div>
+                    <div class="note-meta-info" style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1rem;">
+                        ${noteData && noteData.tags ? `<div class="note-tags" style="margin-bottom: 0.75rem;">${this.renderNoteTags(noteData.tags)}</div>` : ''}
+                        <div class="note-metadata" style="display: flex; flex-wrap: wrap; gap: 1rem; color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">
+                            ${noteData && noteData.author ? `<div class="note-author"><i class="bi bi-person" style="margin-right: 0.25rem;"></i> ${noteData.author.username}</div>` : ''}
+                            ${noteData ? `<div class="note-dates"><i class="bi bi-calendar" style="margin-right: 0.25rem;"></i> ${new Date(noteData.updated_at).toLocaleDateString()}</div>` : ''}
+                            <div class="note-access-info">
+                                <i class="bi bi-eye" style="margin-right: 0.25rem; color: #ffc107;"></i> View Only
+                            </div>
+                            ${noteData && noteData.is_public ? '<div class="note-visibility"><i class="bi bi-unlock" style="margin-right: 0.25rem; color: #28a745;"></i> Public</div>' : '<div class="note-visibility"><i class="bi bi-lock" style="margin-right: 0.25rem; color: #dc3545;"></i> Private</div>'}
+                        </div>
+                    </div>
+                </div>`;
+            
+            modal.classList.add('active');
+            overlay.classList.add('active');
+        }
+
+        showNoteAccessDeniedModal(result) {
+            const modal = this.getOrCreateNoteModal();
+            const overlay = document.getElementById('universalSearchNoteModalOverlay');
+            const content = document.getElementById('universalSearchNoteModalContent');
+            const titleEl = document.getElementById('universalSearchNoteModalTitle');
+            const editBtn = document.getElementById('universalSearchNoteEditBtn');
+            
+            if (!modal || !overlay || !content || !titleEl) {
+                return;
+            }
+
+            titleEl.textContent = result.title || 'Private Note';
+            
+            // Hide edit button
+            if (editBtn) {
+                editBtn.style.display = 'none';
+            }
+            
+            content.innerHTML = `
+                <div class="note-access-denied">
+                    <div class="access-denied-icon">
+                        <i class="bi bi-lock-fill" style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;"></i>
+                    </div>
+                    <h4 style="color: #fff; margin-bottom: 1rem;">Access Denied</h4>
+                    <p style="color: rgba(255, 255, 255, 0.7); text-align: center; line-height: 1.6;">
+                        This note is private and you don't have permission to view it.
+                        Only the note owner can access private notes.
+                    </p>
+                </div>`;
+            
+            modal.classList.add('active');
+            overlay.classList.add('active');
+        }
+
+        showNoteErrorModal(result, errorMessage) {
+            const modal = this.getOrCreateNoteModal();
+            const overlay = document.getElementById('universalSearchNoteModalOverlay');
+            const content = document.getElementById('universalSearchNoteModalContent');
+            const titleEl = document.getElementById('universalSearchNoteModalTitle');
+            const editBtn = document.getElementById('universalSearchNoteEditBtn');
+            
+            if (!modal || !overlay || !content || !titleEl) {
+                // Fallback: show alert and try to navigate to notes page
+                alert(`Note Error: ${errorMessage}`);
+                window.location.href = '/notes';
+                return;
+            }
+
+            titleEl.textContent = result.title || 'Note Error';
+            
+            // Hide edit button
+            if (editBtn) {
+                editBtn.style.display = 'none';
+            }
+            
+            content.innerHTML = `
+                <div class="note-error" style="text-align: center; padding: 2rem;">
+                    <div class="error-icon">
+                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem; color: #ffc107; margin-bottom: 1rem;"></i>
+                    </div>
+                    <h4 style="color: #fff; margin-bottom: 1rem;">Unable to Load Note</h4>
+                    <p style="color: rgba(255, 255, 255, 0.7); text-align: center; line-height: 1.6; margin-bottom: 1.5rem;">
+                        ${errorMessage}
+                    </p>
+                    <div class="error-actions">
+                        <button class="btn btn-primary me-2" onclick="window.location.href='/notes'">
+                            <i class="bi bi-journal-text"></i> Go to Notes
+                        </button>
+                        <button class="btn btn-secondary" onclick="
+                            document.getElementById('universalSearchNoteModal').classList.remove('active');
+                            document.getElementById('universalSearchNoteModalOverlay').classList.remove('active');
+                        ">
+                            <i class="bi bi-x"></i> Close
+                        </button>
+                    </div>
+                </div>`;
+            
+            modal.classList.add('active');
+            overlay.classList.add('active');
+        }
+
+        showNoteEditableModal(noteData) {
+            const modal = this.getOrCreateNoteModal();
+            const overlay = document.getElementById('universalSearchNoteModalOverlay');
+            const content = document.getElementById('universalSearchNoteModalContent');
+            const titleEl = document.getElementById('universalSearchNoteModalTitle');
+            const editBtn = document.getElementById('universalSearchNoteEditBtn');
+            
+            if (!modal || !overlay || !content || !titleEl) {
+                // Fallback to notes page if modal elements don't exist
+                window.location.href = '/notes';
+                return;
+            }
+
+            titleEl.textContent = noteData.title || 'Untitled Note';
+            
+            // Show edit button for owners
+            if (editBtn) {
+                editBtn.style.display = 'inline-flex';
+                editBtn.onclick = () => {
+                    if (window.universalSearchInstance && window.universalSearchInstance.enableNoteEditing) {
+                        window.universalSearchInstance.enableNoteEditing(noteData);
+                    } else {
+                        console.error('Note editing not available');
+                        alert('Note editing is not available. Please try refreshing the page.');
+                    }
+                };
+            }
+            
+            // Parse and display content with proper formatting
+            let displayContent = '';
+            try {
+                if (noteData.content) {
+                    const content = JSON.parse(noteData.content);
+                    if (content.ops && Array.isArray(content.ops)) {
+                        // Process Quill.js Delta format
+                        displayContent = content.ops
+                            .filter(op => op.insert && typeof op.insert === 'string')
+                            .map(op => {
+                                let text = op.insert;
+                                // Convert newlines to proper HTML
+                                text = text.replace(/\n/g, '<br>');
+                                // Apply basic formatting if attributes exist
+                                if (op.attributes) {
+                                    if (op.attributes.bold) text = `<strong>${text}</strong>`;
+                                    if (op.attributes.italic) text = `<em>${text}</em>`;
+                                    if (op.attributes.underline) text = `<u>${text}</u>`;
+                                }
+                                return text;
+                            })
+                            .join('');
+                    } else {
+                        // Fallback for other JSON formats
+                        displayContent = JSON.stringify(content, null, 2).replace(/\n/g, '<br>');
+                    }
+                }
+            } catch (e) {
+                // Fallback for plain text content
+                displayContent = noteData.content ? noteData.content.replace(/\n/g, '<br>') : '';
+            }
+            
+            // Ensure we have some content to display
+            if (!displayContent || displayContent.trim() === '') {
+                displayContent = '<em style="color: rgba(255, 255, 255, 0.5);">This note appears to be empty.</em>';
+            }
+            
+            // Show note content with edit option
+            content.innerHTML = `
+                <div class="note-editable-view" style="max-height: calc(100vh - 200px); overflow-y: auto;">
+                    <div class="note-content-display" style="background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                        <div class="note-text-content" style="color: #fff; line-height: 1.6; font-size: 1rem;">${displayContent || '<em style="color: rgba(255, 255, 255, 0.5);">No content</em>'}</div>
+                    </div>
+                    <div class="note-meta-info" style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1rem;">
+                        ${noteData.tags ? `<div class="note-tags" style="margin-bottom: 0.75rem;">${this.renderNoteTags(noteData.tags)}</div>` : ''}
+                        <div class="note-metadata" style="display: flex; flex-wrap: wrap; gap: 1rem; color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">
+                            <div class="note-privacy">
+                                <i class="bi ${noteData.is_public ? 'bi-unlock' : 'bi-lock-fill'}" style="margin-right: 0.25rem; color: ${noteData.is_public ? '#28a745' : '#dc3545'};"></i>
+                                ${noteData.is_public ? 'Public' : 'Private'}
+                            </div>
+                            <div class="note-dates">
+                                <i class="bi bi-calendar" style="margin-right: 0.25rem;"></i>
+                                Updated: ${new Date(noteData.updated_at).toLocaleDateString()}
+                            </div>
+                            <div class="note-owner-info">
+                                <i class="bi bi-person-check" style="margin-right: 0.25rem; color: #007bff;"></i> You own this note
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            
+            modal.classList.add('active');
+            overlay.classList.add('active');
+        }
+
+        renderNoteTags(tagsString) {
+            if (!tagsString) return '';
+            
+            const tags = tagsString.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+            return tags.map(tag => `
+                <span class="note-tag" style="
+                    display: inline-block;
+                    background: rgba(0, 123, 255, 0.2);
+                    color: #007bff;
+                    padding: 0.25rem 0.75rem;
+                    border-radius: 15px;
+                    font-size: 0.8rem;
+                    margin: 0.125rem;
+                    border: 1px solid rgba(0, 123, 255, 0.3);
+                ">
+                    <i class="bi bi-tag" style="margin-right: 0.25rem;"></i>${tag}
+                </span>
+            `).join('');
+        }
+        
+        viewAllResults() {
+            if (this.currentQuery) {
+                const params = new URLSearchParams({ q: this.currentQuery });
+                window.location.href = `/universal-search?${params}`;
+            }
+        }
+        
+        clearSearch() {
+            this.searchInput.value = '';
+            this.currentQuery = '';
+            this.clearBtn.style.display = 'none';
+            this.hideResults();
+            this.hideSuggestions();
+            this.filters.style.display = 'none';
+            this.searchInput.focus();
+        }
+        
+        showLoading(show, message = '') {
+            // Toggle loader visibility
+            this.loading.style.display = show ? 'flex' : 'none';
+            // Disable / enable input & clear button to prevent concurrent searches only for clock-ID lookups (when a message is provided)
+            const shouldDisable = show && message;
+            this.searchInput.disabled = shouldDisable;
+            this.clearBtn.disabled = shouldDisable;
+
+            // Handle dynamic status text inside loader
+            let statusEl = this.loading.querySelector('.loading-status-text');
+            if (show && message) {
+                if (!statusEl) {
+                    statusEl = document.createElement('span');
+                    statusEl.className = 'loading-status-text';
+                    this.loading.appendChild(statusEl);
+                }
+                statusEl.textContent = message;
+
+                // ─── Hide input elements entirely so only loader + text remain ───
+                if (!this._origPlaceholder) {
+                    this._origPlaceholder = this.searchInput.placeholder;
+                }
+                this.searchInput.value = '';
+                this.searchInput.placeholder = '';
+                this.searchInput.style.display = 'none';
+                if (this.searchIcon) this.searchIcon.style.display = 'none';
+                this.clearBtn.style.display = 'none';
+
+            } else if (statusEl) {
+                statusEl.textContent = '';
+
+                // ─── Restore input elements once loading finishes ───
+                this.searchInput.style.display = 'block';
+                if (this.searchIcon) this.searchIcon.style.display = '';
+                this.searchInput.placeholder = this._origPlaceholder || 'Search everything...';
+                // Show clear button only if there is text
+                this.clearBtn.style.display = this.currentQuery ? 'block' : 'none';
+            }
+        }
+        
+        hideSuggestions() {
+            this.suggestions.style.display = 'none';
+        }
+        
+        hideResults() {
+            this.results.style.display = 'none';
+        }
+        
+        getContentTypeIcon(contentType) {
+            const icons = {
+                'kb_article': 'bi-journal-text',
+                'outage': 'bi-exclamation-triangle',
+                'user': 'bi-person',
+                'office': 'bi-building',
+                'workstation': 'bi-laptop',
+                'document': 'bi-file-earmark-text',
+                'note': 'bi-sticky'
+            };
+            return icons[contentType] || 'bi-file-earmark';
+        }
+        
+        getContentTypeTitle(contentType) {
+            const titles = {
+                'kb_article': 'Knowledge Base',
+                'outage': 'Outages',
+                'user': 'Users',
+                'office': 'Offices',
+                'workstation': 'Workstations',
+                'document': 'Documents',
+                'note': 'Notes'
+            };
+            return titles[contentType] || 'Other';
+        }
+        
+        formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 1) {
+                return 'Today';
+            } else if (diffDays === 2) {
+                return 'Yesterday';
+            } else if (diffDays <= 7) {
+                return `${diffDays - 1} days ago`;
+            } else {
+                return date.toLocaleDateString();
+            }
+        }
+        
+        // --- Suggestion item builder (now merged into main list) ---
+        createSuggestionItem(item) {
+            const iconClass = item.icon || this.getContentTypeIcon(item.type);
+            const suggestionId = `suggestion-${Math.random().toString(36).substr(2, 9)}`;
+            
+            // Special-case the "Full search results…" quick-action so it always
+            // performs a hard navigation, guaranteeing that the dedicated
+            // full-results page opens even if inline JS handlers are blocked.
+            if (item.type === 'view_all') {
+                const url = `/universal-search?q=${encodeURIComponent(this.currentQuery)}`;
+                return `
+                    <a href="${url}" class="result-item suggestion-item suggestion-viewall" style="text-decoration:none;">
+                        <div class="result-icon ${item.type}"><i class="${iconClass}"></i></div>
+                        <div class="result-content">
+                            <div class="result-title">${item.text}</div>
+                            ${item.subtitle ? `<div class="result-description">${item.subtitle}</div>` : ''}
+                        </div>
+                    </a>
+                `;
+            }
+            
+            // Safely encode JSON data for HTML attribute
+            const jsonData = JSON.stringify(item).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            
+            return `
+                <div class="result-item suggestion-item clickable-suggestion" id="${suggestionId}" data-suggestion="${jsonData}" style="cursor: pointer;">
+                    <div class="result-icon ${item.type || 'suggestion'}">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <div class="result-content">
+                        <div class="result-title">${item.text}</div>
+                        ${item.subtitle ? `<div class="result-description">${item.subtitle}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ---------------------------------------------
+        // Clock-ID lookup helper
+        // ---------------------------------------------
+        async lookupClockId(clockId) {
+            try {
+                // --- 1️⃣  Attempt to personalise loader using the cache ---
+                const genericPhrases = [
+                    'Obtaining user profile…',
+                    'Searching for user account…',
+                    'Fetching account information…'
+                ];
+
+                let personalisedMessage = genericPhrases[Math.floor(Math.random() * genericPhrases.length)];
+
+                try {
+                    const cacheRes = await fetch(`/users/cache/${clockId}`);
+                    if (cacheRes.ok) {
+                        const cached = await cacheRes.json();
+                        if (cached && cached.first_name) {
+                            const personalized = [
+                                `Fetching ${cached.first_name}’s account information…`,
+                                `Grabbing ${cached.first_name}’s credentials…`,
+                                `Preparing ${cached.first_name}’s profile…`
+                            ];
+                            personalisedMessage = personalized[Math.floor(Math.random() * personalized.length)];
+                        }
+                    }
+                } catch (_) { /* cache miss or error – keep generic */ }
+
+                // Show loader (disables input to avoid parallel searches)
+                this.showLoading(true, personalisedMessage);
+
+                // --- 2️⃣  Always run live PowerShell lookup in parallel ---
+                const psResponse = await fetch('/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user: clockId })
+                });
+
+                this.showLoading(true, 'Retrieving data…');
+
+                if (!psResponse.ok) {
+                    throw new Error(`Lookup failed (HTTP ${psResponse.status})`);
+                }
+
+                const data = await psResponse.json();
+
+                if (!data || data.error || Object.keys(data).length === 0) {
+                    this.displayError(`No user found for Clock ID ${clockId}`);
+                    return;
+                }
+
+                // Map AD/PowerShell output to modal-friendly keys
+                const mapped = {
+                    username: data.Username || data.username || clockId,
+                    full_name: data.FullName || data.full_name || '',
+                    email: data.Email || data.email || '',
+                    role: data.Title || 'User',
+                    title: data.Title || '',
+                    clock_id: data.ClockID || clockId,
+                    profile_picture: null,
+                    phone: data.Phone || '',
+                    password_last_reset: data.PasswordLastReset || data.password_last_reset || '',
+                    account_status: data.AccountStatus || data.account_status || '',
+                    locked_out: data.LockedOut ?? data.locked_out,
+                    password_expired: data.PasswordExpired ?? data.password_expired,
+                    email_license: data.EmailLicense || data.Email_License || data.email_license || null,
+                    department: data.Department || data.department || '',
+                    epic_status: data.EpicStatus || data.epic_status || '',
+                    epic_block: data.EpicBlock || data.epic_block || '',
+                    immutable_id: data.ImmutableID || data.immutable_id || '',
+                    not_locked_out: data.NotLockedOut ?? data.not_locked_out,
+                    password_not_expired: data.PasswordNotExpired ?? data.password_not_expired,
+                    // --- New fields ---
+                    group_membership: data.GroupMembership || data.group_membership || [],
+                    password_expiration_date: data.PasswordExpirationDate || data.password_expiration_date || '',
+                    mfa_status: data.MFAStatus || data.mfa_status || '',
+                    device_logon_history: data.DeviceLogonHistory || data.device_logon_history || []
+                };
+
+                window.showClockIdUserModal(mapped);
+
+            } catch (err) {
+                console.error('Clock ID lookup error:', err);
+                this.displayError('Clock ID lookup failed.');
+            } finally {
+                this.showLoading(false);
+            }
+        }
+    }
+    
+    // Initialize universal search when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Only initialize if the search container exists and hasn't been initialized
+        if (document.getElementById('universalSearchContainer') && !window.universalSearchInitialized) {
+            window.universalSearchInstance = new UniversalSearch();
+            window.universalSearchInitialized = true;
+        }
+    });
+
+    // Fallback utility – detect whether Dameware Remote Control is *likely* available on the client.
+    // The detection is heuristic-based because browsers cannot reliably query installed
+    // applications.  For now we consider Dameware "available" when running on Windows OS;
+    // this prevents JavaScript errors while still showing a helpful warning banner when
+    // the heuristic fails.
+    if (typeof window.checkDamewareAvailability !== 'function') {
+        window.checkDamewareAvailability = function () {
+            try {
+                const ua = navigator.userAgent || navigator.platform || '';
+                // Very naive detection – adjust if you have a better way to probe the custom
+                // dwrcc:// protocol handler. We simply return true on Windows to keep existing
+                // UI logic working and false otherwise.
+                return /windows/i.test(ua);
+            } catch (err) {
+                console.warn('Dameware availability check failed:', err);
+                return false;
+            }
+        };
+    }
+    
+    // Add note editing methods to UniversalSearch prototype
+    if (typeof UniversalSearch !== 'undefined') {
+        UniversalSearch.prototype.enableNoteEditing = function(noteData) {
+            this.loadQuillAndEnableEditing(noteData);
+        };
+        
+        UniversalSearch.prototype.loadQuillAndEnableEditing = function(noteData) {
+            // Load Quill if not already loaded
+            if (typeof window.Quill === 'undefined') {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.quilljs.com/1.3.6/quill.min.js';
+                script.onload = () => {
+                    this.showEditableNoteModal(noteData);
+                };
+                script.onerror = () => {
+                    console.error('Failed to load Quill editor');
+                    alert('Failed to load the editor. Please try again.');
+                };
+                document.head.appendChild(script);
+            } else {
+                this.showEditableNoteModal(noteData);
+            }
+        };
+        
+        UniversalSearch.prototype.showEditableNoteModal = function(noteData) {
+            const content = document.getElementById('universalSearchNoteModalContent');
+            const titleEl = document.getElementById('universalSearchNoteModalTitle');
+            const editBtn = document.getElementById('universalSearchNoteEditBtn');
+            
+            if (!content || !titleEl) return;
+            
+            // Update modal title to show editing mode
+            titleEl.textContent = `Edit: ${noteData.title || 'Untitled Note'}`;
+            
+            // Hide edit button and show save/cancel
+            if (editBtn) {
+                editBtn.style.display = 'none';
+            }
+            
+            // Parse note content
+            let initialContent;
+            try {
+                initialContent = noteData.content ? JSON.parse(noteData.content) : { ops: [] };
+            } catch (e) {
+                initialContent = { ops: [{ insert: noteData.content || '' }] };
+            }
+            
+            // Create edit interface
+            content.innerHTML = `
+                <div class="note-edit-mode">
+                    <input type="text" class="note-title-edit" id="editNoteTitle" value="${(noteData.title || '').replace(/"/g, '&quot;')}" placeholder="Note title...">
+                    <div class="note-editor-container">
+                        <div id="editNoteEditor"></div>
+                    </div>
+                    <div class="note-edit-actions">
+                        <button class="note-edit-btn secondary" onclick="if(window.universalSearchInstance) window.universalSearchInstance.cancelNoteEdit('${noteData.id}')">
+                            <i class="bi bi-x"></i> Cancel
+                        </button>
+                        <button class="note-edit-btn primary" onclick="if(window.universalSearchInstance) window.universalSearchInstance.saveNoteEdit('${noteData.id}')">
+                            <i class="bi bi-save"></i> Save
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Initialize Quill editor
+            setTimeout(() => {
+                try {
+                    const toolbarOptions = [
+                        ['bold', 'italic', 'underline'],
+                        [{ 'header': [1, 2, 3, false] }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['blockquote', 'code-block'],
+                        ['clean']
+                    ];
+                    
+                    this.noteEditor = new Quill('#editNoteEditor', {
+                        theme: 'snow',
+                        modules: {
+                            toolbar: toolbarOptions
+                        },
+                        placeholder: 'Start writing your note...'
+                    });
+                    
+                    // Set initial content
+                    this.noteEditor.setContents(initialContent);
+                    
+                    // Focus the editor
+                    this.noteEditor.focus();
+                    
+                    // Store original data for cancel functionality
+                    this.originalNoteData = noteData;
+                    
+                } catch (error) {
+                    console.error('Error initializing note editor:', error);
+                    alert('Failed to initialize the editor. Please try again.');
+                }
+            }, 100);
+        };
+        
+        UniversalSearch.prototype.saveNoteEdit = async function(noteId) {
+            const titleInput = document.getElementById('editNoteTitle');
+            
+            if (!this.noteEditor || !titleInput) {
+                alert('Editor not initialized properly');
+                return;
+            }
+            
+            try {
+                const title = titleInput.value.trim() || 'Untitled Note';
+                const content = JSON.stringify(this.noteEditor.getContents());
+                
+                // Show saving state
+                const saveBtn = document.querySelector('.note-edit-btn.primary');
+                const originalText = saveBtn.innerHTML;
+                saveBtn.innerHTML = '<i class="bi bi-hourglass"></i> Saving...';
+                saveBtn.disabled = true;
+                
+                const response = await fetch(`/notes/api/notes/${noteId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        content: content
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to save note: ${response.status} ${response.statusText}`);
+                }
+                
+                const updatedNote = await response.json();
+                
+                // Show success and close modal after a short delay
+                saveBtn.innerHTML = '<i class="bi bi-check"></i> Saved!';
+                saveBtn.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    // Close the modal
+                    const modal = document.getElementById('universalSearchNoteModal');
+                    const overlay = document.getElementById('universalSearchNoteModalOverlay');
+                    if (modal && overlay) {
+                        modal.classList.remove('active');
+                        overlay.classList.remove('active');
+                    }
+                    
+                    // Clean up editor
+                    this.noteEditor = null;
+                    this.originalNoteData = null;
+                    
+                    // Show toast notification
+                    this.showToast('Note saved successfully!', 'success');
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error saving note:', error);
+                alert(`Failed to save note: ${error.message}`);
+                
+                // Restore save button
+                const saveBtn = document.querySelector('.note-edit-btn.primary');
+                saveBtn.innerHTML = '<i class="bi bi-save"></i> Save';
+                saveBtn.disabled = false;
+                saveBtn.style.background = '#007bff';
+            }
+        };
+        
+        UniversalSearch.prototype.cancelNoteEdit = function(noteId) {
+            if (this.originalNoteData) {
+                // Restore the original view
+                this.showNoteEditableModal(this.originalNoteData);
+                
+                // Clean up
+                this.noteEditor = null;
+                this.originalNoteData = null;
+            }
+        };
+        
+        UniversalSearch.prototype.showToast = function(message, type = 'info') {
+            // Simple toast notification
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#007bff'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 11200;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                opacity: 0;
+                transform: translateX(100%);
+                transition: all 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 3000);
+        };
+    }
+
+})();
+
+// Modal functionality for ticket creation and password reset
+window.openTicketModal = function(username, email, fullName) {
+    const modal = getOrCreateTicketModal();
+    const overlay = document.getElementById('universalSearchTicketModalOverlay');
+    const titleEl = document.getElementById('universalSearchTicketModalTitle');
+    const userInfoEl = document.getElementById('universalSearchTicketUserInfo');
+    
+    if (!modal || !overlay || !titleEl || !userInfoEl) return;
+    
+    titleEl.textContent = 'Create Ticket';
+    userInfoEl.innerHTML = `
+        <div class="ticket-user-info">
+            <i class="bi bi-person-circle" style="color: #007bff; margin-right: 0.5rem;"></i>
+            <strong>${fullName}</strong> (${username})
+            <br><small style="color: rgba(255,255,255,0.7);">${email}</small>
+        </div>
+    `;
+    
+    modal.classList.add('active');
+    overlay.classList.add('active');
+    
+    // Store user data for form submission
+    window._currentTicketUser = { username, email, fullName };
+};
+
+window.openPasswordResetModal = function(username, email, fullName) {
+    const modal = getOrCreatePasswordResetModal();
+    const overlay = document.getElementById('universalSearchPasswordResetModalOverlay');
+    const titleEl = document.getElementById('universalSearchPasswordResetModalTitle');
+    const userInfoEl = document.getElementById('universalSearchPasswordResetUserInfo');
+    
+    if (!modal || !overlay || !titleEl || !userInfoEl) return;
+    
+    titleEl.textContent = 'Reset Password';
+    userInfoEl.innerHTML = `
+        <div class="password-reset-user-info">
+            <i class="bi bi-person-circle" style="color: #dc3545; margin-right: 0.5rem;"></i>
+            <strong>${fullName}</strong> (${username})
+            <br><small style="color: rgba(255,255,255,0.7);">${email}</small>
+        </div>
+    `;
+    
+    modal.classList.add('active');
+    overlay.classList.add('active');
+    
+    // Store user data for form submission
+    window._currentPasswordResetUser = { username, email, fullName };
+};
+
+function getOrCreateTicketModal() {
+    let modal = document.getElementById('universalSearchTicketModal');
+    if (!modal) {
+        const modalHtml = `
+            <div class="ticket-modal" id="universalSearchTicketModal">
+                <div class="ticket-modal-header">
+                    <h3 class="ticket-modal-title" id="universalSearchTicketModalTitle">Create Ticket</h3>
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="
+                        document.getElementById('universalSearchTicketModal').classList.remove('active');
+                        document.getElementById('universalSearchTicketModalOverlay').classList.remove('active');
+                    "></button>
+                </div>
+                <div class="ticket-modal-content">
+                    <div id="universalSearchTicketUserInfo" class="mb-3"></div>
+                    
+                    <form id="universalSearchTicketForm">
+                        <div class="mb-3">
+                            <label for="ticketTemplate" class="form-label">Ticket Template</label>
+                            <select class="form-select" id="ticketTemplate" required>
+                                <option value="">Select a template...</option>
+                                <option value="password_reset">Password Reset Request</option>
+                                <option value="account_unlock">Account Unlock Request</option>
+                                <option value="software_request">Software Installation Request</option>
+                                <option value="hardware_issue">Hardware Issue</option>
+                                <option value="network_issue">Network/Connectivity Issue</option>
+                                <option value="email_issue">Email/Outlook Issue</option>
+                                <option value="printer_issue">Printer Issue</option>
+                                <option value="phone_issue">Phone/VoIP Issue</option>
+                                <option value="other">Other/General Support</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="ticketSubject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="ticketSubject" placeholder="Brief description of the issue" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="ticketDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="ticketDescription" rows="4" placeholder="Detailed description of the issue or request" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="ticketPriority" class="form-label">Priority</label>
+                            <select class="form-select" id="ticketPriority" required>
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                        
+                        <div class="ticket-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Create Ticket
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="
+                                document.getElementById('universalSearchTicketModal').classList.remove('active');
+                                document.getElementById('universalSearchTicketModalOverlay').classList.remove('active');
+                            ">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="ticket-modal-overlay" id="universalSearchTicketModalOverlay"></div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        modal = document.getElementById('universalSearchTicketModal');
+        
+        // Add form submission handler
+        const form = document.getElementById('universalSearchTicketForm');
+        if (form) {
+            form.addEventListener('submit', handleTicketSubmission);
+        }
+        
+        // Add click-to-close functionality
+        const overlay = document.getElementById('universalSearchTicketModalOverlay');
+        if (overlay) {
+            overlay.addEventListener('click', () => {
+                modal.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+        
+        // Update subject and description based on template selection
+        const templateSelect = document.getElementById('ticketTemplate');
+        if (templateSelect) {
+            templateSelect.addEventListener('change', updateTicketTemplate);
+        }
+    }
+    return modal;
+}
+
+function getOrCreatePasswordResetModal() {
+    let modal = document.getElementById('universalSearchPasswordResetModal');
+    if (!modal) {
+        const modalHtml = `
+            <div class="password-reset-modal" id="universalSearchPasswordResetModal">
+                <div class="password-reset-modal-header">
+                    <h3 class="password-reset-modal-title" id="universalSearchPasswordResetModalTitle">Reset Password</h3>
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="
+                        document.getElementById('universalSearchPasswordResetModal').classList.remove('active');
+                        document.getElementById('universalSearchPasswordResetModalOverlay').classList.remove('active');
+                    "></button>
+                </div>
+                <div class="password-reset-modal-content">
+                    <div id="universalSearchPasswordResetUserInfo" class="mb-3"></div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-shield-check"></i>
+                        <strong>MFA Authentication Required</strong><br>
+                        This action requires multi-factor authentication for security purposes.
+                    </div>
+                    
+                    <form id="universalSearchPasswordResetForm">
+                        <div class="mb-3">
+                            <label for="resetReason" class="form-label">Reason for Password Reset</label>
+                            <select class="form-select" id="resetReason" required>
+                                <option value="">Select a reason...</option>
+                                <option value="forgot_password">User forgot password</option>
+                                <option value="account_locked">Account locked due to failed attempts</option>
+                                <option value="security_concern">Security concern/compromise</option>
+                                <option value="new_employee">New employee setup</option>
+                                <option value="policy_compliance">Password policy compliance</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3" id="otherReasonDiv" style="display: none;">
+                            <label for="otherReason" class="form-label">Please specify</label>
+                            <input type="text" class="form-control" id="otherReason" placeholder="Specify other reason">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="mfaCode" class="form-label">MFA Verification Code</label>
+                            <input type="text" class="form-control" id="mfaCode" placeholder="Enter your 6-digit MFA code" maxlength="6" pattern="[0-9]{6}" required>
+                            <small class="form-text text-muted">Check your authenticator app for the current code</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="notifyUser" checked>
+                                <label class="form-check-label" for="notifyUser">
+                                    Send password reset notification to user
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="forceChangeNextLogin" checked>
+                                <label class="form-check-label" for="forceChangeNextLogin">
+                                    Force password change on next login
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="password-reset-actions">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-key"></i> Reset Password
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="
+                                document.getElementById('universalSearchPasswordResetModal').classList.remove('active');
+                                document.getElementById('universalSearchPasswordResetModalOverlay').classList.remove('active');
+                            ">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="password-reset-modal-overlay" id="universalSearchPasswordResetModalOverlay"></div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        modal = document.getElementById('universalSearchPasswordResetModal');
+        
+        // Add form submission handler
+        const form = document.getElementById('universalSearchPasswordResetForm');
+        if (form) {
+            form.addEventListener('submit', handlePasswordResetSubmission);
+        }
+        
+        // Add click-to-close functionality
+        const overlay = document.getElementById('universalSearchPasswordResetModalOverlay');
+        if (overlay) {
+            overlay.addEventListener('click', () => {
+                modal.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
+        
+        // Show/hide other reason field
+        const reasonSelect = document.getElementById('resetReason');
+        const otherDiv = document.getElementById('otherReasonDiv');
+        if (reasonSelect && otherDiv) {
+            reasonSelect.addEventListener('change', (e) => {
+                otherDiv.style.display = e.target.value === 'other' ? 'block' : 'none';
+            });
+        }
+    }
+    return modal;
+}
+
+function updateTicketTemplate() {
+    const template = document.getElementById('ticketTemplate').value;
+    const subjectField = document.getElementById('ticketSubject');
+    const descriptionField = document.getElementById('ticketDescription');
+    
+    const templates = {
+        password_reset: {
+            subject: 'Password Reset Request',
+            description: 'User is requesting a password reset for their account.\n\nReason: [Please specify]\nUrgency: [Please specify]'
+        },
+        account_unlock: {
+            subject: 'Account Unlock Request',
+            description: 'User account is locked and needs to be unlocked.\n\nAccount Status: Locked\nReason for Lock: [Please specify]\nUser Impact: [Please specify]'
+        },
+        software_request: {
+            subject: 'Software Installation Request',
+            description: 'User is requesting software installation or access.\n\nSoftware Needed: [Please specify]\nBusiness Justification: [Please specify]\nLicense Required: [Yes/No]'
+        },
+        hardware_issue: {
+            subject: 'Hardware Issue Report',
+            description: 'User is experiencing hardware-related problems.\n\nAffected Hardware: [Please specify]\nIssue Description: [Please specify]\nError Messages: [If any]'
+        },
+        network_issue: {
+            subject: 'Network/Connectivity Issue',
+            description: 'User is experiencing network or connectivity problems.\n\nConnection Type: [WiFi/Ethernet/VPN]\nIssue Description: [Please specify]\nWhen did it start: [Please specify]'
+        },
+        email_issue: {
+            subject: 'Email/Outlook Issue',
+            description: 'User is experiencing email-related problems.\n\nEmail Client: [Outlook/Webmail/Mobile]\nIssue Description: [Please specify]\nError Messages: [If any]'
+        },
+        printer_issue: {
+            subject: 'Printer Issue',
+            description: 'User is experiencing printer-related problems.\n\nPrinter Model: [Please specify]\nIssue Description: [Please specify]\nError Messages: [If any]'
+        },
+        phone_issue: {
+            subject: 'Phone/VoIP Issue',
+            description: 'User is experiencing phone or VoIP-related problems.\n\nPhone Type: [Desk Phone/Mobile/Softphone]\nIssue Description: [Please specify]\nPhone Number: [If applicable]'
+        }
+    };
+    
+    if (template && templates[template]) {
+        subjectField.value = templates[template].subject;
+        descriptionField.value = templates[template].description;
+    } else if (template === 'other') {
+        subjectField.value = '';
+        descriptionField.value = 'Please describe the issue or request in detail.';
+    }
+}
+
+async function handleTicketSubmission(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    // Show loading state
+    submitBtn.innerHTML = '<i class="bi bi-hourglass"></i> Creating Ticket...';
+    submitBtn.disabled = true;
+    
+    try {
+        const formData = {
+            template: document.getElementById('ticketTemplate').value,
+            subject: document.getElementById('ticketSubject').value,
+            description: document.getElementById('ticketDescription').value,
+            priority: document.getElementById('ticketPriority').value,
+            user: window._currentTicketUser
+        };
+        
+        // Simulate API call (replace with actual endpoint)
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Show success
+        submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Ticket Created!';
+        submitBtn.style.background = '#28a745';
+        
+        // Show success message
+        showToast(`Ticket created successfully for ${formData.user.fullName}!`, 'success');
+        
+        setTimeout(() => {
+            // Close modal
+            document.getElementById('universalSearchTicketModal').classList.remove('active');
+            document.getElementById('universalSearchTicketModalOverlay').classList.remove('active');
+            
+            // Reset form
+            form.reset();
+            submitBtn.innerHTML = originalText;
+            submitBtn.style.background = '';
+            submitBtn.disabled = false;
+        }, 2000);
+        
+    } catch (error) {
+        console.error('Error creating ticket:', error);
+        showToast('Failed to create ticket. Please try again.', 'error');
+        
+        // Reset button
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        submitBtn.style.background = '';
+    }
+}
+
+async function handlePasswordResetSubmission(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    // Show loading state
+    submitBtn.innerHTML = '<i class="bi bi-hourglass"></i> Processing...';
+    submitBtn.disabled = true;
+    
+    try {
+        const formData = {
+            reason: document.getElementById('resetReason').value,
+            otherReason: document.getElementById('otherReason').value,
+            mfaCode: document.getElementById('mfaCode').value,
+            notifyUser: document.getElementById('notifyUser').checked,
+            forceChange: document.getElementById('forceChangeNextLogin').checked,
+            user: window._currentPasswordResetUser
+        };
+        
+        // Validate MFA code format
+        if (!/^\d{6}$/.test(formData.mfaCode)) {
+            throw new Error('Invalid MFA code format');
+        }
+        
+        // Simulate API call with MFA verification (replace with actual endpoint)
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Show success
+        submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Password Reset!';
+        submitBtn.style.background = '#28a745';
+        
+        // Show success message
+        showToast(`Password reset successfully for ${formData.user.fullName}!`, 'success');
+        
+        setTimeout(() => {
+            // Close modal
+            document.getElementById('universalSearchPasswordResetModal').classList.remove('active');
+            document.getElementById('universalSearchPasswordResetModalOverlay').classList.remove('active');
+            
+            // Reset form
+            form.reset();
+            submitBtn.innerHTML = originalText;
+            submitBtn.style.background = '';
+            submitBtn.disabled = false;
+        }, 2000);
+        
+    } catch (error) {
+        console.error('Error resetting password:', error);
+        showToast(`Failed to reset password: ${error.message}`, 'error');
+        
+        // Reset button
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        submitBtn.style.background = '';
+    }
+}
+
+function showToast(message, type = 'info') {
+    // Create or get toast container
+    let container = document.getElementById('toastContainer');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 11200;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        `;
+        document.body.appendChild(container);
+    }
+    
+    // Create toast
+    const toast = document.createElement('div');
+    toast.className = 'toast-msg';
+    toast.style.cssText = `
+        background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#007bff'};
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        min-width: 200px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    `;
+    
+    const icon = type === 'success' ? 'bi-check-circle' : type === 'error' ? 'bi-exclamation-triangle' : 'bi-info-circle';
+    toast.innerHTML = `<i class="bi ${icon}"></i>${message}`;
+    
+    container.appendChild(toast);
+    
+    // Animate in
+    setTimeout(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Remove after 4 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 4000);
+}
+</script>
+
+<!-- ——— macOS-style modal enhancements ——— -->
+<style>
+/* macOS-inspired modal container */
+.macos-modal {
+    background: linear-gradient(180deg,#fafafa 0%,#f0f0f3 100%);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-radius: 14px;
+    padding: 24px;
+    max-width: 900px; /* Wider desktop-optimised modal */
+    width: 90vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    color: #1d1d1f;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    animation: modalFadeIn 0.25s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(20px) scale(.98); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* Dark theme override */
+[data-bs-theme="dark"] .macos-modal {
+    background: #2b2b2d;
+    color: #ececec;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    color: #6e6e73;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.modal-close-btn:hover {
+    background: rgba(60,60,67,0.1);
+    color: #000;
+}
+
+[data-bs-theme="dark"] .modal-close-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+
+.modal-title {
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.modal-section {
+    background: rgba(255,255,255,0.6);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+}
+
+[data-bs-theme="dark"] .modal-section {
+    background: rgba(255,255,255,0.05);
+}
+
+.modal-section h4 {
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #3c3c43;
+}
+
+[data-bs-theme="dark"] .modal-section h4 {
+    color: #f1f1f4;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    row-gap: 8px;
+    column-gap: 16px;
+    font-size: 0.9rem;
+}
+
+.info-label {
+    color: #6e6e73;
+}
+
+[data-bs-theme="dark"] .info-label {
+    color: #b5b5b9;
+}
+
+.info-value {
+    font-weight: 500;
+    word-break: break-all;
+}
+
+.status-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.status-text {
+    font-size: 0.85rem;
+}
+
+.status-text.muted { color: #888; }
+[data-bs-theme="dark"] .status-text.muted { color: #aaa; }
+
+.warning-text {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #d87700;
+}
+
+.button-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+}
+.button-group.wrap { flex-wrap: wrap; }
+
+.macos-btn {
+    appearance: none;
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    background: rgba(255,255,255,0.9);
+    color: #111;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.macos-btn:hover {
+    background: rgba(255,255,255,1);
+}
+
+.macos-btn:active {
+    background: rgba(0,0,0,0.05);
+}
+
+.macos-btn.outline {
+    background: transparent;
+}
+
+.macos-btn.lite {
+    background: rgba(255,255,255,0.8);
+}
+
+[data-bs-theme="dark"] .macos-btn {
+    background: rgba(255,255,255,0.06);
+    color: #eee;
+    border: 1px solid rgba(255,255,255,0.12);
+}
+
+[data-bs-theme="dark"] .macos-btn:hover {
+    background: rgba(255,255,255,0.12);
+}
+
+/* --- New status badge styles --- */
+.status-badge {display:inline-block;padding:2px 8px;border-radius:10px;font-size:.75rem;font-weight:600;}
+.badge-locked {background:#ff3b30;color:#fff;}
+.badge-disabled {background:#6c757d;color:#fff;}
+.badge-password-expired {background:#ffcc00;color:#000;}
+.badge-ok {background:#4caf50;color:#fff;}
+.loading-status-text {margin-left:6px;font-size:.8rem;color:#6c757d;}
+
+/* Lists styling */
+.group-list, .device-history-list {margin:0;padding-left:1.2rem;font-size:.85rem;}
+
+/* PDF Modal Styles */
+.pdf-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(24, 26, 26, 0.55);
+    z-index: 11000;
+    backdrop-filter: blur(8px);
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.pdf-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.pdf-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    background: #23272f;
+    z-index: 11100;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.4);
+    border-radius: 1.5rem;
+    width: min(95vw, 900px);
+    height: min(90vh, 750px);
+    min-width: 320px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1), transform 0.25s cubic-bezier(.4,0,.2,1);
+}
+
+.pdf-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.pdf-modal-header {
+    position: sticky;
+    top: 0;
+    background: #23272f;
+    padding: 1.2rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    z-index: 10;
+    border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.pdf-modal-title {
+    color: #7ecbff;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.pdf-modal-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 0;
+    background: #181a1a;
+    border-radius: 0 0 1.5rem 1.5rem;
+}
+
+/* Note Modal Styles */
+.note-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(24, 26, 26, 0.55);
+    z-index: 11000;
+    backdrop-filter: blur(8px);
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.note-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.note-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    background: #23272f;
+    z-index: 11100;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.4);
+    border-radius: 1.5rem;
+    width: min(90vw, 700px);
+    max-height: min(85vh, 600px);
+    min-width: 320px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1), transform 0.25s cubic-bezier(.4,0,.2,1);
+}
+
+.note-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.note-modal-header {
+    position: sticky;
+    top: 0;
+    background: #23272f;
+    padding: 1.2rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    z-index: 10;
+    border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.note-modal-title {
+    color: #f8f9fa;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0;
+    flex: 1;
+}
+
+.note-modal-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.note-modal-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 2rem;
+    background: #181a1a;
+    border-radius: 0 0 1.5rem 1.5rem;
+}
+
+/* Note Content Styles */
+.note-view-only, .note-editable-view {
+    color: #e0e0e0;
+}
+
+.note-content-display {
+    margin-bottom: 2rem;
+}
+
+.note-text-content {
+    line-height: 1.6;
+    font-size: 1rem;
+    white-space: pre-wrap;
+    color: #e0e0e0;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.note-meta-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.note-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.note-tag {
+    background: rgba(126, 203, 255, 0.1);
+    color: #7ecbff;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid rgba(126, 203, 255, 0.2);
+}
+
+.note-privacy {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.note-dates {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Note editing styles */
+.note-edit-mode {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.note-title-edit {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 500;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.note-title-edit:focus {
+    border-color: #007bff;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.note-editor-container {
+    min-height: 300px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.note-edit-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.note-edit-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.note-edit-btn.primary {
+    background: #007bff;
+    border-color: #007bff;
+    color: #fff;
+}
+
+.note-edit-btn.primary:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+}
+
+.note-edit-btn.secondary {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.note-edit-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #fff;
+}
+
+/* Quill editor dark theme overrides for modal */
+.note-modal .ql-toolbar {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 0.5rem 0.5rem 0 0 !important;
+}
+
+.note-modal .ql-container {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-top: none !important;
+    border-radius: 0 0 0.5rem 0.5rem !important;
+    color: #fff !important;
+}
+
+.note-modal .ql-editor {
+    color: #fff !important;
+    min-height: 200px !important;
+}
+
+.note-modal .ql-toolbar .ql-stroke {
+    stroke: #fff !important;
+}
+
+.note-modal .ql-toolbar .ql-fill {
+    fill: #fff !important;
+}
+
+.note-modal .ql-toolbar .ql-picker {
+    color: #fff !important;
+}
+
+.note-modal .ql-editor.ql-blank::before {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Ticket Modal Styles */
+.ticket-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(24, 26, 26, 0.55);
+    z-index: 11000;
+    backdrop-filter: blur(8px);
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.ticket-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.ticket-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    background: #23272f;
+    z-index: 11100;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.4);
+    border-radius: 1.5rem;
+    width: min(90vw, 600px);
+    max-height: min(85vh, 700px);
+    min-width: 320px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1), transform 0.25s cubic-bezier(.4,0,.2,1);
+}
+
+.ticket-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.ticket-modal-header {
+    position: sticky;
+    top: 0;
+    background: #23272f;
+    padding: 1.2rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    z-index: 10;
+    border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.ticket-modal-title {
+    color: #f8f9fa;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.ticket-modal-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 2rem;
+    background: #181a1a;
+    border-radius: 0 0 1.5rem 1.5rem;
+}
+
+.ticket-user-info {
+    background: rgba(0, 123, 255, 0.1);
+    border: 1px solid rgba(0, 123, 255, 0.3);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    color: #f8f9fa;
+    margin-bottom: 1.5rem;
+}
+
+.ticket-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Password Reset Modal Styles */
+.password-reset-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(24, 26, 26, 0.55);
+    z-index: 11000;
+    backdrop-filter: blur(8px);
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.password-reset-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.password-reset-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    background: #23272f;
+    z-index: 11100;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.4);
+    border-radius: 1.5rem;
+    width: min(90vw, 600px);
+    max-height: min(85vh, 700px);
+    min-width: 320px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1), transform 0.25s cubic-bezier(.4,0,.2,1);
+}
+
+.password-reset-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.password-reset-modal-header {
+    position: sticky;
+    top: 0;
+    background: #23272f;
+    padding: 1.2rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    z-index: 10;
+    border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.password-reset-modal-title {
+    color: #f8f9fa;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.password-reset-modal-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 2rem;
+    background: #181a1a;
+    border-radius: 0 0 1.5rem 1.5rem;
+}
+
+.password-reset-user-info {
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    color: #f8f9fa;
+    margin-bottom: 1.5rem;
+}
+
+.password-reset-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Form styling for modals */
+.ticket-modal .form-label,
+.password-reset-modal .form-label {
+    color: #f8f9fa;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.ticket-modal .form-control,
+.ticket-modal .form-select,
+.password-reset-modal .form-control,
+.password-reset-modal .form-select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    color: #fff;
+    padding: 0.75rem;
+}
+
+.ticket-modal .form-control:focus,
+.ticket-modal .form-select:focus,
+.password-reset-modal .form-control:focus,
+.password-reset-modal .form-select:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    color: #fff;
+}
+
+.ticket-modal .form-control::placeholder,
+.password-reset-modal .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.ticket-modal .form-select option,
+.password-reset-modal .form-select option {
+    background: #2c3034;
+    color: #fff;
+}
+
+.ticket-modal .form-check-label,
+.password-reset-modal .form-check-label {
+    color: #f8f9fa;
+}
+
+.ticket-modal .form-check-input:checked,
+.password-reset-modal .form-check-input:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.ticket-modal .form-text,
+.password-reset-modal .form-text {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.ticket-modal .alert,
+.password-reset-modal .alert {
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    color: #ffc107;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Close modal functionality */
+.pdf-modal-overlay:not(.active),
+.note-modal-overlay:not(.active),
+.ticket-modal-overlay:not(.active),
+.password-reset-modal-overlay:not(.active) {
+    display: none;
+}
+
+.pdf-modal:not(.active),
+.note-modal:not(.active),
+.ticket-modal:not(.active),
+.password-reset-modal:not(.active) {
+    display: none;
+}
+</style>
+
+<style>
+/* Ensure anchor-based "view all" items visually match standard list items */
+.suggestion-viewall.result-item { display:flex; align-items:flex-start; cursor:pointer; }
+.suggestion-viewall.result-item:hover { background: rgba(0,123,255,.05); }
+</style>

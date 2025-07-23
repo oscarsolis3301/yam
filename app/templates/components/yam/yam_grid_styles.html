@@ -1,0 +1,55 @@
+<!-- YAM Grid Layout Styles -->
+{% macro render_yam_grid_styles() %}
+<style>
+/* ENHANCED ANALYTICS GRID - BETTER CONTAINER FITTING */
+.yam-analytics-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1.25rem !important; /* Increased gap */
+    width: 100% !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    animation: gridSlideIn 0.8s ease-out 0.9s both;
+    overflow: hidden !important; /* Prevent overflow */
+}
+
+/* ENHANCED STATS GRID - BETTER LAYOUT */
+.yam-stats-grid-full {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.25rem !important; /* Increased gap */
+    width: 100% !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    animation: gridSlideIn 0.8s ease-out 1.1s both;
+    overflow: hidden !important; /* Prevent overflow */
+}
+
+/* ENHANCED ACTION GRID - BETTER SPACING */
+.yam-actions-grid-full {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 1.25rem !important; /* Increased gap */
+    width: 100% !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    animation: gridSlideIn 0.8s ease-out 1.3s both;
+    overflow: hidden !important; /* Prevent overflow */
+}
+
+/* Grid Animations */
+@keyframes gridSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+{% endmacro %} 

@@ -1,0 +1,102 @@
+<!-- YAM Core Layout Styles -->
+{% macro render_yam_core_styles() %}
+<style>
+/* CRITICAL: Hide title bar and remove ALL top spacing for YAM pages */
+.yam-page #yam-title-bar {
+    display: none !important;
+}
+
+.yam-page .window-controls {
+    display: none !important;
+}
+
+.yam-page .main-content {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+.yam-page .main-content.with-outage-banner {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Ensure no extra spacing anywhere */
+.yam-page {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+}
+
+.yam-page body,
+.yam-page html {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+}
+
+/* Force full width on ALL containers */
+.yam-page .container,
+.yam-page .container-fluid,
+.yam-page .row,
+.yam-page .col,
+.yam-page .col-* {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Ensure YAM dashboard takes full width */
+.yam-dashboard-full {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+}
+
+/* Optimized Full-Width Container - NO TOP MARGIN */
+.yam-container-full {
+    width: calc(100% - 3.5rem) !important; /* Account for sidebar */
+    margin-left: 3.5rem !important; /* Offset for sidebar */
+    margin-top: 0 !important; /* NO TOP MARGIN */
+    margin-right: 0 !important;
+    padding: 0.75rem !important; /* Increased padding for better spacing */
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.25rem !important; /* Increased gap for better separation */
+    min-height: 100vh !important;
+    box-sizing: border-box !important;
+    max-width: calc(100% - 3.5rem) !important;
+    overflow-x: hidden !important;
+}
+
+/* When sidebar is collapsed */
+.yam-container-full.sidebar-collapsed {
+    width: 100% !important;
+    margin-left: 0 !important;
+    max-width: 100% !important;
+}
+</style>
+{% endmacro %} 

@@ -1,0 +1,428 @@
+{% macro render_welcome_banner(name, current_user) %}
+<!-- Welcome Banner -->
+<div id="welcomeBanner" class="welcome-banner">
+    <div class="welcome-content">
+        <div class="welcome-left">
+            <h1 class="welcome-title">
+                Welcome back, <span class="welcome-name">{{ name }}</span>
+                <span class="welcome-emoji">👋</span>
+            </h1>
+            <div class="welcome-info">
+                <span class="info-item">
+                    <i class="bi bi-calendar3"></i>
+                    <span id="currentDate"></span>
+                </span>
+                <span class="info-item">
+                    <i class="bi bi-geo-alt"></i>
+                    Pacific Time
+                </span>
+                <span class="info-item">
+                    <i class="bi bi-clock"></i>
+                    <span id="currentTime"></span>
+                </span>
+            </div>
+        </div>
+        <div class="welcome-right">
+            <div class="status-badges">
+                <div class="status-badge connected" id="connectionStatus">
+                    <i class="bi bi-wifi"></i>
+                    <span>Connected</span>
+                </div>
+                <div class="status-badge role">
+                    {% if current_user and current_user.role %}
+                        {{ current_user.role.title() }}
+                    {% else %}
+                        User
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.welcome-banner {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.welcome-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+.welcome-left {
+    flex: 1;
+}
+
+.welcome-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem 0;
+    color: #fff;
+    line-height: 1.2;
+}
+
+.welcome-name {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.welcome-emoji {
+    margin-left: 0.5rem;
+    animation: wave 2s infinite;
+    display: inline-block;
+}
+
+@keyframes wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(20deg); }
+    75% { transform: rotate(-10deg); }
+}
+
+.welcome-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.info-item i {
+    color: #667eea;
+    font-size: 1rem;
+}
+
+.welcome-right {
+    flex-shrink: 0;
+}
+
+.status-badges {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.status-badge.connected {
+    background: rgba(76, 175, 80, 0.15);
+    color: #4caf50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.status-badge.connected.offline {
+    background: rgba(244, 67, 54, 0.15);
+    color: #f44336;
+    border-color: rgba(244, 67, 54, 0.3);
+}
+
+.status-badge.role {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.status-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 768px) {
+    .welcome-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    
+    .welcome-title {
+        font-size: 1.75rem;
+    }
+    
+    .welcome-info {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .status-badges {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-banner {
+        padding: 1.5rem;
+    }
+    
+    .welcome-title {
+        font-size: 1.5rem;
+    }
+    
+    .welcome-info {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .status-badges {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+}
+</style>
+
+<script>
+// Welcome Banner Management with Enhanced Error Handling
+class WelcomeBanner {
+    constructor() {
+        this.errors = [];
+        this.warnings = [];
+        this.dateElement = null;
+        this.timeElement = null;
+        this.statusElement = null;
+        this.updateInterval = null;
+        this.init();
+    }
+    
+    init() {
+        try {
+            this.dateElement = document.getElementById('currentDate');
+            this.timeElement = document.getElementById('currentTime');
+            this.statusElement = document.getElementById('connectionStatus');
+            
+            // Validate required elements
+            if (!this.dateElement) {
+                this.logError('Date element not found', 'Element with id "currentDate" missing');
+            }
+            
+            if (!this.timeElement) {
+                this.logError('Time element not found', 'Element with id "currentTime" missing');
+            }
+            
+            if (!this.statusElement) {
+                this.logError('Status element not found', 'Element with id "connectionStatus" missing');
+            }
+            
+            this.updateDateTime();
+            this.setupSocketListeners();
+            this.startTimeUpdates();
+            
+            this.logInfo('WelcomeBanner initialized successfully');
+            
+        } catch (error) {
+            this.logError('WelcomeBanner initialization failed', error.message);
+        }
+    }
+    
+    updateDateTime() {
+        try {
+            const now = new Date();
+            
+            // Update date
+            if (this.dateElement) {
+                const dateOptions = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                };
+                this.dateElement.textContent = now.toLocaleDateString('en-US', dateOptions);
+            }
+            
+            // Update time
+            if (this.timeElement) {
+                const timeOptions = { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                };
+                this.timeElement.textContent = now.toLocaleTimeString('en-US', timeOptions);
+            }
+            
+        } catch (error) {
+            this.logError('Failed to update date/time', error.message);
+        }
+    }
+    
+    startTimeUpdates() {
+        try {
+            // Clear any existing interval
+            if (this.updateInterval) {
+                clearInterval(this.updateInterval);
+            }
+            
+            // Update time every second
+            this.updateInterval = setInterval(() => {
+                this.updateDateTime();
+            }, 1000);
+            
+            this.logInfo('Time update interval started');
+            
+        } catch (error) {
+            this.logError('Failed to start time updates', error.message);
+        }
+    }
+    
+    updateConnectionStatus(isConnected) {
+        try {
+            if (!this.statusElement) {
+                this.logWarning('Status element not available for connection update');
+                return;
+            }
+            
+            if (isConnected) {
+                this.statusElement.className = 'status-badge connected';
+                this.statusElement.innerHTML = '<i class="bi bi-wifi"></i><span>Connected</span>';
+                this.logInfo('Connection status updated to connected');
+            } else {
+                this.statusElement.className = 'status-badge connected offline';
+                this.statusElement.innerHTML = '<i class="bi bi-wifi-off"></i><span>Disconnected</span>';
+                this.logInfo('Connection status updated to disconnected');
+            }
+            
+        } catch (error) {
+            this.logError('Failed to update connection status', error.message);
+        }
+    }
+    
+    setupSocketListeners() {
+        try {
+            if (window.socketState && window.socketState.socket) {
+                window.socketState.socket.on('connect', () => {
+                    this.updateConnectionStatus(true);
+                });
+                
+                window.socketState.socket.on('disconnect', () => {
+                    this.updateConnectionStatus(false);
+                });
+                
+                this.logInfo('WebSocket listeners setup complete');
+            } else {
+                this.logWarning('WebSocket not available for connection status');
+                
+                // Simulate connection status for development
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    this.logInfo('Simulating connected status for development');
+                    this.updateConnectionStatus(true);
+                }
+            }
+        } catch (error) {
+            this.logError('Failed to setup WebSocket listeners', error.message);
+        }
+    }
+    
+    // Cleanup method
+    destroy() {
+        try {
+            if (this.updateInterval) {
+                clearInterval(this.updateInterval);
+                this.updateInterval = null;
+            }
+            this.logInfo('WelcomeBanner destroyed');
+        } catch (error) {
+            this.logError('Failed to destroy WelcomeBanner', error.message);
+        }
+    }
+    
+    // Logging methods
+    logError(message, details) {
+        this.errors.push({
+            message,
+            details,
+            timestamp: new Date().toISOString()
+        });
+        
+        if (window.index2Debugger) {
+            window.index2Debugger.logError(`[WelcomeBanner] ${message}`, details);
+        }
+        
+        console.error(`[WelcomeBanner] ${message}:`, details);
+    }
+    
+    logWarning(message, details) {
+        this.warnings.push({
+            message,
+            details,
+            timestamp: new Date().toISOString()
+        });
+        
+        if (window.index2Debugger) {
+            window.index2Debugger.logWarning(`[WelcomeBanner] ${message}`, details);
+        }
+        
+        console.warn(`[WelcomeBanner] ${message}:`, details);
+    }
+    
+    logInfo(message, details = '') {
+        this.info = this.info || [];
+        this.info.push({
+            message,
+            details,
+            timestamp: new Date().toISOString()
+        });
+        
+        if (window.index2Debugger) {
+            window.index2Debugger.logInfo(`[WelcomeBanner] ${message}`, details);
+        }
+        
+        console.log(`[WelcomeBanner] ${message}`, details);
+    }
+    
+    // Get debug information
+    getDebugInfo() {
+        return {
+            errors: this.errors,
+            warnings: this.warnings,
+            info: this.info || [],
+            dateElementExists: !!this.dateElement,
+            timeElementExists: !!this.timeElement,
+            statusElementExists: !!this.statusElement,
+            updateIntervalActive: !!this.updateInterval
+        };
+    }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        window.welcomeBanner = new WelcomeBanner();
+        console.log('[Index2] WelcomeBanner initialized successfully');
+    } catch (error) {
+        console.error('[Index2] Failed to initialize WelcomeBanner:', error);
+    }
+});
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (window.welcomeBanner) {
+        window.welcomeBanner.destroy();
+    }
+});
+</script>
+{% endmacro %} 

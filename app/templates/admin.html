@@ -1,0 +1,3165 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"/>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='CSS/styles.css') }}" />
+<style>
+    html, body {
+        background: #121212 !important;
+        color: #fff !important;
+        overflow-x: hidden !important;
+        width: 100vw;
+        max-width: 100vw;
+    }
+    body[data-bs-theme="dark"] {
+        background: #121212 !important;
+        color: #fff !important;
+    }
+    .admin-main-content {
+        margin-left: 5.5rem !important;
+        min-height: 100vh;
+        padding: 50px 16px 32px 2rem;
+        background: #121212 !important;
+        color: #fff !important;
+        transition: margin-left 0.3s;
+        width: calc(100vw - 5.5rem);
+        max-width: calc(100vw - 5.5rem);
+        overflow-x: hidden;
+    }
+    @media (max-width: 600px) {
+        .admin-main-content {
+            margin-left: 0 !important;
+            padding: 16px 4px 0 4px;
+            width: 100vw;
+            max-width: 100vw;
+        }
+    }
+    .dashboard-title {
+        color: #fff !important;
+        margin-left: 2rem;
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+    .dashboard-card, .dashboard-list-card, .dashboard-chart-card, .dashboard-metric-card {
+        background: #1E1E1E !important;
+        color: #fff !important;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        padding: 16px 12px !important;
+        border-radius: 12px;
+        border: 1px solid #2D2D2D;
+    }
+    .dashboard-section-title {
+        color: #fff !important;
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+    .list-group-item {
+        background-color: #1E1E1E !important;
+        color: #fff !important;
+        border-color: #2D2D2D !important;
+    }
+    .dashboard-row {
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        gap: 16px;
+    }
+    .dashboard-metrics {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        width: 100%;
+        max-width: 100%;
+    }
+    .dashboard-metric-card {
+        flex: 1 1 180px;
+        border-radius: 12px;
+        padding: 12px 8px !important;
+        text-align: center;
+        box-shadow: 0 1px 8px rgba(0,0,0,0.1);
+        min-width: 0;
+        max-width: 100%;
+        border: 1px solid #2D2D2D;
+    }
+    .dashboard-metric-title {
+        font-size: 1.05rem;
+        font-weight: 500;
+        margin-bottom: 6px;
+        color: #888;
+    }
+    .dashboard-metric-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fff;
+    }
+    .dashboard-charts {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        width: 100%;
+        max-width: 100%;
+    }
+    .dashboard-chart-card {
+        flex: 1 1 320px;
+        border-radius: 12px;
+        padding: 12px 8px !important;
+        box-shadow: 0 1px 8px rgba(0,0,0,0.1);
+        min-width: 0;
+        max-width: 100%;
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #2D2D2D;
+    }
+    .dashboard-list-card {
+        border-radius: 12px;
+        padding: 12px 8px !important;
+        box-shadow: 0 1px 8px rgba(0,0,0,0.1);
+        margin-bottom: 16px;
+        min-width: 0;
+        max-width: 100%;
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #2D2D2D;
+    }
+    .scrollable-container {
+        max-height: 400px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #2D2D2D #1E1E1E;
+    }
+    .scrollable-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    .scrollable-container::-webkit-scrollbar-track {
+        background: #1E1E1E;
+    }
+    .scrollable-container::-webkit-scrollbar-thumb {
+        background-color: #2D2D2D;
+        border-radius: 3px;
+    }
+    .calendar-container {
+        background: #1a1a1a;
+        border-radius: 8px;
+        padding: 20px;
+        color: #fff;
+    }
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 10px;
+        background: #2a2a2a;
+        border-radius: 6px;
+    }
+    .calendar-header h3 {
+        margin: 0;
+        color: #fff;
+    }
+    .calendar-controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    .calendar-controls button {
+        background: #3a3a3a;
+        border: none;
+        color: #fff;
+        padding: 8px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    .calendar-controls button:hover {
+        background: #4a4a4a;
+    }
+    .calendar-controls button.active {
+        background: #007bff;
+    }
+    .calendar-grid {
+        background: #2a2a2a;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    /* Month View Styles */
+    .calendar-month-view {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 1px;
+        background: #3a3a3a;
+    }
+    .calendar-day-header {
+        background: #2a2a2a;
+        padding: 10px;
+        text-align: center;
+        font-weight: bold;
+        color: #fff;
+    }
+    .calendar-day {
+        background: #2a2a2a;
+        min-height: 150px;
+        padding: 5px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+    .calendar-day > span {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        font-size: 0.9em;
+        color: #888;
+        z-index: 1;
+    }
+    .calendar-event {
+        background: #3a3a3a;
+        border-left: 4px solid #007bff;
+        margin: 2px 0;
+        padding: 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        position: relative;
+        overflow: hidden;
+    }
+    .calendar-event:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        background: #4a4a4a;
+    }
+    .calendar-event .event-title {
+        font-weight: bold;
+        margin-bottom: 4px;
+        color: #fff;
+    }
+    .calendar-event .event-time {
+        font-size: 0.8em;
+        color: #aaa;
+    }
+    /* Day View Styles */
+    .calendar-day-view {
+        display: none;
+        padding: 1rem;
+        height: 100%;
+        min-height: 600px;
+        background: #1E1E1E;
+        border-radius: 8px;
+    }
+    .calendar-day-view.active {
+        display: flex;
+        flex-direction: column;
+    }
+    .calendar-day-view .day-header {
+        text-align: left;
+        margin-bottom: 1rem;
+        padding: 1.5rem;
+        background: #2D2D2D;
+        border-radius: 8px;
+        width: 100%;
+    }
+    .calendar-day-view .day-header h4 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 500;
+    }
+    .calendar-day-view .day-events {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1rem;
+        padding: 1rem;
+        overflow-y: auto;
+        max-height: calc(100vh - 250px);
+    }
+    .calendar-day-view .day-event {
+        padding: 1.5rem;
+        background: #2D2D2D;
+        border-radius: 8px;
+        border-left: 4px solid #4a90e2;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .calendar-day-view .day-event:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .calendar-day-view .day-event h5 {
+        margin-bottom: 0.5rem;
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: #fff;
+    }
+    .calendar-day-view .day-event p {
+        margin-bottom: 0.5rem;
+        color: #ccc;
+        font-size: 1rem;
+    }
+    .calendar-day-view .day-event small {
+        color: #888;
+        font-size: 0.9rem;
+    }
+    .calendar-day-view .day-event.dsc {
+        border-left-color: #007bff;
+    }
+    .calendar-day-view .day-event.isc {
+        border-left-color: #28a745;
+    }
+    .calendar-day-view .day-event.remote {
+        border-left-color: #ffc107;
+    }
+    .calendar-day-view .day-event.current {
+        box-shadow: 0 0 0 2px #ff5252, 0 4px 8px rgba(0, 0, 0, 0.2);
+        background: #ff5252;
+    }
+    .calendar-day-view .day-event.current h5,
+    .calendar-day-view .day-event.current p,
+    .calendar-day-view .day-event.current small {
+        color: #fff;
+    }
+    /* Department Colors */
+    .department-dsc {
+        border-left-color: #007bff;
+    }
+    .department-isc {
+        border-left-color: #28a745;
+    }
+    .department-remote {
+        border-left-color: #ffc107;
+    }
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .calendar-container {
+            padding: 10px;
+        }
+        
+        .calendar-day {
+            min-height: 100px;
+        }
+        
+        .calendar-event {
+            padding: 6px;
+        }
+        
+        .calendar-event .event-title {
+            font-size: 0.9em;
+        }
+        
+        .calendar-event .event-time {
+            font-size: 0.7em;
+        }
+    }
+    /* Department Section Styles */
+    .department-section {
+        margin-bottom: 20px;
+    }
+    .department-title {
+        color: #fff;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #3a3a3a;
+    }
+    /* Event Container Styles */
+    .day-events-container {
+        margin-top: 25px;
+        max-height: calc(100% - 25px);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #4a4a4a #2a2a2a;
+    }
+    .day-events-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    .day-events-container::-webkit-scrollbar-track {
+        background: #2a2a2a;
+    }
+    .day-events-container::-webkit-scrollbar-thumb {
+        background-color: #4a4a4a;
+        border-radius: 3px;
+    }
+    /* Shift Modal Styles */
+    .shift-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+    .shift-modal.active {
+        display: flex;
+    }
+    .shift-modal-content {
+        background: #2a2a2a;
+        padding: 30px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        position: relative;
+        color: #fff;
+    }
+    .shift-modal-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 1.5em;
+        cursor: pointer;
+    }
+    .shift-modal-header {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #3a3a3a;
+    }
+    .shift-modal-header h4 {
+        margin: 0;
+        color: #fff;
+    }
+    .shift-modal-body {
+        margin-bottom: 20px;
+    }
+    .shift-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+    .shift-modal-footer button {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    .shift-modal-footer .btn-secondary {
+        background: #3a3a3a;
+        color: #fff;
+    }
+    .shift-modal-footer .btn-primary {
+        background: #007bff;
+        color: #fff;
+    }
+    /* Outage banner styles are now handled by the component */
+    @keyframes glow {
+        0% { box-shadow: 0 0 8px 2px #00ff00, 0 0 0 2px rgba(255,255,255,0.2); }
+        100% { box-shadow: 0 0 16px 6px #00ff00, 0 0 0 2px rgba(255,255,255,0.2); }
+    }
+    .glowing-green {
+        background: #00ff00 !important;
+        animation: glow 1.2s infinite alternate;
+    }
+    .calendar-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+        background: #1E1E1E;
+        border-radius: 8px;
+        padding: 8px;
+    }
+
+    .calendar-day {
+        min-height: 80px;
+        padding: 4px;
+        border: 1px solid #2D2D2D;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        background: #1E1E1E;
+        position: relative;
+    }
+
+    .calendar-day.has-event {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .calendar-event {
+        font-size: 0.7rem;
+        padding: 2px 4px;
+        margin: 1px 0;
+        border-radius: 3px;
+        background: #2D2D2D;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .calendar-event.morning {
+        background: #4a90e2;
+    }
+    
+    .calendar-event.afternoon {
+        background: #e24a4a;
+    }
+    
+    .calendar-event.full {
+        background: #4ae24a;
+    }
+    
+    .event-title {
+        font-weight: bold;
+        margin-bottom: 1px;
+    }
+    
+    .event-time {
+        font-size: 0.65rem;
+        opacity: 0.8;
+    }
+
+    .calendar-navigation {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .calendar-navigation button {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    #currentMonth {
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    /* Modal Styles */
+    .shift-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .shift-modal.active {
+        display: flex;
+    }
+
+    .shift-modal-content {
+        background: #2D2D2D;
+        border-radius: 8px;
+        padding: 1.5rem;
+        width: 90%;
+        max-width: 400px;
+        position: relative;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .shift-modal-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 5px;
+        line-height: 1;
+    }
+
+    .shift-card {
+        color: white;
+    }
+
+    .shift-card-header {
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .shift-card-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    .shift-card-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.8;
+    }
+
+    .shift-card-details {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .shift-card-detail {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .shift-card-detail i {
+        width: 20px;
+        text-align: center;
+    }
+
+    .shift-card-detail span {
+        font-size: 0.9rem;
+    }
+
+    .calendar-view-toggle {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .calendar-view-toggle .btn {
+        padding: 0.25rem 0.75rem;
+    }
+    
+    .calendar-view-toggle .btn.active {
+        background-color: #0d6efd;
+        color: white;
+    }
+    
+    .calendar-day-view {
+        display: none;
+        padding: 1rem;
+        height: 100%;
+        min-height: 600px;
+        background: #1E1E1E;
+        border-radius: 8px;
+    }
+    
+    .calendar-day-view.active {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .calendar-day-view .day-header {
+        text-align: left;
+        margin-bottom: 1rem;
+        padding: 1.5rem;
+        background: #2D2D2D;
+        border-radius: 8px;
+        width: 100%;
+    }
+
+    .calendar-day-view .day-header h4 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 500;
+    }
+    
+    .calendar-day-view .day-events {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1rem;
+        padding: 1rem;
+        overflow-y: auto;
+        max-height: calc(100vh - 250px);
+    }
+    
+    .calendar-day-view .day-event {
+        padding: 1.5rem;
+        background: #2D2D2D;
+        border-radius: 8px;
+        border-left: 4px solid #4a90e2;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .calendar-day-view .day-event:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .calendar-day-view .day-event h5 {
+        margin-bottom: 0.5rem;
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: #fff;
+    }
+
+    .calendar-day-view .day-event p {
+        margin-bottom: 0.5rem;
+        color: #ccc;
+        font-size: 1rem;
+    }
+
+    .calendar-day-view .day-event small {
+        color: #888;
+        font-size: 0.9rem;
+    }
+    
+    .calendar-day-view .day-event.dsc {
+        border-left-color: #007bff;
+    }
+    
+    .calendar-day-view .day-event.isc {
+        border-left-color: #28a745;
+    }
+    
+    .calendar-day-view .day-event.remote {
+        border-left-color: #ffc107;
+    }
+    
+    .calendar-day-view .day-event.current {
+        box-shadow: 0 0 0 2px #ff5252, 0 4px 8px rgba(0, 0, 0, 0.2);
+        background: #ff5252;
+    }
+    
+    .calendar-day-view .day-event.current h5,
+    .calendar-day-view .day-event.current p,
+    .calendar-day-view .day-event.current small {
+        color: #fff;
+    }
+    
+    .calendar-month-view {
+        display: none;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+        background: #1E1E1E;
+        border-radius: 8px;
+        padding: 8px;
+    }
+    
+    .calendar-month-view.active {
+        display: grid;
+    }
+
+    .calendar-day {
+        min-height: 80px;
+        padding: 4px;
+        border: 1px solid #2D2D2D;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        background: #1E1E1E;
+        position: relative;
+    }
+
+    .calendar-day.has-event {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .calendar-event {
+        font-size: 0.7rem;
+        padding: 2px 4px;
+        margin: 1px 0;
+        border-radius: 3px;
+        background: #2D2D2D;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .calendar-day-header {
+        text-align: center;
+        font-weight: bold;
+        padding: 8px;
+        background: #2D2D2D;
+        border-radius: 4px;
+        margin-bottom: 4px;
+    }
+
+    .calendar-event {
+        background: #4a90e2;
+        color: white;
+        padding: 4px;
+        margin: 2px 0;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .calendar-event:hover {
+        background: #357abd;
+    }
+
+    .upload-schedule {
+        position: relative;
+    }
+
+    .upload-schedule input[type="file"] {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    /* Week View Styles */
+    .calendar-week-view {
+        display: grid;
+        grid-template-columns: 60px repeat(7, 1fr);
+        background: #2a2a2a;
+        border-radius: 6px;
+        overflow-x: auto;
+        min-height: 600px;
+        position: relative;
+    }
+    .week-hour-label {
+        color: #888;
+        font-size: 0.8em;
+        text-align: right;
+        padding: 2px 8px 2px 0;
+        height: 40px;
+        border-bottom: 1px solid #333;
+    }
+    .week-day-header {
+        background: #232323;
+        color: #fff;
+        text-align: center;
+        font-weight: bold;
+        padding: 8px 0;
+        border-bottom: 1px solid #333;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+    .week-day-cell {
+        border-bottom: 1px solid #333;
+        border-right: 1px solid #232323;
+        min-height: 40px;
+        position: relative;
+    }
+    .week-shift-block {
+        position: absolute;
+        left: 4px;
+        right: 4px;
+        border-radius: 4px;
+        color: #fff;
+        padding: 2px 6px;
+        font-size: 0.85em;
+        background: #007bff;
+        opacity: 0.95;
+        cursor: pointer;
+        z-index: 3;
+        border-left: 4px solid #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        transition: box-shadow 0.2s, background 0.2s;
+    }
+    .week-shift-block.dsc { background: #007bff; border-left-color: #007bff; }
+    .week-shift-block.isc { background: #28a745; border-left-color: #28a745; }
+    .week-shift-block.remote { background: #ffc107; color: #222; border-left-color: #ffc107; }
+    .week-shift-block.current { box-shadow: 0 0 0 2px #ff5252, 0 2px 8px rgba(0,0,0,0.15); background: #ff5252; color: #fff; }
+
+    .week-current-time {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #ff5252;
+        z-index: 10;
+        pointer-events: none;
+    }
+
+    /* Day Grid View Styles */
+    .calendar-day-grid-view {
+        display: grid;
+        grid-template-columns: 60px repeat(var(--user-count, 1), 1fr);
+        background: #2a2a2a;
+        border-radius: 6px;
+        overflow-x: auto;
+        min-height: 600px;
+        position: relative;
+    }
+    .day-hour-label {
+        color: #888;
+        font-size: 0.8em;
+        text-align: right;
+        padding: 2px 8px 2px 0;
+        height: 40px;
+        border-bottom: 1px solid #333;
+    }
+    .day-user-header {
+        background: #232323;
+        color: #fff;
+        text-align: center;
+        font-weight: bold;
+        padding: 8px 0;
+        border-bottom: 1px solid #333;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+    .day-user-cell {
+        border-bottom: 1px solid #333;
+        border-right: 1px solid #232323;
+        min-height: 40px;
+        position: relative;
+    }
+    .day-shift-block {
+        position: absolute;
+        left: 4px;
+        right: 4px;
+        border-radius: 4px;
+        color: #fff;
+        padding: 2px 6px;
+        font-size: 0.85em;
+        background: #007bff;
+        opacity: 0.95;
+        cursor: pointer;
+        z-index: 3;
+        border-left: 4px solid #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        transition: box-shadow 0.2s, background 0.2s;
+    }
+    .day-shift-block.dsc { background: #007bff; border-left-color: #007bff; }
+    .day-shift-block.isc { background: #28a745; border-left-color: #28a745; }
+    .day-shift-block.remote { background: #ffc107; color: #222; border-left-color: #ffc107; }
+    .day-shift-block.current { box-shadow: 0 0 0 2px #ff5252, 0 2px 8px rgba(0,0,0,0.15); background: #ff5252; color: #fff; }
+
+    .day-current-time {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #ff5252;
+        z-index: 10;
+        pointer-events: none;
+    }
+
+    .shift-group {
+        background: #2a2a2a;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        width: 100%;
+    }
+
+    .shift-group-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #3a3a3a;
+    }
+
+    .shift-group-title {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: #fff;
+    }
+
+    .shift-group-time {
+        font-size: 0.9rem;
+        color: #888;
+    }
+
+    .shift-group-users {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .user-card {
+        background: #1E1E1E;
+        border-radius: 8px;
+        padding: 1rem;
+        border: 1px solid #2D2D2D;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .user-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .user-card.dsc {
+        border-left: 4px solid #007bff;
+    }
+
+    .user-card.isc {
+        border-left: 4px solid #28a745;
+    }
+
+    .user-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .user-card-name {
+        font-weight: 500;
+        color: #fff;
+        margin: 0;
+    }
+
+    .user-card-department {
+        font-size: 0.8rem;
+        color: #888;
+    }
+
+    .user-card-time {
+        font-size: 0.9rem;
+        color: #aaa;
+        margin-top: 0.5rem;
+    }
+
+    .btn-group .btn-outline-primary {
+        color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-group .btn-outline-primary:hover,
+    .btn-group .btn-outline-primary.active {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    @keyframes pulseDot {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .on-shift-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .timer-svg circle {
+        transition: stroke-dashoffset 1s ease-in-out;
+    }
+
+    .timer-text {
+        transition: color 0.3s ease;
+    }
+
+    .on-shift-container {
+        background: #13151a !important;
+        border-radius: 18px;
+        padding: 24px 12px 12px 12px;
+        min-height: 300px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-main-content w-100">
+    <h1 class="dashboard-title">Welcome back, {{ name }}!</h1>
+    
+    <!-- Add hidden CSV data -->
+    <div id="scheduleData" style="display: none;">
+        DSC,Anthony Risker,4:00 AM,9:00 AM,11:00 AM,1:00 PM,1:00 PM,Mon - Fri,,
+        DSC,Ralph Rosalin,4:00 AM,6:00 AM,8:00 AM,11:15 AM,1:00 PM,Mon - Fri,,
+        ISC,AJ Mercado,5:00 AM,7:00 AM,9:00 AM,12:00 PM,2:00 PM,Mon - Fri,,
+        DSC,Nick Gutierrez,5:00 AM,8:15 AM,11:00 AM,12:15 PM,2:00 PM,Mon - Fri,,
+        DSC,Jarrod Woodson,5:00 AM,7:30 AM,9:00 AM,12:30 PM,2:00 PM,Mon - Fri,,
+        DSC,Rhonda Robinson,6:00 AM,8:00 AM,10:30 AM,11:30 AM,3:00 PM,Mon - Fri,,
+        DSC,Christopher Bush,6:00 AM,9:00 AM,1:00 PM,4:00 PM,3:00 PM,Mon - Fri,,
+        DSC,Mayra Lopez,6:00 AM,7:15 AM,9:30 AM,12:15 PM,3:00 PM,"Tues - Sat, off Sun & Mon",Monday,
+        Remote,Staci Valko,6:00 AM,,,,3:00 PM,Mon - Fri,,
+        ISC,Doug Spohn,6:30 AM,8:30 AM,10:00 AM,1:30 PM,3:30 PM,"Tues - Sat, off Sun & Mon",Monday,
+        DSC,Jayson Barker,7:00 AM,9:15 AM,12:00 PM,2:15 PM,4:00 PM,Mon - Fri,,
+        ISC,Nathan Bui,7:00 AM,9:15 AM,12:00 PM,2:15 PM,4:00 PM,Mon - Fri,,
+        ISC,Jabin Dejesa,8:00 AM,,,,5:00 PM,Mon - Fri,,
+        ISC,Samuel Nightingale,8:00 AM,10:15 AM,12:30 PM,3:15 PM,5:00 PM,Mon - Fri,,
+        ISC,Oscar Solis,8:00 AM,10:15 AM,12:30 PM,3:15 PM,5:00 PM,Mon - Fri,"Fridays, 7:30 am - 4:30 pm","Fridays, 7:30 am - 4:30 pm"
+        ISC,Jonathan Nguyen,8:00 AM,,,,5:00 PM,Mon - Fri,,
+        ISC,JZ Miranda,8:30 AM,10:30 AM,12:30 PM,3:30 PM,5:30 PM,Mon - Fri,,
+        ISC,Richard Nguyen,9:00 AM,11:30 AM,1:30 PM,4:30 PM,6:00 PM,Mon - Fri,,
+        ISC,Pietro Vue,11:00 AM,1:00 PM,3:00 PM,6:00 PM,8:00 PM,,,"Fridays, 10 am - 7 pm"
+    </div>
+
+    <div class="dashboard-row dashboard-metrics">
+        <div class="dashboard-metric-card">
+            <div class="dashboard-metric-title">Open Tickets</div>
+            <div class="dashboard-metric-value" id="openTickets">--</div>
+        </div>
+        <div class="dashboard-metric-card">
+            <div class="dashboard-metric-title">Active Outages</div>
+            <div class="dashboard-metric-value" id="activeOutages">--</div>
+        </div>
+        <div class="dashboard-metric-card">
+            <div class="dashboard-metric-title">Online Users</div>
+            <div class="dashboard-metric-value" id="onlineUsersMetric">--</div>
+        </div>
+    </div>
+
+    <div class="dashboard-row dashboard-charts">
+        <div class="dashboard-chart-card">
+            <div class="dashboard-section-title">Tickets Over Time</div>
+            <div id="ticketsChart"></div>
+        </div>
+        <div class="dashboard-chart-card">
+            <div class="dashboard-section-title">Outages Timeline</div>
+            <div id="outagesChart"></div>
+        </div>
+        <div class="dashboard-chart-card">
+            <div class="dashboard-section-title">User Activity</div>
+            <div id="activityChart"></div>
+        </div>
+    </div>
+
+    <div class="dashboard-row">
+        <div class="dashboard-list-card" style="flex: 1; min-width: 0;">
+            <div class="dashboard-section-title">Users</div>
+            <div class="scrollable-container">
+                <div id="onlineUsers" class="list-group">
+                    <!-- Users will be populated here -->
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-list-card" style="flex: 1; min-width: 0;">
+            <div class="dashboard-section-title">Recent Activity</div>
+            <div class="scrollable-container">
+                <div id="recentActivity" class="list-group"></div>
+            </div>
+        </div>
+    </div>
+
+    {% if current_user.role == 'admin' %}
+    <div class="dashboard-row">
+        <div class="dashboard-list-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="dashboard-section-title mb-0">Current Outages</div>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#outageModal">
+                    <i class="bi bi-plus-circle"></i> Add Outage
+                </button>
+            </div>
+            <div class="scrollable-container">
+                <div id="outagesList" class="list-group"></div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="dashboard-row">
+        <div class="dashboard-list-card w-100" style="min-width: 0;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="dashboard-section-title mb-0">Currently On Shift</div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary active" data-filter="all">All</button>
+                    <button type="button" class="btn btn-outline-primary" data-filter="dsc">DSC</button>
+                    <button type="button" class="btn btn-outline-primary" data-filter="isc">ISC</button>
+                </div>
+            </div>
+            <div class="d-flex flex-column gap-3">
+                <div id="onShiftUsers" class="on-shift-container d-flex flex-wrap gap-3 justify-content-start align-items-stretch" style="width:100%; background: #1a1a1a; padding: 1rem; border-radius: 8px;"></div>
+                <div class="dashboard-section-title mt-3">Not On Shift</div>
+                <div id="offShiftUsers" class="on-shift-container d-flex flex-wrap gap-3 justify-content-start align-items-stretch" style="width:100%; background: #1a1a1a; padding: 1rem; border-radius: 8px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Outage Creation Modal -->
+{% if current_user.role == 'admin' %}
+<div class="modal fade" id="outageModal" tabindex="-1" aria-labelledby="outageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="outageModalLabel">Create New Outage Alert</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="outageForm">
+                    <div class="mb-3">
+                        <label for="outageTitle" class="form-label">Title</label>
+                        <input type="text" class="form-control bg-dark text-white" id="outageTitle" required placeholder="e.g., Network Outage, System Maintenance">
+                    </div>
+                    <div class="mb-3">
+                        <label for="outageDescription" class="form-label">Description</label>
+                        <textarea class="form-control bg-dark text-white" id="outageDescription" rows="3" required placeholder="Please provide details about the outage"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="outageTicket" class="form-label">Ticket ID (Optional)</label>
+                        <input type="text" class="form-control bg-dark text-white" id="outageTicket" placeholder="e.g., INC12345">
+                    </div>
+                    <div class="mb-3">
+                        <label for="affectedSystems" class="form-label">Affected Systems (Optional)</label>
+                        <input type="text" class="form-control bg-dark text-white" id="affectedSystems" placeholder="e.g., Email, VPN, CRM">
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="notifyTeams">
+                        <label class="form-check-label" for="notifyTeams">
+                            Notify via Microsoft Teams
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="saveOutage">Create Outage Alert</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Toast container for notifications -->
+<div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"
+        integrity="sha384-OvV1PW+Xu0+QYN+6YY3S4+1NnlL/zlj3YQ6X2Up6WO6ELW0CUqv5rW+fAP+eXUzM"
+        crossorigin="anonymous"></script>
+
+<script>
+let socket;
+let isUpdating = false;
+let lastDisconnectTime = null;
+let hideTimeout = null;
+let lastOnlineUsers = [];     
+
+
+function hideIcons() {
+    const icons = document.querySelectorAll('.user-icon');
+    icons.forEach(icon => {
+        icon.style.opacity = '0.3'; // Or use display: 'none' if preferred
+    });
+}
+
+function restoreIcons() {
+    const icons = document.querySelectorAll('.user-icon');
+    icons.forEach(icon => {
+        icon.style.opacity = '1';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (!socket) {
+        socket = io({
+            withCredentials: true,       // send your Flask-Login cookie
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 0,
+            reconnectionDelayMax: 1000,
+            timeout: 20000,
+            transports: ['polling']
+            });
+
+            socket.on('connect', () => {
+                console.log('Socket connected');
+                lastDisconnectTime = null;
+                if (hideTimeout) {
+                  clearTimeout(hideTimeout);
+                  hideTimeout = null;
+                }
+                restoreIcons();
+             
+                socket.emit('heartbeat');
+             
+                requestAdminDashboardData();
+              });
+             
+
+                    // Add this to your Socket.IO initialization code
+            socket.on('new_outage_announcement', (data) => {
+                console.log('New outage announcement received:', data);
+                // Update the banner immediately
+                const banner = document.getElementById('outageBanner');
+                const bannerText = document.getElementById('outageBannerText');
+                if (data) {
+                    bannerText.textContent = `Active Outage: ${data.title} - ${data.description}`;
+                    banner.style.display = 'block';
+                    banner.dataset.outageData = JSON.stringify(data);
+                    banner.className = 'outage-banner alert alert-danger';
+                    // Show toast notification
+                    showToast('New outage alert: ' + data.title, 'danger');
+                }
+                // Reload the outages list
+                loadOutages();
+            });
+
+            socket.on('outage_resolved', (data) => {
+                console.log('Outage resolved:', data);
+                // Update the banner immediately
+                const banner = document.getElementById('outageBanner');
+                const bannerText = document.getElementById('outageBannerText');
+                const currentOutage = banner.dataset.outageData ? JSON.parse(banner.dataset.outageData) : null;
+                
+                if (currentOutage && currentOutage.id === data.id) {
+                    banner.className = 'outage-banner alert alert-success';
+                    bannerText.textContent = `Resolved Outage: ${data.title} - ${data.description}`;
+                    // Show toast notification
+                    showToast('Outage resolved: ' + data.title, 'success');
+                    // Hide the banner after 5 seconds
+                    setTimeout(() => {
+                        banner.style.display = 'none';
+                    }, 5000);
+                }
+                // Reload the outages list
+                loadOutages();
+            });
+
+            socket.on('outage_deleted', (data) => {
+                console.log('Outage deleted:', data);
+                // Update the banner immediately
+                const banner = document.getElementById('outageBanner');
+                const currentOutage = banner.dataset.outageData ? JSON.parse(banner.dataset.outageData) : null;
+                
+                if (currentOutage && currentOutage.id === data.id) {
+                    banner.style.display = 'none';
+                    // Show toast notification
+                    showToast('Outage deleted: ' + data.title, 'info');
+                }
+                // Reload the outages list
+                loadOutages();
+            });
+
+            socket.on('outage_modified', (data) => {
+                console.log('Outage modified:', data);
+                // Update the banner immediately
+                const banner = document.getElementById('outageBanner');
+                const bannerText = document.getElementById('outageBannerText');
+                const currentOutage = banner.dataset.outageData ? JSON.parse(banner.dataset.outageData) : null;
+                
+                if (currentOutage && currentOutage.id === data.id) {
+                    bannerText.textContent = `Active Outage: ${data.title} - ${data.description}`;
+                    banner.dataset.outageData = JSON.stringify(data);
+                    banner.className = 'outage-banner alert alert-danger';
+                    // Show toast notification
+                    showToast('Outage updated: ' + data.title, 'warning');
+                }
+                // Reload the outages list
+                loadOutages();
+            });
+
+            // Check for active outages on page load
+            fetch('/api/admin/outages')
+                .then(res => res.json())
+                .then(outages => {
+                    if (outages && outages.length > 0) {
+                        const banner = document.getElementById('outageBanner');
+                        const bannerText = document.getElementById('outageBannerText');
+                        bannerText.textContent = `Active Outage: ${outages[0].title} - ${outages[0].description}`;
+                        banner.style.display = 'block';
+                        banner.dataset.outageData = JSON.stringify(outages[0]);
+                        banner.className = 'outage-banner alert alert-danger';
+                    }
+                })
+                .catch(err => console.error('Error fetching outages:', err));     
+
+        socket.on('disconnect', () => {
+            console.log('Socket disconnected');
+            lastDisconnectTime = Date.now();
+
+            // Schedule hide after 2 minutes if not reconnected
+            hideTimeout = setTimeout(() => {
+                if (!socket.connected && Date.now() - lastDisconnectTime >= 120000) {
+                    console.log('Hiding icons after 2 minutes of disconnect');
+                    hideIcons();
+                }
+            }, 120000);
+        });
+
+        socket.on('online_users_update', function(users) {
+            console.log('Received online users update:', users);
+            if (!isUpdating) {
+                isUpdating = true;
+                try {
+                    updateOnlineUsers(users);
+                } finally {
+                    isUpdating = false;
+                }
+            }
+        });
+
+        setInterval(() => {
+            socket.emit('heartbeat');
+          }, 30_000);  // every 30 seconds
+          
+    }
+
+    loadInitialData();
+
+    let updateInterval = 10000;
+    const maxInterval = 60000;
+
+    function scheduleNextUpdate() {
+        setTimeout(() => {
+            if (socket && socket.connected) {
+                requestAdminDashboardData();
+                updateInterval = Math.min(updateInterval * 1.5, maxInterval);
+            } else {
+                updateInterval = 10000;
+            }
+            scheduleNextUpdate();
+        }, updateInterval);
+    }
+
+    scheduleNextUpdate();
+
+    /*setInterval(() => {
+        if (socket && socket.connected) {
+            socket.emit('heartbeat');
+        }
+    }, 10000);*/
+});
+
+// Function to load initial data
+function loadInitialData() {
+    // Fetch initial dashboard data
+    fetch('/api/admin/dashboard')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Initial dashboard data:', data);
+            
+            // Update metrics
+            if (data.open_tickets !== undefined) {
+                document.getElementById('openTickets').textContent = data.open_tickets;
+            }
+            if (data.active_outages !== undefined) {
+                document.getElementById('activeOutages').textContent = data.active_outages;
+            }
+            
+            // Calculate unique online users count
+            if (data.online_users && Array.isArray(data.online_users)) {
+                const uniqueOnlineUsers = new Set(data.online_users
+                    .filter(user => user.is_online)
+                    .map(user => user.id || user.email));
+                document.getElementById('onlineUsersMetric').textContent = uniqueOnlineUsers.size;
+            }
+            
+            // Update online users list
+            const onlineUsersList = document.getElementById('onlineUsers');
+            if (data.online_users && Array.isArray(data.online_users)) {
+                // Sort users: online first, then by name
+                data.online_users.sort((a, b) => {
+                    if (a.is_online !== b.is_online) return b.is_online - a.is_online;
+                    return a.name.localeCompare(b.name);
+                });
+
+                onlineUsersList.innerHTML = data.online_users.map(user => `
+                    <div class="list-group-item d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div class="position-relative me-3">
+                                <img src="/static/uploads/profile_pictures/${user.profile_picture || 'boy.png'}" 
+                                    alt="${user.name}" 
+                                    class="rounded-circle user-icon"
+                                    width="48" 
+                                    height="48" 
+                                    style="object-fit:cover;object-position:center;opacity:${user.is_online ? '1' : '0.5'};"
+                                    onerror="this.onerror=null;this.src='/static/images/PFP/boy.png';">
+                                ${user.is_online ? `
+                                <span class="position-absolute bottom-0 end-0 p-1 border border-light rounded-circle glowing-green"
+                                      style="width: 14px; height: 14px; background: #00ff00; box-shadow: 0 0 8px 2px #00ff00, 0 0 0 2px rgba(255,255,255,0.2); animation: glow 1.2s infinite alternate;"></span>
+                                ` : ''}
+                            </div>
+                            <div>
+                                <div class="fw-bold d-flex align-items-center">
+                                    ${user.name}
+                                    <span class="ms-2 rounded-circle d-inline-block" 
+                                          style="width: 12px; height: 12px; background-color: ${getRoleColor(user.role || 'user')};" 
+                                          title="${user.role || 'user'}"></span>
+                                </div>
+                                <small class="text-muted">${user.email}</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted">Last seen: <span class="last-seen" data-last-seen="${user.last_seen || ''}"></span></small>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Update last-seen timestamps
+                updateLastSeenWidgets();
+            } else {
+                onlineUsersList.innerHTML = '<div class="list-group-item">No users available</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading initial data:', error);
+            showToast('Error loading dashboard data', 'error');
+            // Set default values for metrics
+            document.getElementById('onlineUsersMetric').textContent = '0';
+            document.getElementById('activeOutages').textContent = '0';
+            document.getElementById('openTickets').textContent = '0';
+            document.getElementById('onlineUsers').innerHTML = '<div class="list-group-item">Error loading users</div>';
+        });
+}
+
+// Function to request dashboard data
+function requestAdminDashboardData() {
+    // 1) Always reload the dashboard via REST
+    console.log('Loading dashboard via fetch…');
+    loadInitialData();
+  
+    // 2) If we have a socket connection, also ask for any socket‐specific updates
+    if (socket && socket.connected) {
+      console.log('Requesting dashboard data via socket…');
+      socket.emit('admin_dashboard_request');
+    }
+  }
+  
+
+// Function to update online users display with smooth transitions
+function updateOnlineUsers(users) {
+    if (!users || !Array.isArray(users)) {
+        console.warn('Invalid users data received:', users);
+        return;
+    }
+
+    const onlineUsersContainer = document.getElementById('onlineUsers');
+    if (!onlineUsersContainer) return;
+
+    // Calculate unique online users count
+    const uniqueOnlineUsers = new Set(users
+        .filter(user => user.is_online)
+        .map(user => user.id || user.email));
+    document.getElementById('onlineUsersMetric').textContent = uniqueOnlineUsers.size;
+
+    // Sort users: online first, then by name
+    users.sort((a, b) => {
+        if (a.is_online !== b.is_online) return b.is_online - a.is_online;
+        return a.name.localeCompare(b.name);
+    });
+
+    // Create new content
+    const newContent = users.map(user => `
+        <div class="list-group-item d-flex align-items-center justify-content-between" 
+             data-user-id="${user.id || ''}" 
+             style="transition: opacity 0.3s ease-in-out;">
+            <div class="d-flex align-items-center">
+                <div class="position-relative me-3">
+                    <img src="/static/uploads/profile_pictures/${user.profile_picture || 'boy.png'}" 
+                        alt="${user.name}" 
+                        class="rounded-circle user-icon"
+                        width="48" 
+                        height="48" 
+                        style="object-fit:cover;object-position:center;opacity:${user.is_online ? '1' : '0.5'};"
+                        onerror="this.onerror=null;this.src='/static/images/PFP/boy.png';">
+                    ${user.is_online ? `
+                    <span class="position-absolute bottom-0 end-0 p-1 border border-light rounded-circle glowing-green"
+                          style="width: 14px; height: 14px; background: #00ff00; box-shadow: 0 0 8px 2px #00ff00, 0 0 0 2px rgba(255,255,255,0.2); animation: glow 1.2s infinite alternate;"></span>
+                    ` : ''}
+                </div>
+                <div>
+                    <div class="fw-bold d-flex align-items-center">
+                        ${user.name}
+                        <span class="ms-2 rounded-circle d-inline-block" 
+                              style="width: 12px; height: 12px; background-color: ${getRoleColor(user.role || 'user')};" 
+                              title="${user.role || 'user'}"></span>
+                    </div>
+                    <small class="text-muted">${user.email}</small>
+                </div>
+            </div>
+            <div class="text-end">
+                <small class="text-muted">Last seen: <span class="last-seen" data-last-seen="${user.last_seen || ''}"></span></small>
+            </div>
+        </div>
+    `).join('');
+
+    // Update with smooth transition
+    const currentItems = onlineUsersContainer.children;
+    const newItems = new DOMParser().parseFromString(newContent, 'text/html').body.children;
+
+    // Remove items that are no longer present
+    Array.from(currentItems).forEach(item => {
+        const userId = item.dataset.userId;
+        if (!users.some(user => (user.id || '') === userId)) {
+            item.style.opacity = '0';
+            setTimeout(() => item.remove(), 300);
+        }
+    });
+
+    // Add or update items
+    Array.from(newItems).forEach(newItem => {
+        const userId = newItem.dataset.userId;
+        const existingItem = onlineUsersContainer.querySelector(`[data-user-id="${userId}"]`);
+        
+        if (existingItem) {
+            // Update existing item
+            existingItem.style.opacity = '0';
+            setTimeout(() => {
+                existingItem.outerHTML = newItem.outerHTML;
+                const updatedItem = onlineUsersContainer.querySelector(`[data-user-id="${userId}"]`);
+                if (updatedItem) {
+                    updatedItem.style.opacity = '1';
+                }
+            }, 300);
+        } else {
+            // Add new item
+            newItem.style.opacity = '0';
+            onlineUsersContainer.appendChild(newItem);
+            setTimeout(() => newItem.style.opacity = '1', 50);
+        }
+    });
+
+    // Update last-seen timestamps
+    updateLastSeenWidgets();
+}
+
+// Function to get role color
+function getRoleColor(role) {
+    switch(role) {
+        case 'admin':
+            return '#FF5733'; // Red for admin
+        case 'manager':
+            return '#33A1FF'; // Blue for manager
+        case 'dev':
+            return '#FFFF00'; // Yellow for developer
+        case 'user':
+            return '#33FF57'; // Green for user
+        default:
+            return '#C4C4C4'; // Grey for undefined roles
+    }
+}
+
+// Function to update all last-seen widgets
+function updateLastSeenWidgets() {
+    const now = new Date();
+    document.querySelectorAll('.last-seen').forEach(function(el) {
+        const lastSeen = el.getAttribute('data-last-seen');
+        if (!lastSeen) {
+            el.textContent = 'N/A';
+            return;
+        }
+        const lastSeenDate = new Date(lastSeen + 'Z');  // Add 'Z' to indicate UTC
+        const diffMs = now - lastSeenDate;
+        if (isNaN(diffMs)) {
+            el.textContent = 'N/A';
+            return;
+        }
+        const diffSec = Math.floor(diffMs / 1000);
+        if (diffSec < 60) {
+            el.textContent = 'just now';
+        } else if (diffSec < 3600) {
+            el.textContent = Math.floor(diffSec / 60) + ' min ago';
+        } else if (diffSec < 86400) {
+            el.textContent = Math.floor(diffSec / 3600) + ' hr ago';
+        } else {
+            el.textContent = lastSeenDate.toLocaleString();
+        }
+    });
+}
+
+// Update last-seen widgets every 10 seconds
+setInterval(updateLastSeenWidgets, 10000);
+
+// Outage Modal logic
+const saveOutageBtn = document.getElementById('saveOutage');
+if (saveOutageBtn) {
+    saveOutageBtn.onclick = async function() {
+        const title = document.getElementById('outageTitle').value.trim();
+        const description = document.getElementById('outageDescription').value.trim();
+        const ticket_id = document.getElementById('outageTicket').value.trim();
+        const affected_systems = document.getElementById('affectedSystems').value.trim();
+        const notifyTeams = document.getElementById('notifyTeams').checked;
+        
+        if (!title || !description) {
+            showToast('Title and description are required.', 'error');
+            return;
+        }
+        
+        try {
+            const res = await fetch('/api/admin/outages', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    title, 
+                    description, 
+                    ticket_id,
+                    affected_systems,
+                    notify_teams: notifyTeams
+                })
+            });
+            
+            const data = await res.json();
+            
+            if (res.ok) {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('outageModal'));
+                if (modal) modal.hide();
+                // Failsafe: Remove lingering modal-backdrop and modal-open
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                
+                // Clear form
+                document.getElementById('outageForm').reset();
+                
+                // Show success message
+                showToast('Outage alert created successfully', 'success');
+                
+                // Refresh outages list
+                loadOutages();
+                
+                // Notify Teams if requested
+                if (notifyTeams) {
+                    try {
+                        await fetch('/api/outages/notify-teams', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ outage_id: data.id })
+                        });
+                    } catch (e) {
+                        console.error('Error notifying Teams:', e);
+                        showToast('Created outage but failed to notify Teams', 'warning');
+                    }
+                }
+            } else {
+                showToast(data.error || 'Failed to create outage', 'error');
+            }
+        } catch (e) {
+            console.error('Error creating outage:', e);
+            showToast('Error creating outage: ' + (e.message || 'Unknown error'), 'error');
+        }
+    };
+}
+
+// Function to show toast notifications
+function showToast(message, type = 'info') {
+    const toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+
+    toastContainer.appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast, {
+        autohide: true,
+        delay: 5000
+    });
+    bsToast.show();
+
+    // Remove the toast element after it's hidden
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+}
+
+// Load outages function
+function loadOutages() {
+    fetch('/api/admin/outages')
+        .then(res => {
+            if (!res.ok) {
+                if (res.status === 403) {
+                    // User is not admin, hide the outages section
+                    const outagesSection = document.querySelector('.dashboard-row:has(#outagesList)');
+                    if (outagesSection) {
+                        outagesSection.style.display = 'none';
+                    }
+                    return [];
+                }
+                throw new Error('Failed to load outages');
+            }
+            return res.json();
+        })
+        .then(outages => {
+            const outagesList = document.getElementById('outagesList');
+            if (!outagesList) return; // Exit if element doesn't exist
+            
+            if (!outages || outages.length === 0) {
+                outagesList.innerHTML = '<div class="list-group-item">No active outages.</div>';
+                // Hide banner if no outages
+                const banner = document.getElementById('outageBanner');
+                if (banner) {
+                    banner.style.display = 'none';
+                }
+                return;
+            }
+
+            // Update banner with the most recent active outage
+            const activeOutages = outages.filter(o => o.status === 'active');
+            if (activeOutages.length > 0) {
+                const latestOutage = activeOutages[0];
+                const banner = document.getElementById('outageBanner');
+                const bannerText = document.getElementById('outageBannerText');
+                if (banner && bannerText) {
+                    bannerText.textContent = `Active Outage: ${latestOutage.title} - ${latestOutage.description}`;
+                    banner.style.display = 'block';
+                    banner.dataset.outageData = JSON.stringify(latestOutage);
+                    banner.className = 'outage-banner alert alert-danger';
+                }
+            }
+
+            // Update the outages list
+            outagesList.innerHTML = outages.map(outage => `
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">${outage.title}</h6>
+                        <p class="mb-1 text-muted">${outage.description}</p>
+                        <small class="text-muted">Started: ${new Date(outage.start_time).toLocaleString()}</small>
+                        ${outage.status === 'resolved' ? 
+                            `<br><small class="text-success">Resolved: ${new Date(outage.resolved_at).toLocaleString()}</small>` : 
+                            ''}
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-primary me-2" onclick="editOutage(${outage.id})">
+                            <i class="bi bi-pencil"></i> Edit
+                        </button>
+                        ${outage.status === 'active' ? `
+                            <button class="btn btn-sm btn-success me-2" onclick="resolveOutage(${outage.id})">
+                                <i class="bi bi-check-circle"></i> Resolve
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-sm btn-danger" onclick="deleteOutage(${outage.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        })
+        .catch(error => {
+            console.error('Error loading outages:', error);
+            // Don't show error toast for non-admin users
+            const outagesList = document.getElementById('outagesList');
+            if (outagesList) {
+                outagesList.innerHTML = '<div class="list-group-item">Unable to load outages.</div>';
+            }
+        });
+}
+
+// Edit outage function
+window.editOutage = function(id) {
+    // Fetch the outage details
+    fetch(`/api/admin/outages/${id}`)
+        .then(res => res.json())
+        .then(outage => {
+            // Populate the modal with outage data
+            document.getElementById('outageTitle').value = outage.title;
+            document.getElementById('outageDescription').value = outage.description;
+            document.getElementById('outageTicket').value = outage.ticket_id || '';
+            document.getElementById('affectedSystems').value = outage.affected_systems || '';
+            
+            // Show the modal
+            const modal = new bootstrap.Modal(document.getElementById('outageModal'));
+            modal.show();
+            
+            // Update the save button to handle updates
+            const saveBtn = document.getElementById('saveOutage');
+            saveBtn.textContent = 'Update Outage';
+            saveBtn.onclick = () => {
+                const updatedData = {
+                    title: document.getElementById('outageTitle').value,
+                    description: document.getElementById('outageDescription').value,
+                    ticket_id: document.getElementById('outageTicket').value,
+                    affected_systems: document.getElementById('affectedSystems').value
+                };
+                
+                fetch(`/api/admin/outages/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedData)
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed to update outage');
+                    showToast('Outage updated successfully', 'success');
+                    modal.hide();
+                    loadOutages();
+                })
+                .catch(error => {
+                    console.error('Error updating outage:', error);
+                    showToast('Failed to update outage', 'error');
+                });
+            };
+        })
+        .catch(error => {
+            console.error('Error fetching outage details:', error);
+            showToast('Error fetching outage details', 'error');
+        });
+};
+
+// Resolve outage function
+window.resolveOutage = function(id) {
+    if (!confirm('Are you sure you want to resolve this outage?')) return;
+    
+    fetch(`/api/admin/outages/${id}/resolve`, { 
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Failed to resolve outage');
+        showToast('Outage resolved successfully', 'success');
+        loadOutages();
+    })
+    .catch(error => {
+        console.error('Error resolving outage:', error);
+        showToast('Failed to resolve outage', 'error');
+    });
+};
+
+// Delete outage function
+window.deleteOutage = function(id) {
+    if (!confirm('Are you sure you want to delete this outage?')) return;
+    
+    fetch(`/api/admin/outages/${id}`, { 
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Failed to delete outage');
+        showToast('Outage deleted successfully', 'success');
+        loadOutages();
+    })
+    .catch(error => {
+        console.error('Error deleting outage:', error);
+        showToast('Failed to delete outage', 'error');
+    });
+};
+
+// Load outages on page load
+document.addEventListener('DOMContentLoaded', () => {
+    loadOutages();
+});
+
+window.addEventListener('DOMContentLoaded', function() {
+  const loadingBar = document.getElementById('globalLoadingBar');
+  let loaded = false;
+  
+  function hideLoading() {
+    if (loaded) return;
+    loaded = true;
+    loadingBar.style.display = 'none';
+  }
+
+  // Initialize charts with dummy data first
+  initializeCharts();
+  
+  // Load data from APIs
+  Promise.all([
+    fetch('/api/admin/dashboard').catch(() => ({ json: () => ({}) })),
+    fetch('/api/admin/activity').catch(() => ({ json: () => [] }))
+  ]).then(([dashboardRes, activityRes]) => {
+    return Promise.all([
+      dashboardRes.json(),
+      activityRes.json()
+    ]);
+  }).then(([dashboardData, activityData]) => {
+    // Update dashboard metrics
+    if (dashboardData) {
+      document.getElementById('openTickets').textContent = dashboardData.open_tickets || '0';
+      document.getElementById('activeOutages').textContent = dashboardData.active_outages || '0';
+      
+      // Calculate unique online users by filtering and using a Set to ensure uniqueness
+      const onlineUsersCount = dashboardData.online_users ? 
+        new Set(dashboardData.online_users
+          .filter(user => user.is_online)
+          .map(user => user.id || user.email)) // Use either id or email as unique identifier
+          .size : 0;
+      document.getElementById('onlineUsersMetric').textContent = onlineUsersCount;
+      
+      // Update online users list
+      const onlineUsersList = document.getElementById('onlineUsers');
+      if (dashboardData.online_users && dashboardData.online_users.length > 0) {
+        onlineUsersList.innerHTML = dashboardData.online_users.map(user => `
+          <div class="list-group-item d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+              <div class="position-relative me-3">
+                    <img src="/static/uploads/profile_pictures/${user.profile_picture || 'boy.png'}" 
+                        alt="${user.name}" 
+                        class="rounded-circle user-icon"
+                        width="48" 
+                        height="48" 
+                        style="object-fit:cover;object-position:center;"
+                        onerror="this.onerror=null;this.src='/static/images/PFP/boy.png';">
+
+                <span class="position-absolute bottom-0 end-0 p-1 border border-light rounded-circle glowing-green"
+                      style="width: 14px; height: 14px; background: #00ff00; box-shadow: 0 0 8px 2px #00ff00, 0 0 0 2px rgba(255,255,255,0.2); animation: glow 1.2s infinite alternate;"></span>
+              </div>
+              <div>
+                <div class="fw-bold d-flex align-items-center">
+                  ${user.name}
+                  <span class="ms-2 rounded-circle d-inline-block" 
+                        style="width: 12px; height: 12px; background-color: ${getRoleColor(user.role || 'user')};" 
+                        title="${user.role || 'user'}"></span>
+                </div>
+                <small class="text-muted">${user.email}</small>
+              </div>
+            </div>
+            <div class="text-end">
+              <small class="text-muted">Last seen: <span class="last-seen" data-last-seen="${user.last_seen || ''}"></span></small>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        onlineUsersList.innerHTML = '<div class="list-group-item">No users online</div>';
+      }
+    }
+    
+    // Update recent activity
+    const recentActivityList = document.getElementById('recentActivity');
+    if (activityData && activityData.length > 0) {
+      recentActivityList.innerHTML = activityData.map(activity => `
+        <div class="list-group-item">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <img src="/static/uploads/profile_pictures/${activity.user.profile_picture || 'boy.png'}" 
+                   alt="${activity.user.name}" 
+                   class="rounded-circle me-2" width="36" height="36" style="object-fit:cover;object-position:center;"
+                   onerror="this.onerror=null;this.src='/static/images/PFP/boy.png';">
+              <span class="badge bg-secondary me-2">${activity.user.name}</span>
+              <span class="badge bg-primary me-2">${activity.type}</span>
+              <span>${activity.description}</span>
+            </div>
+            <small class="text-muted">${new Date(activity.timestamp + 'Z').toLocaleString()}</small>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      recentActivityList.innerHTML = '<div class="list-group-item">No recent activity</div>';
+    }
+    
+    // Hide loading bar after data is loaded
+    setTimeout(hideLoading, 400);
+  }).catch(error => {
+    console.error('Error loading dashboard data:', error);
+    hideLoading();
+  });
+
+  // Fallback: hide after 4s
+  setTimeout(hideLoading, 4000);
+});
+
+// Initialize charts with dummy data
+function initializeCharts() {
+  // Tickets chart
+  var ticketsChart = new ApexCharts(document.querySelector("#ticketsChart"), {
+    chart: { type: 'area', height: 250, toolbar: { show: false }, background: 'transparent' },
+    series: [{ name: 'Tickets', data: [10, 15, 12, 20, 18, 25, 22] }],
+    xaxis: { categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], labels: { style: { colors: '#fff' } } },
+    yaxis: { labels: { style: { colors: '#fff' } } },
+    colors: ['#17ead9'],
+    fill: { type: 'gradient', gradient: { shade: 'dark', type: 'vertical', shadeIntensity: 0.5, opacityFrom: 0.7, opacityTo: 0.2, stops: [0, 100] } },
+    grid: { borderColor: '#2D2D2D' },
+    dataLabels: { enabled: false },
+    stroke: { curve: 'smooth', width: 3 },
+    tooltip: { theme: 'dark' },
+  });
+  ticketsChart.render();
+
+  // Outages chart
+  var outagesChart = new ApexCharts(document.querySelector("#outagesChart"), {
+    chart: { type: 'line', height: 250, toolbar: { show: false }, background: 'transparent' },
+    series: [{ name: 'Active Outages', data: [0, 0, 1, 0, 2, 1, 0] }],
+    xaxis: { categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], labels: { style: { colors: '#fff' } } },
+    yaxis: { labels: { style: { colors: '#fff' } } },
+    colors: ['#ff4444'],
+    grid: { borderColor: '#2D2D2D' },
+    dataLabels: { enabled: false },
+    stroke: { curve: 'smooth', width: 3 },
+    tooltip: { theme: 'dark' },
+  });
+  outagesChart.render();
+
+  // Activity chart
+  var activityChart = new ApexCharts(document.querySelector("#activityChart"), {
+    chart: { type: 'bar', height: 250, toolbar: { show: false }, background: 'transparent' },
+    series: [{ name: 'Active Users', data: [5, 7, 6, 8, 9, 10, 8] }],
+    xaxis: { categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], labels: { style: { colors: '#fff' } } },
+    yaxis: { labels: { style: { colors: '#fff' } } },
+    colors: ['#f02fc2'],
+    grid: { borderColor: '#2D2D2D' },
+    dataLabels: { enabled: false },
+    stroke: { width: 2 },
+    tooltip: { theme: 'dark' },
+  });
+  activityChart.render();
+}
+
+// Calendar functionality
+function initializeCalendar() {
+    console.log('Initializing calendar...');
+    const calendar = {
+        currentDate: new Date(),
+        events: [],
+        view: 'month' // 'month' or 'day'
+    };
+
+    // Sample schedule data for testing
+    const scheduleData = [
+        {
+            department: 'DSC',
+            name: 'Anthony Risker',
+            startTime: '4:00 AM',
+            endTime: '1:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'DSC',
+            name: 'Ralph Rosalin',
+            startTime: '4:00 AM',
+            endTime: '1:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'AJ Mercado',
+            startTime: '5:00 AM',
+            endTime: '2:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'DSC',
+            name: 'Nick Gutierrez',
+            startTime: '5:00 AM',
+            endTime: '2:00 PM',
+            workDays: 'Sun - Thurs, off Fri & Sat'
+        },
+        {
+            department: 'DSC',
+            name: 'Jarrod Woodson',
+            startTime: '5:00 AM',
+            endTime: '2:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'DSC',
+            name: 'Rhonda Robinson',
+            startTime: '6:00 AM',
+            endTime: '3:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'DSC',
+            name: 'Christopher Bush',
+            startTime: '6:00 AM',
+            endTime: '3:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'DSC',
+            name: 'Mayra Lopez',
+            startTime: '6:00 AM',
+            endTime: '3:00 PM',
+            workDays: 'Tues - Sat, off Sun & Mon'
+        },
+        {
+            department: 'Remote',
+            name: 'Staci Valko',
+            startTime: '6:00 AM',
+            endTime: '3:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'Doug Spohn',
+            startTime: '6:30 AM',
+            endTime: '3:30 PM',
+            workDays: 'Tues - Sat, off Sun & Mon'
+        },
+        {
+            department: 'DSC',
+            name: 'Jayson Barker',
+            startTime: '7:00 AM',
+            endTime: '4:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'Nathan Bui',
+            startTime: '7:00 AM',
+            endTime: '4:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'Jabin Dejesa',
+            startTime: '8:00 AM',
+            endTime: '5:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'Samuel Nightingale',
+            startTime: '8:00 AM',
+            endTime: '5:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'Oscar Solis',
+            startTime: '8:00 AM',
+            endTime: '5:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'Jonathan Nguyen',
+            startTime: '8:00 AM',
+            endTime: '5:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'JZ Miranda',
+            startTime: '8:30 AM',
+            endTime: '5:30 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'Richard Nguyen',
+            startTime: '9:00 AM',
+            endTime: '6:00 PM',
+            workDays: 'Mon - Fri'
+        },
+        {
+            department: 'ISC',
+            name: 'Pietro Vue',
+            startTime: '11:00 AM',
+            endTime: '8:00 PM',
+            workDays: 'Mon - Fri'
+        }
+    ];
+
+    // Function to parse work days string into actual dates
+    function parseWorkDays(workDays) {
+        console.log('Parsing work days:', workDays);
+        const days = [];
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth();
+
+        // Get all days in the current month
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        // Parse work days string
+        let workDayPatterns = [];
+        if (workDays.includes('Mon - Fri')) {
+            workDayPatterns = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+        } else if (workDays.includes('Tues - Sat')) {
+            workDayPatterns = ['Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        } else if (workDays.includes('Sun - Thurs')) {
+            workDayPatterns = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu'];
+        } else if (workDays.includes('Sun - Thurs, off Fri & Sat')) {
+            workDayPatterns = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu'];
+        } else if (workDays.includes('Tues - Sat, off Sun & Mon')) {
+            workDayPatterns = ['Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        } else {
+            // Handle individual days
+            workDayPatterns = workDays.split(',').map(d => d.trim().substring(0, 3));
+        }
+        
+        console.log('Work day patterns:', workDayPatterns);
+        
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
+            const shortWeekday = weekday.substring(0, 3);
+            
+            if (workDayPatterns.includes(shortWeekday)) {
+                days.push(`${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`);
+            }
+        }
+
+        console.log('Generated dates:', days);
+        return days;
+    }
+
+    // Process schedule data into calendar events
+    function processScheduleData(data) {
+        console.log('Processing schedule data:', data);
+        const events = [];
+        
+        data.forEach(schedule => {
+            const days = parseWorkDays(schedule.workDays);
+            days.forEach(day => {
+                events.push({
+                    date: day,
+                    title: `${schedule.name} - Shift`,
+                    user: schedule.name,
+                    time: `${schedule.startTime} - ${schedule.endTime}`,
+                    type: 'shift',
+                    department: schedule.department
+                });
+            });
+        });
+
+        console.log('Generated events:', events);
+        return events;
+    }
+
+    // Initialize calendar with sample data
+    calendar.events = processScheduleData(scheduleData);
+    console.log('Calendar initialized with events:', calendar.events);
+
+    function renderCalendar() {
+        console.log('Rendering calendar with events:', calendar.events);
+        const year = calendar.currentDate.getFullYear();
+        const month = calendar.currentDate.getMonth();
+        const day = calendar.currentDate.getDate();
+        
+        const currentDateElement = document.getElementById('currentDate');
+        if (currentDateElement) {
+            if (calendar.view === 'month') {
+                currentDateElement.textContent = 
+                    `${calendar.currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
+            } else {
+                currentDateElement.textContent = 
+                    `${calendar.currentDate.toLocaleString('default', { 
+                        weekday: 'long',
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                    })}`;
+            }
+        }
+
+        const calendarGrid = document.getElementById('calendarGrid');
+        if (!calendarGrid) return;
+
+        if (calendar.view === 'month') {
+            renderMonthView(calendarGrid, year, month);
+        } else {
+            renderDayView(calendarGrid, year, month, day);
+        }
+    }
+
+    function renderMonthView(container, year, month) {
+        console.log('Rendering month view for:', { year, month });
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const startingDay = firstDay.getDay();
+
+        let calendarHTML = '<div class="calendar-month-view active">';
+        
+        // Add day headers
+        const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        weekdays.forEach(day => {
+            calendarHTML += `<div class="calendar-day-header">${day}</div>`;
+        });
+        
+        // Add empty cells for days before the first day of the month
+        for (let i = 0; i < startingDay; i++) {
+            calendarHTML += '<div class="calendar-day"></div>';
+        }
+
+        // Add days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const dayEvents = calendar.events.filter(event => event.date === date);
+            console.log(`Day ${day} events:`, dayEvents);
+            
+            calendarHTML += `
+                <div class="calendar-day ${dayEvents.length > 0 ? 'has-event' : ''}">
+                    <span>${day}</span>
+                    ${dayEvents.map(event => `
+                        <div class="calendar-event ${event.type}" 
+                             onclick="showShiftModal(${JSON.stringify(event).replace(/"/g, '&quot;')})"
+                             title="${event.user}: ${event.time}">
+                            <div class="event-title">${event.user}</div>
+                            <div class="event-time">${event.time}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        calendarHTML += '</div>';
+        container.innerHTML = calendarHTML;
+    }
+
+    function renderDayView(container, year, month, day) {
+        const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayEvents = calendar.events.filter(event => event.date === date);
+        console.log('Day view events:', dayEvents);
+
+        let calendarHTML = `
+            <div class="calendar-day-view active">
+                <div class="day-header">
+                    <h4>${calendar.currentDate.toLocaleString('default', { 
+                        weekday: 'long',
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                    })}</h4>
+                </div>
+                <div class="day-events">
+                    ${dayEvents.length > 0 ? dayEvents.map(event => `
+                        <div class="day-event ${event.type}" 
+                             onclick="showShiftModal(${JSON.stringify(event).replace(/"/g, '&quot;')})">
+                            <h5>${event.user}</h5>
+                            <p class="mb-1">${event.department} - ${event.title}</p>
+                            <small class="text-muted">${event.time}</small>
+                        </div>
+                    `).join('') : '<div class="text-center text-muted">No shifts scheduled for this day</div>'}
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = calendarHTML;
+    }
+
+    // Add event listeners for navigation
+    const prevDateBtn = document.getElementById('prevDate');
+    const nextDateBtn = document.getElementById('nextDate');
+    const monthViewBtn = document.getElementById('monthViewBtn');
+    const dayViewBtn = document.getElementById('dayViewBtn');
+    const weekViewBtn = document.getElementById('weekViewBtn');
+    
+    if (prevDateBtn) {
+        prevDateBtn.addEventListener('click', () => {
+            if (calendar.view === 'month') {
+                calendar.currentDate.setMonth(calendar.currentDate.getMonth() - 1);
+            } else {
+                calendar.currentDate.setDate(calendar.currentDate.getDate() - 1);
+            }
+            renderCalendar();
+        });
+    }
+    
+    if (nextDateBtn) {
+        nextDateBtn.addEventListener('click', () => {
+            if (calendar.view === 'month') {
+                calendar.currentDate.setMonth(calendar.currentDate.getMonth() + 1);
+            } else {
+                calendar.currentDate.setDate(calendar.currentDate.getDate() + 1);
+            }
+            renderCalendar();
+        });
+    }
+
+    if (monthViewBtn && dayViewBtn && weekViewBtn) {
+        monthViewBtn.addEventListener('click', () => {
+            calendar.view = 'month';
+            monthViewBtn.classList.add('active');
+            dayViewBtn.classList.remove('active');
+            weekViewBtn.classList.remove('active');
+            renderCalendar();
+        });
+
+        dayViewBtn.addEventListener('click', () => {
+            calendar.view = 'day';
+            dayViewBtn.classList.add('active');
+            monthViewBtn.classList.remove('active');
+            weekViewBtn.classList.remove('active');
+            renderCalendar();
+        });
+
+        weekViewBtn.addEventListener('click', () => {
+            calendar.view = 'week';
+            weekViewBtn.classList.add('active');
+            monthViewBtn.classList.remove('active');
+            dayViewBtn.classList.remove('active');
+            renderCalendar();
+        });
+    }
+
+    // Initial render
+    renderCalendar();
+}
+
+// Initialize calendar when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing calendar...');
+    initializeCalendar();
+});
+
+// Add modal HTML to the page
+const modalHTML = `
+    <div class="shift-modal" id="shiftModal">
+        <div class="shift-modal-content">
+            <button class="shift-modal-close" onclick="closeShiftModal()">&times;</button>
+            <div class="shift-card">
+                <div class="shift-card-header">
+                    <div class="shift-card-title" id="modalUserName"></div>
+                    <div class="shift-card-subtitle" id="modalShiftType"></div>
+                </div>
+                <div class="shift-card-details">
+                    <div class="shift-card-detail">
+                        <i class="fas fa-clock"></i>
+                        <span id="modalShiftTime"></span>
+                    </div>
+                    <div class="shift-card-detail">
+                        <i class="fas fa-calendar"></i>
+                        <span id="modalShiftDate"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+`;
+document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+// Add modal functions
+window.showShiftModal = function(event) {
+    const modal = document.getElementById('shiftModal');
+    const userName = document.getElementById('modalUserName');
+    const shiftType = document.getElementById('modalShiftType');
+    const shiftTime = document.getElementById('modalShiftTime');
+    const shiftDate = document.getElementById('modalShiftDate');
+
+    userName.textContent = event.user;
+    shiftType.textContent = event.title;
+    shiftTime.textContent = event.time;
+    shiftDate.textContent = new Date(event.date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    modal.classList.add('active');
+};
+
+window.closeShiftModal = function() {
+    const modal = document.getElementById('shiftModal');
+    modal.classList.remove('active');
+};
+
+// Update outages chart when new outage is created
+function updateOutagesChart(outageData) {
+    const outagesChart = ApexCharts.getChartByID('outagesChart');
+    if (outagesChart) {
+        const currentData = outagesChart.w.config.series[0].data;
+        const newData = [...currentData];
+        newData[newData.length - 1] = (newData[newData.length - 1] || 0) + 1;
+        outagesChart.updateSeries([{ data: newData }]);
+    }
+}
+
+// Add 'Week' view to navigation
+// (Assume buttons with ids: monthViewBtn, weekViewBtn, dayViewBtn)
+
+// Add week view rendering
+function renderWeekView(container, year, month, day) {
+    // Find the start of the week (Sunday)
+    const current = new Date(year, month, day);
+    const weekStart = new Date(current);
+    weekStart.setDate(current.getDate() - current.getDay());
+    const weekDates = Array.from({length: 7}, (_, i) => {
+        const d = new Date(weekStart);
+        d.setDate(weekStart.getDate() + i);
+        return d;
+    });
+    // 24 hours
+    const hours = Array.from({length: 24}, (_, i) => i);
+    // Build grid
+    let html = '<div class="calendar-week-view">';
+    // Top row: empty + day headers
+    html += '<div></div>';
+    weekDates.forEach(d => {
+        html += `<div class="week-day-header">${d.toLocaleDateString('en-US', {weekday: 'short', month: 'short', day: 'numeric'})}</div>`;
+    });
+    // Rows: hour label + day cells
+    hours.forEach(hour => {
+        html += `<div class="week-hour-label">${hour === 0 ? '12am' : hour < 12 ? hour+'am' : (hour === 12 ? '12pm' : (hour-12)+'pm')}</div>`;
+        weekDates.forEach((d, colIdx) => {
+            html += `<div class="week-day-cell" data-day="${d.toISOString().slice(0,10)}" data-hour="${hour}"></div>`;
+        });
+    });
+    html += '</div>';
+    container.innerHTML = html;
+    // Place shift blocks
+    calendar.events.forEach(event => {
+        const eventDate = new Date(event.date);
+        const colIdx = weekDates.findIndex(d => d.toDateString() === eventDate.toDateString());
+        if (colIdx === -1) return;
+        // Parse start/end
+        const [startTime, endTime] = event.time.split(' - ');
+        const start = parseTimeToHourMin(startTime);
+        const end = parseTimeToHourMin(endTime);
+        const top = start.hour * 40 + (start.min/60)*40;
+        const height = ((end.hour + end.min/60) - (start.hour + start.min/60)) * 40;
+        // Find cell
+        const cell = container.querySelector(`.week-day-cell[data-day="${event.date}"][data-hour="${start.hour}"]`);
+        if (cell) {
+            // Create block
+            const block = document.createElement('div');
+            block.className = `week-shift-block ${event.department ? event.department.toLowerCase() : ''}`;
+            block.style.top = `${top}px`;
+            block.style.height = `${height}px`;
+            block.style.position = 'absolute';
+            block.innerHTML = `<b>${event.user}</b><br><span style='font-size:0.9em'>${event.time}</span>`;
+            block.onclick = () => showShiftModal(event);
+            // Highlight if current
+            if (isUserOnShiftNow(event)) block.classList.add('current');
+            // Place in cell
+            cell.style.position = 'relative';
+            cell.appendChild(block);
+        }
+    });
+    // Draw current time line
+    const now = new Date();
+    if (weekDates.some(d => d.toDateString() === now.toDateString())) {
+        const hour = now.getHours();
+        const min = now.getMinutes();
+        const y = hour * 40 + (min/60)*40;
+        weekDates.forEach((d, idx) => {
+            if (d.toDateString() === now.toDateString()) {
+                // Find all cells for this day
+                const cells = container.querySelectorAll(`.week-day-cell[data-day="${d.toISOString().slice(0,10)}"]`);
+                cells.forEach(cell => {
+                    const line = document.createElement('div');
+                    line.className = 'week-current-time';
+                    line.style.top = `${y}px`;
+                    cell.appendChild(line);
+                });
+            }
+        });
+    }
+}
+
+function parseTimeToHourMin(timeStr) {
+    // e.g. '4:00 AM' or '1:00 PM'
+    const [hm, ampm] = timeStr.trim().split(' ');
+    let [h, m] = hm.split(':').map(Number);
+    if (ampm.toUpperCase() === 'PM' && h !== 12) h += 12;
+    if (ampm.toUpperCase() === 'AM' && h === 12) h = 0;
+    return {hour: h, min: m};
+}
+
+function isUserOnShiftNow(event) {
+    const now = new Date();
+    const eventDate = new Date(event.date);
+    if (now.toDateString() !== eventDate.toDateString()) return false;
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    const [startTime, endTime] = event.time.split(' - ');
+    const start = parseTimeToHourMin(startTime);
+    const end = parseTimeToHourMin(endTime);
+    const startMinutes = start.hour * 60 + start.min;
+    const endMinutes = end.hour * 60 + end.min;
+    return nowMinutes >= startMinutes && nowMinutes < endMinutes;
+}
+
+// Add event listeners for week view
+const weekViewBtn = document.getElementById('weekViewBtn');
+if (weekViewBtn) {
+    weekViewBtn.addEventListener('click', () => {
+        calendar.view = 'week';
+        weekViewBtn.classList.add('active');
+        monthViewBtn.classList.remove('active');
+        dayViewBtn.classList.remove('active');
+        renderCalendar();
+    });
+}
+
+// Update renderCalendar to support week view
+function renderCalendar() {
+    const year = calendar.currentDate.getFullYear();
+    const month = calendar.currentDate.getMonth();
+    const day = calendar.currentDate.getDate();
+    const currentDateElement = document.getElementById('currentDate');
+    if (currentDateElement) {
+        if (calendar.view === 'month') {
+            currentDateElement.textContent = `${calendar.currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
+        } else if (calendar.view === 'week') {
+            const weekStart = new Date(calendar.currentDate);
+            weekStart.setDate(calendar.currentDate.getDate() - calendar.currentDate.getDay());
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 6);
+            currentDateElement.textContent = `${weekStart.toLocaleDateString('default', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('default', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+        } else {
+            currentDateElement.textContent = `${calendar.currentDate.toLocaleString('default', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`;
+        }
+    }
+    const calendarGrid = document.getElementById('calendarGrid');
+    if (!calendarGrid) return;
+    if (calendar.view === 'month') {
+        renderMonthView(calendarGrid, year, month);
+    } else if (calendar.view === 'week') {
+        renderWeekView(calendarGrid, year, month, day);
+    } else {
+        renderDayView(calendarGrid, year, month, day);
+    }
+}
+
+// Add 'Current' view to navigation
+// (Assume buttons with ids: monthViewBtn, weekViewBtn, dayViewBtn, currentViewBtn)
+
+// Add day grid view rendering
+function renderDayGridView(container, year, month, day, onlyToday=false) {
+    // Get all users with shifts today
+    const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const dayEvents = calendar.events.filter(event => event.date === date);
+    // Unique users
+    const users = Array.from(new Set(dayEvents.map(e => e.user)));
+    container.style.setProperty('--user-count', users.length);
+    // 24 hours
+    const hours = Array.from({length: 24}, (_, i) => i);
+    // Build grid
+    let html = '<div class="calendar-day-grid-view">';
+    // Top row: empty + user headers
+    html += '<div></div>';
+    users.forEach(user => {
+        html += `<div class="day-user-header">${user}</div>`;
+    });
+    // Rows: hour label + user cells
+    hours.forEach(hour => {
+        html += `<div class="day-hour-label">${hour === 0 ? '12am' : hour < 12 ? hour+'am' : (hour === 12 ? '12pm' : (hour-12)+'pm')}</div>`;
+        users.forEach(user => {
+            html += `<div class="day-user-cell" data-user="${user}" data-hour="${hour}"></div>`;
+        });
+    });
+    html += '</div>';
+    container.innerHTML = html;
+    // Place shift blocks
+    dayEvents.forEach(event => {
+        const userIdx = users.indexOf(event.user);
+        if (userIdx === -1) return;
+        // Parse start/end
+        const [startTime, endTime] = event.time.split(' - ');
+        const start = parseTimeToHourMin(startTime);
+        const end = parseTimeToHourMin(endTime);
+        const top = start.hour * 40 + (start.min/60)*40;
+        const height = ((end.hour + end.min/60) - (start.hour + start.min/60)) * 40;
+        // Find cell
+        const cell = container.querySelector(`.day-user-cell[data-user="${event.user}"][data-hour="${start.hour}"]`);
+        if (cell) {
+            // Create block
+            const block = document.createElement('div');
+            block.className = `day-shift-block ${event.department ? event.department.toLowerCase() : ''}`;
+            block.style.top = `${top}px`;
+            block.style.height = `${height}px`;
+            block.style.position = 'absolute';
+            block.innerHTML = `<b>${event.user}</b><br><span style='font-size:0.9em'>${event.time}</span>`;
+            block.onclick = () => showShiftModal(event);
+            // Highlight if current
+            if (isUserOnShiftNow(event)) block.classList.add('current');
+            // Place in cell
+            cell.style.position = 'relative';
+            cell.appendChild(block);
+        }
+    });
+    // Draw current time line
+    if (onlyToday) {
+        const now = new Date();
+        if (now.getFullYear() === year && now.getMonth() === month && now.getDate() === day) {
+            const hour = now.getHours();
+            const min = now.getMinutes();
+            const y = hour * 40 + (min/60)*40;
+            users.forEach(user => {
+                const cells = container.querySelectorAll(`.day-user-cell[data-user="${user}"]`);
+                cells.forEach(cell => {
+                    const line = document.createElement('div');
+                    line.className = 'day-current-time';
+                    line.style.top = `${y}px`;
+                    cell.appendChild(line);
+                });
+            });
+        }
+    }
+}
+
+// Add event listeners for current view
+const currentViewBtn = document.getElementById('currentViewBtn');
+if (currentViewBtn) {
+    currentViewBtn.addEventListener('click', () => {
+        calendar.view = 'current';
+        currentViewBtn.classList.add('active');
+        monthViewBtn.classList.remove('active');
+        weekViewBtn.classList.remove('active');
+        dayViewBtn.classList.remove('active');
+        renderCalendar();
+    });
+}
+
+// Update renderCalendar to support current and day grid views
+function renderCalendar() {
+    const year = calendar.currentDate.getFullYear();
+    const month = calendar.currentDate.getMonth();
+    const day = calendar.currentDate.getDate();
+    const currentDateElement = document.getElementById('currentDate');
+    if (currentDateElement) {
+        if (calendar.view === 'month') {
+            currentDateElement.textContent = `${calendar.currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
+        } else if (calendar.view === 'week') {
+            const weekStart = new Date(calendar.currentDate);
+            weekStart.setDate(calendar.currentDate.getDate() - calendar.currentDate.getDay());
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 6);
+            currentDateElement.textContent = `${weekStart.toLocaleDateString('default', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('default', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+        } else if (calendar.view === 'current') {
+            currentDateElement.textContent = `${new Date().toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`;
+        } else {
+            currentDateElement.textContent = `${calendar.currentDate.toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`;
+        }
+    }
+    const calendarGrid = document.getElementById('calendarGrid');
+    if (!calendarGrid) return;
+    if (calendar.view === 'month') {
+        renderMonthView(calendarGrid, year, month);
+    } else if (calendar.view === 'week') {
+        renderWeekView(calendarGrid, year, month, day);
+    } else if (calendar.view === 'current') {
+        const now = new Date();
+        renderDayGridView(calendarGrid, now.getFullYear(), now.getMonth(), now.getDate(), true);
+        // Optionally, setInterval to update the current time line every minute
+        if (window._currentTimeInterval) clearInterval(window._currentTimeInterval);
+        window._currentTimeInterval = setInterval(() => {
+            renderDayGridView(calendarGrid, now.getFullYear(), now.getMonth(), now.getDate(), true);
+        }, 60000);
+    } else {
+        renderDayGridView(calendarGrid, year, month, day);
+    }
+}
+
+// --- Real-Time On-Shift Users with Countdown ---
+const CSV_PATH = '/static/uploads/files/scheduling.csv';
+
+function fetchCSV(url) {
+    return fetch(url)
+        .then(response => response.text())
+        .then(text => parseCSV(text));
+}
+
+function parseCSV(text) {
+    const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0 && !/^,+$/.test(l));
+    const header = lines[0].split(',');
+    const data = [];
+    for (let i = 1; i < lines.length; i++) {
+        const row = lines[i].split(',');
+        if (row.length < 7 || !row[1] || !row[2] || !row[6]) continue;
+        data.push({
+            department: row[0],
+            name: row[1],
+            start: row[2],
+            end: row[6],
+            workDays: row[7],
+            notes: row[8] || ''
+        });
+    }
+    return data;
+}
+
+function isTodayWorkday(workDays) {
+    const today = new Date();
+    const weekday = today.toLocaleDateString('en-US', { weekday: 'short' });
+    if (!workDays) return false;
+    if (workDays.includes('Mon - Fri')) return ['Mon','Tue','Wed','Thu','Fri'].includes(weekday);
+    if (workDays.includes('Tues - Sat')) return ['Tue','Wed','Thu','Fri','Sat'].includes(weekday);
+    if (workDays.includes('Sun - Thurs')) return ['Sun','Mon','Tue','Wed','Thu'].includes(weekday);
+    if (workDays.includes('Sun - Thurs, off Fri & Sat')) return ['Sun','Mon','Tue','Wed','Thu'].includes(weekday);
+    if (workDays.includes('Tues - Sat, off Sun & Mon')) return ['Tue','Wed','Thu','Fri','Sat'].includes(weekday);
+    return workDays.includes(weekday);
+}
+
+function parseTimeToDate(timeStr) {
+    // e.g. '4:00 AM' or '1:00 PM'
+    const [hm, ampm] = timeStr.trim().split(' ');
+    let [h, m] = hm.split(':').map(Number);
+    if (ampm.toUpperCase() === 'PM' && h !== 12) h += 12;
+    if (ampm.toUpperCase() === 'AM' && h === 12) h = 0;
+    const now = new Date();
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
+    return d;
+}
+
+function getTimeLeft(endDate) {
+    const now = new Date();
+    let diff = Math.max(0, endDate - now);
+    const hours = Math.floor(diff / 3600000);
+    diff -= hours * 3600000;
+    const mins = Math.floor(diff / 60000);
+    diff -= mins * 60000;
+    const secs = Math.floor(diff / 1000);
+    return { hours, mins, secs };
+}
+
+function filterOnShiftUsers(data) {
+    const now = new Date();
+    return data.filter(user => {
+        if (!isTodayWorkday(user.workDays)) return false;
+        const start = parseTimeToDate(user.start);
+        const end = parseTimeToDate(user.end);
+        return now >= start && now < end;
+    });
+}
+
+function renderOnShiftUsers(users) {
+    const container = document.getElementById('onShiftUsers');
+    if (!container) return;
+    
+    // Only render if container is empty or has different number of users
+    const currentCards = container.querySelectorAll('.on-shift-card');
+    if (currentCards.length === users.length) return;
+    
+    container.innerHTML = users.length ? users.map((user, idx) => {
+        const percent = getShiftPercent(user.start, user.end);
+        const pastel = '#aee6f9';
+        const darkBg = '#181a20';
+        const darkBorder = '#23242a';
+        const svg = `
+        <svg width="32" height="32" viewBox="0 0 56 56">
+            <circle cx="28" cy="28" r="24" stroke="#333" stroke-width="6" fill="none"/>
+            <circle cx="28" cy="28" r="24" stroke="${pastel}" stroke-width="6" fill="none" stroke-dasharray="${2 * Math.PI * 24}" stroke-dashoffset="${(1 - percent) * 2 * Math.PI * 24}" style="transition: stroke-dashoffset 1s linear;"/>
+        </svg>`;
+        return `
+            <div class="on-shift-card d-flex align-items-center justify-content-between p-2 mb-2" style="background:${darkBg};border-radius:8px;border:1px solid ${darkBorder};box-shadow:0 2px 8px #000a;width:100%;transition:transform 0.3s ease,box-shadow 0.3s ease;animation:fadeIn 0.5s ease-out">
+                <div class="d-flex align-items-center">
+                    <div class="on-shift-dot me-2" style="width:12px;height:12px;border-radius:50%;background:${pastel};box-shadow:0 0 8px 2px ${pastel}99;animation:pulseDot 2s infinite ease-in-out"></div>
+                    <div class="me-3">
+                        <div class="fw-bold" style="color:#fff;font-size:0.9rem">${user.name}</div>
+                        <div class="text-muted" style="font-size:0.8rem">${user.department}</div>
+                    </div>
+                    <span class="badge bg-secondary" style="font-size:0.8rem">${user.start} - ${user.end}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="timer-svg">${svg}</div>
+                    <span class="timer-text fw-bold" id="timer-${idx}" style="color:#e0e0e0;font-size:0.9rem;min-width:100px;text-align:right">--:--:--</span>
+                </div>
+            </div>
+        `;
+    }).join('') : '<div class="text-muted w-100 text-center">No one is currently on shift.</div>';
+}
+
+function getShiftPercent(start, end) {
+    const now = new Date();
+    const s = parseTimeToDate(start);
+    const e = parseTimeToDate(end);
+    if (now < s) return 0;
+    if (now > e) return 1;
+    return (now - s) / (e - s);
+}
+
+function updateCountdowns(users) {
+    users.forEach((user, idx) => {
+        const end = parseTimeToDate(user.end);
+        const now = new Date();
+        let left = getTimeLeft(end);
+        const timer = document.getElementById(`timer-${idx}`);
+        if (!timer) return;
+        
+        if (now > end) {
+            if (timer.textContent !== 'Shift Ended') {
+                timer.textContent = 'Shift Ended';
+                timer.style.color = '#ff3c6f';
+            }
+            return;
+        }
+        
+        const newTimeText = `${left.hours}h ${left.mins}m ${left.secs}s left`;
+        if (timer.textContent !== newTimeText) {
+            timer.textContent = newTimeText;
+            timer.style.color = '#e0e0e0';
+        }
+    });
+    
+    // Update SVG progress bars
+    document.querySelectorAll('.timer-svg svg').forEach((svg, i) => {
+        const user = users[i];
+        if (!user) return;
+        const percent = getShiftPercent(user.start, user.end);
+        const circle = svg.querySelectorAll('circle')[1];
+        if (circle) {
+            const r = 24;
+            const c = 2 * Math.PI * r;
+            const newOffset = ((1 - percent) * c).toString();
+            if (circle.getAttribute('stroke-dashoffset') !== newOffset) {
+                circle.setAttribute('stroke-dashoffset', newOffset);
+            }
+        }
+    });
+}
+
+// Fix filter logic for on-shift users
+function setupOnShiftFilter(data) {
+    const filterButtons = document.querySelectorAll('[data-filter]');
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            const filter = button.dataset.filter;
+            let filtered = filter === 'all' ? data : data.filter(u => u.department && u.department.toLowerCase() === filter);
+            let onShift = filterOnShiftUsers(filtered);
+            renderOnShiftUsers(onShift);
+            updateCountdowns(onShift);
+        });
+    });
+}
+
+function startOnShiftRealtime() {
+    fetchCSV(CSV_PATH).then(data => {
+        // Initial render
+        let onShift = filterOnShiftUsers(data);
+        renderOnShiftUsers(onShift);
+        updateCountdowns(onShift);
+        setupOnShiftFilter(data);
+        
+        // Update only timers and progress circles every second
+        setInterval(() => {
+            const activeBtn = document.querySelector('[data-filter].active');
+            const filter = activeBtn ? activeBtn.dataset.filter : 'all';
+            let filtered = filter === 'all' ? data : data.filter(u => u.department && u.department.toLowerCase() === filter);
+            let newOnShift = filterOnShiftUsers(filtered);
+            
+            // Only update timers and progress circles
+            updateCountdowns(newOnShift);
+        }, 1000);
+    });
+}
+
+// Add vibrant timer animation
+const style = document.createElement('style');
+style.innerHTML = `
+@keyframes pulseDot {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.on-shift-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.timer-svg circle {
+    transition: stroke-dashoffset 1s ease-in-out;
+}
+
+.timer-text {
+    transition: color 0.3s ease;
+}
+
+.on-shift-container {
+    background: #13151a !important;
+    border-radius: 12px;
+    padding: 12px;
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.on-shift-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.on-shift-container::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.on-shift-container::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 3px;
+}
+`;
+document.head.appendChild(style);
+
+// Start the real-time on-shift view
+startOnShiftRealtime();
+
+function updateOnShiftUsers(users) {
+    const container = document.getElementById('onShiftUsers');
+    if (!users || users.length === 0) {
+        container.innerHTML = '<div class="text-muted w-100 text-center">No one is currently on shift.</div>';
+        return;
+    }
+
+    // Group users by remaining time
+    const groups = {};
+    users.forEach(user => {
+        const remainingTime = user.remaining_time || 'Unknown';
+        if (!groups[remainingTime]) {
+            groups[remainingTime] = [];
+        }
+        groups[remainingTime].push(user);
+    });
+
+    // Sort groups by remaining time
+    const sortedGroups = Object.entries(groups).sort((a, b) => {
+        if (a[0] === 'Unknown') return 1;
+        if (b[0] === 'Unknown') return -1;
+        return a[0].localeCompare(b[0]);
+    });
+
+    // Create HTML for each group
+    container.innerHTML = sortedGroups.map(([time, groupUsers]) => `
+        <div class="shift-group" data-department="all">
+            <div class="shift-group-header">
+                <div class="shift-group-title">${time} Remaining</div>
+                <div class="shift-group-time">${groupUsers.length} user${groupUsers.length !== 1 ? 's' : ''}</div>
+            </div>
+            <div class="shift-group-users">
+                ${groupUsers.map(user => `
+                    <div class="user-card ${user.department.toLowerCase()}" data-department="${user.department.toLowerCase()}">
+                        <div class="user-card-header">
+                            <i class="bi bi-person-circle"></i>
+                            <div>
+                                <h6 class="user-card-name">${user.name}</h6>
+                                <div class="user-card-department">${user.department}</div>
+                            </div>
+                        </div>
+                        <div class="user-card-time">
+                            <i class="bi bi-clock"></i> ${user.remaining_time}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+
+    // Add filter functionality
+    const filterButtons = document.querySelectorAll('[data-filter]');
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Update active state
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            const filter = button.dataset.filter;
+            const groups = document.querySelectorAll('.shift-group');
+            groups.forEach(group => {
+                if (filter === 'all') {
+                    group.style.display = 'block';
+                } else {
+                    const users = group.querySelectorAll(`.user-card[data-department="${filter}"]`);
+                    const hasFilteredUsers = users.length > 0;
+                    group.style.display = hasFilteredUsers ? 'block' : 'none';
+                }
+            });
+        });
+    });
+}
+</script>
+{% endblock %}

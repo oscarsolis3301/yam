@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+{% block title %}Cache Management - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-database"></i> User Cache Management
+                </h1>
+                <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cache Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Total Entries</h5>
+                            <h2 id="totalEntries">-</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-database fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Recent Entries</h5>
+                            <h2 id="recentEntries">-</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-clock-history fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Cache Size</h5>
+                            <h2 id="cacheSize">-</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-hdd fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Actions</h5>
+                            <div class="btn-group-vertical">
+                                <button class="btn btn-sm btn-light" onclick="refreshStats()">
+                                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                                </button>
+                                <button class="btn btn-sm btn-light" onclick="showPopulateModal()">
+                                    <i class="bi bi-plus-circle"></i> Add Entries
+                                </button>
+                            </div>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-gear fs-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Cache Entries -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-list-ul"></i> Recent Cache Entries
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="cacheTable">
+                            <thead>
+                                <tr>
+                                    <th>Clock ID</th>
+                                    <th>Name</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Job Title</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cacheTableBody">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Populate Cache Modal -->
+<div class="modal fade" id="populateModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Populate Cache</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="clockIds" class="form-label">Clock IDs (one per line or comma-separated)</label>
+                    <textarea class="form-control" id="clockIds" rows="10" placeholder="Enter clock IDs here...&#10;Example:&#10;12345&#10;67890&#10;11111"></textarea>
+                </div>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Note:</strong> This will attempt to lookup each clock ID in Active Directory and cache the user information for faster future searches.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="populateCache()">
+                    <i class="bi bi-plus-circle"></i> Populate Cache
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Results Modal -->
+<div class="modal fade" id="resultsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cache Population Results</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="resultsContent">
+                <!-- Results will be populated here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let populateModal, resultsModal;
+
+document.addEventListener('DOMContentLoaded', function() {
+    populateModal = new bootstrap.Modal(document.getElementById('populateModal'));
+    resultsModal = new bootstrap.Modal(document.getElementById('resultsModal'));
+    
+    loadCacheStats();
+});
+
+async function loadCacheStats() {
+    try {
+        const response = await fetch('/admin/api/cache/stats');
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('totalEntries').textContent = data.total_entries;
+            document.getElementById('recentEntries').textContent = data.recent_entries;
+            document.getElementById('cacheSize').textContent = data.cache_size_mb.toFixed(2) + ' MB';
+            
+            // Populate table
+            const tbody = document.getElementById('cacheTableBody');
+            if (data.sample_entries && data.sample_entries.length > 0) {
+                tbody.innerHTML = data.sample_entries.map(entry => `
+                    <tr>
+                        <td><code>${entry.clock_id}</code></td>
+                        <td>${entry.first_name} ${entry.last_name || ''}</td>
+                        <td>${entry.username || '-'}</td>
+                        <td>${entry.email || '-'}</td>
+                        <td>${entry.job_title || '-'}</td>
+                        <td>${entry.created_at ? new Date(entry.created_at).toLocaleDateString() : '-'}</td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">No cache entries found</td></tr>';
+            }
+        }
+    } catch (error) {
+        console.error('Error loading cache stats:', error);
+    }
+}
+
+function refreshStats() {
+    loadCacheStats();
+}
+
+function showPopulateModal() {
+    populateModal.show();
+}
+
+async function populateCache() {
+    const clockIdsText = document.getElementById('clockIds').value.trim();
+    if (!clockIdsText) {
+        alert('Please enter some clock IDs');
+        return;
+    }
+    
+    // Parse clock IDs (support both comma-separated and line-separated)
+    const clockIds = clockIdsText
+        .split(/[,\n]/)
+        .map(id => id.trim())
+        .filter(id => id && /^\d+$/.test(id));
+    
+    if (clockIds.length === 0) {
+        alert('Please enter valid numeric clock IDs');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/admin/api/cache/populate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ clock_ids: clockIds })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Show results
+            const resultsContent = document.getElementById('resultsContent');
+            const summary = data.summary;
+            
+            resultsContent.innerHTML = `
+                <div class="alert alert-success">
+                    <h6>Summary:</h6>
+                    <ul>
+                        <li>Total processed: ${summary.total_processed}</li>
+                        <li>Successfully cached: ${summary.successful}</li>
+                        <li>Already existed: ${summary.already_existed}</li>
+                        <li>Failed: ${summary.failed}</li>
+                    </ul>
+                </div>
+                
+                ${data.results.failed.length > 0 ? `
+                    <div class="alert alert-warning">
+                        <h6>Failed Entries:</h6>
+                        <ul>
+                            ${data.results.failed.map(f => `<li>Clock ID ${f.clock_id}: ${f.error}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+                
+                ${data.results.success.length > 0 ? `
+                    <div class="alert alert-info">
+                        <h6>Successfully Cached:</h6>
+                        <p>${data.results.success.join(', ')}</p>
+                    </div>
+                ` : ''}
+            `;
+            
+            populateModal.hide();
+            resultsModal.show();
+            
+            // Refresh stats
+            setTimeout(loadCacheStats, 1000);
+        } else {
+            alert('Error: ' + (data.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error populating cache:', error);
+        alert('Error populating cache: ' + error.message);
+    }
+}
+</script>
+{% endblock %}

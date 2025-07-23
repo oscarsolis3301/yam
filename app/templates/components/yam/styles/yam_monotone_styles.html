@@ -1,0 +1,384 @@
+<!-- YAM Monotone Styles - Strategic Color Accents -->
+<style>
+/* MONOTONE BASE STYLES - Clean, minimal design with strategic color accents */
+
+/* 1. WELCOME BANNER - Subtle monotone with strategic accent */
+.yam-welcome-banner {
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(40, 40, 40, 0.95) 100%) !important;
+    border: 2px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.yam-welcome-banner::before {
+    background: rgba(255, 255, 255, 0.03) !important;
+    animation: none !important;
+}
+
+/* Strategic accent: Add subtle shimmer only on hover */
+.yam-welcome-banner:hover::before {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.05)) !important;
+    animation: subtleShimmer 4s ease-in-out infinite !important;
+}
+
+@keyframes subtleShimmer {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+}
+
+/* 2. WELCOME TITLE - Clean monotone with strategic accent */
+.yam-brand {
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    -webkit-text-fill-color: initial !important;
+    background-clip: initial !important;
+    color: #ffffff !important;
+    text-shadow: none !important;
+}
+
+/* Strategic accent: Add subtle glow on hover */
+.yam-welcome-banner:hover .yam-brand {
+    color: #ffffff !important;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3) !important;
+}
+
+.welcome-name {
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    -webkit-text-fill-color: initial !important;
+    background-clip: initial !important;
+    color: #ffffff !important;
+}
+
+/* Strategic accent: Add subtle color on hover */
+.yam-welcome-banner:hover .welcome-name {
+    color: #e0e0e0 !important;
+}
+
+/* 3. ROCKET EMOJI - Clean monotone with strategic animation */
+.welcome-emoji {
+    animation: none !important;
+    color: #ffffff !important;
+}
+
+/* Strategic accent: Add subtle float on hover */
+.yam-welcome-banner:hover .welcome-emoji {
+    animation: subtleFloat 3s ease-in-out infinite !important;
+}
+
+@keyframes subtleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+/* 4. INFO ITEMS - Clean monotone with strategic accent */
+.info-item i {
+    color: #b0b0b0 !important;
+}
+
+/* Strategic accent: Add color only on hover */
+.yam-welcome-banner:hover .info-item i {
+    color: #ffffff !important;
+}
+
+/* 5. STATUS BADGES - Clean monotone with strategic status colors */
+.status-badge.connected {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+}
+
+.status-badge.connected i {
+    color: #ffffff !important;
+}
+
+/* Strategic accent: Add green color only when status is important */
+.status-badge.connected.important {
+    background: rgba(34, 197, 94, 0.15) !important;
+    border-color: rgba(34, 197, 94, 0.3) !important;
+    color: #22c55e !important;
+}
+
+.status-badge.connected.important i {
+    color: #22c55e !important;
+}
+
+/* 6. ALL CARDS - Clean monotone with strategic accents */
+.yam-card-enhanced::before,
+.yam-stats-card::before,
+.yam-status-card::before,
+.yam-user-card::before,
+.yam-connection-card::before,
+.yam-analytics-card::before,
+.yam-stats-card-compact::before,
+.yam-action-group::before {
+    background: rgba(255, 255, 255, 0.02) !important;
+    animation: none !important;
+}
+
+/* Strategic accent: Add subtle shimmer only on hover */
+.yam-card-enhanced:hover::before,
+.yam-stats-card:hover::before,
+.yam-status-card:hover::before,
+.yam-user-card:hover::before,
+.yam-connection-card:hover::before,
+.yam-analytics-card:hover::before,
+.yam-stats-card-compact:hover::before,
+.yam-action-group:hover::before {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.05)) !important;
+    animation: subtleShimmer 4s ease-in-out infinite !important;
+}
+
+/* 7. ACTION BUTTONS - Clean monotone with strategic accent */
+.yam-action-btn i {
+    color: #b0b0b0 !important;
+}
+
+/* Strategic accent: Add color only on hover */
+.yam-action-btn:hover i {
+    color: #ffffff !important;
+}
+
+/* 8. USER QUICK VIEW - Clean monotone with strategic accent */
+.user-avatar {
+    border: 4px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Strategic accent: Add subtle glow on hover */
+.yam-user-card:hover .user-avatar {
+    border: 4px solid rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1) !important;
+}
+
+.online-indicator {
+    background: #ffffff !important;
+    border: 3px solid #1a1a1a !important;
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Strategic accent: Add green color only when status is important */
+.online-indicator.important {
+    background: #4ade80 !important;
+    box-shadow: 0 2px 8px rgba(74, 222, 128, 0.4) !important;
+}
+
+/* 9. STATS AND METRICS - Clean monotone with strategic accents */
+.stat-value,
+.stat-label {
+    color: #b0b0b0 !important;
+}
+
+/* Strategic accent: Add color only on hover or when values are significant */
+.yam-card-enhanced:hover .stat-value,
+.stat-value.important {
+    color: #ffffff !important;
+}
+
+.yam-card-enhanced:hover .stat-label {
+    color: #e0e0e0 !important;
+}
+
+/* 10. CHARTS - Clean monotone with strategic accents */
+.chart-container,
+.chart-wrapper {
+    background: rgba(255, 255, 255, 0.02) !important;
+}
+
+/* Strategic accent: Add subtle background only on hover */
+.yam-card-enhanced:hover .chart-container,
+.yam-card-enhanced:hover .chart-wrapper {
+    background: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* 11. FOCUS STATES - Strategic accent colors */
+.yam-card-enhanced:focus-within::before,
+.yam-action-group:focus-within::before,
+.yam-welcome-banner:focus-within::before {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.08)) !important;
+    animation: subtleShimmer 3s ease-in-out infinite !important;
+}
+
+.yam-action-btn:focus i {
+    color: #ffffff !important;
+}
+
+/* 12. LOADING STATES - Strategic accent colors */
+.yam-card-enhanced.loading::before,
+.yam-action-group.loading::before {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.1)) !important;
+    animation: subtleShimmer 1.5s infinite !important;
+}
+
+/* 13. ERROR STATES - Strategic red accent */
+.yam-card-enhanced.error::before,
+.yam-action-group.error::before {
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.2), rgba(239, 68, 68, 0.3)) !important;
+    animation: subtleShimmer 2s ease-in-out infinite !important;
+}
+
+/* 14. SUCCESS STATES - Strategic green accent */
+.yam-card-enhanced.success::before,
+.yam-action-group.success::before {
+    background: linear-gradient(90deg, rgba(34, 197, 94, 0.3), rgba(22, 163, 74, 0.2), rgba(34, 197, 94, 0.3)) !important;
+    animation: subtleShimmer 2s ease-in-out infinite !important;
+}
+
+/* 15. WARNING STATES - Strategic yellow accent */
+.yam-card-enhanced.warning::before,
+.yam-action-group.warning::before {
+    background: linear-gradient(90deg, rgba(234, 179, 8, 0.3), rgba(202, 138, 4, 0.2), rgba(234, 179, 8, 0.3)) !important;
+    animation: subtleShimmer 2s ease-in-out infinite !important;
+}
+
+/* 16. REDUCED MOTION SUPPORT - Respect user preferences */
+@media (prefers-reduced-motion: reduce) {
+    .yam-welcome-banner::before,
+    .yam-card-enhanced::before,
+    .yam-stats-card::before,
+    .yam-status-card::before,
+    .yam-user-card::before,
+    .yam-connection-card::before,
+    .yam-analytics-card::before,
+    .yam-stats-card-compact::before,
+    .yam-action-group::before,
+    .welcome-emoji {
+        animation: none !important;
+    }
+    
+    .yam-welcome-banner:hover::before,
+    .yam-card-enhanced:hover::before,
+    .yam-stats-card:hover::before,
+    .yam-status-card:hover::before,
+    .yam-user-card:hover::before,
+    .yam-connection-card:hover::before,
+    .yam-analytics-card:hover::before,
+    .yam-stats-card-compact:hover::before,
+    .yam-action-group:hover::before {
+        animation: none !important;
+    }
+}
+
+/* 17. DARK MODE ENHANCEMENTS - Ensure good contrast in monotone mode */
+@media (prefers-color-scheme: dark) {
+    .yam-welcome-banner,
+    .yam-card-enhanced,
+    .yam-action-group {
+        background: linear-gradient(135deg, rgba(18, 18, 18, 0.95) 0%, rgba(32, 32, 32, 0.95) 100%) !important;
+    }
+}
+
+/* 18. HIGH CONTRAST MODE - Ensure accessibility */
+@media (prefers-contrast: high) {
+    .yam-welcome-banner,
+    .yam-card-enhanced,
+    .yam-action-group {
+        border: 2px solid #ffffff !important;
+    }
+    
+    .yam-action-btn {
+        border: 2px solid #ffffff !important;
+    }
+}
+
+/* 19. PRINT STYLES - Remove all animations and colors for printing */
+@media print {
+    .yam-welcome-banner::before,
+    .yam-card-enhanced::before,
+    .yam-stats-card::before,
+    .yam-status-card::before,
+    .yam-user-card::before,
+    .yam-connection-card::before,
+    .yam-analytics-card::before,
+    .yam-stats-card-compact::before,
+    .yam-action-group::before,
+    .welcome-emoji {
+        animation: none !important;
+        background: none !important;
+    }
+    
+    .yam-brand,
+    .welcome-name {
+        background: none !important;
+        -webkit-background-clip: initial !important;
+        -webkit-text-fill-color: initial !important;
+        background-clip: initial !important;
+        color: #000000 !important;
+    }
+    
+    .yam-welcome-banner,
+    .yam-card-enhanced,
+    .yam-action-group {
+        background: #ffffff !important;
+        color: #000000 !important;
+        border: 1px solid #000000 !important;
+        box-shadow: none !important;
+    }
+}
+
+/* 20. PERFORMANCE OPTIMIZATIONS - Reduce GPU usage when not needed */
+.yam-welcome-banner:not(:hover)::before,
+.yam-card-enhanced:not(:hover)::before,
+.yam-stats-card:not(:hover)::before,
+.yam-status-card:not(:hover)::before,
+.yam-user-card:not(:hover)::before,
+.yam-connection-card:not(:hover)::before,
+.yam-analytics-card:not(:hover)::before,
+.yam-stats-card-compact:not(:hover)::before,
+.yam-action-group:not(:hover)::before {
+    will-change: auto !important;
+}
+
+.yam-welcome-banner:hover::before,
+.yam-card-enhanced:hover::before,
+.yam-stats-card:hover::before,
+.yam-status-card:hover::before,
+.yam-user-card:hover::before,
+.yam-connection-card:hover::before,
+.yam-analytics-card:hover::before,
+.yam-stats-card-compact:hover::before,
+.yam-action-group:hover::before {
+    will-change: transform !important;
+}
+
+/* 21. STRATEGIC COLOR ACCENTS - Areas that should pop with color */
+/* Chart data points - make them stand out */
+.chart-container canvas {
+    filter: contrast(1.1) brightness(1.05) !important;
+}
+
+/* Important notifications - use strategic colors */
+.notification.important {
+    background: rgba(239, 68, 68, 0.15) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: #ef4444 !important;
+}
+
+.notification.success {
+    background: rgba(34, 197, 94, 0.15) !important;
+    border-color: rgba(34, 197, 94, 0.3) !important;
+    color: #22c55e !important;
+}
+
+.notification.warning {
+    background: rgba(234, 179, 8, 0.15) !important;
+    border-color: rgba(234, 179, 8, 0.3) !important;
+    color: #eab308 !important;
+}
+
+/* Critical system status - use strategic colors */
+.system-status.critical {
+    background: rgba(239, 68, 68, 0.2) !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+    color: #ef4444 !important;
+}
+
+.system-status.warning {
+    background: rgba(234, 179, 8, 0.2) !important;
+    border-color: rgba(234, 179, 8, 0.4) !important;
+    color: #eab308 !important;
+}
+
+.system-status.normal {
+    background: rgba(34, 197, 94, 0.2) !important;
+    border-color: rgba(34, 197, 94, 0.4) !important;
+    color: #22c55e !important;
+}
+</style> 

@@ -1,0 +1,72 @@
+{% import 'components/dashboard/dashboard_styles.html' as dashboard_styles %}
+
+{% macro render_dashboard_head(current_user) %}
+<!-- Discord-like Dashboard Head Component -->
+{{ dashboard_styles.render_dashboard_styles() }}
+
+<!-- Google Fonts - Discord-like typography -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<!-- Chart.js for Analytics -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Additional Meta Tags -->
+<meta name="theme-color" content="#36393f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/Y.ico') }}">
+
+<!-- Custom Dashboard Meta -->
+<meta name="dashboard-version" content="2.0.0">
+<meta name="dashboard-theme" content="discord-dark">
+
+<!-- Discord-like CSS Variables -->
+<style>
+/* Discord-like font fallbacks */
+body {
+    font-family: 'Inter', 'Whitney', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* Ensure smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Discord-like focus styles */
+*:focus {
+    outline: 2px solid #5865f2;
+    outline-offset: 2px;
+}
+
+/* Discord-like selection */
+::selection {
+    background: rgba(88, 101, 242, 0.3);
+    color: #ffffff;
+}
+
+/* Discord-like scrollbar for webkit browsers */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #2f3136;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4f545c;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #72767d;
+}
+</style>
+{% endmacro %} 

@@ -1,0 +1,37 @@
+﻿{% extends "base.html" %}
+
+{% block head %}
+<title>Patterson Technician Dispatch - PDSI</title>
+{% include 'patterson/components/styles.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="patterson-container">
+    <!-- Dashboard Header -->
+    {% include 'patterson/components/header.html' %}
+    
+    <!-- Statistics Cards -->
+    {% include 'patterson/components/stats.html' %}
+    
+    <!-- Main Content Grid -->
+    <div class="main-content-grid">
+        <!-- Calendar Section -->
+        {% include 'patterson/components/calendar.html' %}
+        
+        <!-- Tickets Section -->
+        {% include 'patterson/components/tickets.html' %}
+    </div>
+</div>
+
+<!-- Real-time Update Indicator -->
+<div class="update-indicator" id="update-indicator">
+    <i class="bi bi-check-circle"></i>
+    <span id="update-message">Data updated successfully</span>
+</div>
+
+<!-- Modals -->
+{% include 'patterson/components/modals.html' %}
+
+<!-- Scripts -->
+{% include 'patterson/components/script.html' %}
+{% endblock %} 

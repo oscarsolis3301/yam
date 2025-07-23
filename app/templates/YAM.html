@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+body {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+    color: white;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', Arial, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.dashboard-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dashboard-title {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(45deg, #00d4ff, #ff0080);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.dashboard-subtitle {
+    font-size: 1.2rem;
+    color: #b0b0b0;
+    margin-bottom: 1rem;
+}
+
+.user-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.user-card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.user-card strong {
+    color: #00d4ff;
+}
+
+.dashboard-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.info-card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+}
+
+.info-card h3 {
+    color: #00d4ff;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.info-card p {
+    color: #b0b0b0;
+    line-height: 1.6;
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #00ff41;
+    margin-right: 0.5rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.timestamp {
+    text-align: center;
+    margin-top: 2rem;
+    color: #72767d;
+    font-size: 0.9rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1rem;
+    }
+    
+    .dashboard-title {
+        font-size: 2rem;
+    }
+    
+    .dashboard-content {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">YAM Dashboard - SESSION CLEANUP ENABLED</h1>
+        <p class="dashboard-subtitle">Your Advanced Management System - All sessions cleared on restart!</p>
+        
+        <div class="user-info">
+            {% if current_user and current_user.is_authenticated %}
+                <div class="user-card">
+                    <span class="status-indicator"></span>
+                    <strong>User:</strong> {{ current_user.username }}
+                </div>
+                <div class="user-card">
+                    <strong>Email:</strong> {{ current_user.email }}
+                </div>
+                <div class="user-card">
+                    <strong>Role:</strong> {{ current_user.role if current_user.role else 'User' }}
+                </div>
+            {% else %}
+                <div class="user-card">
+                    <strong>Status:</strong> Not authenticated
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="dashboard-content">
+        <div class="info-card">
+            <h3>🚀 System Status</h3>
+            <p>YAM server is running successfully with hot reloading enabled. Template changes will automatically refresh in the browser.</p>
+        </div>
+        
+        <div class="info-card">
+            <h3>🔧 Development Mode</h3>
+            <p>You're currently in development mode with enhanced debugging and real-time file monitoring capabilities.</p>
+        </div>
+        
+        <div class="info-card">
+            <h3>📊 Real-time Updates</h3>
+            <p>Socket.IO integration provides real-time updates for user presence, system metrics, and collaborative features.</p>
+        </div>
+        
+        <div class="info-card">
+            <h3>🎨 Modern UI</h3>
+            <p>Built with modern CSS features including backdrop filters, gradients, and smooth animations for an enhanced user experience.</p>
+        </div>
+    </div>
+    
+    <div class="timestamp">
+        Last updated: {{ moment().format('MMMM Do YYYY, h:mm:ss a') if moment else 'Now' }}
+    </div>
+</div>
+{% endblock %}

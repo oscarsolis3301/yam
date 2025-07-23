@@ -1,0 +1,635 @@
+{% macro render_dashboard_scripts() %}
+<script>
+// Discord-like Dark Dashboard Scripts
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Dashboard
+    initDashboard();
+    
+    // Initialize Charts with vibrant colors
+    initCharts();
+    
+    // Initialize Event Listeners
+    initEventListeners();
+    
+    // Initialize Universal Search
+    initDashboardUniversalSearch();
+    
+    // Initialize Interactive Features
+    initInteractiveDashboard();
+    
+    // Initialize Server Sidebar
+    initServerSidebar();
+});
+
+// Dashboard Initialization
+function initDashboard() {
+    console.log('Discord-like Dashboard initialized');
+    
+    // Load real data
+    loadDashboardData();
+    
+    // Set up real-time updates
+    setupRealTimeUpdates();
+    
+    // Add fade-in animation to cards
+    animateCards();
+}
+
+// Server Sidebar Initialization
+function initServerSidebar() {
+    const serverIcons = document.querySelectorAll('.server-icon');
+    
+    serverIcons.forEach(icon => {
+        icon.addEventListener('click', function() {
+            // Remove active class from all icons
+            serverIcons.forEach(i => i.classList.remove('active'));
+            
+            // Add active class to clicked icon
+            this.classList.add('active');
+            
+            // Handle navigation (placeholder)
+            const title = this.getAttribute('title');
+            showNotification(`Navigating to ${title}`, 'info');
+        });
+    });
+}
+
+// Chart Initialization with Vibrant Colors
+function initCharts() {
+    // Tickets Chart with vibrant colors
+    const ticketsCtx = document.getElementById('ticketsChart');
+    if (ticketsCtx) {
+        new Chart(ticketsCtx, {
+            type: 'line',
+            data: {
+                labels: ['6AM', '8AM', '10AM', '12PM', '2PM', '4PM', '6PM', '8PM', '10PM'],
+                datasets: [{
+                    label: 'Tickets Closed',
+                    data: [3, 7, 12, 18, 15, 22, 19, 14, 8],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointHoverBackgroundColor: '#10b981',
+                    pointHoverBorderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#94a3b8',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#94a3b8',
+                            font: {
+                                size: 12
+                            },
+                            callback: function(value) {
+                                return value + ' tickets';
+                            }
+                        }
+                    }
+                },
+                elements: {
+                    point: {
+                        hoverBackgroundColor: '#10b981'
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        });
+    }
+    
+    // User Distribution Chart with vibrant colors
+    const userDistributionCtx = document.getElementById('userDistributionChart');
+    if (userDistributionCtx) {
+        new Chart(userDistributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Active Users', 'Inactive Users', 'New Users', 'Premium Users'],
+                datasets: [{
+                    data: [45, 25, 20, 10],
+                    backgroundColor: [
+                        '#3b82f6',  // Blue
+                        '#ef4444',  // Red
+                        '#10b981',  // Green
+                        '#f59e0b'   // Orange
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 8,
+                    borderColor: '#40444b'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#94a3b8',
+                            font: {
+                                size: 12
+                            },
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    }
+                },
+                cutout: '60%',
+                animation: {
+                    animateRotate: true,
+                    animateScale: true
+                }
+            }
+        });
+    }
+}
+
+// Event Listeners
+function initEventListeners() {
+    // Notification button
+    const notificationBtn = document.getElementById('notificationBtn');
+    if (notificationBtn) {
+        notificationBtn.addEventListener('click', function() {
+            showNotification('Notifications feature coming soon!', 'info');
+        });
+    }
+    
+    // User profile
+    const userProfile = document.querySelector('.user-profile');
+    if (userProfile) {
+        userProfile.addEventListener('click', function() {
+            showNotification('Profile settings coming soon!', 'info');
+        });
+    }
+    
+    // Quick action buttons
+    const quickActionBtns = document.querySelectorAll('.quick-action-btn');
+    quickActionBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const action = this.getAttribute('data-action');
+            handleQuickAction(action);
+        });
+    });
+    
+    // System metrics refresh
+    const refreshSystemMetricsBtn = document.getElementById('refreshSystemMetrics');
+    if (refreshSystemMetricsBtn) {
+        refreshSystemMetricsBtn.addEventListener('click', function() {
+            loadSystemMetrics();
+            showNotification('System metrics refreshed', 'success');
+        });
+    }
+    
+    // Chart refresh buttons
+    const refreshTicketsChartBtn = document.getElementById('refreshTicketsChart');
+    if (refreshTicketsChartBtn) {
+        refreshTicketsChartBtn.addEventListener('click', function() {
+            refreshChart('ticketsChart');
+            showNotification('Tickets chart refreshed', 'success');
+        });
+    }
+    
+    const refreshUserDistributionBtn = document.getElementById('refreshUserDistribution');
+    if (refreshUserDistributionBtn) {
+        refreshUserDistributionBtn.addEventListener('click', function() {
+            refreshChart('userDistributionChart');
+            showNotification('User distribution refreshed', 'success');
+        });
+    }
+    
+    // Export buttons
+    const exportTicketsDataBtn = document.getElementById('exportTicketsData');
+    if (exportTicketsDataBtn) {
+        exportTicketsDataBtn.addEventListener('click', function() {
+            exportData('tickets');
+        });
+    }
+    
+    const exportUserDataBtn = document.getElementById('exportUserData');
+    if (exportUserDataBtn) {
+        exportUserDataBtn.addEventListener('click', function() {
+            exportData('users');
+        });
+    }
+    
+    // Activity refresh and filter
+    const refreshActivityBtn = document.getElementById('refreshActivity');
+    if (refreshActivityBtn) {
+        refreshActivityBtn.addEventListener('click', function() {
+            loadRecentActivity();
+            showNotification('Activity refreshed', 'success');
+        });
+    }
+    
+    const filterActivityBtn = document.getElementById('filterActivity');
+    if (filterActivityBtn) {
+        filterActivityBtn.addEventListener('click', function() {
+            showActivityFilterModal();
+        });
+    }
+    
+    // Activity item clicks
+    const activityItems = document.querySelectorAll('.activity-item');
+    activityItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const ticketLink = this.querySelector('.ticket-link');
+            if (ticketLink) {
+                showTicketDetails(ticketLink.textContent);
+            }
+        });
+    });
+}
+
+// Dashboard Universal Search
+function initDashboardUniversalSearch() {
+    const searchInput = document.getElementById('dashboardSearchInput');
+    const searchResults = document.getElementById('dashboardSearchResults');
+    const searchClearBtn = document.getElementById('searchClearBtn');
+    
+    if (!searchInput) return;
+    
+    let searchTimeout;
+    
+    searchInput.addEventListener('input', function() {
+        const query = this.value.trim();
+        
+        // Show/hide clear button
+        if (searchClearBtn) {
+            searchClearBtn.style.display = query ? 'block' : 'none';
+        }
+        
+        if (query.length < 2) {
+            hideSearchResults();
+            return;
+        }
+        
+        // Clear previous timeout
+        clearTimeout(searchTimeout);
+        
+        // Debounce search
+        searchTimeout = setTimeout(() => {
+            performDashboardSearch(query);
+        }, 300);
+    });
+    
+    // Clear search
+    if (searchClearBtn) {
+        searchClearBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            hideSearchResults();
+            searchInput.focus();
+        });
+    }
+    
+    // Keyboard shortcuts
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            hideSearchResults();
+            this.blur();
+        }
+    });
+    
+    // Hide results when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchResults?.contains(e.target)) {
+            hideSearchResults();
+        }
+    });
+}
+
+// Interactive Dashboard Features
+function initInteractiveDashboard() {
+    // System metric interactions
+    const systemMetrics = document.querySelectorAll('.system-metric');
+    systemMetrics.forEach(metric => {
+        metric.addEventListener('click', function() {
+            const metricType = this.id.replace('Metric', '').toLowerCase();
+            showMetricDetails(metricType);
+        });
+    });
+    
+    // Stat card interactions
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const cardType = this.classList.contains('primary') ? 'users' :
+                           this.classList.contains('success') ? 'sessions' :
+                           this.classList.contains('info') ? 'online' : 'system';
+            showStatDetails(cardType);
+        });
+    });
+}
+
+// Data Loading Functions
+async function loadDashboardData() {
+    try {
+        console.log('Loading dashboard data...');
+        
+        await Promise.all([
+            loadUserStats(),
+            loadSystemMetrics(),
+            loadOnlineUsers(),
+            loadRecentActivity()
+        ]);
+        
+        console.log('Dashboard data loaded successfully');
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        showNotification('Error loading dashboard data', 'error');
+    }
+}
+
+async function loadUserStats() {
+    try {
+        const response = await fetch('/api/users/online');
+        if (response.ok) {
+            const data = await response.json();
+            
+            updateElement('totalUsers', data.total_users || 0);
+            updateElement('activeSessions', data.online_users || 0);
+            updateElement('onlineUsers', data.online_users || 0);
+            
+            updateChangeIndicator('totalUsersChange', '+5.2% from last hour');
+            updateChangeIndicator('activeSessionsChange', '+2.1% from last hour');
+            updateChangeIndicator('onlineUsersChange', '+1.8% from last hour');
+        }
+    } catch (error) {
+        console.error('Error loading user stats:', error);
+        // Fallback to static data
+        updateElement('totalUsers', 156);
+        updateElement('activeSessions', 23);
+        updateElement('onlineUsers', 23);
+    }
+}
+
+async function loadSystemMetrics() {
+    try {
+        const response = await fetch('/api/system/metrics');
+        if (response.ok) {
+            const data = await response.json();
+            
+            updateElement('systemLoad', `${data.cpu?.usage || 45}%`);
+            updateElement('realCpuUsage', `${data.cpu?.usage || 45}%`);
+            updateElement('realMemoryUsage', `${data.memory?.usage || 62}%`);
+            updateElement('realDiskUsage', `${data.disk?.usage || 78}%`);
+            updateElement('realNetworkStatus', data.network?.down > 0 ? 'Connected' : 'Disconnected');
+            
+            // Update progress bars
+            updateProgressBar('cpuMetric', data.cpu?.usage || 45);
+            updateProgressBar('memoryMetric', data.memory?.usage || 62);
+            updateProgressBar('diskMetric', data.disk?.usage || 78);
+            
+            updateChangeIndicator('systemLoadChange', `${data.cpu?.usage > 70 ? '+' : '-'}${Math.abs((data.cpu?.usage || 45) - 65)}% from last hour`);
+        }
+    } catch (error) {
+        console.error('Error loading system metrics:', error);
+        // Fallback to static data
+        updateElement('systemLoad', '45%');
+        updateElement('realCpuUsage', '45%');
+        updateElement('realMemoryUsage', '62%');
+        updateElement('realDiskUsage', '78%');
+        updateElement('realNetworkStatus', 'Connected');
+    }
+}
+
+async function loadOnlineUsers() {
+    try {
+        const response = await fetch('/api/users/online');
+        if (response.ok) {
+            const data = await response.json();
+            updateElement('onlineUsers', data.online_users || 0);
+        }
+    } catch (error) {
+        console.error('Error loading online users:', error);
+    }
+}
+
+async function loadRecentActivity() {
+    try {
+        const response = await fetch('/api/activity/recent');
+        if (response.ok) {
+            const data = await response.json();
+            updateRecentActivity(data);
+        }
+    } catch (error) {
+        console.error('Error loading recent activity:', error);
+        // Keep existing static data
+    }
+}
+
+// Utility Functions
+function updateElement(id, value) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.textContent = value;
+    }
+}
+
+function updateChangeIndicator(id, text) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.textContent = text;
+    }
+}
+
+function updateProgressBar(metricId, percentage) {
+    const metric = document.getElementById(metricId);
+    if (metric) {
+        const progressBar = metric.querySelector('.metric-progress');
+        if (progressBar) {
+            progressBar.style.width = `${percentage}%`;
+            
+            // Update color based on percentage
+            if (percentage > 80) {
+                progressBar.style.background = '#ef4444'; // Red
+            } else if (percentage > 60) {
+                progressBar.style.background = '#f59e0b'; // Orange
+            } else {
+                progressBar.style.background = '#10b981'; // Green
+            }
+        }
+    }
+}
+
+function updateRecentActivity(data) {
+    const activityFeed = document.querySelector('.activity-feed');
+    if (!activityFeed || !data) return;
+    
+    // Update with real data if available
+    // For now, keep the existing static data
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+function handleQuickAction(action) {
+    switch (action) {
+        case 'add-user':
+            showNotification('Add User feature coming soon!', 'info');
+            break;
+        case 'new-ticket':
+            showNotification('New Ticket feature coming soon!', 'info');
+            break;
+        case 'create-report':
+            showNotification('Create Report feature coming soon!', 'info');
+            break;
+        case 'settings':
+            showNotification('Settings feature coming soon!', 'info');
+            break;
+        default:
+            showNotification('Action not implemented yet', 'warning');
+    }
+}
+
+function refreshChart(chartId) {
+    // Add chart refresh logic here
+    console.log(`Refreshing chart: ${chartId}`);
+}
+
+function exportData(type) {
+    showNotification(`${type} data export feature coming soon!`, 'info');
+}
+
+function showActivityFilterModal() {
+    showNotification('Activity filter feature coming soon!', 'info');
+}
+
+function showMetricDetails(metricType) {
+    showNotification(`${metricType} details feature coming soon!`, 'info');
+}
+
+function showTicketDetails(ticketNumber) {
+    showNotification(`Ticket ${ticketNumber} details feature coming soon!`, 'info');
+}
+
+function showStatDetails(statType) {
+    showNotification(`${statType} statistics details feature coming soon!`, 'info');
+}
+
+function performDashboardSearch(query) {
+    // Implement search functionality
+    console.log('Searching for:', query);
+    
+    // Show results (placeholder)
+    showSearchResults(query);
+}
+
+function showSearchResults(query) {
+    const searchResults = document.getElementById('dashboardSearchResults');
+    const resultsContent = document.getElementById('dashboardResultsContent');
+    const resultsCount = document.getElementById('dashboardResultsCount');
+    
+    if (!searchResults || !resultsContent) return;
+    
+    // Placeholder results
+    resultsContent.innerHTML = `
+        <div class="search-result-item">
+            <div class="search-result-icon" style="background: #3b82f6;">
+                <i class="bi bi-ticket"></i>
+            </div>
+            <div class="search-result-content">
+                <div class="search-result-title">Ticket ${query}</div>
+                <div class="search-result-subtitle">Support ticket</div>
+            </div>
+        </div>
+    `;
+    
+    if (resultsCount) {
+        resultsCount.textContent = '1 result found';
+    }
+    
+    searchResults.style.display = 'block';
+}
+
+function hideSearchResults() {
+    const searchResults = document.getElementById('dashboardSearchResults');
+    if (searchResults) searchResults.style.display = 'none';
+}
+
+function setupRealTimeUpdates() {
+    // Set up real-time updates every 30 seconds
+    setInterval(() => {
+        loadSystemMetrics();
+    }, 30000);
+    
+    // Set up activity updates every 60 seconds
+    setInterval(() => {
+        loadRecentActivity();
+    }, 60000);
+}
+
+// Animation Functions
+function animateCards() {
+    const cards = document.querySelectorAll('.content-card, .stat-card');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.3s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+}
+
+// Performance monitoring
+function monitorPerformance() {
+    window.addEventListener('load', function() {
+        const loadTime = performance.now();
+        console.log(`Discord-like Dashboard loaded in ${loadTime.toFixed(2)}ms`);
+    });
+}
+
+// Initialize performance monitoring
+monitorPerformance();
+</script>
+{% endmacro %} 

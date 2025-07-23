@@ -1,0 +1,2792 @@
+{% extends "base.html" %}
+{% block head %}
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+<!-- Quill Rich Text Editor -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<!-- Fallback – use jsDelivr if the primary CDN fails (e.g. corporate firewall) -->
+<link id="quillStylesheetFallback" href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.min.css" rel="stylesheet" disabled>
+<!-- Sortable.js for drag and drop -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+<style>
+  /* === Dark Theme Design System === */
+  :root {
+    --dark-bg: #0d1117;
+    --dark-surface: #161b22;
+    --dark-surface-2: #21262d;
+    --dark-border: #30363d;
+    --dark-border-light: #21262d;
+    --dark-text: #f0f6fc;
+    --dark-text-secondary: #8b949e;
+    --dark-text-muted: #6e7681;
+    --dark-accent: #58a6ff;
+    --dark-accent-hover: #79c0ff;
+    --dark-success: #3fb950;
+    --dark-warning: #d29922;
+    --dark-danger: #f85149;
+    --dark-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --dark-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.4);
+    --dark-radius: 8px;
+    --dark-radius-small: 6px;
+    --dark-transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* === Layout === */
+  body {
+    background: var(--dark-bg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    color: var(--dark-text);
+  }
+  
+  .workspace-wrapper {
+    display: flex;
+    height: 100vh;
+    background: var(--dark-bg);
+    margin-left: 3.5rem; /* Account for fixed sidebar */
+    position: relative; /* Ensure proper positioning */
+    z-index: 10; /* Higher z-index than main content */
+    width: calc(100vw - 3.5rem); /* Ensure proper width */
+  }
+  
+  /* === Sidebar === */
+  .notes-sidebar {
+    width: 320px;
+    min-width: 320px; /* Prevent shrinking */
+    max-width: 320px; /* Prevent growing */
+    background: var(--dark-surface);
+    border-right: 1px solid var(--dark-border);
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--dark-shadow);
+    position: relative; /* Ensure proper positioning */
+    z-index: 11; /* Ensure it's above other elements */
+    flex-shrink: 0; /* Prevent sidebar from shrinking */
+    height: 100vh; /* Ensure full height */
+  }
+  
+  .sidebar-header {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid var(--dark-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0; /* Don't shrink header */
+  }
+  
+  .sidebar-header h6 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--dark-text);
+  }
+  
+  .btn-new-note {
+    background: var(--dark-accent);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--dark-radius-small);
+    cursor: pointer;
+    transition: var(--dark-transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    box-shadow: var(--dark-shadow);
+  }
+  
+  .btn-new-note:hover {
+    background: var(--dark-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--dark-shadow-hover);
+  }
+  
+  .sidebar-search {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--dark-border);
+    flex-shrink: 0; /* Don't shrink search */
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--dark-border);
+    border-radius: var(--dark-radius-small);
+    font-size: 14px;
+    background: var(--dark-surface-2);
+    color: var(--dark-text);
+    transition: var(--dark-transition);
+  }
+  
+  .search-input:focus {
+    outline: none;
+    border-color: var(--dark-accent);
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+  }
+  
+  .search-input::placeholder {
+    color: var(--dark-text-muted);
+  }
+  
+  .notes-list, #collabNotesList {
+    flex: 1 1 auto; /* Allow growing and shrinking, take remaining space */
+    overflow-y: auto;
+    padding: 8px 0;
+    min-height: 200px; /* Ensure minimum height */
+    height: 100%; /* Take full available height */
+    width: 100%; /* Take full available width */
+    position: relative; /* Ensure proper positioning */
+    z-index: 1; /* Ensure it's above background elements */
+    box-sizing: border-box; /* Include padding in dimensions */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+  }
+  .notes-list::-webkit-scrollbar, #collabNotesList::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+  
+  .note-item {
+    padding: 12px 20px !important;
+    cursor: pointer;
+    margin: 4px 8px !important;
+    border-radius: 6px;
+    background: transparent;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    min-height: 60px !important;
+    height: auto !important;
+    width: calc(100% - 16px) !important;
+    box-sizing: border-box !important;
+    border: 1px solid transparent;
+    position: relative !important;
+    overflow: visible !important;
+    transition: all 0.2s ease;
+  }
+  
+  .note-item:hover {
+    background: var(--dark-surface-2) !important;
+    border-color: var(--dark-border);
+  }
+  
+  .note-item.note-active {
+    background: rgba(88, 166, 255, 0.1) !important;
+    border-left: 3px solid var(--dark-accent);
+  }
+  
+  .note-title {
+    font-weight: 500;
+    color: var(--dark-text) !important;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px !important;
+    display: block !important;
+  }
+  
+  .note-preview {
+    font-size: 12px;
+    color: var(--dark-text-secondary) !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 8px;
+    line-height: 1.4;
+    display: block !important;
+  }
+  
+  .note-meta {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--dark-text-muted) !important;
+  }
+  
+  .note-tags {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  
+  .note-tag {
+    background: rgba(88, 166, 255, 0.1);
+    color: var(--dark-accent);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 500;
+  }
+  
+  .note-privacy-indicator {
+    font-size: 12px;
+    opacity: 0.7;
+  }
+  
+  /* === Main Editor Area === */
+  .editor-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--dark-surface);
+    margin: 16px;
+    border-radius: var(--dark-radius);
+    box-shadow: var(--dark-shadow);
+    overflow: hidden;
+  }
+  
+  .editor-header {
+    padding: 24px 32px 16px;
+    border-bottom: 1px solid var(--dark-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .title-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .title-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 24px;
+    font-weight: 600;
+    background: transparent;
+    color: var(--dark-text) !important; /* Ensure actual text is always white */
+    padding: 0;
+    margin-right: 16px;
+    transition: var(--dark-transition);
+  }
+  
+  .title-input::placeholder {
+    color: var(--dark-text-muted) !important; /* Placeholder is light gray */
+    font-weight: 400;
+    opacity: 0.7;
+  }
+  
+  .title-input:focus::placeholder {
+    opacity: 0.5;
+  }
+  
+  /* Ensure text color remains white when typing */
+  .title-input:not(:placeholder-shown) {
+    color: var(--dark-text) !important;
+    font-weight: 600;
+  }
+  
+  .tags-input {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  
+  .tag-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--dark-text);
+    font-size: 14px;
+    min-width: 100px;
+  }
+  
+  .tag-input::placeholder {
+    color: var(--dark-text-muted) !important;
+  }
+  
+  .editor-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .btn-control {
+    background: var(--dark-surface-2);
+    border: 1px solid var(--dark-border);
+    color: var(--dark-text);
+    padding: 8px 12px;
+    border-radius: var(--dark-radius-small);
+    cursor: pointer;
+    transition: var(--dark-transition);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .btn-control:hover {
+    background: var(--dark-surface);
+    border-color: var(--dark-accent);
+  }
+  
+  .btn-control.active {
+    background: rgba(88, 166, 255, 0.1);
+    border-color: var(--dark-accent);
+    color: var(--dark-accent);
+  }
+  
+  .privacy-toggle {
+    position: relative;
+    z-index: 2000; /* Ensure tooltip is above all other elements */
+    margin-top: 32px; /* Visually balanced spacing below controls */
+  }
+  
+  .privacy-toggle .tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    background: var(--dark-surface-2);
+    color: var(--dark-text);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--dark-transition);
+    margin-bottom: 12px;
+    border: 1px solid var(--dark-border);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    z-index: 2100;
+    max-width: 250px;
+    overflow-wrap: break-word;
+  }
+  
+  .privacy-toggle:hover .tooltip {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  /* Ensure tooltip never goes out of viewport */
+  @media (max-width: 600px) {
+    .privacy-toggle .tooltip {
+      left: 0;
+      right: 0;
+      transform: none;
+      min-width: 120px;
+      max-width: 90vw;
+    }
+  }
+  /* Fix ticket link input cutoff */
+  .ticket-link-input {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+  }
+  #ticketLinkInput {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    background: transparent;
+    color: var(--dark-text);
+    border: none;
+    outline: none;
+    font-size: 14px;
+    padding: 6px 0;
+    box-sizing: border-box;
+  }
+  #ticketLinkInput::placeholder {
+    color: var(--dark-text-muted);
+    opacity: 0.8;
+  }
+  /* Ensure suggestions dropdown is always visible */
+  #ticketLinkSuggestions {
+    max-width: 100vw;
+    overflow-x: auto;
+    z-index: 2200;
+  }
+  
+  /* === Rich Text Editor === */
+  .editor-content {
+    flex: 1;
+    padding: 24px 32px;
+    overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+  }
+  .editor-content::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+  
+  .ql-container {
+    border: none !important;
+    background: transparent !important;
+    font-family: inherit !important;
+  }
+  
+  .ql-editor {
+    background: transparent !important;
+    color: var(--dark-text) !important;
+    font-size: 16px !important;
+    line-height: 1.6 !important;
+    padding: 0 !important;
+    min-height: 60vh !important;
+  }
+  
+  .ql-editor p {
+    margin-bottom: 1rem !important;
+  }
+  
+  .ql-editor h1 {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    margin: 2rem 0 1rem !important;
+    color: var(--dark-text) !important;
+  }
+  
+  .ql-editor h2 {
+    font-size: 1.5rem !important;
+    font-weight: 600 !important;
+    margin: 1.5rem 0 0.75rem !important;
+    color: var(--dark-text) !important;
+  }
+  
+  .ql-editor h3 {
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    margin: 1.25rem 0 0.5rem !important;
+    color: var(--dark-text) !important;
+  }
+  
+  .ql-editor ul, .ql-editor ol {
+    margin-bottom: 1rem !important;
+    padding-left: 1.5rem !important;
+  }
+  
+  .ql-editor li {
+    margin-bottom: 0.25rem !important;
+  }
+  
+  .ql-editor blockquote {
+    border-left: 4px solid var(--dark-accent) !important;
+    padding-left: 1rem !important;
+    margin: 1rem 0 !important;
+    font-style: italic !important;
+    color: var(--dark-text-secondary) !important;
+  }
+  
+  .ql-editor code {
+    background: var(--dark-surface-2) !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace !important;
+    font-size: 14px !important;
+  }
+  
+  .ql-editor pre {
+    background: var(--dark-surface-2) !important;
+    padding: 1rem !important;
+    border-radius: var(--dark-radius-small) !important;
+    margin: 1rem 0 !important;
+    overflow-x: auto !important;
+    border: 1px solid var(--dark-border) !important;
+  }
+  
+  .ql-editor pre code {
+    background: none !important;
+    padding: 0 !important;
+  }
+  
+  /* === Image Styling in Editor === */
+  .ql-editor img {
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: var(--dark-radius-small) !important;
+    margin: 8px 0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid var(--dark-border) !important;
+    transition: var(--dark-transition) !important;
+  }
+  
+  .ql-editor img:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+    border-color: var(--dark-accent) !important;
+  }
+  
+  /* === Toolbar === */
+  .ql-toolbar {
+    background: var(--dark-surface-2) !important;
+    border: 1px solid var(--dark-border) !important;
+    border-radius: var(--dark-radius-small) !important;
+    margin-bottom: 16px !important;
+    padding: 8px !important;
+  }
+  
+  .ql-toolbar .ql-stroke {
+    stroke: var(--dark-text) !important;
+  }
+  
+  .ql-toolbar .ql-fill {
+    fill: var(--dark-text) !important;
+  }
+  
+  .ql-toolbar .ql-picker {
+    color: var(--dark-text) !important;
+  }
+  
+  .ql-toolbar .ql-picker-options {
+    background: var(--dark-surface-2) !important;
+    border: 1px solid var(--dark-border) !important;
+    border-radius: var(--dark-radius-small) !important;
+    box-shadow: var(--dark-shadow-hover) !important;
+  }
+  
+  .ql-toolbar .ql-picker-item {
+    color: var(--dark-text) !important;
+  }
+  
+  .ql-toolbar .ql-picker-item:hover {
+    background: var(--dark-surface) !important;
+  }
+  
+  .ql-toolbar .ql-picker-item.ql-selected {
+    background: rgba(88, 166, 255, 0.1) !important;
+    color: var(--dark-accent) !important;
+  }
+  
+  /* === Context Menu === */
+  .context-menu {
+    position: fixed;
+    background: var(--dark-surface-2);
+    border: 1px solid var(--dark-border);
+    border-radius: var(--dark-radius-small);
+    padding: 8px 0;
+    min-width: 180px;
+    z-index: 1000;
+    box-shadow: var(--dark-shadow-hover);
+  }
+  
+  .context-menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    color: var(--dark-text);
+    font-size: 14px;
+    transition: var(--dark-transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .context-menu-item:hover {
+    background: var(--dark-surface);
+  }
+  
+  .context-menu-item.danger {
+    color: var(--dark-danger);
+  }
+  
+  .context-menu-item.danger:hover {
+    background: rgba(248, 81, 73, 0.1);
+  }
+  
+  .context-menu-separator {
+    height: 1px;
+    background: var(--dark-border);
+    margin: 4px 0;
+  }
+  
+  /* === Status Indicators === */
+  .status-indicator {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--dark-surface-2);
+    border: 1px solid var(--dark-border);
+    border-radius: var(--dark-radius-small);
+    padding: 12px 16px;
+    color: var(--dark-text);
+    font-size: 14px;
+    z-index: 100;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: var(--dark-transition);
+    box-shadow: var(--dark-shadow-hover);
+  }
+  
+  .status-indicator.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .status-indicator.saving {
+    color: var(--dark-warning);
+  }
+  
+  .status-indicator.saved {
+    color: var(--dark-success);
+  }
+  
+  .status-indicator.error {
+    color: var(--dark-danger);
+  }
+  
+  /* === Empty State === */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--dark-text-muted);
+    height: 200px;
+  }
+  
+  .empty-state i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+  
+  .empty-state h3 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--dark-text-secondary);
+  }
+  
+  .empty-state p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.8;
+  }
+  
+  /* === Responsive === */
+  @media (max-width: 768px) {
+    .workspace-wrapper {
+      flex-direction: column;
+      margin-left: 0;
+    }
+    
+    .notes-sidebar {
+      width: 100%;
+      height: 200px;
+    }
+    
+    .editor-container {
+      height: calc(100vh - 200px);
+      margin: 8px;
+    }
+  }
+
+  /* Ensure the #editor container is always writable & visible */
+  #editor {
+    min-height: 60vh !important;           /* visible height */
+    height: 100% !important;               /* grow with flex */
+    background: transparent !important;    /* ensure not gray */
+    color: var(--dark-text) !important;
+    border: none !important;
+  }
+  
+  /* Fix for potential Quill container issues */
+  #editor .ql-container {
+    background: transparent !important;
+    border: none !important;
+    font-family: inherit !important;
+  }
+  
+  #editor .ql-editor {
+    background: transparent !important;
+    color: var(--dark-text) !important;
+    font-size: 16px !important;
+    line-height: 1.6 !important;
+    padding: 0 !important;
+    min-height: 60vh !important;
+    border: none !important;
+    cursor: text !important;
+  }
+  
+  /* Ensure editor is never disabled-looking */
+  #editor.ql-disabled .ql-editor {
+    color: var(--dark-text) !important;
+  }
+  
+  /* Style the Quill placeholder text */
+  .ql-editor.ql-blank::before {
+    color: var(--dark-text-muted) !important;
+    font-style: italic !important;
+  }
+
+  /* === Modern Toast Notifications (MacOS-inspired) === */
+  .toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+    /* Removed any bottom property to ensure top right placement */
+  }
+
+  .toast {
+    background: rgba(28, 28, 30, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: auto;
+    max-width: 350px;
+    min-width: 250px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .toast.show {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .toast.success {
+    border-left: 3px solid #30d158;
+    background: linear-gradient(135deg, rgba(48, 209, 88, 0.1) 0%, rgba(28, 28, 30, 0.95) 100%);
+  }
+
+  .toast.error {
+    border-left: 3px solid #ff453a;
+    background: linear-gradient(135deg, rgba(255, 69, 58, 0.1) 0%, rgba(28, 28, 30, 0.95) 100%);
+  }
+
+  .toast.warning {
+    border-left: 3px solid #ff9f0a;
+    background: linear-gradient(135deg, rgba(255, 159, 10, 0.1) 0%, rgba(28, 28, 30, 0.95) 100%);
+  }
+
+  .toast.info {
+    border-left: 3px solid #007aff;
+    background: linear-gradient(135deg, rgba(0, 122, 255, 0.1) 0%, rgba(28, 28, 30, 0.95) 100%);
+  }
+
+  .toast-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .toast-icon {
+    font-size: 16px;
+    min-width: 16px;
+  }
+
+  .toast.success .toast-icon {
+    color: #30d158;
+  }
+
+  .toast.error .toast-icon {
+    color: #ff453a;
+  }
+
+  .toast.warning .toast-icon {
+    color: #ff9f0a;
+  }
+
+  .toast.info .toast-icon {
+    color: #007aff;
+  }
+
+  .toast-message {
+    flex: 1;
+    line-height: 1.4;
+  }
+
+  .toast-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0;
+    margin-left: 12px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+  }
+
+  .toast-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+
+  /* Toast animations */
+  @keyframes toastSlideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes toastSlideOut {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  /* Remove vertical gap above content ONLY on collab-notes page */
+  .main-content {
+    margin-top: 3px !important;
+  }
+
+  /* === Tooltip Utility (for lock and share with users) === */
+  .tooltip-above {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 4px); /* 4px gap above the button */
+    transform: translateX(-50%);
+    background: var(--dark-surface-2);
+    color: var(--dark-text);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--dark-transition);
+    border: 1px solid var(--dark-border);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    z-index: 2100;
+    max-width: 250px;
+    overflow-wrap: break-word;
+  }
+  .privacy-toggle:hover .tooltip-above,
+  .user-share-input:hover .tooltip-above {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  @media (max-width: 600px) {
+    .tooltip-above {
+      left: 0;
+      right: 0;
+      transform: none;
+      min-width: 120px;
+      max-width: 90vw;
+    }
+  }
+  /* Fallback: If not enough space above, show below */
+  .tooltip-below {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 4px);
+    transform: translateX(-50%);
+    background: var(--dark-surface-2);
+    color: var(--dark-text);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--dark-transition);
+    border: 1px solid var(--dark-border);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    z-index: 2100;
+    max-width: 250px;
+    overflow-wrap: break-word;
+  }
+  .privacy-toggle.show-below .tooltip-below,
+  .user-share-input.show-below .tooltip-below {
+    opacity: 1;
+    pointer-events: auto;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="workspace-wrapper">
+  <!-- Sidebar -->
+  <div class="notes-sidebar">
+    <div class="sidebar-header">
+      <h6><i class="bi bi-stickies"></i> My Notes</h6>
+      <button class="btn-new-note" id="btnNewNote" title="Create new note">
+        <i class="bi bi-plus"></i>
+      </button>
+    </div>
+    
+    <div class="sidebar-search">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search notes..." />
+    </div>
+    
+    <div class="notes-list" id="collabNotesList">
+      <!-- Notes will be populated here -->
+    </div>
+  </div>
+
+  <!-- Main Editor -->
+  <div class="editor-container">
+    <div class="editor-header">
+      <div class="title-section">
+        <input id="noteTitle" class="title-input" placeholder="Untitled Note" style="margin-bottom: 24px; margin-top: 0;" />
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0; margin-bottom: 24px; width: 100%;">
+          <div class="editor-controls" style="display: flex; align-items: center; gap: 8px;">
+            <button class="btn-control" id="btnSave" title="Save (⌘+S)">
+              <i class="bi bi-save"></i>
+            </button>
+            <div class="editor-action-toggle" id="tagsToggle" style="display:inline-block;position:relative;">
+              <button class="btn-control" title="Add tags" type="button">
+                <i class="bi bi-tag"></i>
+              </button>
+              <div class="tooltip-above">Add tags</div>
+            </div>
+            <div class="editor-action-toggle" id="ticketLinkToggle" style="display:inline-block;position:relative;">
+              <button class="btn-control" title="Link to ticket" type="button">
+                <i class="bi bi-link-45deg"></i>
+              </button>
+              <div class="tooltip-above">Link to ticket</div>
+            </div>
+            <div class="editor-action-toggle" id="userShareToggle" style="display:inline-block;position:relative;">
+              <button class="btn-control" title="Add users to share with" type="button">
+                <i class="bi bi-person-plus"></i>
+              </button>
+              <div class="tooltip-above">Add users to share with</div>
+            </div>
+          </div>
+          <div class="privacy-toggle" id="privacyToggle" style="margin-left: 16px; align-self: center; margin-top: -6px;">
+            <button class="btn-control" title="Toggle privacy">
+              <i id="privacyIcon" class="bi bi-unlock"></i>
+            </button>
+            <div class="tooltip-above">Public Note</div>
+            <div class="tooltip-below">Private Note</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="editor-content">
+      <div id="editor"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Status Indicator -->
+<div class="status-indicator" id="statusIndicator">
+  <span id="statusText">Ready</span>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer">
+  <!-- Toasts will be dynamically added here -->
+</div>
+
+<!-- Context Menu -->
+<div class="context-menu" id="contextMenu" style="display: none;">
+  <div class="context-menu-item" data-action="edit">
+    <i class="bi bi-pencil"></i> Edit
+  </div>
+  <div class="context-menu-item" data-action="duplicate">
+    <i class="bi bi-files"></i> Duplicate
+  </div>
+  <div class="context-menu-separator"></div>
+  <div class="context-menu-item danger" data-action="delete">
+    <i class="bi bi-trash"></i> Delete
+  </div>
+</div>
+
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+<script>
+  // --------------------------------------------------------------------
+  // Resilient Quill loader – falls back to jsDelivr if the primary CDN is
+  // blocked (common on some corporate networks)
+  // --------------------------------------------------------------------
+  (function ensureQuillLoaded() {
+    function loadFallback() {
+      if (window.Quill) { return Promise.resolve(); }
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js';
+        script.onload = () => {
+          // Enable fallback stylesheet as well
+          const cssFallback = document.getElementById('quillStylesheetFallback');
+          if (cssFallback) cssFallback.disabled = false;
+          resolve();
+        };
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+
+    // If Quill isn't ready after DOMContentLoaded, attempt fallback load.
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!window.Quill) {
+        loadFallback().catch(err => console.error('Failed to load Quill fallback:', err));
+      }
+    });
+  })();
+</script>
+
+<script>
+  // === Global Variables ===
+  let currentNoteId = null;
+  let currentNoteIsPublic = true;
+  let currentTags = [];
+  let quill = null;
+  let saveTimeout = null;
+  let collabNotes = []; // Renamed to avoid conflicts with other templates
+  
+  // === Utility Functions ===
+  function debounce(fn, delay = 400) {
+    let t;
+    return (...args) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn(...args), delay);
+    };
+  }
+
+  function showStatus(message, type = 'info', duration = 3000) {
+    const indicator = document.getElementById('statusIndicator');
+    const text = document.getElementById('statusText');
+    
+    text.textContent = message;
+    indicator.className = `status-indicator show ${type}`;
+    
+    setTimeout(() => {
+      indicator.classList.remove('show');
+    }, duration);
+  }
+  
+  function showContextMenu(event, noteId) {
+    event.preventDefault();
+    const menu = document.getElementById('contextMenu');
+    menu.style.display = 'block';
+    menu.style.left = event.pageX + 'px';
+    menu.style.top = event.pageY + 'px';
+    
+    // Store the note ID for context menu actions
+    menu.dataset.noteId = noteId;
+    
+    // Hide menu when clicking outside
+    const hideMenu = () => {
+      menu.style.display = 'none';
+      document.removeEventListener('click', hideMenu);
+    };
+    
+    setTimeout(() => document.addEventListener('click', hideMenu), 100);
+  }
+  
+  function parseTags(tagsString) {
+    if (!tagsString) return [];
+    return tagsString.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+  }
+  
+  function renderTags(tags) {
+    return tags.map(tag => `<span class="note-tag">${tag}</span>`).join('');
+  }
+  
+  // === Helper Functions ===
+  function updateLocalNote(updatedNote) {
+    console.log('Updating local note in array:', updatedNote.id);
+    
+    // Find and update the note in the local array
+    const index = collabNotes.findIndex(n => n.id === updatedNote.id);
+    if (index !== -1) {
+      const oldNote = collabNotes[index];
+      collabNotes[index] = updatedNote;
+      
+      // Only re-sort and re-render if the updated_at changed significantly
+      // (indicating a real content change that should move it to the top)
+      const oldTime = new Date(oldNote.updated_at).getTime();
+      const newTime = new Date(updatedNote.updated_at).getTime();
+      const timeDiff = Math.abs(newTime - oldTime);
+      
+      // Only re-sort if the time difference is more than 1 second
+      // (avoids micro-changes from moving notes around)
+      if (timeDiff > 1000) {
+        console.log('Significant time change detected, re-sorting notes');
+        collabNotes.sort((a, b) => {
+          const dateA = new Date(a.updated_at);
+          const dateB = new Date(b.updated_at);
+          return dateB - dateA;
+        });
+        renderNotesSidebar(); // Re-render to show new order
+      } else {
+        console.log('Minor time change, preserving note order');
+        // Just update the active note styling without changing order
+        updateActiveNote();
+      }
+    } else {
+      console.warn('Note not found in local array, fetching fresh data');
+      fetchNotes(); // Fallback to full refresh if note not found
+    }
+  }
+
+  // === API Functions ===
+  async function fetchNotes() {
+    try {
+      console.log('Fetching notes from API...');
+      const resp = await fetch('/notes/api/notes', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin'
+      });
+      
+      console.log('Notes API response status:', resp.status);
+      
+      if (!resp.ok) {
+        const errorText = await resp.text();
+        console.error('API error response:', errorText);
+        
+        // Try to parse error details
+        let errorDetails = '';
+        try {
+          const errorData = JSON.parse(errorText);
+          errorDetails = errorData.details || errorData.error || errorText;
+        } catch {
+          errorDetails = errorText;
+        }
+        
+        throw new Error(`HTTP ${resp.status}: ${errorDetails}`);
+      }
+      
+      const data = await resp.json();
+      console.log('Raw API response:', data);
+      console.log('API response type:', typeof data);
+      console.log('Is array:', Array.isArray(data));
+      
+      if (!Array.isArray(data)) {
+        console.error('API returned non-array data:', data);
+        
+        // Check if it's an error response
+        if (data && data.error) {
+          throw new Error(data.error + (data.details ? ': ' + data.details : ''));
+        }
+        
+        throw new Error('API returned non-array data');
+      }
+      
+      collabNotes = data;
+      console.log('Successfully fetched', collabNotes.length, 'notes');
+      console.log('Notes data:', collabNotes);
+      
+      // Force a re-render of the sidebar
+      console.log('About to call renderNotesSidebar...');
+      renderNotesSidebar();
+      console.log('renderNotesSidebar call completed');
+      
+      return collabNotes;
+    } catch (error) {
+      console.error('Error fetching notes:', error);
+      showStatus('Failed to load notes', 'error');
+      showToast('Failed to load notes: ' + error.message, 'error');
+      
+      // Set empty array as fallback
+      collabNotes = [];
+      renderNotesSidebar();
+      
+      // Show a more helpful error message
+      const listEl = document.getElementById('collabNotesList');
+      if (listEl) {
+        listEl.innerHTML = `
+          <div class="empty-state">
+            <i class="bi bi-exclamation-triangle" style="color: var(--dark-danger);"></i>
+            <h3>Connection Error</h3>
+            <p>Unable to load notes. Please try refreshing the page.</p>
+            <button onclick="location.reload()" class="btn btn-primary" style="margin-top: 1rem; background: var(--dark-accent); border: none;">
+              <i class="bi bi-arrow-clockwise"></i> Refresh Page
+            </button>
+          </div>
+        `;
+      }
+      
+      return [];
+    }
+  }
+
+  async function createNote() {
+    try {
+      console.log('=== CREATING NEW NOTE ===');
+      
+      // Auto-save current note before creating new one
+      if (currentNoteId) {
+        console.log('Auto-saving current note before creating new one...');
+        await saveNoteContent();
+        await saveNoteTitle(); // Also save title changes
+      }
+      
+      showStatus('Creating note...', 'saving');
+      
+      const requestData = { 
+        title: '',  // Empty title so placeholder shows properly
+        content: JSON.stringify({ ops: [] }),
+        is_public: true,
+        tags: ''
+      };
+      
+      console.log('Sending create note request with data:', requestData);
+      
+      const resp = await fetch('/notes/api/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData),
+      });
+      
+      console.log('Create note response status:', resp.status);
+      
+      if (!resp.ok) {
+        const errorText = await resp.text();
+        console.error('Create note failed with response:', errorText);
+        
+        // Try to parse error details
+        let errorDetails = '';
+        try {
+          const errorData = JSON.parse(errorText);
+          errorDetails = errorData.details || errorData.error || errorText;
+        } catch {
+          errorDetails = errorText;
+        }
+        
+        throw new Error('Failed to create note: ' + errorDetails);
+      }
+      
+      const newNote = await resp.json();
+      
+      // Check if the response contains an error
+      if (newNote && newNote.error) {
+        throw new Error(newNote.error + (newNote.details ? ': ' + newNote.details : ''));
+      }
+      
+      console.log('Successfully created note:', newNote);
+      
+      // Add the new note to the beginning of the local array (most recent)
+      collabNotes.unshift(newNote);
+      
+      // Re-render sidebar to show the new note
+      renderNotesSidebar();
+      
+      // Select the new note
+      console.log('Selecting newly created note:', newNote.id);
+      selectNote(newNote.id);
+      showToast('Note created successfully', 'success');
+      showStatus('Note created', 'saved');
+      
+      // Focus the title input so user can start typing immediately
+      setTimeout(() => {
+        const titleEl = document.getElementById('noteTitle');
+        if (titleEl) {
+          console.log('Focusing title input');
+          titleEl.focus();
+        }
+      }, 100);
+    } catch (error) {
+      console.error('Error creating note:', error);
+      showToast('Failed to create note: ' + error.message, 'error');
+      showStatus('Failed to create note', 'error');
+      
+      // Show a retry button
+      const btnNewNote = document.getElementById('btnNewNote');
+      if (btnNewNote) {
+        const originalText = btnNewNote.innerHTML;
+        btnNewNote.innerHTML = '<i class="bi bi-exclamation-triangle"></i>';
+        btnNewNote.title = 'Click to retry creating note';
+        btnNewNote.onclick = () => {
+          btnNewNote.innerHTML = originalText;
+          btnNewNote.title = 'Create new note';
+          btnNewNote.onclick = createNote;
+          createNote();
+        };
+        
+        // Reset after 10 seconds
+        setTimeout(() => {
+          btnNewNote.innerHTML = originalText;
+          btnNewNote.title = 'Create new note';
+          btnNewNote.onclick = createNote;
+        }, 10000);
+      }
+    }
+  }
+  
+  async function selectNote(noteId) {
+    console.log('=== SELECTING NOTE ===');
+    console.log('Note ID to select:', noteId);
+    
+    currentNoteId = noteId;
+    const note = collabNotes.find(n => n.id === noteId);
+    if (!note) {
+      console.error('Note not found in collabNotes array:', noteId);
+      console.log('Available notes:', collabNotes.map(n => ({ id: n.id, title: n.title })));
+      return;
+    }
+    
+    console.log('Found note to select:', note);
+    console.log('Selecting note:', note.title || 'Untitled', 'ID:', noteId);
+    
+    // Update title input - handle placeholder properly
+    const titleEl = document.getElementById('noteTitle');
+    if (titleEl) {
+      console.log('Updating title input element');
+      // If note has a real title, show it; otherwise leave placeholder visible
+      if (note.title && note.title.trim() && note.title !== 'Untitled') {
+        titleEl.value = note.title;
+        titleEl.style.color = 'var(--dark-text)';
+        console.log('Set title input to:', note.title);
+      } else {
+        titleEl.value = '';
+        titleEl.style.color = 'var(--dark-text-muted)';
+        console.log('Cleared title input (showing placeholder)');
+      }
+    } else {
+      console.error('Title input element not found');
+    }
+    
+    // Update editor content
+    try {
+      console.log('Updating editor content...');
+      if (quill) {
+        const content = note.content ? JSON.parse(note.content) : { ops: [] };
+        quill.setContents(content);
+        console.log('Set Quill content:', content);
+      } else {
+        const fallbackEditor = document.getElementById('fallbackEditor');
+        if (fallbackEditor) {
+          fallbackEditor.value = note.content || '';
+          console.log('Set fallback editor content:', note.content);
+        } else {
+          console.error('No editor found (neither Quill nor fallback)');
+        }
+      }
+    } catch (e) {
+      console.error('Error parsing note content:', e);
+      if (quill) {
+        quill.setText(note.content || '');
+      } else {
+        const fallbackEditor = document.getElementById('fallbackEditor');
+        if (fallbackEditor) {
+          fallbackEditor.value = note.content || '';
+        }
+      }
+    }
+    
+    // Update privacy status
+    console.log('Updating privacy status to:', note.is_public);
+    currentNoteIsPublic = note.is_public;
+    updatePrivacyUI();
+    
+    // Update tags
+    console.log('Updating tags:', note.tags);
+    currentTags = parseTags(note.tags);
+    renderTagsInput();
+    
+    // Update active state in sidebar
+    console.log('Updating active note in sidebar');
+    updateActiveNote();
+    
+    showStatus('Note loaded', 'saved');
+    console.log('=== NOTE SELECTION COMPLETE ===');
+  }
+  
+  async function saveNoteContent() {
+    if (!currentNoteId) {
+      console.log('Cannot save note content - no currentNoteId');
+      return;
+    }
+    
+    try {
+      console.log('=== SAVING NOTE CONTENT ===');
+      console.log('Current note ID:', currentNoteId);
+      showStatus('Saving...', 'saving');
+      
+      let content;
+      if (quill) {
+        content = JSON.stringify(quill.getContents());
+        console.log('Using Quill editor content:', content);
+      } else {
+        const fallbackEditor = document.getElementById('fallbackEditor');
+        content = fallbackEditor ? fallbackEditor.value : '';
+        console.log('Using fallback editor content:', content);
+      }
+      
+      const requestData = { content };
+      console.log('Sending save request with data:', requestData);
+      
+      const resp = await fetch(`/notes/api/notes/${currentNoteId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData),
+      });
+      
+      console.log('Save content response status:', resp.status);
+      
+      if (!resp.ok) {
+        const errorText = await resp.text();
+        console.error('Save content failed with response:', errorText);
+        throw new Error('Failed to save note: ' + errorText);
+      }
+      
+      const updatedNote = await resp.json();
+      console.log('Note content saved successfully');
+      
+      // Update the note in the local array without re-fetching all notes
+      updateLocalNote(updatedNote);
+      
+      showStatus('Saved', 'saved');
+    } catch (error) {
+      console.error('Error saving note:', error);
+      showStatus('Failed to save', 'error');
+      showToast('Failed to save note: ' + error.message, 'error');
+    }
+  }
+  
+  async function saveNoteTitle() {
+    if (!currentNoteId) {
+      console.log('Cannot save note title - no currentNoteId');
+      return;
+    }
+    
+    try {
+      console.log('=== SAVING NOTE TITLE ===');
+      console.log('Current note ID:', currentNoteId);
+      
+      const titleInputEl = document.getElementById('noteTitle');
+      const titleInput = titleInputEl ? titleInputEl.value.trim() : '';
+      console.log('Title input value:', titleInput);
+      
+      // Check if title actually changed
+      const currentNote = collabNotes.find(n => n.id === currentNoteId);
+      const currentTitle = currentNote ? currentNote.title : '';
+      const newTitle = titleInput || 'Untitled';
+      
+      if (currentTitle === newTitle) {
+        console.log('Title unchanged, skipping save');
+        return; // No change, don't save
+      }
+      
+      console.log('Title to save:', newTitle);
+      
+      const requestData = { title: newTitle };
+      console.log('Sending title save request with data:', requestData);
+      
+      const resp = await fetch(`/notes/api/notes/${currentNoteId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData),
+      });
+      
+      console.log('Save title response status:', resp.status);
+      
+      if (!resp.ok) {
+        const errorText = await resp.text();
+        console.error('Save title failed with response:', errorText);
+        throw new Error('Failed to save title: ' + errorText);
+      }
+      
+      const updatedNote = await resp.json();
+      console.log('Note title saved successfully');
+      
+      // Update the note in the local array and re-render sidebar to show new title
+      updateLocalNote(updatedNote);
+      renderNotesSidebar();
+      
+    } catch (error) {
+      console.error('Error saving title:', error);
+      showToast('Failed to save title: ' + error.message, 'error');
+      showStatus('Failed to save title', 'error');
+    }
+  }
+  
+  async function saveNoteTags() {
+    if (!currentNoteId) return;
+    
+    try {
+      const tags = currentTags.join(', ');
+      
+      // Check if tags actually changed
+      const currentNote = collabNotes.find(n => n.id === currentNoteId);
+      const currentTags = currentNote ? currentNote.tags : '';
+      
+      if (currentTags === tags) {
+        console.log('Tags unchanged, skipping save');
+        return; // No change, don't save
+      }
+      
+      const resp = await fetch(`/notes/api/notes/${currentNoteId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tags }),
+      });
+      
+      if (!resp.ok) throw new Error('Failed to save tags');
+      
+      const updatedNote = await resp.json();
+      
+      // Update the note in the local array without re-fetching all notes
+      updateLocalNote(updatedNote);
+      
+    } catch (error) {
+      console.error('Error saving tags:', error);
+      showStatus('Failed to save tags', 'error');
+    }
+  }
+  
+  async function togglePrivacy() {
+    if (!currentNoteId) return;
+    
+    try {
+      const newStatus = !currentNoteIsPublic;
+      const resp = await fetch(`/notes/api/notes/${currentNoteId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_public: newStatus }),
+      });
+      
+      if (!resp.ok) throw new Error('Failed to update privacy');
+      
+      const updatedNote = await resp.json();
+      currentNoteIsPublic = updatedNote.is_public;
+      updatePrivacyUI();
+      
+      // Update the note locally instead of re-fetching all notes
+      updateLocalNote(updatedNote);
+      
+      showToast(`Note is now ${currentNoteIsPublic ? 'public' : 'private'}`, 'success');
+      showStatus(`Note is now ${currentNoteIsPublic ? 'public' : 'private'}`, 'saved');
+    } catch (error) {
+      console.error('Error toggling privacy:', error);
+      showToast('Failed to update privacy', 'error');
+      showStatus('Failed to update privacy', 'error');
+    }
+  }
+  
+  async function deleteNote(noteId) {
+    if (!confirm('Are you sure you want to delete this note? This action cannot be undone.')) {
+      return;
+    }
+    
+    try {
+      const resp = await fetch(`/notes/api/notes/${noteId}`, {
+        method: 'DELETE'
+      });
+      
+      if (!resp.ok) throw new Error('Failed to delete note');
+      
+      // Remove the note from local array
+      const index = collabNotes.findIndex(n => n.id === noteId);
+      if (index !== -1) {
+        collabNotes.splice(index, 1);
+      }
+      
+      if (currentNoteId === noteId) {
+        currentNoteId = null;
+        const titleEl = document.getElementById('noteTitle');
+        if (titleEl) {
+          titleEl.value = '';
+        }
+        
+        if (quill) {
+          quill.setText('');
+        } else {
+          const fallbackEditor = document.getElementById('fallbackEditor');
+          if (fallbackEditor) {
+            fallbackEditor.value = '';
+          }
+        }
+        
+        currentTags = [];
+        renderTagsInput();
+        updateActiveNote();
+      }
+      
+      // Re-render sidebar to show the note is gone
+      renderNotesSidebar();
+      
+      showToast('Note deleted successfully', 'success');
+      showStatus('Note deleted', 'saved');
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      showToast('Failed to delete note', 'error');
+      showStatus('Failed to delete note', 'error');
+    }
+  }
+  
+  async function duplicateNote(noteId) {
+    try {
+      const note = collabNotes.find(n => n.id === noteId);
+      if (!note) return;
+      
+      const resp = await fetch('/notes/api/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          title: `${note.title} (Copy)`, 
+          content: note.content,
+          is_public: note.is_public,
+          tags: note.tags
+        }),
+      });
+      
+      if (!resp.ok) throw new Error('Failed to duplicate note');
+      
+      const newNote = await resp.json();
+      
+      // Add the new note to the beginning of the local array (most recent)
+      collabNotes.unshift(newNote);
+      
+      // Re-render sidebar to show the new note
+      renderNotesSidebar();
+      
+      showToast('Note duplicated successfully', 'success');
+      showStatus('Note duplicated', 'saved');
+    } catch (error) {
+      console.error('Error duplicating note:', error);
+      showToast('Failed to duplicate note', 'error');
+      showStatus('Failed to duplicate note', 'error');
+    }
+  }
+  
+  // === Tag Management ===
+  function renderTagsInput() {
+    const container = document.getElementById('tagsInput');
+    container.innerHTML = '';
+    
+    // Render existing tags
+    currentTags.forEach((tag, index) => {
+      const tagEl = document.createElement('span');
+      tagEl.className = 'note-tag';
+      tagEl.textContent = tag;
+      tagEl.onclick = () => removeTag(index);
+      container.appendChild(tagEl);
+    });
+    
+    // Add input for new tags
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'tag-input';
+    input.placeholder = currentTags.length === 0 ? 'Add tags...' : '';
+    input.onkeydown = handleTagInput;
+    container.appendChild(input);
+  }
+  
+  function handleTagInput(event) {
+    if (event.key === 'Enter' || event.key === ',') {
+      event.preventDefault();
+      const value = event.target.value.trim();
+      if (value && !currentTags.includes(value)) {
+        currentTags.push(value);
+        renderTagsInput();
+        saveNoteTags();
+      }
+      event.target.value = '';
+    }
+  }
+  
+  function removeTag(index) {
+    currentTags.splice(index, 1);
+    renderTagsInput();
+    saveNoteTags();
+  }
+  
+  // === UI Functions ===
+  function renderNotesSidebar() {
+    console.log('=== RENDERING NOTES SIDEBAR ===');
+    console.log('Rendering notes sidebar...');
+    console.log('collabNotes variable:', collabNotes);
+    console.log('collabNotes length:', collabNotes ? collabNotes.length : 'undefined');
+    
+    const listEl = document.getElementById('collabNotesList');
+    if (!listEl) {
+      console.error('collabNotesList element not found!');
+      console.log('Looking for collabNotesList in DOM...');
+      console.log('All elements with notes-list class:', document.querySelectorAll('.notes-list'));
+      return;
+    }
+    
+    console.log('collabNotesList element found:', listEl);
+    console.log('Number of notes to render:', collabNotes.length);
+    
+    // Clear existing content
+    listEl.innerHTML = '';
+    console.log('Cleared existing content');
+    
+    if (collabNotes.length === 0) {
+      console.log('No notes found, showing empty state');
+      const emptyHtml = `
+        <div class="empty-state">
+          <i class="bi bi-journal-text"></i>
+          <h3>No notes yet</h3>
+          <p>Create your first note to get started</p>
+        </div>
+      `;
+      listEl.innerHTML = emptyHtml;
+      console.log('Empty state HTML set:', emptyHtml);
+      console.log('listEl innerHTML after empty state:', listEl.innerHTML);
+      return;
+    }
+    
+    // Sort notes by updated_at in descending order
+    const sortedNotes = [...collabNotes].sort((a, b) => {
+      const dateA = new Date(a.updated_at);
+      const dateB = new Date(b.updated_at);
+      return dateB - dateA;
+    });
+    
+    console.log('Rendering', sortedNotes.length, 'sorted notes');
+    console.log('Sorted notes:', sortedNotes);
+    
+    let itemsAdded = 0;
+    sortedNotes.forEach((note, index) => {
+      console.log(`Rendering note ${index + 1}:`, note.title || 'Untitled', 'ID:', note.id);
+      
+      const item = document.createElement('div');
+      item.className = `note-item ${note.id === currentNoteId ? 'note-active' : ''}`;
+      item.dataset.id = note.id;
+      
+      // Parse content for preview
+      let preview = '';
+      try {
+        if (note.content) {
+          const content = JSON.parse(note.content);
+          if (content.ops && Array.isArray(content.ops)) {
+            preview = content.ops
+              .filter(op => op.insert && typeof op.insert === 'string')
+              .map(op => op.insert.trim())
+              .join(' ')
+              .substring(0, 100);
+          }
+        }
+      } catch (e) {
+        // Fallback for plain text content
+        preview = (note.content || '').substring(0, 100);
+      }
+      
+      // Parse tags safely
+      const tags = parseTags(note.tags);
+      
+      // Get display title - handle empty/null titles properly
+      const displayTitle = (note.title && note.title.trim()) ? note.title.trim() : 'Untitled Note';
+      
+      const itemHtml = `
+        <div class="note-title">${displayTitle}</div>
+        <div class="note-preview">${preview}${preview.length >= 100 ? '...' : ''}</div>
+        <div class="note-tags">${renderTags(tags)}</div>
+        <div class="note-meta">
+          <span>${new Date(note.updated_at).toLocaleDateString()}</span>
+          <span class="note-privacy-indicator">
+            <i class="bi ${note.is_public ? 'bi-unlock' : 'bi-lock-fill'}"></i>
+          </span>
+        </div>
+      `;
+      
+      item.innerHTML = itemHtml;
+      
+      item.onclick = () => selectNote(note.id);
+      item.oncontextmenu = (e) => showContextMenu(e, note.id);
+      
+      listEl.appendChild(item);
+      itemsAdded++;
+      console.log(`Added note item ${itemsAdded} to DOM`);
+    });
+    
+    console.log('Sidebar rendering complete. Total items added:', itemsAdded);
+    console.log('listEl children count:', listEl.children.length);
+    console.log('listEl innerHTML length:', listEl.innerHTML.length);
+    console.log('=== END RENDERING NOTES SIDEBAR ===');
+  }
+  
+  function updateActiveNote() {
+    document.querySelectorAll('.note-item').forEach((el) => {
+      el.classList.toggle('note-active', parseInt(el.dataset.id) === currentNoteId);
+    });
+  }
+  
+  function updatePrivacyUI() {
+    const icon = document.getElementById('privacyIcon');
+    const tooltip = document.querySelector('.privacy-toggle .tooltip');
+    
+    icon.className = currentNoteIsPublic ? 'bi bi-unlock' : 'bi bi-lock-fill';
+    tooltip.textContent = currentNoteIsPublic ? 'Public Note' : 'Private Note';
+  }
+  
+  // === Search Functionality ===
+  function setupSearch() {
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', debounce(async (e) => {
+      const query = e.target.value.trim();
+      if (query.length === 0) {
+        await fetchNotes();
+        return;
+      }
+      
+      try {
+        const resp = await fetch(`/notes/api/notes/search?q=${encodeURIComponent(query)}`);
+        if (!resp.ok) throw new Error('Search failed');
+        collabNotes = await resp.json();
+        renderNotesSidebar();
+      } catch (error) {
+        console.error('Search error:', error);
+      }
+    }, 200));
+  }
+  
+  // === Event Listeners ===
+  function setupEventListeners() {
+    console.log('=== SETTING UP EVENT LISTENERS ===');
+    const btnNewNote = document.getElementById('btnNewNote');
+    const noteTitle = document.getElementById('noteTitle');
+    const privacyToggle = document.getElementById('privacyToggle');
+    const contextMenu = document.getElementById('contextMenu');
+    const btnSave = document.getElementById('btnSave');
+    
+    console.log('Event listener elements check:');
+    console.log('- btnNewNote:', btnNewNote ? 'FOUND' : 'NOT FOUND');
+    console.log('- noteTitle:', noteTitle ? 'FOUND' : 'NOT FOUND');
+    console.log('- privacyToggle:', privacyToggle ? 'FOUND' : 'NOT FOUND');
+    console.log('- contextMenu:', contextMenu ? 'FOUND' : 'NOT FOUND');
+    console.log('- btnSave:', btnSave ? 'FOUND' : 'NOT FOUND');
+    
+    if (btnNewNote) {
+      console.log('Adding click listener to New Note button');
+      btnNewNote.addEventListener('click', () => {
+        console.log('New Note button clicked!');
+        createNote();
+      });
+    } else {
+      console.error('btnNewNote element not found - cannot add click listener');
+    }
+    
+    if (noteTitle) {
+      console.log('Adding input listener to note title');
+      noteTitle.addEventListener('input', debounce(saveNoteTitle, 400));
+    }
+    
+    if (privacyToggle) {
+      console.log('Adding click listener to privacy toggle');
+      privacyToggle.addEventListener('click', togglePrivacy);
+    }
+    
+    if (btnSave) {
+      console.log('Adding click listener to save button');
+      btnSave.addEventListener('click', () => {
+        if (currentNoteId) {
+          saveNoteContent();
+        }
+      });
+    }
+  
+    // Context menu actions
+    if (contextMenu) {
+      console.log('Adding click listener to context menu');
+      contextMenu.addEventListener('click', (e) => {
+        const action = e.target.closest('.context-menu-item')?.dataset.action;
+        const noteId = parseInt(e.target.closest('.context-menu').dataset.noteId);
+        
+        if (!action || !noteId) return;
+        
+        switch (action) {
+          case 'edit':
+            selectNote(noteId);
+            break;
+          case 'duplicate':
+            duplicateNote(noteId);
+            break;
+          case 'delete':
+            deleteNote(noteId);
+            break;
+        }
+      });
+    }
+  
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      switch (e.key) {
+        case 'b':
+          e.preventDefault();
+          const format = quill.getFormat();
+          quill.format('bold', !format.bold);
+          updateToolbarState();
+          break;
+        case 'i':
+          e.preventDefault();
+          const format2 = quill.getFormat();
+          quill.format('italic', !format2.italic);
+          updateToolbarState();
+          break;
+        case 'u':
+          e.preventDefault();
+          const format3 = quill.getFormat();
+          quill.format('underline', !format3.underline);
+          updateToolbarState();
+          break;
+        case 's':
+          e.preventDefault();
+          if (currentNoteId) {
+            saveNoteContent();
+          }
+          break;
+        case 'n':
+          e.preventDefault();
+          console.log('Ctrl+N pressed - creating new note');
+          createNote();
+          break;
+        case 'v':
+          // Let the paste event handler handle Ctrl+V for images
+          // Don't prevent default here as we want normal paste to work for text
+          break;
+      }
+    }
+  });
+  
+  console.log('=== EVENT LISTENERS SETUP COMPLETE ===');
+  }
+
+  // === Toast Notification System ===
+  function showToast(message, type = 'info', duration = 4000) {
+    const toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) return;
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    // Set icon based on type
+    let icon = '';
+    switch (type) {
+      case 'success':
+        icon = '<i class="bi bi-check-circle-fill"></i>';
+        break;
+      case 'error':
+        icon = '<i class="bi bi-x-circle-fill"></i>';
+        break;
+      case 'warning':
+        icon = '<i class="bi bi-exclamation-triangle-fill"></i>';
+        break;
+      case 'info':
+      default:
+        icon = '<i class="bi bi-info-circle-fill"></i>';
+        break;
+    }
+
+    toast.innerHTML = `
+      <div class="toast-content">
+        <span class="toast-icon">${icon}</span>
+        <span class="toast-message">${message}</span>
+        <button class="toast-close" aria-label="Close">×</button>
+      </div>
+    `;
+
+    // Add close functionality
+    const closeBtn = toast.querySelector('.toast-close');
+    closeBtn.addEventListener('click', () => {
+      hideToast(toast);
+    });
+
+    // Add to container
+    toastContainer.appendChild(toast);
+
+    // Trigger animation
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 10);
+
+    // Auto-hide after duration
+    if (duration > 0) {
+      setTimeout(() => {
+        hideToast(toast);
+      }, duration);
+    }
+
+    return toast;
+  }
+
+  function hideToast(toast) {
+    toast.classList.remove('show');
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
+  }
+
+  // === Error Suppression and Cleanup ===
+  
+  // Suppress common browser extension errors that interfere with the app
+  window.addEventListener('error', (event) => {
+    // Suppress extension-related errors
+    if (event.message && (
+      event.message.includes('message channel closed') ||
+      event.message.includes('Extension context invalidated') ||
+      event.message.includes('listener indicated an asynchronous response')
+    )) {
+      event.preventDefault();
+      return false;
+    }
+  });
+  
+  // Suppress unhandled promise rejections from extensions
+  window.addEventListener('unhandledrejection', (event) => {
+    if (event.reason && event.reason.message && (
+      event.reason.message.includes('message channel closed') ||
+      event.reason.message.includes('Extension context invalidated')
+    )) {
+      event.preventDefault();
+      return false;
+    }
+  });
+  
+  // Hide feedback widgets that might interfere
+  function hideFeedbackWidget() {
+    // Look for common feedback widget selectors and hide them
+    const feedbackSelectors = [
+      '.feedback-widget',
+      '.feedback-form',
+      '.feedback-button',
+      '#feedback-widget',
+      '[class*="feedback"]',
+      '[id*="feedback"]',
+      '[class*="helpdesk"]',
+      '[id*="helpdesk"]'
+    ];
+
+    feedbackSelectors.forEach(selector => {
+      try {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(el => {
+          if (el && (el.style.position === 'fixed' || 
+              getComputedStyle(el).position === 'fixed')) {
+            el.style.display = 'none';
+          }
+        });
+      } catch (e) {
+        // Ignore errors from selector queries
+      }
+    });
+  }
+  
+  // === Initialization ===
+  // Ensure the application only starts once Quill is available. If the primary CDN
+  // is blocked we may still be downloading the fallback script, so we poll until
+  // window.Quill exists before continuing. This prevents the editor from
+  // initializing in a "null" state which previously resulted in a grey, non-
+  // editable panel.
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('=== NOTES APP INITIALIZATION ===');
+    console.log('DOM Content Loaded, initializing notes app...');
+    
+    // Check if elements exist
+    const notesList = document.getElementById('collabNotesList');
+    const btnNewNote = document.getElementById('btnNewNote');
+    const searchInput = document.getElementById('searchInput');
+    const noteTitle = document.getElementById('noteTitle');
+    const editor = document.getElementById('editor');
+    
+    console.log('DOM elements check:');
+    console.log('- notesList:', notesList ? 'FOUND' : 'NOT FOUND');
+    console.log('- btnNewNote:', btnNewNote ? 'FOUND' : 'NOT FOUND');
+    console.log('- searchInput:', searchInput ? 'FOUND' : 'NOT FOUND');
+    console.log('- noteTitle:', noteTitle ? 'FOUND' : 'NOT FOUND');
+    console.log('- editor:', editor ? 'FOUND' : 'NOT FOUND');
+    
+    // Prevent async response errors by ensuring single initialization
+    if (window.notesAppInitialized) {
+      console.log('Notes app already initialized, skipping...');
+      return;
+    }
+    window.notesAppInitialized = true;
+    
+    const startApp = async () => {
+      console.log('Starting notes app...');
+      
+      try {
+        // Initialize components in sequence to prevent race conditions
+        console.log('Initializing editor...');
+        initEditor();
+        console.log('Setting up search...');
+        setupSearch();
+        console.log('Setting up event listeners...');
+        setupEventListeners();
+        
+        // Fetch notes and render sidebar
+        console.log('Fetching initial notes...');
+        await fetchNotes();
+        console.log('Notes app initialization complete');
+        
+        // Hide feedback widgets that might interfere
+        hideFeedbackWidget();
+        
+        showStatus('Notes app ready', 'saved');
+      } catch (error) {
+        console.error('Error during app initialization:', error);
+        showStatus('Initialization failed', 'error');
+      }
+    };
+
+    if (window.Quill) {
+      // Quill loaded from the primary CDN – start immediately.
+      console.log('Quill found, starting app immediately...');
+      startApp();
+    } else {
+      // Wait for the fallback script to finish loading (or for the primary CDN
+      // script to finally resolve). Poll every 100 ms up to 5 seconds.
+      let attempts = 0;
+      const maxAttempts = 50; // 50 × 100 ms = 5 s
+      const waitForQuill = setInterval(() => {
+        if (window.Quill) {
+          clearInterval(waitForQuill);
+          console.log('Quill loaded from fallback, starting app...');
+          startApp();
+        } else if (++attempts >= maxAttempts) {
+          clearInterval(waitForQuill);
+          console.error('Quill failed to load – editor unavailable, starting with fallback');
+          // Still try to setup the app without Quill
+          setupEventListeners();
+          fetchNotes().then(() => {
+            console.log('App started without Quill editor');
+          });
+        }
+      }, 100);
+    }
+  });
+
+  // === Debug Functions ===
+  window.debugCollabNotes = {
+    debugPasteEvent: () => {
+      console.log('=== PASTE DEBUG MODE ACTIVATED ===');
+      
+      // Add a temporary debug listener to ALL paste events
+      const debugListener = (e) => {
+        console.log('🔍 PASTE DEBUG:', {
+          target: e.target,
+          currentTarget: e.currentTarget,
+          eventPhase: e.eventPhase,
+          bubbles: e.bubbles,
+          cancelable: e.cancelable,
+          defaultPrevented: e.defaultPrevented,
+          clipboardData: e.clipboardData ? 'present' : 'missing',
+          items: e.clipboardData ? Array.from(e.clipboardData.items).map(item => ({ type: item.type, kind: item.kind })) : 'no data'
+        });
+      };
+      
+      document.addEventListener('paste', debugListener, true);
+      window.addEventListener('paste', debugListener, true);
+      
+      // Remove after 30 seconds
+      setTimeout(() => {
+        document.removeEventListener('paste', debugListener, true);
+        window.removeEventListener('paste', debugListener, true);
+        console.log('🔍 PASTE DEBUG MODE DEACTIVATED');
+      }, 30000);
+      
+      console.log('🔍 Try pasting an image now - debug info will show for 30 seconds');
+    },
+    fetchAndRender: async () => {
+      console.log('=== DEBUG: Manual fetch and render ===');
+      try {
+        await fetchNotes();
+        renderNotesSidebar();
+        console.log('Debug fetch and render completed');
+      } catch (error) {
+        console.error('Debug fetch and render failed:', error);
+      }
+    },
+    
+    checkElements: () => {
+      console.log('=== DEBUG: Element Check ===');
+      const elements = {
+        collabNotesList: document.getElementById('collabNotesList'),
+        btnNewNote: document.getElementById('btnNewNote'),
+        searchInput: document.getElementById('searchInput'),
+        noteTitle: document.getElementById('noteTitle'),
+        editor: document.getElementById('editor')
+      };
+      
+      Object.entries(elements).forEach(([name, element]) => {
+        console.log(`${name}:`, element ? 'FOUND' : 'NOT FOUND', element);
+      });
+      
+      return elements;
+    },
+    
+    getCurrentNotes: () => {
+      console.log('Current collab notes:', collabNotes);
+      return collabNotes;
+    },
+    
+    testAPI: async () => {
+      console.log('=== DEBUG: Testing API directly ===');
+      try {
+        const response = await fetch('/notes/api/notes');
+        console.log('API response status:', response.status);
+        const data = await response.json();
+        console.log('API response data:', data);
+        return data;
+      } catch (error) {
+        console.error('API test failed:', error);
+        return null;
+      }
+    },
+    
+    renderTestNotes: () => {
+      console.log('=== DEBUG: Rendering test notes ===');
+      const listEl = document.getElementById('collabNotesList');
+      if (!listEl) {
+        console.error('collabNotesList not found');
+        return;
+      }
+      
+      listEl.innerHTML = `
+        <div class="note-item" style="background: rgba(88, 166, 255, 0.1) !important; color: var(--dark-text) !important; padding: 20px !important; margin: 10px !important; border: 1px solid var(--dark-border) !important;">
+          <div class="note-title" style="color: var(--dark-text) !important; font-size: 16px !important; font-weight: bold !important;">TEST COLLAB NOTE 1</div>
+          <div class="note-preview" style="color: var(--dark-text-secondary) !important;">This is a test collaborative note</div>
+          <div class="note-meta" style="color: var(--dark-text-muted) !important;">Today • Public</div>
+        </div>
+        <div class="note-item" style="background: rgba(88, 166, 255, 0.1) !important; color: var(--dark-text) !important; padding: 20px !important; margin: 10px !important; border: 1px solid var(--dark-border) !important;">
+          <div class="note-title" style="color: var(--dark-text) !important; font-size: 16px !important; font-weight: bold !important;">TEST COLLAB NOTE 2</div>
+          <div class="note-preview" style="color: var(--dark-text-secondary) !important;">Another test collaborative note</div>
+          <div class="note-meta" style="color: var(--dark-text-muted) !important;">Yesterday • Private</div>
+        </div>
+      `;
+      
+      console.log('Test collab notes rendered');
+      console.log('List element:', listEl);
+      console.log('Children count:', listEl.children.length);
+    },
+    
+    clearTestNotes: () => {
+      const listEl = document.getElementById('collabNotesList');
+      if (listEl) {
+        listEl.innerHTML = '';
+        console.log('Test notes cleared');
+      }
+    }
+  };
+  
+  console.log('Debug functions added to window.debugCollabNotes');
+
+  // === Image Pasting Functionality ===
+  function setupImagePasting() {
+    if (!quill) {
+      console.log('Quill not available, skipping image pasting setup');
+      return;
+    }
+    
+    console.log('Setting up image pasting functionality');
+    
+    // Create a very aggressive paste interceptor that stops ALL image pastes
+    const interceptPasteGlobally = (e) => {
+      console.log('Global paste interceptor triggered', e.target, e.currentTarget);
+      
+      const clipboardData = e.clipboardData || e.originalEvent?.clipboardData;
+      if (!clipboardData) return;
+      
+      const items = Array.from(clipboardData.items);
+      const imageItem = items.find(item => item.type.startsWith('image/'));
+      
+      if (imageItem) {
+        console.log('🚫 INTERCEPTING IMAGE PASTE - Preventing Jarvis/other handlers');
+        
+        // AGGRESSIVELY stop this event from reaching anything else
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        
+        // Only process if we're in the notes editor
+        if (e.target.closest('#editor, .ql-editor, .editor-content, .collab_notes')) {
+          console.log('✅ Processing image in notes editor');
+          const file = imageItem.getAsFile();
+          if (file) {
+            handleImagePaste(file);
+          }
+        } else {
+          console.log('❌ Image paste outside notes editor - blocking');
+        }
+        
+        return false; // Extra safety
+      }
+    };
+    
+    // Add the interceptor at the VERY TOP of the event chain
+    document.addEventListener('paste', interceptPasteGlobally, true);
+    window.addEventListener('paste', interceptPasteGlobally, true);
+    
+    // Also add to the editor element specifically
+    const editorElement = quill.root;
+    editorElement.addEventListener('paste', async (e) => {
+      console.log('Editor-specific paste handler');
+      
+      const clipboardData = e.clipboardData || e.originalEvent?.clipboardData;
+      if (!clipboardData) return;
+      
+      const items = Array.from(clipboardData.items);
+      const imageItem = items.find(item => item.type.startsWith('image/'));
+      
+      if (imageItem) {
+        console.log('🖼️ Image detected in editor - handling locally');
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        
+        const file = imageItem.getAsFile();
+        if (file) {
+          await handleImagePaste(file);
+        }
+        return false;
+      }
+    }, true);
+    
+    console.log('✅ Aggressive image pasting setup complete');
+  }
+  
+  async function handleImagePaste(file) {
+    try {
+      // Show file size info
+      const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      showStatus(`Processing image (${fileSizeMB}MB)...`, 'saving');
+      
+      // Check file size (warn if > 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        showToast(`Large image detected (${fileSizeMB}MB). This may slow down the note.`, 'warning');
+      }
+      
+      // Convert image to base64
+      const base64 = await fileToBase64(file);
+      
+      // Insert image into Quill editor at current cursor position
+      const range = quill.getSelection();
+      const index = range ? range.index : quill.getLength();
+      
+      // Insert the image
+      quill.insertEmbed(index, 'image', base64);
+      
+      // Move cursor after the image and add a line break
+      quill.setSelection(index + 1);
+      quill.insertText(index + 1, '\n');
+      quill.setSelection(index + 2);
+      
+      showStatus('Image inserted successfully', 'saved');
+      showToast(`Image pasted successfully (${fileSizeMB}MB)`, 'success');
+      
+      // Auto-save the note with the new image
+      if (currentNoteId) {
+        setTimeout(() => saveNoteContent(), 500);
+      }
+      
+    } catch (error) {
+      console.error('Error handling image paste:', error);
+      showStatus('Failed to insert image', 'error');
+      showToast('Failed to paste image: ' + error.message, 'error');
+    }
+  }
+  
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+  
+  // === Rich Text Editor Initialization ===
+  function initEditor() {
+    if (!window.Quill) {
+      console.error('Quill editor failed to load');
+      // Show a fallback editor
+      showFallbackEditor();
+      return;
+    }
+    
+    const editorContainer = document.getElementById('editor');
+    if (!editorContainer) {
+      console.error('Editor container not found');
+      return;
+    }
+
+    const toolbarOptions = [
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'header': 1 }, { 'header': 2 }, { 'header': 3 }],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+      ['blockquote', 'code-block'],
+      ['clean']
+    ];
+
+    try {
+      quill = new Quill('#editor', {
+        theme: 'snow',
+        modules: {
+          toolbar: toolbarOptions
+        },
+        placeholder: 'Start writing your note...',
+        bounds: '#editor'
+      });
+
+      // Ensure the editor is enabled (writeable)
+      quill.enable(true);
+      
+      // Set focus to editor to confirm it's interactive
+      setTimeout(() => {
+        quill.focus();
+      }, 100);
+      
+      // Auto-save on content change - faster auto-save
+      quill.on('text-change', debounce(() => {
+        if (currentNoteId) {
+          saveNoteContent();
+        }
+      }, 500));
+      
+      // Add image pasting functionality
+      setupImagePasting();
+      
+      console.log('Quill editor initialized successfully');
+    } catch (error) {
+      console.error('Error initializing Quill:', error);
+      showFallbackEditor();
+    }
+  }
+  
+  function showFallbackEditor() {
+    const editorContainer = document.getElementById('editor');
+    if (editorContainer) {
+      editorContainer.innerHTML = '<textarea id="fallbackEditor" style="width: 100%; height: 400px; border: none; outline: none; font-family: inherit; font-size: 16px; line-height: 1.6; padding: 20px; background: transparent; color: var(--dark-text); resize: none;" placeholder="Start writing your note... (Note: Rich text features and image pasting require Quill editor)"></textarea>';
+      
+      const fallbackEditor = document.getElementById('fallbackEditor');
+      if (fallbackEditor) {
+        fallbackEditor.addEventListener('input', debounce(() => {
+          if (currentNoteId) {
+            saveNoteContentFallback();
+          }
+        }, 500));
+        
+        // Add basic paste listener for fallback (text only)
+        fallbackEditor.addEventListener('paste', (e) => {
+          // Let the default paste behavior work for text
+          // Image pasting is not supported in the fallback editor
+          setTimeout(() => {
+            if (currentNoteId) {
+              saveNoteContentFallback();
+            }
+          }, 100);
+        });
+      }
+    }
+  }
+  
+  function saveNoteContentFallback() {
+    if (!currentNoteId) return;
+    
+    const fallbackEditor = document.getElementById('fallbackEditor');
+    if (!fallbackEditor) return;
+    
+    const content = fallbackEditor.value;
+    
+    fetch(`/notes/api/notes/${currentNoteId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content }),
+    }).then(() => {
+      showStatus('Saved', 'saved');
+    }).catch(error => {
+      console.error('Error saving note:', error);
+      showStatus('Failed to save', 'error');
+    });
+  }
+
+  // Function to extract plain text from Quill content
+  function extractPlainTextFromQuill(content) {
+    try {
+      if (!content) return '';
+      
+      // Try to parse as JSON
+      const data = typeof content === 'string' ? JSON.parse(content) : content;
+      
+      // Check if it's Quill Delta format
+      if (data && data.ops && Array.isArray(data.ops)) {
+        const textParts = [];
+        
+        for (const op of data.ops) {
+          if (op && typeof op.insert === 'string') {
+            // Only process text inserts, skip images and other embeds
+            let text = op.insert;
+            // Clean up excessive newlines but preserve structure
+            text = text.replace(/\n\n\n+/g, '\n\n').replace(/\n/g, ' ');
+            textParts.push(text.trim());
+          }
+          // Skip non-string inserts (images, videos, etc.)
+        }
+        
+        return textParts.join(' ').trim();
+      } else {
+        // If not Quill format, return as-is (fallback for plain text)
+        return content;
+      }
+    } catch (e) {
+      // If parsing fails, treat as plain text
+      return content || '';
+    }
+  }
+
+  function renderNotesList() {
+    const list = document.getElementById('notesList');
+    if (!list) return;
+    
+    list.innerHTML = ''; // Clear existing content
+    
+    const sortedNotes = [...collabNotes].sort((a, b) => {
+      const dateA = new Date(a.updated_at);
+      const dateB = new Date(b.updated_at);
+      return dateB - dateA;
+    });
+    
+    console.log('Rendering', sortedNotes.length, 'sorted notes');
+    console.log('Sorted notes:', sortedNotes);
+    
+    let itemsAdded = 0;
+    sortedNotes.forEach((note, index) => {
+      console.log(`Rendering note ${index + 1}:`, note.title || 'Untitled', 'ID:', note.id);
+      
+      const item = document.createElement('div');
+      item.className = `note-item ${note.id === currentNoteId ? 'note-active' : ''}`;
+      item.dataset.id = note.id;
+      
+      // Parse content for preview using the plain text extraction function
+      let preview = '';
+      try {
+        if (note.content) {
+          // Use the new plain text extraction function
+          preview = extractPlainTextFromQuill(note.content).substring(0, 100);
+        }
+      } catch (e) {
+        console.warn('Error extracting preview from note content:', e);
+        // Fallback for plain text content
+        preview = (note.content || '').substring(0, 100);
+      }
+      
+      // Parse tags safely
+      const tags = parseTags(note.tags);
+      
+      // Get display title - handle empty/null titles properly
+      const displayTitle = (note.title && note.title.trim()) ? note.title.trim() : 'Untitled Note';
+      
+      const itemHtml = `
+        <div class="note-title">${displayTitle}</div>
+        <div class="note-preview">${preview}${preview.length >= 100 ? '...' : ''}</div>
+        <div class="note-tags">${renderTags(tags)}</div>
+        <div class="note-meta">
+          <span>${new Date(note.updated_at).toLocaleDateString()}</span>
+          <span class="note-privacy-indicator">
+            <i class="bi ${note.is_public ? 'bi-unlock' : 'bi-lock-fill'}"></i>
+          </span>
+        </div>
+      `;
+      
+      item.innerHTML = itemHtml;
+      
+      // Add click event
+      item.addEventListener('click', () => selectNote(note.id));
+      
+      list.appendChild(item);
+      itemsAdded++;
+      console.log(`Added note item ${itemsAdded} to DOM:`, displayTitle);
+    });
+    
+    console.log(`Total items added to DOM: ${itemsAdded}`);
+    
+    // Show empty state if no notes
+    if (sortedNotes.length === 0) {
+      list.innerHTML = '<div class="empty-state">No notes yet. Create your first note to get started!</div>';
+    }
+  }
+
+  // === Ticket Linking Autocomplete ===
+  let linkedTicket = null;
+  const ticketLinkInput = document.getElementById('ticketLinkInput');
+  const ticketLinkSuggestions = document.getElementById('ticketLinkSuggestions');
+
+  if (ticketLinkInput) {
+    ticketLinkInput.addEventListener('input', debounce(async (e) => {
+      const query = e.target.value.trim();
+      if (!query) {
+        ticketLinkSuggestions.style.display = 'none';
+        return;
+      }
+      // Fetch tickets from API
+      try {
+        const resp = await fetch(`/patterson/api/freshworks-tickets?q=${encodeURIComponent(query)}`);
+        const data = await resp.json();
+        if (!data.tickets || !Array.isArray(data.tickets)) {
+          ticketLinkSuggestions.style.display = 'none';
+          return;
+        }
+        ticketLinkSuggestions.innerHTML = data.tickets.slice(0, 5).map(ticket =>
+          `<div class="context-menu-item" data-id="${ticket.id}">
+            <strong>${ticket.ticket_number}</strong>: ${ticket.title}
+          </div>`
+        ).join('');
+        ticketLinkSuggestions.style.display = 'block';
+        // Add click listeners
+        Array.from(ticketLinkSuggestions.children).forEach(item => {
+          item.onclick = () => {
+            linkedTicket = data.tickets.find(t => t.id == item.dataset.id);
+            ticketLinkInput.value = `${linkedTicket.ticket_number}: ${linkedTicket.title}`;
+            ticketLinkSuggestions.style.display = 'none';
+            renderLinkedTicket();
+          };
+        });
+      } catch (err) {
+        ticketLinkSuggestions.style.display = 'none';
+      }
+    }, 300));
+  }
+
+  function renderLinkedTicket() {
+    // Optionally show a badge or link for the selected ticket
+    if (linkedTicket) {
+      ticketLinkInput.value = `${linkedTicket.ticket_number}: ${linkedTicket.title}`;
+      ticketLinkInput.style.background = 'rgba(88,166,255,0.08)';
+    } else {
+      ticketLinkInput.value = '';
+      ticketLinkInput.style.background = '';
+    }
+  }
+
+  // === User Sharing Autocomplete ===
+  let sharedUsers = [];
+  const userShareInput = document.getElementById('userShareInput');
+  const userShareSuggestions = document.getElementById('userShareSuggestions');
+  const sharedUsersList = document.getElementById('sharedUsersList');
+
+  if (userShareInput) {
+    userShareInput.addEventListener('input', debounce(async (e) => {
+      const query = e.target.value.trim();
+      if (!query) {
+        userShareSuggestions.style.display = 'none';
+        return;
+      }
+      // Fetch users from API
+      try {
+        const resp = await fetch(`/api/users/search?q=${encodeURIComponent(query)}`);
+        const data = await resp.json();
+        if (!Array.isArray(data)) {
+          userShareSuggestions.style.display = 'none';
+          return;
+        }
+        userShareSuggestions.innerHTML = data.slice(0, 5).map(user =>
+          `<div class="context-menu-item" data-id="${user.id}">
+            <strong>${user.username}</strong> (${user.email})
+          </div>`
+        ).join('');
+        userShareSuggestions.style.display = 'block';
+        // Add click listeners
+        Array.from(userShareSuggestions.children).forEach(item => {
+          item.onclick = () => {
+            const user = data.find(u => u.id == item.dataset.id);
+            if (user && !sharedUsers.some(u => u.id == user.id)) {
+              sharedUsers.push(user);
+              renderSharedUsers();
+            }
+            userShareInput.value = '';
+            userShareSuggestions.style.display = 'none';
+          };
+        });
+      } catch (err) {
+        userShareSuggestions.style.display = 'none';
+      }
+    }, 300));
+  }
+
+  function renderSharedUsers() {
+    if (!sharedUsersList) return;
+    sharedUsersList.innerHTML = sharedUsers.map(user =>
+      `<span class="note-tag" style="background:rgba(0,122,255,0.15);color:#58a6ff;cursor:pointer;" title="Remove" data-id="${user.id}">
+        ${user.username} <i class="bi bi-x" style="font-size:10px;"></i>
+      </span>`
+    ).join('');
+    // Remove user on click
+    Array.from(sharedUsersList.children).forEach(item => {
+      item.onclick = () => {
+        const id = item.dataset.id;
+        sharedUsers = sharedUsers.filter(u => u.id != id);
+        renderSharedUsers();
+      };
+    });
+  }
+
+  function adjustTooltipPosition() {
+    // For lock
+    const toggle = document.getElementById('privacyToggle');
+    if (toggle) {
+      const tooltip = toggle.querySelector('.tooltip-above');
+      if (tooltip) {
+        const rect = tooltip.getBoundingClientRect();
+        if (rect.top < 0) {
+          toggle.classList.add('show-below');
+        } else {
+          toggle.classList.remove('show-below');
+        }
+      }
+    }
+    // For share with users
+    const share = document.querySelector('.user-share-input');
+    if (share) {
+      const tooltip = share.querySelector('.tooltip-above');
+      if (tooltip) {
+        const rect = tooltip.getBoundingClientRect();
+        if (rect.top < 0) {
+          share.classList.add('show-below');
+        } else {
+          share.classList.remove('show-below');
+        }
+      }
+    }
+  }
+  document.addEventListener('mouseover', adjustTooltipPosition, true);
+  window.addEventListener('resize', adjustTooltipPosition);
+
+  // Add focus buttons for tags, ticket link, and user share
+  const tagsToggle = document.getElementById('tagsToggle');
+  const tagInput = document.getElementById('tagInput');
+  if (tagsToggle && tagInput) {
+    tagsToggle.querySelector('button').addEventListener('click', () => tagInput.focus());
+  }
+  const ticketLinkToggle = document.getElementById('ticketLinkToggle');
+  const ticketLinkInputBtn = document.getElementById('ticketLinkInput');
+  if (ticketLinkToggle && ticketLinkInputBtn) {
+    ticketLinkToggle.querySelector('button').addEventListener('click', () => ticketLinkInputBtn.focus());
+  }
+  const userShareToggle = document.getElementById('userShareToggle');
+  const userShareInputBtn = document.getElementById('userShareInput');
+  if (userShareToggle && userShareInputBtn) {
+    userShareToggle.querySelector('button').addEventListener('click', () => userShareInputBtn.focus());
+  }
+</script>
+{% endblock %} 

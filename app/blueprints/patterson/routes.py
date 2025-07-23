@@ -7,7 +7,7 @@ import os
 import requests
 from . import bp
 from app.models import User, SearchHistory, SystemSettings, UserSettings, Note, Activity, Document, KBArticle, KBAttachment, SharedLink, UserPresence, TimeEntry, UserMapping, PattersonTicket, PattersonCalendarEvent  # Import new models
-from app.config import FRESH_ENDPOINT, FRESH_API, TICKET_STATUSES, TICKET_PRIORITIES
+from extensions import Config
 from app.utils.patterson_file_manager import get_patterson_file_manager
 from app.utils.patterson_db_manager import get_patterson_db_manager
 # Import the new Freshworks database manager
@@ -1032,7 +1032,7 @@ def get_freshworks_status():
     """Get Freshworks connection status."""
     try:
         # Test Freshworks connectivity
-        if not FRESH_ENDPOINT or FRESH_ENDPOINT == 'https://your-domain.freshdesk.com/api/v2/':
+        if not Config.FRESH_ENDPOINT or Config.FRESH_ENDPOINT == 'https://your-domain.freshdesk.com/api/v2/':
             return jsonify({
                 'success': False,
                 'connected': False,
@@ -1043,8 +1043,8 @@ def get_freshworks_status():
         try:
             query = 'tag:patterson-dispatch AND status:2'
             response = requests.get(
-                f"{FRESH_ENDPOINT}tickets/filter?query=\"{query}\"",
-                auth=(FRESH_API, 'TICKETS'),
+                        f"{Config.FRESH_ENDPOINT}tickets/filter?query=\"{query}\"",
+        auth=(Config.FRESH_API, 'TICKETS'),
                 timeout=10
             )
             

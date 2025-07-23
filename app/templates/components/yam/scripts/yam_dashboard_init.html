@@ -1,0 +1,465 @@
+<script>
+// Enhanced YAM Dashboard System with Real-time Updates
+window.yamDashboard = {
+    components: {},
+    initialized: false,
+    autoRefresh: true,
+    refreshInterval: 30000, // 30 seconds
+    lastUpdate: Date.now(),
+    
+    // Register component function
+    registerComponent: function(name, component) {
+        try {
+            this.components[name] = component;
+            console.log(`YAM Component registered: ${name}`);
+            return true;
+        } catch (error) {
+            console.error(`Failed to register component ${name}:`, error);
+            return false;
+        }
+    },
+    
+    // Get component function
+    getComponent: function(name) {
+        return this.components[name] || null;
+    },
+    
+    init() {
+        if (this.initialized) {
+            console.log('YAM Dashboard already initialized');
+            return;
+        }
+        
+        // Initialize real-time updates
+        if (window.yamRealtime) {
+            window.yamRealtime.setupRealTimeUpdates();
+        }
+        
+        this.setupAnimations();
+        this.setupResponsive();
+        this.setupScrollbarOptimization();
+        this.setupErrorHandling();
+        this.setupPerformanceMonitoring();
+        this.setupModalHandling();
+        this.setupAutoRefresh();
+        this.initialized = true;
+        console.log('YAM Dashboard initialized successfully - Enhanced Premium Feel with Real-time Updates');
+    },
+    
+    // Setup auto-refresh for fallback
+    setupAutoRefresh() {
+        if (!this.autoRefresh) return;
+        
+        setInterval(() => {
+            // Only refresh if no real-time updates for 2 minutes
+            const timeSinceLastUpdate = Date.now() - this.lastUpdate;
+            if (timeSinceLastUpdate > 120000) { // 2 minutes
+                console.log('🔄 YAM Dashboard: Auto-refreshing due to no recent updates');
+                this.refreshDashboard();
+            }
+        }, this.refreshInterval);
+    },
+    
+    // Refresh dashboard data
+    async refreshDashboard() {
+        try {
+            console.log('🔄 YAM Dashboard: Refreshing dashboard data...');
+            
+            // Refresh quick stats
+            await this.refreshComponent('quick_stats');
+            
+            // Refresh user analytics
+            await this.refreshComponent('user_analytics');
+            
+            // Refresh system health
+            await this.refreshComponent('system_health');
+            
+            this.lastUpdate = Date.now();
+            this.updateLastUpdatedDisplay();
+            
+        } catch (error) {
+            console.error('YAM Dashboard: Error refreshing dashboard:', error);
+        }
+    },
+    
+    // Refresh specific component
+    async refreshComponent(componentName) {
+        try {
+            const component = this.getComponent(componentName);
+            if (component && typeof component.refresh === 'function') {
+                await component.refresh();
+            }
+        } catch (error) {
+            console.error(`YAM Dashboard: Error refreshing component ${componentName}:`, error);
+        }
+    },
+    
+    // Update last updated display
+    updateLastUpdatedDisplay() {
+        const lastUpdatedElements = document.querySelectorAll('.last-updated');
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        
+        lastUpdatedElements.forEach(element => {
+            element.textContent = `Last updated: ${timeString}`;
+        });
+    },
+    
+    // CRITICAL: Setup modal handling
+    setupModalHandling() {
+        // Ensure all modals have proper z-index
+        this.fixModalZIndex();
+        
+        // Monitor for dynamically added modals
+        this.monitorModalChanges();
+        
+        // Fix any existing modal issues
+        setTimeout(() => {
+            this.fixModalZIndex();
+        }, 1000);
+        
+        // Enhanced modal event listeners
+        this.setupModalEventListeners();
+        
+        console.log('YAM Dashboard: Enhanced modal handling initialized');
+    },
+    
+    // CRITICAL: Fix modal z-index issues
+    fixModalZIndex() {
+        // Fix Bootstrap modals
+        const bootstrapModals = document.querySelectorAll('.modal');
+        bootstrapModals.forEach(modal => {
+            modal.style.zIndex = '99999999';
+            
+            const modalDialog = modal.querySelector('.modal-dialog');
+            if (modalDialog) {
+                modalDialog.style.zIndex = '99999999';
+            }
+            
+            const modalContent = modal.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.style.zIndex = '99999999';
+                modalContent.style.pointerEvents = 'auto';
+            }
+        });
+        
+        // Fix modal backdrops
+        const modalBackdrops = document.querySelectorAll('.modal-backdrop');
+        modalBackdrops.forEach(backdrop => {
+            backdrop.style.zIndex = '99999998';
+        });
+        
+        // Fix YAM modals
+        const yamModalOverlays = document.querySelectorAll('.yam-modal-overlay');
+        yamModalOverlays.forEach(overlay => {
+            overlay.style.zIndex = '99999999';
+            overlay.style.pointerEvents = 'auto';
+        });
+        
+        // Ensure all form elements are interactive
+        const formElements = document.querySelectorAll('input, textarea, select, button');
+        formElements.forEach(element => {
+            element.style.pointerEvents = 'auto';
+            element.style.position = 'relative';
+            element.style.zIndex = 'auto';
+        });
+    },
+    
+    // CRITICAL: Monitor for modal changes
+    monitorModalChanges() {
+        // Use MutationObserver to watch for modal changes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.nodeType === Node.ELEMENT_NODE) {
+                            if (node.classList && node.classList.contains('modal')) {
+                                this.fixModalZIndex();
+                            }
+                            if (node.querySelector && node.querySelector('.modal')) {
+                                this.fixModalZIndex();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    },
+    
+    // CRITICAL: Setup enhanced modal event listeners
+    setupModalEventListeners() {
+        // Listen for modal show events
+        document.addEventListener('show.bs.modal', (event) => {
+            const modal = event.target;
+            this.enhanceModal(modal);
+        });
+        
+        // Listen for modal shown events
+        document.addEventListener('shown.bs.modal', (event) => {
+            const modal = event.target;
+            this.ensureModalInteractivity(modal);
+        });
+        
+        // Listen for modal hide events
+        document.addEventListener('hide.bs.modal', (event) => {
+            const modal = event.target;
+            this.cleanupModal(modal);
+        });
+        
+        // Enhanced click outside to close
+        document.addEventListener('click', (event) => {
+            if (event.target.classList.contains('modal')) {
+                const modal = event.target;
+                if (modal.classList.contains('show')) {
+                    this.closeModal(modal);
+                }
+            }
+        });
+    },
+    
+    // CRITICAL: Enhance modal appearance and functionality
+    enhanceModal(modal) {
+        if (!modal) return;
+        
+        // Ensure proper positioning
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.zIndex = '99999999';
+        modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+        
+        // Enhance modal dialog
+        const dialog = modal.querySelector('.modal-dialog');
+        if (dialog) {
+            dialog.style.margin = 'auto';
+            dialog.style.maxWidth = '90%';
+            dialog.style.maxHeight = '90%';
+            dialog.style.overflow = 'auto';
+        }
+        
+        // Enhance modal content
+        const content = modal.querySelector('.modal-content');
+        if (content) {
+            content.style.background = 'rgba(26, 26, 26, 0.98)';
+            content.style.backdropFilter = 'blur(20px)';
+            content.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+            content.style.borderRadius = '16px';
+            content.style.boxShadow = '0 32px 128px rgba(0, 0, 0, 0.8)';
+        }
+        
+        // Add backdrop if needed
+        if (!document.querySelector('.modal-backdrop')) {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.style.zIndex = '99999998';
+            backdrop.style.position = 'fixed';
+            backdrop.style.top = '0';
+            backdrop.style.left = '0';
+            backdrop.style.width = '100%';
+            backdrop.style.height = '100%';
+            backdrop.style.background = 'rgba(0, 0, 0, 0.7)';
+            backdrop.style.backdropFilter = 'blur(5px)';
+            document.body.appendChild(backdrop);
+        }
+    },
+    
+    // CRITICAL: Ensure modal interactivity
+    ensureModalInteractivity(modal) {
+        if (!modal) return;
+        
+        // Ensure all form elements are interactive
+        const formElements = modal.querySelectorAll('input, textarea, select, button, a');
+        formElements.forEach(element => {
+            element.style.pointerEvents = 'auto';
+            element.style.position = 'relative';
+            element.style.zIndex = 'auto';
+            
+            // Enhanced styling for form elements
+            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA' || element.tagName === 'SELECT') {
+                element.style.background = 'rgba(40, 40, 40, 0.9)';
+                element.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+                element.style.color = '#ffffff';
+                element.style.borderRadius = '8px';
+                element.style.padding = '0.75rem 1rem';
+            }
+        });
+        
+        // Focus first input if available
+        const firstInput = modal.querySelector('input, textarea, select');
+        if (firstInput) {
+            setTimeout(() => {
+                firstInput.focus();
+            }, 100);
+        }
+    },
+    
+    // CRITICAL: Cleanup modal
+    cleanupModal(modal) {
+        if (!modal) return;
+        
+        // Remove backdrop
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.remove();
+        }
+        
+        // Reset modal styles
+        modal.style.display = 'none';
+        modal.style.zIndex = '';
+    },
+    
+    // CRITICAL: Close modal
+    closeModal(modal) {
+        if (!modal) return;
+        
+        // Use Bootstrap modal if available
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const bsModal = bootstrap.Modal.getInstance(modal);
+            if (bsModal) {
+                bsModal.hide();
+            }
+        } else {
+            // Fallback close
+            modal.classList.remove('show');
+            modal.style.display = 'none';
+            document.body.classList.remove('modal-open');
+            this.cleanupModal(modal);
+        }
+    },
+    
+    setupAnimations() {
+        // Animation system removed
+        console.log('YAM Dashboard: Animations disabled');
+    },
+    
+    setupResponsive() {
+        const handleResize = () => {
+            const container = document.getElementById('yamContainer');
+            if (container) {
+                if (window.innerWidth <= 768) {
+                    container.classList.add('mobile-view');
+                } else {
+                    container.classList.remove('mobile-view');
+                }
+            }
+        };
+        
+        window.addEventListener('resize', handleResize);
+        handleResize();
+    },
+    
+    setupScrollbarOptimization() {
+        const container = document.getElementById('yamContainer');
+        if (container) {
+            container.style.scrollBehavior = 'smooth';
+        }
+    },
+    
+    setupErrorHandling() {
+        window.addEventListener('error', (event) => {
+            console.error('YAM Dashboard Error:', event.error);
+        });
+        
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('YAM Dashboard Unhandled Promise Rejection:', event.reason);
+        });
+    },
+    
+    setupPerformanceMonitoring() {
+        // Performance monitoring
+        const loadTime = performance.now();
+        console.log(`YAM Dashboard: Enhanced version loaded in ${loadTime.toFixed(2)}ms`);
+        
+        // Monitor component load times
+        window.addEventListener('load', () => {
+            const totalLoadTime = performance.now() - loadTime;
+            console.log(`YAM Dashboard: Total enhanced load time: ${totalLoadTime.toFixed(2)}ms`);
+        });
+    }
+};
+
+// Initialize immediately when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.yamDashboard.init();
+    });
+} else {
+    window.yamDashboard.init();
+}
+
+// Safe component initialization wrapper
+window.safeInitComponent = function(componentName, initFunction) {
+    try {
+        if (typeof initFunction === 'function') {
+            initFunction();
+            console.log(`${componentName} component initialized`);
+        } else {
+            console.warn(`${componentName} init function not found`);
+        }
+    } catch (error) {
+        console.error(`Error initializing ${componentName}:`, error);
+    }
+};
+
+// Safe event listener wrapper
+window.safeAddEventListener = function(element, event, handler) {
+    try {
+        if (element && typeof element.addEventListener === 'function') {
+            element.addEventListener(event, handler);
+            return true;
+        } else {
+            console.warn('Element not found or addEventListener not available:', element);
+            return false;
+        }
+    } catch (error) {
+        console.error('Error adding event listener:', error);
+        return false;
+    }
+};
+
+// Enhanced performance monitoring
+window.yamPerformance = {
+    startTime: performance.now(),
+    metrics: {},
+    
+    init() {
+        console.log('YAM Performance: Enhanced monitoring initialized');
+    },
+    
+    mark(name) {
+        this.metrics[name] = performance.now();
+    },
+    
+    measure(name, startMark, endMark) {
+        try {
+            const start = this.metrics[startMark] || this.startTime;
+            const end = this.metrics[endMark] || performance.now();
+            const duration = end - start;
+            console.log(`YAM Performance: ${name} took ${duration.toFixed(2)}ms`);
+            return duration;
+        } catch (error) {
+            console.warn(`YAM Performance: Could not measure ${name}`, error);
+            return 0;
+        }
+    },
+    
+    getMetrics() {
+        return {
+            ...this.metrics,
+            totalLoadTime: performance.now() - this.startTime
+        };
+    }
+};
+
+// Initialize performance monitoring
+window.yamPerformance.init();
+</script> 

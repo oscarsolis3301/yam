@@ -1,0 +1,1666 @@
+{% macro render_outage_tracker(current_user) %}
+<!-- YAM Outage Tracker Component - ULTRA VISUALLY APPEALING -->
+<div id="yamOutageTracker" class="yam-outage-tracker">
+    <div class="tracker-header">
+        <h4 class="tracker-title">
+            <i class="bi bi-exclamation-triangle"></i>
+            Outage Tracker
+        </h4>
+        <div class="tracker-controls">
+            {% if current_user.role in ['admin', 'manager', 'developer'] %}
+            <button class="tracker-control-btn create-outage-btn" id="yamCreateOutage" title="Create New Outage">
+                <i class="bi bi-plus-circle"></i>
+            </button>
+            {% endif %}
+            <button class="tracker-control-btn" id="yamOutageRefresh" title="Refresh Data">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <button class="tracker-control-btn" id="yamOutageSettings" title="Settings">
+                <i class="bi bi-gear"></i>
+            </button>
+            <div class="tracker-status" id="yamOutageStatus">
+                <i class="bi bi-circle-fill"></i>
+                <span>Monitoring</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tracker-grid">
+        <!-- ULTRA VISUALLY APPEALING OUTAGE GRAPH -->
+        <div class="tracker-card main-graph-card">
+            <div class="card-header">
+                <h5><i class="bi bi-graph-up"></i> Outage Analytics Graph</h5>
+                <span class="card-subtitle">Real-time outage visualization</span>
+            </div>
+            <div class="graph-container">
+                <div class="graph-loading" id="yamGraphLoading">
+                    <div class="loading-spinner">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <span>Loading outage data...</span>
+                </div>
+                <canvas id="yamOutageGraph" width="800" height="400"></canvas>
+                <div class="graph-overlay" id="yamGraphOverlay">
+                    <div class="graph-tooltip" id="yamGraphTooltip"></div>
+                </div>
+            </div>
+            <div class="graph-controls">
+                <div class="control-group">
+                    <label>Time Range:</label>
+                    <select id="yamTimeRange" class="graph-select">
+                        <option value="7">Last 7 Days</option>
+                        <option value="30" selected>Last 30 Days</option>
+                        <option value="90">Last 90 Days</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Chart Type:</label>
+                    <select id="yamChartType" class="graph-select">
+                        <option value="line" selected>Line Chart</option>
+                        <option value="bar">Bar Chart</option>
+                        <option value="area">Area Chart</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Current Outages -->
+        <div class="tracker-card current-outages-card">
+            <div class="card-header">
+                <h5><i class="bi bi-exclamation-triangle"></i> Active Outages</h5>
+                <span class="card-subtitle">Real-time system status</span>
+            </div>
+            <div class="outage-stream" id="yamOutageStream">
+                <!-- Outage items will be populated here -->
+                <div class="loading-placeholder">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span>Loading outages...</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Outage Analytics -->
+        <div class="tracker-card outage-analytics-card">
+            <div class="card-header">
+                <h5><i class="bi bi-bar-chart"></i> Outage Analytics</h5>
+                <span class="card-subtitle">This month's summary</span>
+            </div>
+            <div class="outage-metrics">
+                <div class="metric-row">
+                    <div class="metric-item">
+                        <div class="metric-icon active">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value" id="yamActiveOutages">0</div>
+                            <div class="metric-label">Active</div>
+                        </div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-icon resolved">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value" id="yamResolvedOutages">0</div>
+                            <div class="metric-label">Resolved</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-row">
+                    <div class="metric-item">
+                        <div class="metric-icon total">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value" id="yamTotalOutages">0</div>
+                            <div class="metric-label">Total</div>
+                        </div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-icon avg-duration">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value" id="yamAvgDuration">0h</div>
+                            <div class="metric-label">Avg Duration</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Health Score -->
+        <div class="tracker-card health-score-card">
+            <div class="card-header">
+                <h5><i class="bi bi-heart-pulse"></i> System Health Score</h5>
+                <span class="card-subtitle">Overall system status</span>
+            </div>
+            <div class="health-display">
+                <div class="score-circle" id="yamHealthCircle">
+                    <div class="circle-progress">
+                        <svg viewBox="0 0 100 100">
+                            <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
+                            <circle class="circle-progress-bar" cx="50" cy="50" r="40" id="yamHealthProgress"></circle>
+                        </svg>
+                        <div class="circle-text">
+                            <span class="circle-value" id="yamHealthScore">100%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="health-breakdown">
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Uptime:</span>
+                        <span class="breakdown-value" id="yamUptime">100%</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Response Time:</span>
+                        <span class="breakdown-value" id="yamResponseTime">Good</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Last Incident:</span>
+                        <span class="breakdown-value" id="yamLastIncident">None</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Create Outage Modal -->
+    <div class="modal fade" id="yamCreateOutageModal" tabindex="-1" aria-labelledby="yamCreateOutageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-light">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title" id="yamCreateOutageModalLabel">
+                        <i class="bi bi-plus-circle"></i>
+                        Create New Outage
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="yamCreateOutageForm">
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" class="form-control bg-dark text-light border-secondary" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control bg-dark text-light border-secondary" name="description" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Start Time</label>
+                            <input type="datetime-local" class="form-control bg-dark text-light border-secondary" name="start_time" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Expected Duration (hours)</label>
+                            <input type="number" class="form-control bg-dark text-light border-secondary" name="duration" min="0.5" step="0.5" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Affected Systems</label>
+                            <input type="text" class="form-control bg-dark text-light border-secondary" name="affected_systems" required>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="yamNotifyTeams" name="notify_teams">
+                            <label class="form-check-label" for="yamNotifyTeams">
+                                Notify via Microsoft Teams
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="yamSubmitOutage">Create Outage</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal fade" id="yamOutageSettingsModal" tabindex="-1" aria-labelledby="yamOutageSettingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="yamOutageSettingsModalLabel">
+                        <i class="bi bi-gear"></i>
+                        Outage Tracker Settings
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-group">
+                        <h6>Display Options</h6>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="yamShowActiveOnly" checked>
+                                Show active outages only
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="yamShowResolved" checked>
+                                Show resolved outages
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="yamAutoRefresh" checked>
+                                Auto-refresh data
+                            </label>
+                        </div>
+                    </div>
+                    <div class="settings-group">
+                        <h6>Notification Settings</h6>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="yamNotifyNew" checked>
+                                Notify on new outages
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="yamNotifyResolved" checked>
+                                Notify when resolved
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="yamSaveOutageSettings">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast container for notifications -->
+<div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+
+<style>
+.yam-outage-tracker {
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(40, 40, 40, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.yam-outage-tracker::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #ff6b6b, #ee5a24, #ff6b6b);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.tracker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.tracker-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tracker-title i {
+    color: #ff6b6b;
+}
+
+.tracker-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.tracker-control-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+}
+
+.tracker-control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.tracker-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 0.25rem 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+.tracker-status i {
+    color: #4caf50;
+    font-size: 0.7rem;
+    animation: pulse 2s infinite;
+}
+
+.tracker-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+/* ULTRA VISUALLY APPEALING GRAPH STYLES */
+.main-graph-card {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(40, 40, 40, 0.95) 100%);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.main-graph-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ff6b6b, #ee5a24, #ff6b6b, #ee5a24);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+.graph-container {
+    position: relative;
+    height: 400px;
+    margin: 1rem 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.graph-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    z-index: 10;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top: 3px solid #ff6b6b;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loading-spinner i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    color: #ff6b6b;
+}
+
+.graph-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.graph-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    font-size: 0.85rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.graph-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.control-group label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.graph-select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.graph-select:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.graph-select:focus {
+    outline: none;
+    border-color: #ff6b6b;
+    box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
+}
+
+/* Create Outage Button Styles */
+.create-outage-btn {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3) !important;
+    transition: all 0.3s ease !important;
+}
+
+.create-outage-btn:hover {
+    background: linear-gradient(135deg, #ee5a24, #ff6b6b) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4) !important;
+}
+
+.create-outage-btn:active {
+    transform: translateY(0) !important;
+}
+
+.tracker-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.tracker-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.outage-stream {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.loading-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 2rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+}
+
+.loading-placeholder i {
+    animation: spin 1s linear infinite;
+}
+
+.no-outages {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 2rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+}
+
+.no-outages i {
+    color: #4caf50;
+    font-size: 1.2rem;
+}
+
+.error-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 2rem;
+    color: #ff6b6b;
+    font-style: italic;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.outage-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.outage-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px);
+}
+
+.outage-item.active {
+    border-left-color: #ff6b6b;
+}
+
+.outage-item.resolved {
+    border-left-color: #4caf50;
+}
+
+.outage-item.medium {
+    border-left-color: #ff9800;
+}
+
+.outage-item.high {
+    border-left-color: #f44336;
+}
+
+.outage-item.low {
+    border-left-color: #2196f3;
+}
+
+.outage-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.outage-icon.active {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+}
+
+.outage-icon.resolved {
+    background: linear-gradient(135deg, #4caf50, #8bc34a);
+}
+
+.outage-icon.medium {
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+}
+
+.outage-icon.high {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+}
+
+.outage-icon.low {
+    background: linear-gradient(135deg, #2196f3, #03a9f4);
+}
+
+.outage-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.outage-title {
+    font-size: 0.9rem;
+    color: #fff;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.outage-description {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.25rem;
+    line-height: 1.3;
+}
+
+.outage-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.outage-severity {
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+}
+
+.outage-severity.high {
+    background: rgba(244, 67, 54, 0.2);
+    color: #ff6b6b;
+}
+
+.outage-severity.medium {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ffb74d;
+}
+
+.outage-severity.low {
+    background: rgba(33, 150, 243, 0.2);
+    color: #64b5f6;
+}
+
+.outage-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.metric-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.metric-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.metric-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.metric-icon.active {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+}
+
+.metric-icon.resolved {
+    background: linear-gradient(135deg, #4caf50, #8bc34a);
+}
+
+.metric-icon.total {
+    background: linear-gradient(135deg, #2196f3, #03a9f4);
+}
+
+.metric-icon.avg-duration {
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+}
+
+.metric-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.metric-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.health-display {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.score-circle {
+    flex-shrink: 0;
+}
+
+.circle-progress {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.circle-progress svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.circle-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 8;
+}
+
+.circle-progress-bar {
+    fill: none;
+    stroke: #4caf50;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 251.2;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+.circle-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.circle-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.health-breakdown {
+    flex: 1;
+    min-width: 0;
+}
+
+.breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+}
+
+.breakdown-label {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.breakdown-value {
+    color: #fff;
+    font-weight: 600;
+}
+
+.timeline-container {
+    height: 200px;
+    position: relative;
+}
+
+.timeline-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.settings-group {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.settings-group h6 {
+    color: #fff;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.setting-item {
+    margin-bottom: 0.75rem;
+}
+
+.setting-item label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.setting-item input[type="checkbox"] {
+    accent-color: #ff6b6b;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .yam-outage-tracker {
+        padding: 1rem;
+    }
+    
+    .tracker-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .tracker-controls {
+        align-self: flex-end;
+    }
+    
+    .tracker-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .metric-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .health-display {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .graph-container {
+        height: 300px;
+    }
+    
+    .graph-controls {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+</style>
+
+<script>
+// YAM Outage Tracker Component - ULTRA VISUALLY APPEALING
+window.yamOutageTracker = {
+    data: {
+        outages: [],
+        activeCount: 0,
+        resolvedCount: 0,
+        totalCount: 0,
+        avgDuration: 0,
+        healthScore: 100,
+        uptime: 100,
+        responseTime: 'Good',
+        lastIncident: 'None'
+    },
+    settings: {
+        showActiveOnly: true,
+        showResolved: true,
+        autoRefresh: true,
+        notifyNew: true,
+        notifyResolved: true
+    },
+    timers: {
+        refresh: null,
+        update: null
+    },
+    chart: null,
+    graphChart: null,
+    currentTimeRange: 30,
+    currentChartType: 'line',
+    
+    init() {
+        this.loadSettings();
+        this.setupEventListeners();
+        this.loadOutages();
+        this.startAutoRefresh();
+        console.log('YAM Outage Tracker: Component initialized');
+    },
+    
+    loadSettings() {
+        const saved = localStorage.getItem('yam_outage_settings');
+        if (saved) {
+            this.settings = { ...this.settings, ...JSON.parse(saved) };
+        }
+    },
+    
+    saveSettings() {
+        localStorage.setItem('yam_outage_settings', JSON.stringify(this.settings));
+    },
+    
+    setupEventListeners() {
+        // Refresh button
+        const refreshBtn = document.getElementById('yamOutageRefresh');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => this.loadOutages());
+        }
+        
+        // Create outage button
+        const createBtn = document.getElementById('yamCreateOutage');
+        if (createBtn) {
+            createBtn.addEventListener('click', () => this.showCreateOutageModal());
+        }
+        
+        // Settings button
+        const settingsBtn = document.getElementById('yamOutageSettings');
+        if (settingsBtn) {
+            settingsBtn.addEventListener('click', () => this.showSettings());
+        }
+        
+        // Save settings button
+        const saveBtn = document.getElementById('yamSaveOutageSettings');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => this.saveOutageSettings());
+        }
+        
+        // Submit outage button
+        const submitBtn = document.getElementById('yamSubmitOutage');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', () => this.createOutage());
+        }
+        
+        // Graph controls
+        const timeRangeSelect = document.getElementById('yamTimeRange');
+        if (timeRangeSelect) {
+            timeRangeSelect.addEventListener('change', (e) => {
+                this.currentTimeRange = parseInt(e.target.value);
+                this.updateGraph();
+            });
+        }
+        
+        const chartTypeSelect = document.getElementById('yamChartType');
+        if (chartTypeSelect) {
+            chartTypeSelect.addEventListener('change', (e) => {
+                this.currentChartType = e.target.value;
+                this.updateGraph();
+            });
+        }
+    },
+    
+    async loadOutages() {
+        try {
+            // Show loading state
+            this.showLoading();
+            
+            // Fetch outages from API
+            const response = await fetch('/api/admin/outages?all=1');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const outages = await response.json();
+            this.data.outages = outages;
+            
+            // Calculate metrics
+            this.calculateMetrics();
+            this.updateDisplays();
+            this.updateGraph();
+            
+            console.log(`YAM Outage Tracker: Loaded ${outages.length} outages`);
+        } catch (error) {
+            console.error('YAM Outage Tracker: Error loading outages:', error);
+            this.showError('Failed to load outages');
+        }
+    },
+    
+    calculateMetrics() {
+        const now = new Date();
+        const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+        
+        // Filter outages from last 30 days
+        const recentOutages = this.data.outages.filter(outage => {
+            const startTime = new Date(outage.start_time);
+            return startTime >= thirtyDaysAgo;
+        });
+        
+        this.data.activeCount = recentOutages.filter(o => o.status === 'active').length;
+        this.data.resolvedCount = recentOutages.filter(o => o.status === 'resolved').length;
+        this.data.totalCount = recentOutages.length;
+        
+        // Calculate average duration
+        const resolvedOutages = recentOutages.filter(o => o.status === 'resolved' && o.end_time);
+        if (resolvedOutages.length > 0) {
+            const totalDuration = resolvedOutages.reduce((sum, outage) => {
+                const start = new Date(outage.start_time);
+                const end = new Date(outage.end_time);
+                return sum + (end - start);
+            }, 0);
+            this.data.avgDuration = totalDuration / resolvedOutages.length / (1000 * 60 * 60); // Convert to hours
+        } else {
+            this.data.avgDuration = 0;
+        }
+        
+        // Calculate health score
+        this.calculateHealthScore();
+    },
+    
+    calculateHealthScore() {
+        // Base score starts at 100
+        let score = 100;
+        
+        // Deduct points for active outages
+        score -= this.data.activeCount * 10;
+        
+        // Deduct points for high severity outages
+        const highSeverityCount = this.data.outages.filter(o => 
+            o.status === 'active' && o.severity === 'high'
+        ).length;
+        score -= highSeverityCount * 15;
+        
+        // Ensure score doesn't go below 0
+        this.data.healthScore = Math.max(0, score);
+        
+        // Calculate uptime (simplified)
+        if (this.data.totalCount > 0) {
+            this.data.uptime = Math.round(((this.data.totalCount - this.data.activeCount) / this.data.totalCount) * 100);
+        } else {
+            this.data.uptime = 100;
+        }
+        
+        // Set response time based on active outages
+        if (this.data.activeCount === 0) {
+            this.data.responseTime = 'Excellent';
+        } else if (this.data.activeCount <= 2) {
+            this.data.responseTime = 'Good';
+        } else if (this.data.activeCount <= 5) {
+            this.data.responseTime = 'Fair';
+        } else {
+            this.data.responseTime = 'Poor';
+        }
+        
+        // Set last incident
+        if (this.data.outages.length > 0) {
+            const latestOutage = this.data.outages[0];
+            const startTime = new Date(latestOutage.start_time);
+            const timeDiff = now.getTime() - startTime.getTime();
+            const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            
+            if (daysDiff === 0) {
+                this.data.lastIncident = 'Today';
+            } else if (daysDiff === 1) {
+                this.data.lastIncident = 'Yesterday';
+            } else {
+                this.data.lastIncident = `${daysDiff} days ago`;
+            }
+        } else {
+            this.data.lastIncident = 'None';
+        }
+    },
+    
+    updateDisplays() {
+        this.updateMetrics();
+        this.updateHealthScore();
+        this.updateOutageStream();
+    },
+    
+    updateMetrics() {
+        document.getElementById('yamActiveOutages').textContent = this.data.activeCount;
+        document.getElementById('yamResolvedOutages').textContent = this.data.resolvedCount;
+        document.getElementById('yamTotalOutages').textContent = this.data.totalCount;
+        document.getElementById('yamAvgDuration').textContent = `${Math.round(this.data.avgDuration)}h`;
+    },
+    
+    updateHealthScore() {
+        const progress = document.getElementById('yamHealthProgress');
+        if (progress) {
+            const circumference = 2 * Math.PI * 40;
+            const offset = circumference - (this.data.healthScore / 100) * circumference;
+            progress.style.strokeDashoffset = offset;
+            
+            // Change color based on score
+            if (this.data.healthScore >= 80) {
+                progress.style.stroke = '#4caf50';
+            } else if (this.data.healthScore >= 60) {
+                progress.style.stroke = '#ff9800';
+            } else {
+                progress.style.stroke = '#f44336';
+            }
+        }
+        
+        document.getElementById('yamHealthScore').textContent = `${this.data.healthScore}%`;
+        document.getElementById('yamUptime').textContent = `${this.data.uptime}%`;
+        document.getElementById('yamResponseTime').textContent = this.data.responseTime;
+        document.getElementById('yamLastIncident').textContent = this.data.lastIncident;
+    },
+    
+    updateOutageStream() {
+        const container = document.getElementById('yamOutageStream');
+        if (!container) return;
+        
+        // Filter outages based on settings
+        let displayOutages = this.data.outages;
+        if (this.settings.showActiveOnly) {
+            displayOutages = displayOutages.filter(o => o.status === 'active');
+        }
+        if (!this.settings.showResolved) {
+            displayOutages = displayOutages.filter(o => o.status !== 'resolved');
+        }
+        
+        // Show limited number of outages
+        displayOutages = displayOutages.slice(0, 5);
+        
+        if (displayOutages.length === 0) {
+            container.innerHTML = `
+                <div class="no-outages">
+                    <i class="bi bi-check-circle"></i>
+                    <span>No outages to display</span>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = displayOutages.map(outage => `
+            <div class="outage-item ${outage.status} ${outage.severity || 'medium'}">
+                <div class="outage-icon ${outage.status} ${outage.severity || 'medium'}">
+                    <i class="bi bi-${this.getOutageIcon(outage.status, outage.severity)}"></i>
+                </div>
+                <div class="outage-info">
+                    <div class="outage-title">${outage.title}</div>
+                    <div class="outage-description">${outage.description.substring(0, 100)}${outage.description.length > 100 ? '...' : ''}</div>
+                    <div class="outage-meta">
+                        <span class="outage-severity ${outage.severity || 'medium'}">${outage.severity || 'medium'}</span>
+                        <span>${this.formatDate(outage.start_time)}</span>
+                        ${outage.affected_systems ? `<span>${outage.affected_systems}</span>` : ''}
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    },
+    
+    updateGraph() {
+        const canvas = document.getElementById('yamOutageGraph');
+        if (!canvas) return;
+        
+        // Hide loading
+        const loading = document.getElementById('yamGraphLoading');
+        if (loading) loading.style.display = 'none';
+        
+        // Destroy existing chart
+        if (this.graphChart) {
+            this.graphChart.destroy();
+        }
+        
+        // Get data for the selected time range
+        const now = new Date();
+        const daysAgo = new Date(now.getTime() - (this.currentTimeRange * 24 * 60 * 60 * 1000));
+        
+        // Group outages by day
+        const dailyData = {};
+        for (let i = 0; i < this.currentTimeRange; i++) {
+            const date = new Date(daysAgo.getTime() + (i * 24 * 60 * 60 * 1000));
+            const dateStr = date.toISOString().split('T')[0];
+            dailyData[dateStr] = { active: 0, resolved: 0, total: 0 };
+        }
+        
+        // Count outages per day
+        this.data.outages.forEach(outage => {
+            const startDate = new Date(outage.start_time).toISOString().split('T')[0];
+            if (dailyData[startDate]) {
+                dailyData[startDate].total++;
+                if (outage.status === 'active') {
+                    dailyData[startDate].active++;
+                } else {
+                    dailyData[startDate].resolved++;
+                }
+            }
+        });
+        
+        // Prepare chart data
+        const labels = Object.keys(dailyData).map(date => {
+            const d = new Date(date);
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        });
+        
+        const activeData = Object.values(dailyData).map(d => d.active);
+        const resolvedData = Object.values(dailyData).map(d => d.resolved);
+        const totalData = Object.values(dailyData).map(d => d.total);
+        
+        // Create ultra-visually appealing chart
+        const ctx = canvas.getContext('2d');
+        this.graphChart = new Chart(ctx, {
+            type: this.currentChartType,
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Active Outages',
+                        data: activeData,
+                        borderColor: '#ff6b6b',
+                        backgroundColor: this.currentChartType === 'line' ? 'rgba(255, 107, 107, 0.1)' : 'rgba(255, 107, 107, 0.8)',
+                        borderWidth: 3,
+                        fill: this.currentChartType === 'line' || this.currentChartType === 'area',
+                        tension: 0.4,
+                        pointBackgroundColor: '#ff6b6b',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: '#ff6b6b',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 3
+                    },
+                    {
+                        label: 'Resolved Outages',
+                        data: resolvedData,
+                        borderColor: '#4caf50',
+                        backgroundColor: this.currentChartType === 'line' ? 'rgba(76, 175, 80, 0.1)' : 'rgba(76, 175, 80, 0.8)',
+                        borderWidth: 3,
+                        fill: this.currentChartType === 'line' || this.currentChartType === 'area',
+                        tension: 0.4,
+                        pointBackgroundColor: '#4caf50',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: '#4caf50',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 3
+                    },
+                    {
+                        label: 'Total Outages',
+                        data: totalData,
+                        borderColor: '#2196f3',
+                        backgroundColor: this.currentChartType === 'line' ? 'rgba(33, 150, 243, 0.1)' : 'rgba(33, 150, 243, 0.8)',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.4,
+                        pointBackgroundColor: '#2196f3',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#2196f3',
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            color: '#fff',
+                            font: {
+                                size: 12,
+                                weight: '600'
+                            },
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: true,
+                        titleFont: {
+                            size: 14,
+                            weight: '600'
+                        },
+                        bodyFont: {
+                            size: 12
+                        },
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Date',
+                            color: '#fff',
+                            font: {
+                                size: 12,
+                                weight: '600'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.7)',
+                            font: {
+                                size: 10
+                            }
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Outages',
+                            color: '#fff',
+                            font: {
+                                size: 12,
+                                weight: '600'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.7)',
+                            font: {
+                                size: 10
+                            },
+                            stepSize: 1
+                        },
+                        beginAtZero: true
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart'
+                },
+                elements: {
+                    point: {
+                        hoverRadius: 8
+                    }
+                }
+            }
+        });
+    },
+    
+    getOutageIcon(status, severity) {
+        if (status === 'active') {
+            return 'exclamation-triangle';
+        } else if (status === 'resolved') {
+            return 'check-circle';
+        }
+        return 'circle';
+    },
+    
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 1) {
+            return 'Today';
+        } else if (diffDays === 2) {
+            return 'Yesterday';
+        } else if (diffDays <= 7) {
+            return `${diffDays - 1} days ago`;
+        } else {
+            return date.toLocaleDateString();
+        }
+    },
+    
+    showLoading() {
+        const container = document.getElementById('yamOutageStream');
+        if (container) {
+            container.innerHTML = `
+                <div class="loading-placeholder">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span>Loading outages...</span>
+                </div>
+            `;
+        }
+    },
+    
+    showError(message) {
+        const container = document.getElementById('yamOutageStream');
+        if (container) {
+            container.innerHTML = `
+                <div class="error-placeholder">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+        }
+    },
+    
+    startAutoRefresh() {
+        if (this.settings.autoRefresh) {
+            this.timers.refresh = setInterval(() => {
+                this.loadOutages();
+            }, 30000); // Refresh every 30 seconds
+        }
+    },
+    
+    showCreateOutageModal() {
+        // Set default start time to now
+        const now = new Date();
+        const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        document.querySelector('#yamCreateOutageForm input[name="start_time"]').value = localDateTime;
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('yamCreateOutageModal'));
+        modal.show();
+    },
+    
+    async createOutage() {
+        const form = document.getElementById('yamCreateOutageForm');
+        if (!form) return;
+        
+        const formData = new FormData(form);
+        const outageData = Object.fromEntries(formData.entries());
+        
+        // Ensure start_time is properly formatted
+        if (outageData.start_time) {
+            const date = new Date(outageData.start_time);
+            if (!isNaN(date.getTime())) {
+                outageData.start_time = date.toISOString();
+            } else {
+                this.showToast('Invalid start time format', 'error');
+                return;
+            }
+        } else {
+            outageData.start_time = new Date().toISOString();
+        }
+        
+        try {
+            const res = await fetch('/api/admin/outages', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(outageData)
+            });
+            
+            const data = await res.json();
+            
+            if (res.ok) {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('yamCreateOutageModal'));
+                if (modal) modal.hide();
+                
+                // Clear form
+                form.reset();
+                
+                // Show success message
+                this.showToast('Outage created successfully', 'success');
+                
+                // Notify Teams if requested
+                if (outageData.notify_teams) {
+                    try {
+                        await fetch('/api/outages/notify-teams', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ outage_id: data.id })
+                        });
+                    } catch (e) {
+                        console.error('Error notifying Teams:', e);
+                        this.showToast('Created outage but failed to notify Teams', 'warning');
+                    }
+                }
+                
+                // Reload outages
+                this.loadOutages();
+            } else {
+                this.showToast(data.error || 'Failed to create outage', 'error');
+            }
+        } catch (e) {
+            console.error('Error creating outage:', e);
+            this.showToast('Error creating outage: ' + (e.message || 'Unknown error'), 'error');
+        }
+    },
+    
+    showToast(message, type = 'info') {
+        // Create toast notification
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+        
+        // Add to page
+        const container = document.getElementById('toastContainer') || document.body;
+        container.appendChild(toast);
+        
+        // Show toast
+        const bsToast = new bootstrap.Toast(toast, {
+            autohide: true,
+            delay: 5000
+        });
+        bsToast.show();
+        
+        // Remove after hidden
+        toast.addEventListener('hidden.bs.toast', () => {
+            toast.remove();
+        });
+    },
+    
+    showSettings() {
+        // Populate current settings
+        document.getElementById('yamShowActiveOnly').checked = this.settings.showActiveOnly;
+        document.getElementById('yamShowResolved').checked = this.settings.showResolved;
+        document.getElementById('yamAutoRefresh').checked = this.settings.autoRefresh;
+        document.getElementById('yamNotifyNew').checked = this.settings.notifyNew;
+        document.getElementById('yamNotifyResolved').checked = this.settings.notifyResolved;
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('yamOutageSettingsModal'));
+        modal.show();
+    },
+    
+    saveOutageSettings() {
+        this.settings = {
+            showActiveOnly: document.getElementById('yamShowActiveOnly').checked,
+            showResolved: document.getElementById('yamShowResolved').checked,
+            autoRefresh: document.getElementById('yamAutoRefresh').checked,
+            notifyNew: document.getElementById('yamNotifyNew').checked,
+            notifyResolved: document.getElementById('yamNotifyResolved').checked
+        };
+        
+        this.saveSettings();
+        
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('yamOutageSettingsModal'));
+        modal.hide();
+        
+        // Update displays
+        this.updateOutageStream();
+        
+        // Restart auto-refresh if needed
+        if (this.timers.refresh) {
+            clearInterval(this.timers.refresh);
+        }
+        this.startAutoRefresh();
+    },
+    
+    destroy() {
+        // Clear timers
+        Object.values(this.timers).forEach(timer => {
+            if (timer) clearInterval(timer);
+        });
+        
+        console.log('YAM Outage Tracker: Component destroyed');
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.yamOutageTracker) {
+        window.yamOutageTracker.init();
+    }
+});
+
+// Register with YAM Dashboard if available
+if (window.yamDashboard) {
+    window.yamDashboard.registerComponent('outageTracker', window.yamOutageTracker);
+}
+</script>
+{% endmacro %} 

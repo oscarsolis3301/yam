@@ -1,0 +1,64 @@
+<!-- YAM Dashboard Initialization and Cleanup JavaScript -->
+{% macro render_yam_initialization_js() %}
+<script>
+// Enhanced YAM Dashboard Initialization with Real Data
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('YAM Dashboard Enhanced initialization started');
+    
+    // Performance monitoring
+    const startTime = performance.now();
+    
+    // Initialize YAM Dashboard
+    if (window.yamDashboard) {
+        window.yamDashboard.init();
+    }
+    
+    // Enhanced error boundary
+    window.addEventListener('error', function(e) {
+        console.error('Global error caught:', e.error);
+        // Send error to analytics if available
+        if (window.gtag) {
+            window.gtag('event', 'exception', {
+                description: e.error?.message || 'Unknown error',
+                fatal: false
+            });
+        }
+    });
+    
+    // Performance logging
+    const endTime = performance.now();
+    console.log(`YAM Dashboard Enhanced initialization completed in ${(endTime - startTime).toFixed(2)}ms`);
+});
+
+// Enhanced cleanup on page unload
+window.addEventListener('beforeunload', function() {
+    if (window.yamRealData) {
+        window.yamRealData.stopAutoRefresh();
+    }
+    if (window.dailyAnalytics) {
+        window.dailyAnalytics.destroy();
+    }
+});
+
+// Initialize components safely when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait a bit for other scripts to load
+    setTimeout(() => {
+        // Initialize components that might have been missed
+        const components = [
+            'dailyAnalytics',
+            'systemMonitor', 
+            'userAnalytics',
+            'userPresenceMap',
+            'teamCollaboration'
+        ];
+        
+        components.forEach(componentName => {
+            if (window[componentName] && typeof window[componentName].init === 'function') {
+                window.safeInitComponent(componentName, () => window[componentName].init());
+            }
+        });
+    }, 1000);
+});
+</script>
+{% endmacro %} 

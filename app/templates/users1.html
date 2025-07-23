@@ -1,0 +1,852 @@
+{% extends "base.html" %}
+{% block head %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.145.0">
+    <!-- <meta http-equiv="pragma" content="no-cache"> -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/Y.ico') }}">
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/sidebars/">
+    <script src="../static/JS/color-modes.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    
+    <!-- BOOTSTRAP ICONS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../static/CSS/style.css">
+    <link rel="stylesheet" href="../static/CSS/search.css">
+
+    <link rel="apple-touch-icon" href="../assets/img/favicons/apple-touch-icon.png" sizes="180x180">
+    <link rel="icon" href="../assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="../assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
+    <link rel="manifest" href="../assets/img/favicons/manifest.json">
+    <link rel="mask-icon" href="../assets/img/favicons/safari-pinned-tab.svg" color="#712cf9">
+    <link rel="icon" href="../assets/img/favicons/favicon.ico">
+    <meta name="theme-color" content="#712cf9">
+
+    <!-- TABLE STYLING -->
+    <style>
+
+      .expanded-width {
+        max-width: 1000px !important;
+        transition: max-width 0.3s ease;
+      }
+
+    </style>
+    <!-- TOAST STYLING -->
+    <style>
+      .toast-header.bg-success,
+      .toast-header.bg-danger,
+      .toast-header.bg-info {
+        border-top-left-radius: 0.375rem;
+        border-top-right-radius: 0.375rem;
+      }
+    </style>
+    
+    <!-- SEARCH BAR STYLING -->
+    <!-- <style>
+      .input-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+      }
+      
+      /* Search bar style (optional, just for clarity) */
+      .search-bar {
+        width: 100%;
+        position: relative;
+        z-index: 1;
+      }
+      
+      /* Overlay that blocks interaction */
+      .form-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(240, 240, 240, 0.6);
+        backdrop-filter: blur(2px);
+        display: none; /* initially hidden */
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+        border-radius: 8px;
+        pointer-events: all;
+      }
+      
+      /* Spinner animation */
+      .loader {
+        width: 30px;
+        height: 30px;
+        border: 4px solid #ccc;
+        border-top: 4px solid #333;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      
+    </style> -->
+
+    <style>
+      .toast-container {
+        z-index: 9999; /* Make sure toast stays above other content */
+      }
+    </style>
+
+    <style>
+      @keyframes pulse-danger {
+        0%   { background-color: #f8d7da; }
+        50%  { background-color: #f5c6cb; }
+        100% { background-color: #f8d7da; }
+      }
+      
+      .table-danger-animated {
+        background-color: #f8d7da !important;
+        animation: pulse-danger 1.5s infinite;
+        transition: background-color 0.3s ease-in-out;
+      }
+      </style>
+      
+
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+      .b-example-divider {
+        width: 100%;
+        height: 3rem;
+        background-color: rgba(0, 0, 0, .1);
+        border: solid rgba(0, 0, 0, .15);
+        border-width: 1px 0;
+        box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+      }
+
+      .b-example-vr {
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 100vh;
+      }
+
+      .bi {
+        vertical-align: -.125em;
+        fill: currentColor;
+      }
+
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+
+      .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .btn-bd-primary {
+        --bd-violet-bg: #712cf9;
+        --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+
+        --bs-btn-font-weight: 600;
+        --bs-btn-color: var(--bs-white);
+        --bs-btn-bg: var(--bd-violet-bg);
+        --bs-btn-border-color: var(--bd-violet-bg);
+        --bs-btn-hover-color: var(--bs-white);
+        --bs-btn-hover-bg: #6528e0;
+        --bs-btn-hover-border-color: #6528e0;
+        --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+        --bs-btn-active-color: var(--bs-btn-hover-color);
+        --bs-btn-active-bg: #5a23c8;
+        --bs-btn-active-border-color: #5a23c8;
+      }
+
+      .bd-mode-toggle {
+        z-index: 1500;
+      }
+
+      .bd-mode-toggle .bi {
+        width: 1em;
+        height: 1em;
+      }
+
+      .bd-mode-toggle .dropdown-menu .active .bi {
+        display: block !important;
+      }
+
+
+
+       /* Make sure the body fills the entire screen */
+       body, html {
+        height: 100%;
+        overflow: hidden;
+    }
+    /* Make the sidebar stick to the top */
+    .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh; /* Full height */
+        overflow-y: auto; /* Allow scrolling if content overflows */
+    }
+    .main {
+        height: 100vh; /* Full height for main content */
+        overflow-y: auto; /* Allow scrolling for the main content */
+        padding: 20px;
+        overflow: scroll;
+        -ms-overflow-style: none;  /* Hides scrollbar in Internet Explorer 10+ */
+        scrollbar-width: none;
+    }
+    main::-webkit-scrollbar {
+        display: none; /* Hides scrollbar in WebKit browsers (Chrome, Safari, etc.) */
+      }
+    /* Add a small transition for hiding/showing the sidebar */
+    .sidebar-hidden {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+    }
+    </style>
+    <style>
+      .mx-auto {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: start;
+        padding-top: 20%;
+        transition: padding-top 0.5s ease;
+        min-height: 100vh;
+      }
+  
+      .container {
+        width: 100%;
+        max-width: 600px;
+        text-align: center;
+      }
+  
+      .input-container {
+        width: 100%;
+      }
+  
+      .search-bar input {
+        width: 100%;
+      }
+  
+      #result {
+        margin-top: 20px;
+      }
+  
+      #userTable {
+        margin-top: 20px;
+        display: none;
+      }
+  
+      @media (max-width: 576px) {
+        .container {
+          padding: 0 10px;
+        }
+      }
+    </style>
+
+    <!-- Custom styles for this template -->
+    <link href="../static/css/sidebars.css" rel="stylesheet">
+    {% endblock %}
+    {% block content %}
+
+    <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+  <symbol id="check2" viewBox="0 0 16 16">
+    <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+  </symbol>
+  <symbol id="circle-half" viewBox="0 0 16 16">
+    <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
+  </symbol>
+  <symbol id="moon-stars-fill" viewBox="0 0 16 16">
+    <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+    <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z"/>
+  </symbol>
+  <symbol id="sun-fill" viewBox="0 0 16 16">
+    <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"/>
+  </symbol>
+</svg>
+
+
+
+   <!-- THEME CHANGER START -->
+    <!-- <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
+      <button class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center"
+        id="bd-theme"
+        type="button"
+        aria-expanded="false"
+        data-bs-toggle="dropdown"
+        
+        aria-label="Toggle theme (auto)">
+  <svg class="bi my-1 theme-icon-active" aria-hidden="true"><use href="#circle-half"></use></svg>
+  <span class="visually-hidden" id="bd-theme-text">Toggle theme</span>
+</button>
+<ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bd-theme-text">
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+      <svg class="bi me-2 opacity-50" aria-hidden="true"><use href="#sun-fill"></use></svg>
+      Light
+      <svg class="bi ms-auto d-none" aria-hidden="true"><use href="#check2"></use></svg>
+    </button>
+  </li>
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+      <svg class="bi me-2 opacity-50" aria-hidden="true"><use href="#moon-stars-fill"></use></svg>
+      Dark
+      <svg class="bi ms-auto d-none" aria-hidden="true"><use href="#check2"></use></svg>
+    </button>
+  </li>
+  <li>
+    <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
+      <svg class="bi me-2 opacity-50" aria-hidden="true"><use href="#circle-half"></use></svg>
+      Auto
+      <svg class="bi ms-auto d-none" aria-hidden="true"><use href="#check2"></use></svg>
+    </button>
+  </li>
+</ul>
+    </div> -->
+     <!-- END OF THEME CHANGER-->
+
+
+
+<!-- ICONS -->
+<svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+  <symbol id="bootstrap" viewBox="0 0 118 94">
+    <title>Bootstrap</title>
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M24.509 0c-6.733 0-11.715 5.893-11.492 12.284.214 6.14-.064 14.092-2.066 20.577C8.943 39.365 5.547 43.485 0 44.014v5.972c5.547.529 8.943 4.649 10.951 11.153 2.002 6.485 2.28 14.437 2.066 20.577C12.794 88.106 17.776 94 24.51 94H93.5c6.733 0 11.714-5.893 11.491-12.284-.214-6.14.064-14.092 2.066-20.577 2.009-6.504 5.396-10.624 10.943-11.153v-5.972c-5.547-.529-8.934-4.649-10.943-11.153-2.002-6.484-2.28-14.437-2.066-20.577C105.214 5.894 100.233 0 93.5 0H24.508zM80 57.863C80 66.663 73.436 72 62.543 72H44a2 2 0 01-2-2V24a2 2 0 012-2h18.437c9.083 0 15.044 4.92 15.044 12.474 0 5.302-4.01 10.049-9.119 10.88v.277C75.317 46.394 80 51.21 80 57.863zM60.521 28.34H49.948v14.934h8.905c6.884 0 10.68-2.772 10.68-7.727 0-4.643-3.264-7.207-9.012-7.207zM49.948 49.2v16.458H60.91c7.167 0 10.964-2.876 10.964-8.281 0-5.406-3.903-8.178-11.425-8.178H49.948z"></path>
+  </symbol>
+  <symbol id="home" viewBox="0 0 16 16">
+    <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4H2.5z"/>
+  </symbol>
+  <symbol id="speedometer2" viewBox="0 0 16 16">
+    <path d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4zM3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707zM2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10zm9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5zm.754-4.246a.389.389 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.389.389 0 0 0-.029-.518z"/>
+    <path fill-rule="evenodd" d="M0 10a8 8 0 1 1 15.547 2.661c-.442 1.253-1.845 1.602-2.932 1.25C11.309 13.488 9.475 13 8 13c-1.474 0-3.31.488-4.615.911-1.087.352-2.49.003-2.932-1.25A7.988 7.988 0 0 1 0 10zm8-7a7 7 0 0 0-6.603 9.329c.203.575.923.876 1.68.63C4.397 12.533 6.358 12 8 12s3.604.532 4.923.96c.757.245 1.477-.056 1.68-.631A7 7 0 0 0 8 3z"/>
+  </symbol>
+  <symbol id="table" viewBox="0 0 16 16">
+    <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 2h-4v3h4V4zm0 4h-4v3h4V8zm0 4h-4v3h3a1 1 0 0 0 1-1v-2zm-5 3v-3H6v3h4zm-5 0v-3H1v2a1 1 0 0 0 1 1h3zm-4-4h4V8H1v3zm0-4h4V4H1v3zm5-3v3h4V4H6zm4 4H6v3h4V8z"/>
+  </symbol>
+  <symbol id="people-circle" viewBox="0 0 16 16">
+    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+    <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+  </symbol>
+  <symbol id="grid" viewBox="0 0 16 16">
+    <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
+  </symbol>
+</svg> <!-- END OF ICONS-->
+
+
+<main class="d-flex flex-nowrap">
+
+{% include "sidebar.html" %}
+
+
+<!-- Main Content -->
+<div class="mx-auto" style="padding-top: 20%; display: flex; flex-direction: column; align-items: center; width: 1000px;">
+  <div class="container text-center" style="width: 100%; max-width: 800px;">
+
+ <!-- Search bar with autocomplete suggestions -->
+ <div class="input-container">
+  <!-- <form id="searchForm" class="search-bar" autocomplete="off"> -->
+    <input type="text" id="animated-input" name="t" class="search-input" placeholder="Search users..." required autocomplete="off">
+  <!-- </form> -->
+  <div id="spinner" style="position: absolute; top: 50%; right: 16px; transform: translateY(-50%); display: none;">
+    <div class="spinner"></div>
+  </div>
+  <div class="suggestions" id="suggestions"></div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("animated-input");
+    const suggestionsList = document.getElementById("suggestions");
+    const searchForm = document.getElementById('searchForm');
+
+    input.addEventListener("input", async () => {
+      const query = input.value.trim();
+      suggestionsList.innerHTML = "";
+
+      if (query.length < 3) return suggestionsList.style.display = "none"; // Only search if query is at least 3 characters
+
+      try {
+        const res = await fetch(`/autocomplete?query=${query}`);
+        const data = await res.json();
+        if (data.length === 0) {
+          suggestionsList.style.display = "none";
+          return;
+        }
+
+        data.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = item.name;  // Assuming 'name' is a field in your SQLite data
+          li.style.padding = "8px 12px";
+          li.style.cursor = "pointer";
+          li.addEventListener("click", () => {
+            input.value = item.name;
+            suggestionsList.innerHTML = "";
+            suggestionsList.style.display = "none";
+            searchForm.requestSubmit();
+          });
+          suggestionsList.appendChild(li);
+        });
+
+        suggestionsList.style.display = "block";
+      } catch (err) {
+        console.error("Error fetching suggestions:", err);
+      }
+    });
+
+    input.addEventListener("blur", () => {
+      setTimeout(() => suggestionsList.style.display = 'none', 100);
+    });
+
+    searchForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userQuery = input.value.trim();
+      if (!userQuery) return;
+
+      try {
+        const res = await fetch(`/users?query=${userQuery}`);
+        const data = await res.json();
+        if (data.error) {
+          resultDiv.innerHTML = `<div class="alert alert-danger mt-3">${data.error || 'User not found or server error.'}</div>`;
+          table.style.display = 'none';
+          wrapper.style.paddingTop = '20%';
+          showToast("User search failed.", "bg-danger");
+          input.disabled = false;
+          document.getElementById('ticketStatusMsg').textContent = '';
+          return;
+        }
+        // Handle results from /users endpoint here
+        console.log(data);  // You can update UI with data
+      } catch (error) {
+        console.error("Error searching users:", error);
+      }
+    });
+  });
+</script>
+
+    <!-- SEARCH RESULT -->
+    <div id="result" style="margin-top: 20px;"></div>
+
+    <!-- USER INFO TABLE -->
+    <table class="table table-striped table-dark" id="userTable" style="display: none; width: 100%;">
+      <thead>
+        <tr class="table-warning align-middle">
+          <th colspan="2">
+            <div class="d-flex justify-content-center position-relative">
+              <span class="fw-bold text-center">USER INFORMATION</span>
+              <span class="position-absolute end-0">
+                <button class="btn btn-sm btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#ticketModal" title="Create Ticket">➕</button>
+                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#resetModal" title="Reset Password">🔑</button>
+              </span>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Dynamic rows go here -->
+      </tbody>
+    </table>
+
+    <!-- TICKETS TABLE -->
+<table class="table table-bordered table-dark mt-4" id="ticketsTable" style="display: none;">
+  <thead>
+    <tr class="table-info text-dark">
+      <th>Subject</th>
+      <th>Description</th>
+      <th>Requestor</th>
+    </tr>
+  </thead>
+  <tbody id="ticketsTableBody">
+    <!-- Dynamically filled -->
+  </tbody>
+</table>
+
+    <p id="ticketStatusMsg" class="mt-2 fw-bold"></p>
+  </div>
+</div>
+
+<!-- TICKET MODAL -->
+<div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content text-dark">
+      <div class="modal-header">
+        <h5 class="modal-title">Create New Ticket</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="createTicketForm">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="ticketSubject" class="form-label text-light">Subject</label>
+            <input type="text" class="form-control" id="ticketSubject" name="subject" required>
+          </div>
+          <div class="mb-3">
+            <label for="ticketDesc" class="form-label text-light">Description</label>
+            <textarea class="form-control" id="ticketDesc" name="description" rows="3" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary text-light">Create Ticket</button>
+          <button type="button" class="btn btn-secondary text-light" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- RESET PASSWORD MODAL -->
+<div class="modal fade" id="resetModal" tabindex="-1" aria-labelledby="resetModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content text-dark">
+      <div class="modal-header">
+        <h5 class="modal-title">Reset Password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">Are you sure you want to reset the password for this user?</div>
+      <div class="modal-footer">
+        <button id="confirmResetBtn" type="button" class="btn btn-danger">Yes, Reset</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    let userDirectory = JSON.parse(localStorage.getItem("userDirectory")) || [];
+    const input = document.getElementById("animated-input");
+    const suggestionsList = document.getElementById("suggestions");
+    const label = document.querySelector("label[for='animated-input']");
+    const searchForm = document.getElementById('searchForm');
+    const resultDiv = document.getElementById('result');
+    const table = document.getElementById('userTable');
+    const tbody = table.querySelector('tbody');
+    const wrapper = document.querySelector('.mx-auto');
+    let currentUserData = null;
+
+    input.addEventListener("input", async () => {
+      const query = input.value.toLowerCase();
+      suggestionsList.innerHTML = "";
+      if (!query) return suggestionsList.style.display = "none";
+
+      const localMatches = userDirectory.filter(user =>
+        user.name.toLowerCase().includes(query) || user.clockId.toLowerCase().includes(query)
+      );
+
+      let remoteMatches = [];
+      try {
+        const res = await fetch('/autocomplete');
+        const suggestions = await res.json();
+        remoteMatches = suggestions.filter(item => item.toLowerCase().includes(query));
+      } catch (err) {
+        console.warn("Autocomplete fetch failed:", err);
+      }
+
+      const combinedMatches = [
+        ...localMatches.map(user => ({ display: `${user.name} (${user.clockId})`, value: user.clockId })),
+        ...remoteMatches.map(item => ({ display: item, value: item }))
+      ];
+
+      if (combinedMatches.length === 0) return suggestionsList.style.display = "none";
+
+      combinedMatches.forEach(match => {
+        const li = document.createElement("li");
+        li.textContent = match.display;
+        li.style.padding = "8px 12px";
+        li.style.cursor = "pointer";
+        li.addEventListener("click", () => {
+          input.value = match.value;
+          suggestionsList.innerHTML = "";
+          suggestionsList.style.display = "none";
+          label.classList.add("active");
+          searchForm.requestSubmit();
+        });
+        suggestionsList.appendChild(li);
+      });
+
+      suggestionsList.style.display = "block";
+    });
+
+    input.addEventListener("focus", () => {
+      label.style.top = "8px";
+      label.style.fontSize = "12px";
+      label.style.color = "#555";
+    });
+
+    input.addEventListener("blur", () => {
+      if (!input.value) {
+        label.style.top = "50%";
+        label.style.fontSize = "16px";
+        label.style.color = "#888";
+      }
+      setTimeout(() => suggestionsList.style.display = 'none', 100); // Delay to allow click
+    });
+
+    function addToDirectory(name, clockId) {
+      if (!userDirectory.some(user => user.clockId === clockId)) {
+        userDirectory.push({ name, clockId });
+        localStorage.setItem("userDirectory", JSON.stringify(userDirectory));
+      }
+    }
+
+    function formatKey(key) {
+      return key.replace(/([a-z])([A-Z])/g, '$1 $2');
+    }
+
+    function timeAgo(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      if (diffDays === 0) return 'Today';
+      if (diffDays === 1) return '1 day ago';
+      return `${diffDays} days ago`;
+    }
+
+    searchForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const user = input.value.trim();
+      if (!user) return;
+
+      document.getElementById('ticketStatusMsg').textContent = 'Searching...';
+      input.disabled = true;
+      resultDiv.innerText = '';
+      table.style.display = 'none';
+      wrapper.style.paddingTop = '2%';
+      showToast("Searching for user...", "bg-info");
+
+      try {
+        const res = await fetch('/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user })
+        });
+        const data = await res.json();
+        currentUserData = data;
+        tbody.innerHTML = '';
+
+        const preferredOrder = [
+          "FullName", "Title", "Email", "PasswordLastReset", "DisplayName",
+          "Username", "ClockID", "LastChecked", "AccountStatus", "LockedOut", "PasswordExpired"
+        ];
+
+        const orderedData = {};
+        preferredOrder.forEach(key => {
+          if (key in data) orderedData[key] = data[key];
+        });
+        for (const key in data) {
+          if (!(key in orderedData)) orderedData[key] = data[key];
+        }
+
+        for (const key in orderedData) {
+          const displayKey = formatKey(key);
+          let value = String(orderedData[key]).toLowerCase();
+
+          if (value === "true") value = "True";
+          else if (value === "false") value = "False";
+          else if (["enabled", "disabled", "locked", "unlocked", "expired", "active", "inactive"].includes(value))
+            value = value.charAt(0).toUpperCase() + value.slice(1);
+
+          const isAlert = (key === "LockedOut" || key === "PasswordExpired") && value === "True";
+          const row = document.createElement('tr');
+          if (isAlert) row.classList.add('bg-danger', 'text-white', 'fw-bold');
+
+          if (key === 'FullName' || key === 'Title') {
+            value = value.replace(/\b\w/g, char => char.toUpperCase());
+          }
+
+          if (key === 'PasswordLastReset') {
+            value += ` (${timeAgo(orderedData[key])})`;
+          }
+
+          row.innerHTML = `
+            <td class="fw-bold text-light">${displayKey}</td>
+            <td>${value}</td>
+          `;
+          tbody.appendChild(row);
+        }
+
+        table.style.display = 'table';
+        showToast("User found successfully!");
+      } catch (error) {
+        console.error(error);
+        showToast("User search failed.", "bg-danger");
+      } finally {
+        input.disabled = false;
+        document.getElementById('ticketStatusMsg').textContent = '';
+      }
+    });
+
+    document.getElementById('createTicketForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentUserData) return alert('Search for a user first.');
+
+      const subject = document.getElementById('ticketSubject').value;
+      const description = document.getElementById('ticketDesc').value;
+      const requestor = currentUserData.Email || currentUserData.Username;
+
+      try {
+        const res = await fetch('/create_ticket', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subject, description, requestor })
+        });
+        const data = await res.json();
+        showToast("Ticket created successfully!");
+        document.getElementById('ticketStatusMsg').textContent = data.message;
+        bootstrap.Modal.getInstance(document.getElementById('ticketModal')).hide();
+
+        document.getElementById('ticketSubject').value = '';
+        document.getElementById('ticketDesc').value = '';
+
+        const ticketTable = document.getElementById('ticketsTable');
+        const ticketBody = document.getElementById('ticketsTableBody');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+          <td>${subject}</td>
+          <td>${description}</td>
+          <td>${requestor}</td>
+        `;
+        ticketBody.appendChild(newRow);
+        ticketTable.style.display = 'table';
+
+      } catch (error) {
+        console.error(error);
+        showToast("Failed to create ticket.", "bg-danger");
+        document.getElementById('ticketStatusMsg').textContent = 'An error occurred.';
+      }
+    });
+
+    document.getElementById('confirmResetBtn').addEventListener('click', async () => {
+      try {
+        await fetch('/reset_password', { method: 'POST' });
+        showToast("Password reset successfully!");
+        bootstrap.Modal.getInstance(document.getElementById('resetModal')).hide();
+      } catch (error) {
+        console.error(error);
+        showToast("Password reset failed.", "bg-danger");
+      }
+    });
+
+    function showToast(message, toastClass = "bg-success") {
+      const toastElement = document.getElementById('userToast');
+      const toastHeader = toastElement.querySelector('.toast-header');
+      const toastBody = toastElement.querySelector('.toast-body');
+      toastHeader.className = 'toast-header ' + toastClass + ' text-white';
+      toastBody.textContent = message;
+      new bootstrap.Toast(toastElement).show();
+    }
+  });
+</script>
+
+  <!-- Include Socket.IO Client -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.0/socket.io.min.js"></script>
+
+<script>
+  const socket = io(); // Initialize WebSocket connection
+  const searchInput = document.getElementById('animated-input');
+  const suggestionsList = document.getElementById('suggestions');
+  
+  // Listen for real-time suggestions updates
+  socket.on('update_suggestions', function(data) {
+    suggestionsList.innerHTML = '';
+    if (data.suggestions.length > 0) {
+      suggestionsList.style.display = 'block';
+      data.suggestions.forEach(suggestion => {
+        const li = document.createElement('li');
+        li.textContent = suggestion;
+        li.addEventListener('click', () => {
+          searchInput.value = suggestion;
+          suggestionsList.style.display = 'none';
+        });
+        suggestionsList.appendChild(li);
+      });
+    } else {
+      suggestionsList.style.display = 'none';
+    }
+  });
+
+  // Send user input to the backend in real-time
+  searchInput.addEventListener('input', function() {
+    const query = searchInput.value.trim();
+    if (query.length > 0) {
+      socket.emit('search_input', query); // Send the query to the server
+    } else {
+      suggestionsList.style.display = 'none';
+    }
+  });
+</script>
+
+</main>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+<script defer src="../static/js/sidebars.js"></script>
+
+
+<div class="toast-container position-fixed top-0 end-0 p-3">
+  <div id="userToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto">Notification</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      <span id="toastMessage">Message goes here...</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- SEARCH BAR JS -->
+<!-- <script>
+
+  const form = document.getElementById('searchForm');
+  const input = document.getElementById('animated-input');
+  const overlay = document.getElementById('formOverlay');
+  
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = input.value.trim();
+  
+    // Show overlay & block interaction
+    overlay.style.display = 'flex';
+  
+    try {
+      const res = await fetch(`/api/users/${username}`);
+      if (!res.ok) throw new Error('User not found');
+  
+      const data = await res.json();
+      console.log('User data:', data);
+    } catch (err) {
+      console.error('Error:', err.message);
+    } finally {
+      // Hide overlay
+      overlay.style.display = 'none';
+    }
+  });
+  
+</script> -->
+{% endblock %}

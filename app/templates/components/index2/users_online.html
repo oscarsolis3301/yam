@@ -1,0 +1,815 @@
+{% macro render_users_online(current_user) %}
+<!-- Users Online Section -->
+<div id="usersOnline" class="users-online-section">
+    <div class="section-header">
+        <h3 class="section-title">
+            <i class="bi bi-people-fill"></i>
+            Team Members Online
+        </h3>
+        <div class="section-actions">
+            <button class="action-btn refresh-btn" id="refreshUsersBtn" title="Refresh">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <span class="user-count" id="userCount">0</span>
+        </div>
+    </div>
+    
+    <div class="users-container">
+        <div id="usersList" class="users-list">
+            <!-- Loading state -->
+            <div class="loading-state">
+                <i class="bi bi-people"></i>
+                <div>Loading team members...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userDetailsModalLabel">User Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="userDetailsContent">
+                <!-- User details will be populated here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Modal Backdrop -->
+<div id="modalBackdrop" class="modal-backdrop" style="display: none;"></div>
+
+<style>
+.users-online-section {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title i {
+    color: #667eea;
+}
+
+.section-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.action-btn:active {
+    transform: scale(0.95);
+}
+
+.user-count {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.users-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.user-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateX(4px);
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.user-avatar.online::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background: #4caf50;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+}
+
+.user-avatar.offline::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background: #f44336;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.user-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.25rem;
+    word-wrap: break-word;
+}
+
+.user-status {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    word-wrap: break-word;
+}
+
+.user-role {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.loading-state, .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+}
+
+.loading-state i, .empty-state i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* Modal Styles */
+.modal {
+    z-index: 1055 !important;
+    pointer-events: auto !important;
+}
+
+.modal-dialog {
+    z-index: 1056 !important;
+    pointer-events: auto !important;
+}
+
+.modal-content {
+    background: rgba(30, 30, 30, 0.98);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    color: #fff;
+    z-index: 1057 !important;
+    pointer-events: auto !important;
+    position: relative;
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    pointer-events: auto !important;
+}
+
+.modal-title {
+    color: #fff;
+    font-weight: 600;
+    pointer-events: auto !important;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    pointer-events: auto !important;
+}
+
+/* Custom Modal Backdrop */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1054 !important;
+    pointer-events: auto !important;
+    cursor: pointer;
+}
+
+.modal-backdrop.show {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+/* Bootstrap Modal Backdrop Override */
+.modal-backdrop.show {
+    opacity: 0.5 !important;
+}
+
+.btn-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    position: relative;
+}
+
+.btn-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.btn-close::before,
+.btn-close::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 2px;
+    background: #fff;
+    border-radius: 1px;
+    pointer-events: none;
+}
+
+.btn-close::before {
+    transform: rotate(45deg);
+}
+
+.btn-close::after {
+    transform: rotate(-45deg);
+}
+
+/* Ensure all modal elements are interactive */
+.modal * {
+    pointer-events: auto !important;
+}
+
+.modal-dialog * {
+    pointer-events: auto !important;
+}
+
+.modal-content * {
+    pointer-events: auto !important;
+}
+
+/* Modal animations */
+.modal.fade .modal-dialog {
+    transition: transform 0.3s ease-out;
+    transform: translate(0, -50px);
+}
+
+.modal.show .modal-dialog {
+    transform: none;
+}
+
+/* Body scroll lock when modal is open */
+body.modal-open {
+    overflow: hidden !important;
+    padding-right: 0 !important;
+}
+
+/* Ensure modal is centered and properly positioned */
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 1rem);
+}
+
+@media (min-width: 576px) {
+    .modal-dialog-centered {
+        min-height: calc(100% - 3.5rem);
+    }
+}
+
+/* User Details Content */
+.user-details-content {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.user-profile {
+    text-align: center;
+}
+
+.user-profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 600;
+    color: white;
+    position: relative;
+}
+
+.user-profile-avatar.online::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    background: #4caf50;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 12px rgba(76, 175, 80, 0.6);
+}
+
+.user-info-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-label {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.info-value {
+    color: #fff;
+}
+
+@media (max-width: 768px) {
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .section-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .user-item {
+        padding: 0.75rem;
+    }
+    
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .users-online-section {
+        padding: 1rem;
+    }
+    
+    .user-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+    
+    .user-info {
+        text-align: center;
+    }
+}
+</style>
+
+<script>
+// Users Online Management
+class UsersOnline {
+    constructor() {
+        this.users = [];
+        this.isLoading = false;
+        this.init();
+    }
+    
+    init() {
+        this.loadUsers();
+        this.setupEventHandlers();
+        this.setupSocketListeners();
+        this.setupPeriodicRefresh();
+    }
+    
+    async loadUsers() {
+        if (this.isLoading) return;
+        
+        this.isLoading = true;
+        this.showLoadingState();
+        
+        try {
+            const response = await fetch('/api/admin/users/online');
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
+            const users = await response.json();
+            this.users = users || [];
+            this.updateUsersList();
+            this.updateUserCount();
+            
+        } catch (error) {
+            console.error('Error loading users:', error);
+            this.showError('Failed to load users.');
+        } finally {
+            this.isLoading = false;
+        }
+    }
+    
+    updateUsersList() {
+        const container = document.getElementById('usersList');
+        if (!container) return;
+        
+        if (!this.users || this.users.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-people"></i>
+                    <div>No users online</div>
+                    <small>Check back later</small>
+                </div>
+            `;
+            return;
+        }
+        
+        // Sort users: online first, then by name
+        const sortedUsers = [...this.users].sort((a, b) => {
+            if (a.is_online !== b.is_online) return b.is_online - a.is_online;
+            return (a.name || a.username || '').localeCompare(b.name || b.username || '');
+        });
+        
+        container.innerHTML = sortedUsers.map(user => this.renderUserItem(user)).join('');
+        this.addUserClickHandlers();
+    }
+    
+    renderUserItem(user) {
+        const status = user.is_online ? 'online' : 'offline';
+        const statusText = user.is_online ? 'Online' : 'Offline';
+        const lastSeen = user.last_seen ? this.formatTimestamp(user.last_seen) : 'Unknown';
+        const roleClass = user.role || 'user';
+        
+        return `
+            <div class="user-item" data-user-id="${user.id}" data-user-data='${JSON.stringify(user)}'>
+                <div class="user-avatar ${status}">
+                    ${(user.name || user.username || 'U').charAt(0).toUpperCase()}
+                </div>
+                <div class="user-info">
+                    <div class="user-name">
+                        ${this.escapeHtml(user.name || user.username || 'Unknown User')}
+                        <span class="user-role">${user.role || 'user'}</span>
+                    </div>
+                    <div class="user-status">${statusText} • Last seen: ${lastSeen}</div>
+                </div>
+            </div>
+        `;
+    }
+    
+    addUserClickHandlers() {
+        const userItems = document.querySelectorAll('.user-item[data-user-id]');
+        userItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                const userId = item.getAttribute('data-user-id');
+                const userData = JSON.parse(item.getAttribute('data-user-data'));
+                this.showUserDetails(userData);
+            });
+        });
+    }
+    
+    async showUserDetails(user) {
+        try {
+            const modalElement = document.getElementById('userDetailsModal');
+            const backdropElement = document.getElementById('modalBackdrop');
+            const content = document.getElementById('userDetailsContent');
+            
+            if (!modalElement || !content) {
+                console.error('Modal elements not found');
+                return;
+            }
+            
+            content.innerHTML = this.renderUserDetails(user);
+            
+            // Show backdrop first
+            if (backdropElement) {
+                backdropElement.style.display = 'block';
+                setTimeout(() => {
+                    backdropElement.classList.add('show');
+                }, 10);
+            }
+            
+            // Show modal
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            } else {
+                // Custom modal implementation
+                modalElement.style.display = 'block';
+                modalElement.classList.add('show');
+                document.body.classList.add('modal-open');
+                
+                // Add escape key handler
+                const escapeHandler = (e) => {
+                    if (e.key === 'Escape') {
+                        this.hideUserDetails();
+                        document.removeEventListener('keydown', escapeHandler);
+                    }
+                };
+                document.addEventListener('keydown', escapeHandler);
+                
+                // Add backdrop click handler
+                if (backdropElement) {
+                    const backdropClickHandler = (e) => {
+                        if (e.target === backdropElement) {
+                            this.hideUserDetails();
+                            backdropElement.removeEventListener('click', backdropClickHandler);
+                        }
+                    };
+                    backdropElement.addEventListener('click', backdropClickHandler);
+                }
+                
+                // Add close button handler
+                const closeBtn = modalElement.querySelector('.btn-close');
+                if (closeBtn) {
+                    const closeHandler = () => {
+                        this.hideUserDetails();
+                        closeBtn.removeEventListener('click', closeHandler);
+                    };
+                    closeBtn.addEventListener('click', closeHandler);
+                }
+            }
+            
+        } catch (error) {
+            console.error('Error showing user details:', error);
+        }
+    }
+    
+    hideUserDetails() {
+        try {
+            const modalElement = document.getElementById('userDetailsModal');
+            const backdropElement = document.getElementById('modalBackdrop');
+            
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) {
+                    modal.hide();
+                }
+            } else {
+                // Custom modal hide
+                if (modalElement) {
+                    modalElement.classList.remove('show');
+                    setTimeout(() => {
+                        modalElement.style.display = 'none';
+                    }, 300);
+                }
+                
+                if (backdropElement) {
+                    backdropElement.classList.remove('show');
+                    setTimeout(() => {
+                        backdropElement.style.display = 'none';
+                    }, 300);
+                }
+                
+                document.body.classList.remove('modal-open');
+            }
+            
+        } catch (error) {
+            console.error('Error hiding user details:', error);
+        }
+    }
+    
+    renderUserDetails(user) {
+        const status = user.is_online ? 'online' : 'offline';
+        const statusText = user.is_online ? 'Online' : 'Offline';
+        
+        return `
+            <div class="user-details-content">
+                <div class="user-profile">
+                    <div class="user-profile-avatar ${status}">
+                        ${(user.name || user.username || 'U').charAt(0).toUpperCase()}
+                    </div>
+                    <h4>${this.escapeHtml(user.name || user.username || 'Unknown User')}</h4>
+                    <p class="text-muted">${statusText}</p>
+                </div>
+                
+                <div class="user-info-grid">
+                    <div class="info-row">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">${this.escapeHtml(user.email || 'N/A')}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Role:</span>
+                        <span class="info-value">${user.role || 'user'}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Last Seen:</span>
+                        <span class="info-value">${this.formatTimestamp(user.last_seen)}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Account Created:</span>
+                        <span class="info-value">${this.formatDate(user.created_at)}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    updateUserCount() {
+        const countElement = document.getElementById('userCount');
+        if (countElement) {
+            countElement.textContent = this.users.length;
+        }
+    }
+    
+    setupEventHandlers() {
+        const refreshBtn = document.getElementById('refreshUsersBtn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                this.loadUsers();
+            });
+        }
+    }
+    
+    setupSocketListeners() {
+        if (window.socketState && window.socketState.socket) {
+            window.socketState.socket.on('online_users_update', (users) => {
+                this.users = users || [];
+                this.updateUsersList();
+                this.updateUserCount();
+            });
+            
+            window.socketState.socket.on('user_status_change', (userData) => {
+                this.updateUserStatus(userData);
+            });
+        }
+    }
+    
+    updateUserStatus(userData) {
+        const userIndex = this.users.findIndex(u => u.id === userData.id);
+        if (userIndex !== -1) {
+            this.users[userIndex] = { ...this.users[userIndex], ...userData };
+        } else if (userData.is_online) {
+            this.users.unshift(userData);
+        }
+        this.updateUsersList();
+        this.updateUserCount();
+    }
+    
+    setupPeriodicRefresh() {
+        setInterval(() => {
+            this.loadUsers();
+        }, 30000); // Refresh every 30 seconds
+    }
+    
+    showLoadingState() {
+        const container = document.getElementById('usersList');
+        if (container) {
+            container.innerHTML = `
+                <div class="loading-state">
+                    <i class="bi bi-people"></i>
+                    <div>Loading team members...</div>
+                </div>
+            `;
+        }
+    }
+    
+    showError(message) {
+        const container = document.getElementById('usersList');
+        if (container) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <div>${message}</div>
+                </div>
+            `;
+        }
+    }
+    
+    // Utility methods
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    formatTimestamp(timestamp) {
+        if (!timestamp) return 'Unknown';
+        
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diff = now - date;
+        
+        if (diff < 60000) return 'Just now';
+        if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+        if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+        return date.toLocaleDateString();
+    }
+    
+    formatDate(timestamp) {
+        if (!timestamp) return 'Unknown';
+        return new Date(timestamp).toLocaleDateString();
+    }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.usersOnline = new UsersOnline();
+});
+</script>
+{% endmacro %} 

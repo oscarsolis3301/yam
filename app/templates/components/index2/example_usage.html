@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Index2{% endblock %}
+
+{% block head %}
+<!-- Required CSS and JS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Import Index2 Components -->
+{% from 'components.index2.outage_banner' import render_outage_banner %}
+{% from 'components.index2.welcome_banner' import render_welcome_banner %}
+{% from 'components.index2.users_online' import render_users_online %}
+{% from 'components.index2.main_layout' import render_main_layout %}
+{% endblock %}
+
+{% block content %}
+<!-- Render the main layout with all components -->
+{{ render_main_layout(name, current_user) }}
+{% endblock %}
+
+{% block scripts %}
+<!-- Bootstrap JS for modals -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Example of how to test the components -->
+<script>
+// Test functions for development
+window.testOutageBanner = function() {
+    if (window.outageBanner) {
+        window.outageBanner.showOutage({
+            title: 'Test Outage',
+            description: 'This is a test outage for development purposes'
+        });
+    }
+};
+
+window.testToast = function() {
+    if (window.showToast) {
+        window.showToast('This is a test toast notification', 'success');
+    }
+};
+
+window.testUserModal = function() {
+    // Simulate a user click to test modal
+    const userItems = document.querySelectorAll('.user-item');
+    if (userItems.length > 0) {
+        userItems[0].click();
+    } else {
+        // Create a test user if no users are loaded
+        if (window.usersOnline) {
+            const testUser = {
+                id: 'test-123',
+                name: 'Test User',
+                username: 'testuser',
+                email: 'test@example.com',
+                role: 'admin',
+                is_online: true,
+                last_seen: new Date().toISOString(),
+                created_at: new Date().toISOString()
+            };
+            window.usersOnline.showUserDetails(testUser);
+        }
+    }
+};
+
+window.testModalClose = function() {
+    if (window.usersOnline && window.usersOnline.hideUserDetails) {
+        window.usersOnline.hideUserDetails();
+    }
+};
+
+// Add test buttons to the page for development
+document.addEventListener('DOMContentLoaded', () => {
+    // Only add test buttons in development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        const testDiv = document.createElement('div');
+        testDiv.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            border-radius: 8px;
+            z-index: 10000;
+        `;
+        
+        testDiv.innerHTML = `
+            <h6 style="color: white; margin-bottom: 0.5rem;">Test Controls</h6>
+            <button onclick="testOutageBanner()" style="margin: 0.25rem; padding: 0.5rem; border-radius: 4px; border: none; background: #dc3545; color: white; cursor: pointer;">Test Outage</button>
+            <button onclick="testToast()" style="margin: 0.25rem; padding: 0.5rem; border-radius: 4px; border: none; background: #28a745; color: white; cursor: pointer;">Test Toast</button>
+            <button onclick="testUserModal()" style="margin: 0.25rem; padding: 0.5rem; border-radius: 4px; border: none; background: #007bff; color: white; cursor: pointer;">Test Modal</button>
+            <button onclick="testModalClose()" style="margin: 0.25rem; padding: 0.5rem; border-radius: 4px; border: none; background: #6c757d; color: white; cursor: pointer;">Close Modal</button>
+            <button onclick="testModal()" style="margin: 0.25rem; padding: 0.5rem; border-radius: 4px; border: none; background: #17a2b8; color: white; cursor: pointer;">Global Modal</button>
+        `;
+        
+        document.body.appendChild(testDiv);
+    }
+});
+</script>
+{% endblock %} 

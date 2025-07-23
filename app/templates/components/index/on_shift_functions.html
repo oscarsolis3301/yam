@@ -1,0 +1,435 @@
+{% macro render_on_shift_functions() %}
+<script>
+// --- Real-Time On-Shift Users with Countdown ---
+// Exact file name as provided
+const CSV_PATH = '/static/uploads/files/SD-Schedules.csv';
+const HTML_PATH = '/static/uploads/files/SD-Schedules.html';
+
+function fetchCSV(url) {
+    return fetch(url)
+        .then(response => response.text())
+        .then(text => parseCSV(text));
+}
+
+function parseCSV(text) {
+    const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0 && !/^,+$/.test(l));
+    const header = lines[0].split(',');
+    const data = [];
+    for (let i = 1; i < lines.length; i++) {
+        const row = lines[i].split(',');
+        if (row.length < 7 || !row[1] || !row[2] || !row[6]) continue;
+        data.push({
+            department: row[0],
+            name: row[1],
+            start: row[2],
+            end: row[6],
+            workDays: row[7],
+            notes: row[8] || ''
+        });
+    }
+    return data;
+}
+
+// Utility – current time in Pacific Time (regardless of user's browser locale)
+function nowPST() {
+    // "new Date()" then convert via locale string keeps local wall-clock in target TZ
+    const pstString = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });
+    return new Date(pstString);
+}
+
+// Replace direct "new Date()" usages in shift helpers with PST-aware versions
+
+function parseTimeToDate(timeStr) {
+    const [hm, ampm] = timeStr.trim().split(' ');
+    let [h, m] = hm.split(':').map(Number);
+    if (ampm.toUpperCase() === 'PM' && h !== 12) h += 12;
+    if (ampm.toUpperCase() === 'AM' && h === 12) h = 0;
+    const now = nowPST();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
+}
+
+// Update helper functions that rely on current date
+
+function isTodayWorkday(workDays) {
+    const today = nowPST();
+    const weekday = today.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'America/Los_Angeles' });
+    if (!workDays) return false;
+    if (workDays.includes('Mon - Fri')) return ['Mon','Tue','Wed','Thu','Fri'].includes(weekday);
+    if (workDays.includes('Tues - Sat')) return ['Tue','Wed','Thu','Fri','Sat'].includes(weekday);
+    if (workDays.includes('Sun - Thurs')) return ['Sun','Mon','Tue','Wed','Thu'].includes(weekday);
+    if (workDays.includes('Sun - Thurs, off Fri & Sat')) return ['Sun','Mon','Tue','Wed','Thu'].includes(weekday);
+    if (workDays.includes('Tues - Sat, off Sun & Mon')) return ['Tue','Wed','Thu','Fri','Sat'].includes(weekday);
+    return workDays.includes(weekday);
+}
+
+function getTimeLeft(endDate) {
+    const now = nowPST();
+    let diff = Math.max(0, endDate - now);
+    const hours = Math.floor(diff / 3600000);
+    diff -= hours * 3600000;
+    const mins = Math.floor(diff / 60000);
+    diff -= mins * 60000;
+    const secs = Math.floor(diff / 1000);
+    return { hours, mins, secs };
+}
+
+function filterOnShiftUsers(data) {
+    const now = nowPST();
+    return data.filter(user => {
+        if (!isTodayWorkday(user.workDays)) return false;
+        const start = parseTimeToDate(user.start);
+        const end = parseTimeToDate(user.end);
+        return now >= start && now < end;
+    });
+}
+
+function renderOnShiftUsers(users) {
+    const container = document.getElementById('onShiftUsers');
+    if (!container) return;
+    
+    // Only render if container is empty or has different number of users
+    const currentCards = container.querySelectorAll('.on-shift-card');
+    if (currentCards.length === users.length) return;
+    
+    container.innerHTML = users.length ? users.map((user, idx) => {
+        const percent = getShiftPercent(user.start, user.end);
+        const pastel = '#aee6f9';
+        const darkBg = '#181a20';
+        const darkBorder = '#23242a';
+        const svg = `
+        <svg width="32" height="32" viewBox="0 0 56 56">
+            <circle cx="28" cy="28" r="24" stroke="#333" stroke-width="6" fill="none"/>
+            <circle cx="28" cy="28" r="24" stroke="${pastel}" stroke-width="6" fill="none" stroke-dasharray="${2 * Math.PI * 24}" stroke-dashoffset="${(1 - percent) * 2 * Math.PI * 24}" style="transition: stroke-dashoffset 1s linear;"/>
+        </svg>`;
+        return `
+            <div class="on-shift-card d-flex align-items-center justify-content-between p-2 mb-2" style="background:${darkBg};border-radius:8px;border:1px solid ${darkBorder};box-shadow:0 2px 8px #000a;width:100%;transition:transform 0.3s ease,box-shadow 0.3s ease;animation:fadeIn 0.5s ease-out">
+                <div class="d-flex align-items-center">
+                    <div class="on-shift-dot me-2" style="width:12px;height:12px;border-radius:50%;background:${pastel};box-shadow:0 0 8px 2px ${pastel}99;animation:pulseDot 2s infinite ease-in-out"></div>
+                    <div class="me-3">
+                        <div class="fw-bold" style="color:#fff;font-size:0.9rem">${user.name}</div>
+                        <div class="text-muted" style="font-size:0.8rem">${user.department}</div>
+                    </div>
+                    <span class="badge bg-secondary" style="font-size:0.8rem">${user.start} - ${user.end}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="timer-svg">${svg}</div>
+                    <span class="timer-text fw-bold" id="timer-${idx}" style="color:#e0e0e0;font-size:0.9rem;min-width:100px;text-align:right">--:--:--</span>
+                </div>
+            </div>
+        `;
+    }).join('') : '<div class="text-muted w-100 text-center">No one is currently on shift.</div>';
+}
+
+function getShiftPercent(start, end) {
+    const now = nowPST();
+    const s = parseTimeToDate(start);
+    const e = parseTimeToDate(end);
+    if (now < s) return 0;
+    if (now > e) return 1;
+    return (now - s) / (e - s);
+}
+
+function updateCountdowns(users) {
+    users.forEach((user, idx) => {
+        const end = parseTimeToDate(user.end);
+        const now = new Date();
+        let left = getTimeLeft(end);
+        const timer = document.getElementById(`timer-${idx}`);
+        const cTimer = document.getElementById(`cTimer-${idx}`);
+        if (!timer && !cTimer) return;
+        
+        if (now > end) {
+            if (timer && timer.textContent !== 'Shift Ended') {
+                timer.textContent = 'Shift Ended';
+                timer.style.color = '#ff3c6f';
+            }
+            if (cTimer && cTimer.textContent !== 'Ended') {
+                cTimer.textContent = 'Ended';
+                cTimer.classList.remove('bg-success');
+                cTimer.classList.add('bg-danger');
+            }
+            return;
+        }
+        
+        const newTimeText = `${left.hours}h ${left.mins}m ${left.secs}s left`;
+        if (timer && timer.textContent !== newTimeText) {
+            timer.textContent = newTimeText;
+            timer.style.color = '#e0e0e0';
+        }
+        if (cTimer && cTimer.textContent !== newTimeText) {
+            cTimer.textContent = newTimeText;
+        }
+    });
+    
+    // Update SVG progress bars
+    document.querySelectorAll('.timer-svg svg').forEach((svg, i) => {
+        const user = users[i];
+        if (!user) return;
+        const percent = getShiftPercent(user.start, user.end);
+        const circle = svg.querySelectorAll('circle')[1];
+        if (circle) {
+            const r = 24;
+            const c = 2 * Math.PI * r;
+            const newOffset = ((1 - percent) * c).toString();
+            if (circle.getAttribute('stroke-dashoffset') !== newOffset) {
+                circle.setAttribute('stroke-dashoffset', newOffset);
+            }
+        }
+    });
+}
+
+// Fix filter logic for on-shift users
+function setupOnShiftFilter(data) {
+    const filterButtons = document.querySelectorAll('[data-filter]');
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            const filter = button.dataset.filter;
+            let filtered = filter === 'all' ? data : data.filter(u => u.department && u.department.toLowerCase() === filter);
+            let onShift = filterOnShiftUsers(filtered);
+            renderOnShiftUsers(onShift);
+            updateCountdowns(onShift);
+        });
+    });
+}
+
+function startOnShiftRealtime() {
+    loadScheduleData().then(data => {
+        // Initial render
+        let onShift = filterOnShiftUsers(data);
+        renderOnShiftUsers(onShift);
+        renderOnShiftUsersCompact(onShift);
+        updateCountdowns(onShift);
+        renderOffShiftUsers(data, onShift);
+        setupOnShiftFilter(data);
+        
+        // Update only timers and progress circles every second
+        setInterval(() => {
+            const activeBtn = document.querySelector('[data-filter].active');
+            const filter = activeBtn ? activeBtn.dataset.filter : 'all';
+            let filtered = filter === 'all' ? data : data.filter(u => u.department && u.department.toLowerCase() === filter);
+            let newOnShift = filterOnShiftUsers(filtered);
+            
+            // Render list then update timers
+            renderOnShiftUsersCompact(newOnShift);
+            updateCountdowns(newOnShift);
+            renderOffShiftUsers(data, newOnShift);
+        }, 1000);
+    });
+}
+
+// Add vibrant timer animation
+const style = document.createElement('style');
+style.innerHTML = `
+@keyframes pulseDot {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.on-shift-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.timer-svg circle {
+    transition: stroke-dashoffset 1s ease-in-out;
+}
+
+.timer-text {
+    transition: color 0.3s ease;
+}
+
+.on-shift-container {
+    background: #13151a !important;
+    border-radius: 12px;
+    padding: 12px;
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.on-shift-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.on-shift-container::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.on-shift-container::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 3px;
+}
+`;
+document.head.appendChild(style);
+
+// Start the real-time on-shift view
+startOnShiftRealtime();
+
+function updateOnShiftUsers(users) {
+    const container = document.getElementById('onShiftUsers');
+    if (!users || users.length === 0) {
+        container.innerHTML = '<div class="text-muted w-100 text-center">No one is currently on shift.</div>';
+        return;
+    }
+
+    // Group users by remaining time
+    const groups = {};
+    users.forEach(user => {
+        const remainingTime = user.remaining_time || 'Unknown';
+        if (!groups[remainingTime]) {
+            groups[remainingTime] = [];
+        }
+        groups[remainingTime].push(user);
+    });
+
+    // Sort groups by remaining time
+    const sortedGroups = Object.entries(groups).sort((a, b) => {
+        if (a[0] === 'Unknown') return 1;
+        if (b[0] === 'Unknown') return -1;
+        return a[0].localeCompare(b[0]);
+    });
+
+    // Create HTML for each group
+    container.innerHTML = sortedGroups.map(([time, groupUsers]) => `
+        <div class="shift-group" data-department="all">
+            <div class="shift-group-header">
+                <div class="shift-group-title">${time} Remaining</div>
+                <div class="shift-group-time">${groupUsers.length} user${groupUsers.length !== 1 ? 's' : ''}</div>
+            </div>
+            <div class="shift-group-users">
+                ${groupUsers.map(user => `
+                    <div class="user-card ${user.department.toLowerCase()}" data-department="${user.department.toLowerCase()}">
+                        <div class="user-card-header">
+                            <i class="bi bi-person-circle"></i>
+                            <div>
+                                <h6 class="user-card-name">${user.name}</h6>
+                                <div class="user-card-department">${user.department}</div>
+                            </div>
+                        </div>
+                        <div class="user-card-time">
+                            <i class="bi bi-clock"></i> ${user.remaining_time}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+
+    // Add filter functionality
+    const filterButtons = document.querySelectorAll('[data-filter]');
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Update active state
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            const filter = button.dataset.filter;
+            const groups = document.querySelectorAll('.shift-group');
+            groups.forEach(group => {
+                if (filter === 'all') {
+                    group.style.display = 'block';
+                } else {
+                    const users = group.querySelectorAll(`.user-card[data-department="${filter}"]`);
+                    const hasFilteredUsers = users.length > 0;
+                    group.style.display = hasFilteredUsers ? 'block' : 'none';
+                }
+            });
+        });
+    });
+}
+
+// Compact list for dashboard side-by-side view (users only)
+function renderOnShiftUsersCompact(users) {
+    const container = document.getElementById('onShiftUsersCompact');
+    if (!container) return;
+
+    container.innerHTML = users.length ? users.map((u, idx) => `
+        <div class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>${u.name}</strong><br>
+                <small class="text-muted">${u.department}</small>
+            </div>
+            <div class="d-flex flex-column align-items-end">
+                <span class="badge bg-secondary mb-1">${u.start} – ${u.end}</span>
+                <span class="badge bg-success" id="cTimer-${idx}">--:--:--</span>
+            </div>
+        </div>
+    `).join('') : '<div class="list-group-item">No one is currently on shift.</div>';
+}
+
+// Parse the Google-Sheets-exported HTML table (SD-Schedules.html)
+function fetchHTMLSchedule(url) {
+    return fetch(url)
+        .then(resp => resp.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const rows = Array.from(doc.querySelectorAll('table.waffle tbody tr'));
+            const schedule = [];
+            rows.slice(1).forEach(r => { // skip header row
+                const cells = r.querySelectorAll('td');
+                if (cells.length < 8) return;
+                const dept = cells[0].textContent.trim();
+                const name = cells[1].textContent.trim();
+                const start = cells[2].textContent.trim();
+                const end   = cells[6].textContent.trim();
+                const work  = cells[7].textContent.trim();
+                if (!name || !start || !end) return;
+                schedule.push({
+                    department: dept || 'N/A',
+                    name,
+                    start,
+                    end,
+                    workDays: work,
+                    notes: cells[9] ? cells[9].textContent.trim() : ''
+                });
+            });
+            return schedule;
+        });
+}
+
+// Unified loader – prefer CSV, fallback to HTML
+function loadScheduleData() {
+    return fetchCSV(CSV_PATH).then(arr => {
+        if (arr && arr.length) return arr;
+        return fetchHTMLSchedule(HTML_PATH);
+    }).catch(() => fetchHTMLSchedule(HTML_PATH));
+}
+
+// Render "Not On Shift" list in the detailed admin card
+function renderOffShiftUsers(allUsers, onShiftUsers) {
+    const container = document.getElementById('offShiftUsers');
+    if (!container) return;
+
+    // Determine the active department filter (all/dsc/isc)
+    const activeBtn = document.querySelector('.dashboard-list-card.w-100 button.btn-outline-primary.active');
+    const filter = activeBtn ? activeBtn.dataset.filter : 'all';
+
+    // Fast lookup of on-shift names
+    const onShiftNames = new Set(onShiftUsers.map(u => u.name));
+
+    let offShift = allUsers.filter(u => !onShiftNames.has(u.name) && isTodayWorkday(u.workDays));
+
+    if (filter !== 'all') {
+        offShift = offShift.filter(u => (u.department || '').toLowerCase() === filter);
+    }
+
+    container.innerHTML = offShift.length ? offShift.map(u => `
+        <div class="on-shift-card d-flex align-items-center justify-content-between p-2 mb-2" style="background:#1f242d;border-radius:8px;width:100%;">
+            <div>
+                <strong>${u.name}</strong> <small class="text-muted">${u.department}</small>
+            </div>
+            <span class="badge bg-secondary">${u.start} – ${u.end}</span>
+        </div>
+    `).join('') : '<div class="text-muted w-100 text-center">Everyone scheduled is on shift now.</div>';
+}
+</script>
+{% endmacro %} 

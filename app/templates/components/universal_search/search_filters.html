@@ -1,0 +1,101 @@
+<!-- Search Filters Component -->
+<style>
+.search-filters {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 12px 16px;
+    background: rgba(248, 249, 250, 0.8);
+    overflow-x: hidden;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.filter-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+.filter-btn.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* Dark theme support */
+[data-bs-theme="dark"] .search-filters {
+    background: rgba(52, 58, 64, 0.8);
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .filter-btn {
+    background: rgba(52, 58, 64, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #adb5bd;
+}
+
+[data-bs-theme="dark"] .filter-btn:hover {
+    background: rgba(73, 80, 87, 0.8);
+}
+
+@media (max-width: 768px) {
+    .filter-buttons {
+        gap: 6px;
+    }
+    
+    .filter-btn {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+}
+</style>
+
+<!-- Search Filters HTML -->
+<div class="search-filters" id="searchFilters" style="display: none;">
+    <div class="filter-buttons">
+        <button class="filter-btn active" data-type="all">
+            <i class="bi bi-grid"></i>
+            All
+        </button>
+        <button class="filter-btn" data-type="kb_article">
+            <i class="bi bi-journal-text"></i>
+            KB
+        </button>
+        <button class="filter-btn" data-type="outage">
+            <i class="bi bi-exclamation-triangle"></i>
+            Outages
+        </button>
+        <button class="filter-btn" data-type="user">
+            <i class="bi bi-person"></i>
+            Users
+        </button>
+        <button class="filter-btn" data-type="office">
+            <i class="bi bi-building"></i>
+            Offices
+        </button>
+        <button class="filter-btn" data-type="workstation">
+            <i class="bi bi-laptop"></i>
+            Devices
+        </button>
+        <button class="filter-btn" data-type="note">
+            <i class="bi bi-sticky"></i>
+            Notes
+        </button>
+    </div>
+</div> 

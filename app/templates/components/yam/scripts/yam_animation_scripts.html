@@ -1,0 +1,246 @@
+<!-- YAM Animation Scripts - Smooth Interactions and Staggered Animations -->
+<script>
+// YAM Animation Controller
+window.yamAnimations = {
+    isInitialized: false,
+    animationQueue: [],
+    
+    init() {
+        if (this.isInitialized) return;
+        
+        this.setupIntersectionObserver();
+        this.setupScrollAnimations();
+        this.setupHoverEffects();
+        this.isInitialized = true;
+        
+        console.log('YAM Animations initialized');
+    },
+    
+    setupIntersectionObserver() {
+        // Create intersection observer for fade-in animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const element = entry.target;
+                    const delay = element.getAttribute('data-delay') || '0';
+                    
+                    // Add animation with delay
+                    setTimeout(() => {
+                        element.style.opacity = '1';
+                        element.style.transform = 'translateY(0)';
+                    }, parseInt(delay));
+                    
+                    observer.unobserve(element);
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '50px'
+        });
+        
+        // Observe all animated elements
+        document.querySelectorAll('.yam-fade-in-up, .yam-slide-in-left, .yam-slide-in-right').forEach(el => {
+            observer.observe(el);
+        });
+    },
+    
+    setupScrollAnimations() {
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    },
+    
+    setupHoverEffects() {
+        // Enhanced hover effects for cards
+        document.querySelectorAll('.yam-card-enhanced').forEach(card => {
+            card.addEventListener('mouseenter', this.handleCardHover.bind(this, card, true));
+            card.addEventListener('mouseleave', this.handleCardHover.bind(this, card, false));
+        });
+        
+        // Button hover effects
+        document.querySelectorAll('.yam-action-btn').forEach(btn => {
+            btn.addEventListener('mouseenter', this.handleButtonHover.bind(this, btn, true));
+            btn.addEventListener('mouseleave', this.handleButtonHover.bind(this, btn, false));
+        });
+    },
+    
+    handleCardHover(card, isEntering) {
+        if (isEntering) {
+            card.style.transform = 'translateY(-4px)';
+            card.style.boxShadow = '0 16px 50px rgba(0, 0, 0, 0.5)';
+        } else {
+            card.style.transform = 'translateY(0)';
+            card.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.4)';
+        }
+    },
+    
+    handleButtonHover(btn, isEntering) {
+        if (isEntering) {
+            btn.style.transform = 'translateY(-3px) scale(1.02)';
+            btn.style.boxShadow = '0 12px 35px rgba(88, 101, 242, 0.4)';
+        } else {
+            btn.style.transform = 'translateY(0) scale(1)';
+            btn.style.boxShadow = '0 8px 25px rgba(88, 101, 242, 0.3)';
+        }
+    },
+    
+    // Animate element entrance
+    animateElement(element, animationType = 'fadeIn', delay = 0) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                element.style.opacity = '0';
+                element.style.transform = this.getInitialTransform(animationType);
+                
+                requestAnimationFrame(() => {
+                    element.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0) translateX(0)';
+                    
+                    setTimeout(resolve, 600);
+                });
+            }, delay);
+        });
+    },
+    
+    getInitialTransform(animationType) {
+        switch (animationType) {
+            case 'slideInLeft':
+                return 'translateX(-30px)';
+            case 'slideInRight':
+                return 'translateX(30px)';
+            case 'fadeInUp':
+            default:
+                return 'translateY(30px)';
+        }
+    },
+    
+    // Staggered animation for multiple elements
+    animateStaggered(elements, animationType = 'fadeIn', staggerDelay = 100) {
+        const promises = elements.map((element, index) => {
+            return this.animateElement(element, animationType, index * staggerDelay);
+        });
+        
+        return Promise.all(promises);
+    },
+    
+    // Loading animation
+    showLoading(element) {
+        element.classList.add('yam-loading');
+        element.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Loading...';
+    },
+    
+    hideLoading(element, originalContent) {
+        element.classList.remove('yam-loading');
+        element.innerHTML = originalContent;
+    },
+    
+    // Pulse animation for status indicators
+    pulseElement(element, duration = 2000) {
+        element.classList.add('yam-pulse');
+        setTimeout(() => {
+            element.classList.remove('yam-pulse');
+        }, duration);
+    },
+    
+    // Glow effect for important elements
+    glowElement(element, duration = 3000) {
+        element.classList.add('yam-glow');
+        setTimeout(() => {
+            element.classList.remove('yam-glow');
+        }, duration);
+    },
+    
+    // Smooth number counting animation
+    animateNumber(element, targetValue, duration = 1000) {
+        const startValue = 0;
+        const startTime = performance.now();
+        
+        const animate = (currentTime) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            const currentValue = Math.floor(startValue + (targetValue - startValue) * this.easeOutQuart(progress));
+            element.textContent = currentValue;
+            
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            }
+        };
+        
+        requestAnimationFrame(animate);
+    },
+    
+    easeOutQuart(t) {
+        return 1 - Math.pow(1 - t, 4);
+    },
+    
+    // Refresh animation for components
+    refreshComponent(componentId) {
+        const component = document.getElementById(componentId);
+        if (!component) return;
+        
+        component.style.transform = 'scale(0.95)';
+        component.style.opacity = '0.7';
+        
+        setTimeout(() => {
+            component.style.transition = 'all 0.3s ease';
+            component.style.transform = 'scale(1)';
+            component.style.opacity = '1';
+        }, 150);
+    },
+    
+    // Success animation
+    showSuccess(element, message = 'Success!') {
+        const originalContent = element.innerHTML;
+        element.innerHTML = `<i class="bi bi-check-circle"></i> ${message}`;
+        element.style.color = '#4ade80';
+        element.style.background = 'rgba(74, 222, 128, 0.1)';
+        element.style.borderColor = 'rgba(74, 222, 128, 0.3)';
+        
+        setTimeout(() => {
+            element.innerHTML = originalContent;
+            element.style.color = '';
+            element.style.background = '';
+            element.style.borderColor = '';
+        }, 2000);
+    },
+    
+    // Error animation
+    showError(element, message = 'Error!') {
+        const originalContent = element.innerHTML;
+        element.innerHTML = `<i class="bi bi-exclamation-triangle"></i> ${message}`;
+        element.style.color = '#f87171';
+        element.style.background = 'rgba(248, 113, 113, 0.1)';
+        element.style.borderColor = 'rgba(248, 113, 113, 0.3)';
+        
+        setTimeout(() => {
+            element.innerHTML = originalContent;
+            element.style.color = '';
+            element.style.background = '';
+            element.style.borderColor = '';
+        }, 2000);
+    }
+};
+
+// Initialize animations when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.yamAnimations.init();
+    });
+} else {
+    window.yamAnimations.init();
+}
+
+// Export for use in other scripts
+window.YAMAnimations = window.yamAnimations;
+</script> 

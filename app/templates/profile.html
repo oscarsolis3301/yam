@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - ServiceDesk AI{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="profile-picture-container mb-3" id="profileDropZone">
+                        <img src="{{ url_for('static', filename='uploads/profile_pictures/' + current_user.profile_picture) }}" 
+                             alt="Profile Picture" 
+                             class="rounded-circle profile-picture"
+                             id="profilePicture"
+                             onerror="this.onerror=null;this.src='/static/images/PFP/boy.png';">
+                        <div class="profile-picture-overlay" id="profileOverlay">
+                            <label for="profilePictureInput" class="btn btn-light btn-sm mb-0">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                            <input type="file" 
+                                   id="profilePictureInput" 
+                                   accept="image/*" 
+                                   style="display: none;"
+                                   onchange="previewProfilePicture(this)">
+                            <div id="profileSpinner" style="display:none;"><i class="fas fa-spinner fa-spin"></i></div>
+                            <div id="profileCheck" style="display:none;"><i class="fas fa-check-circle text-success"></i></div>
+                        </div>
+                        <div id="profilePreviewContainer" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);border-radius:50%;z-index:10;">
+                            <img id="profilePreview" style="max-width:100%;max-height:100%;border-radius:50%;object-fit:cover;object-position:center;" />
+                            <button class="btn btn-success btn-sm mt-2" onclick="uploadProfilePictureFromPreview()">Save</button>
+                            <button class="btn btn-secondary btn-sm mt-2" onclick="cancelProfilePreview()">Cancel</button>
+                        </div>
+                    </div>
+                    <h4>{{ current_user.username }}</h4>
+                    <p class="text-muted">{{ current_user.email }}</p>
+                    {% if current_user.okta_verified %}
+                    <span class="badge bg-success">
+                        <i class="fas fa-check-circle"></i> Okta Verified
+                    </span>
+                    {% else %}
+                    <button class="btn btn-outline-primary btn-sm" onclick="verifyOkta()">
+                        <i class="fas fa-shield-alt"></i> Verify with Okta
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card bg-dark text-light">
+                <div class="card-header">
+                    <h5 class="mb-0">Account Information</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1">
+                        <strong>Member since:</strong><br>
+                        {{ current_user.created_at.strftime('%B %d, %Y') }}
+                    </p>
+                    <p class="mb-1">
+                        <strong>Last login:</strong><br>
+                        {{ current_user.last_login.strftime('%B %d, %Y %H:%M') if current_user.last_login else 'Never' }}
+                    </p>
+                    <p class="mb-0">
+                        <strong>Account status:</strong><br>
+                        <span class="badge {{ 'bg-success' if current_user.is_active else 'bg-danger' }}">
+                            {{ 'Active' if current_user.is_active else 'Inactive' }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Profile Settings</h5>
+                </div>
+                <div class="card-body">
+                    <form id="profile-form" method="POST" action="{{ url_for('profile_management.profile') }}">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ form.username.label(class="form-label") }}
+                            {{ form.username(class="form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control") }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card bg-dark text-light">
+                <div class="card-header">
+                    <h5 class="mb-0">Change Password</h5>
+                </div>
+                <div class="card-body">
+                    <form id="password-form">
+                        <div class="mb-3">
+                            <label class="form-label">Current Password</label>
+                            <input type="password" class="form-control bg-dark text-light" name="current_password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">New Password</label>
+                            <input type="password" class="form-control bg-dark text-light" name="new_password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control bg-dark text-light" name="confirm_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Change Password</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="profileToast" class="profile-toast"></div>
+
+<style>
+.profile-picture-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+}
+
+.profile-picture {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-picture-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.profile-picture-container:hover .profile-picture-overlay {
+    opacity: 1;
+}
+
+.profile-toast {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    background: #23272f;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    transition: opacity 0.3s;
+    z-index: 9999;
+}
+.profile-toast.show {
+    opacity: 1;
+}
+</style>
+
+<script>
+// Drag-and-drop and live preview for profile picture
+const dropZone = document.getElementById('profileDropZone');
+const overlay = document.getElementById('profileOverlay');
+const previewContainer = document.getElementById('profilePreviewContainer');
+const previewImg = document.getElementById('profilePreview');
+const spinner = document.getElementById('profileSpinner');
+const check = document.getElementById('profileCheck');
+const toast = document.getElementById('profileToast');
+let previewFile = null;
+
+dropZone.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    overlay.style.opacity = 1;
+});
+dropZone.addEventListener('dragleave', function(e) {
+    overlay.style.opacity = 0;
+});
+dropZone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    overlay.style.opacity = 0;
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        previewProfilePictureFile(e.dataTransfer.files[0]);
+    }
+});
+function previewProfilePicture(input) {
+    if (input.files && input.files[0]) {
+        previewProfilePictureFile(input.files[0]);
+    }
+}
+function previewProfilePictureFile(file) {
+    if (!file.type.startsWith('image/')) {
+        showProfileToast('Only image files are allowed.');
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        previewImg.src = e.target.result;
+        previewContainer.style.display = 'flex';
+        previewFile = file;
+    };
+    reader.readAsDataURL(file);
+}
+function uploadProfilePictureFromPreview() {
+    if (!previewFile) return;
+    spinner.style.display = 'block';
+    check.style.display = 'none';
+    const formData = new FormData();
+    formData.append('file', previewFile);
+    fetch('/api/profile/picture', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        spinner.style.display = 'none';
+        if (data.success) {
+            check.style.display = 'block';
+            showProfileToast('Profile picture updated!', true);
+            setTimeout(() => window.location.reload(), 1200);
+        } else {
+            showProfileToast('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        spinner.style.display = 'none';
+        showProfileToast('Error uploading profile picture');
+    });
+    previewContainer.style.display = 'none';
+    previewFile = null;
+}
+function cancelProfilePreview() {
+    previewContainer.style.display = 'none';
+    previewFile = null;
+}
+function showProfileToast(msg, success) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    if (success) toast.style.background = '#28a745';
+    else toast.style.background = '#23272f';
+    setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+function verifyOkta() {
+    const oktaDetected = !!window.okta || !!window.chrome?.runtime?.id;
+    if (!oktaDetected) {
+        showProfileToast('Okta Verify extension not detected. Please install it from the Chrome Web Store.');
+        window.open('https://chrome.google.com/webstore/detail/okta-browser-plugin/', '_blank');
+        return;
+    }
+    spinner.style.display = 'block';
+    fetch('/api/profile/okta-verify', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        spinner.style.display = 'none';
+        if (data.success) {
+            showProfileToast('Okta verified!', true);
+            setTimeout(() => window.location.reload(), 1200);
+        } else {
+            showProfileToast('Okta verification failed: ' + data.message);
+        }
+    })
+    .catch(error => {
+        spinner.style.display = 'none';
+        showProfileToast('Error verifying Okta');
+    });
+}
+
+// Profile form submission
+document.getElementById('profile-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    
+    try {
+        const response = await fetch('/api/profile/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: formData.get('username'),
+                email: formData.get('email')
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showProfileToast('Profile updated successfully!', true);
+            // Update the displayed email and username immediately
+            document.querySelector('.card-body.text-center h4').textContent = formData.get('username');
+            document.querySelector('.card-body.text-center p.text-muted').textContent = formData.get('email');
+        } else {
+            showProfileToast(data.error || 'Failed to update profile');
+        }
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        showProfileToast('An error occurred while updating profile');
+    }
+});
+
+// Password form submission
+document.getElementById('password-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    
+    // Validate passwords match
+    if (formData.get('new_password') !== formData.get('confirm_password')) {
+        showProfileToast('New passwords do not match');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/profile/change-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                current_password: formData.get('current_password'),
+                new_password: formData.get('new_password')
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            showProfileToast('Password changed successfully!', true);
+            e.target.reset();
+        } else {
+            showProfileToast(data.error || 'Failed to change password');
+        }
+    } catch (error) {
+        console.error('Error changing password:', error);
+        showProfileToast('An error occurred while changing password');
+    }
+});
+</script>
+{% endblock %} 

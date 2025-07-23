@@ -1,0 +1,42 @@
+body{
+    background-color: #f1f5fb;
+    color: black;
+}
+header{
+    background-color: #009ddb;
+    height: 100px;
+    color: #e9eaf0;
+}    
+.Disabled{
+    pointer-events: none;
+    cursor: not-allowed;
+    opacity: 0.65;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+    box-shadow: none
+}
+.columns.is-equal-height > .column > * {
+    height: 100% !important;
+}
+.box{
+    animation: navAnimOpen .5s ease-in-out;
+}        
+
+.selection{
+  transition: transform .3s;        
+}
+.selection:hover{
+  transform: scale(1.05);
+}
+
+
+
+@keyframes fadeIn {
+0% { opacity: 0; }
+100% { opacity: 1; }
+}
+@keyframes navAnimOpen {
+0% {display: none;opacity: 0;}
+1% {display: block;opacity: 0;}
+100% {opacity: 1;}
+}

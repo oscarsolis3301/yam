@@ -1,0 +1,181 @@
+<!-- Search Results Component -->
+<style>
+.search-results-dropdown {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 8px;
+    max-height: 600px;
+    overflow: hidden;
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(248, 249, 250, 0.8);
+}
+
+.results-count {
+    font-size: 14px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.results-content {
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.result-item {
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.result-item:hover {
+    background: rgba(0, 123, 255, 0.05);
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+.result-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: white;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.result-icon.kb_article { background: #28a745; }
+.result-icon.outage { background: #dc3545; }
+.result-icon.user { background: #17a2b8; }
+.result-icon.office { background: #6f42c1; }
+.result-icon.workstation { background: #fd7e14; }
+.result-icon.document { background: #20c997; }
+.result-icon.note { background: #ffc107; }
+
+.result-content {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.result-title {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+    line-height: 1.3;
+    font-size: 15px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.result-title mark {
+    background: #fff3cd;
+    color: #856404;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+.result-description {
+    font-size: 13px;
+    color: #6c757d;
+    line-height: 1.4;
+    margin-bottom: 6px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.result-description mark {
+    background: #fff3cd;
+    color: #856404;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+.result-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 11px;
+    color: #adb5bd;
+    flex-wrap: wrap;
+}
+
+.result-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.result-item.selected {
+    background: rgba(0, 123, 255, 0.12);
+    border-left: 3px solid #007bff;
+}
+
+.result-item.selected .result-icon {
+    background: rgba(0, 123, 255, 0.2);
+    color: #007bff;
+}
+
+/* Dark theme support for results */
+[data-bs-theme="dark"] .search-results-dropdown {
+    background: rgba(33, 37, 41, 0.98);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .results-header {
+    background: rgba(52, 58, 64, 0.8);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .result-item {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .result-item:hover {
+    background: rgba(0, 123, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .result-title {
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .result-description {
+    color: #adb5bd;
+}
+</style>
+
+<!-- Search Results HTML -->
+<div id="searchResults" class="search-results-dropdown" style="display: none;">
+    <div class="results-header">
+        <div class="results-count">
+            <span id="resultsCount">0</span> results
+        </div>
+        <div class="results-actions">
+            <button class="btn btn-sm btn-outline-secondary" id="viewAllResults">
+                View All
+            </button>
+        </div>
+    </div>
+    <div class="results-content" id="resultsContent">
+        <!-- Results will be populated here -->
+    </div>
+</div> 

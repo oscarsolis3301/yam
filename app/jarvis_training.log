@@ -1,0 +1,2013 @@
+2025-06-18 16:49:11,379 - INFO - Starting Jarvis AI training process...
+2025-06-18 16:49:11,380 - INFO - Connected to database: db/chat_qa.db
+2025-06-18 16:49:11,385 - INFO - Database table structure verified
+2025-06-18 16:49:11,386 - INFO - Current Q&A pairs in database: 0
+2025-06-18 16:49:11,386 - INFO - Need to generate 1,000,000 additional Q&A pairs
+2025-06-18 16:49:12,005 - INFO - Generated 1,000,000 unique Q&A pairs
+2025-06-18 16:49:12,023 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 1,000
+2025-06-18 16:49:12,023 - INFO - Progress: 0.1% (1,000/1,000,000) - ETA: 10.6 minutes
+2025-06-18 16:49:12,030 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 2,000
+2025-06-18 16:49:12,030 - INFO - Progress: 0.2% (2,000/1,000,000) - ETA: 5.4 minutes
+2025-06-18 16:49:12,038 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 3,000
+2025-06-18 16:49:12,038 - INFO - Progress: 0.3% (3,000/1,000,000) - ETA: 3.6 minutes
+2025-06-18 16:49:12,048 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 4,000
+2025-06-18 16:49:12,048 - INFO - Progress: 0.4% (4,000/1,000,000) - ETA: 2.7 minutes
+2025-06-18 16:49:12,058 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 5,000
+2025-06-18 16:49:12,058 - INFO - Progress: 0.5% (5,000/1,000,000) - ETA: 2.2 minutes
+2025-06-18 16:49:12,069 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 6,000
+2025-06-18 16:49:12,069 - INFO - Progress: 0.6% (6,000/1,000,000) - ETA: 1.9 minutes
+2025-06-18 16:49:12,081 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 7,000
+2025-06-18 16:49:12,082 - INFO - Progress: 0.7% (7,000/1,000,000) - ETA: 1.6 minutes
+2025-06-18 16:49:12,095 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 8,000
+2025-06-18 16:49:12,096 - INFO - Progress: 0.8% (8,000/1,000,000) - ETA: 1.5 minutes
+2025-06-18 16:49:12,109 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 9,000
+2025-06-18 16:49:12,109 - INFO - Progress: 0.9% (9,000/1,000,000) - ETA: 1.3 minutes
+2025-06-18 16:49:12,123 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 10,000
+2025-06-18 16:49:12,123 - INFO - Progress: 1.0% (10,000/1,000,000) - ETA: 1.2 minutes
+2025-06-18 16:49:12,136 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 11,000
+2025-06-18 16:49:12,136 - INFO - Progress: 1.1% (11,000/1,000,000) - ETA: 1.1 minutes
+2025-06-18 16:49:12,151 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 12,000
+2025-06-18 16:49:12,151 - INFO - Progress: 1.2% (12,000/1,000,000) - ETA: 1.1 minutes
+2025-06-18 16:49:12,178 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 13,000
+2025-06-18 16:49:12,179 - INFO - Progress: 1.3% (13,000/1,000,000) - ETA: 1.0 minutes
+2025-06-18 16:49:12,196 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 14,000
+2025-06-18 16:49:12,197 - INFO - Progress: 1.4% (14,000/1,000,000) - ETA: 1.0 minutes
+2025-06-18 16:49:12,216 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 15,000
+2025-06-18 16:49:12,216 - INFO - Progress: 1.5% (15,000/1,000,000) - ETA: 0.9 minutes
+2025-06-18 16:49:12,233 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 16,000
+2025-06-18 16:49:12,234 - INFO - Progress: 1.6% (16,000/1,000,000) - ETA: 0.9 minutes
+2025-06-18 16:49:12,251 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 17,000
+2025-06-18 16:49:12,251 - INFO - Progress: 1.7% (17,000/1,000,000) - ETA: 0.8 minutes
+2025-06-18 16:49:12,270 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 18,000
+2025-06-18 16:49:12,270 - INFO - Progress: 1.8% (18,000/1,000,000) - ETA: 0.8 minutes
+2025-06-18 16:49:12,290 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 19,000
+2025-06-18 16:49:12,291 - INFO - Progress: 1.9% (19,000/1,000,000) - ETA: 0.8 minutes
+2025-06-18 16:49:12,313 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 20,000
+2025-06-18 16:49:12,314 - INFO - Progress: 2.0% (20,000/1,000,000) - ETA: 0.8 minutes
+2025-06-18 16:49:12,337 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 21,000
+2025-06-18 16:49:12,337 - INFO - Progress: 2.1% (21,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:12,360 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 22,000
+2025-06-18 16:49:12,360 - INFO - Progress: 2.2% (22,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:12,384 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 23,000
+2025-06-18 16:49:12,384 - INFO - Progress: 2.3% (23,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:12,413 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 24,000
+2025-06-18 16:49:12,414 - INFO - Progress: 2.4% (24,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:12,443 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 25,000
+2025-06-18 16:49:12,443 - INFO - Progress: 2.5% (25,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:12,470 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 26,000
+2025-06-18 16:49:12,471 - INFO - Progress: 2.6% (26,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:12,498 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 27,000
+2025-06-18 16:49:12,498 - INFO - Progress: 2.7% (27,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:12,526 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 28,000
+2025-06-18 16:49:12,527 - INFO - Progress: 2.8% (28,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:12,561 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 29,000
+2025-06-18 16:49:12,561 - INFO - Progress: 2.9% (29,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:12,602 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 30,000
+2025-06-18 16:49:12,603 - INFO - Progress: 3.0% (30,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:12,640 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 31,000
+2025-06-18 16:49:12,640 - INFO - Progress: 3.1% (31,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:12,677 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 32,000
+2025-06-18 16:49:12,677 - INFO - Progress: 3.2% (32,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:12,711 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 33,000
+2025-06-18 16:49:12,711 - INFO - Progress: 3.3% (33,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:12,745 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 34,000
+2025-06-18 16:49:12,745 - INFO - Progress: 3.4% (34,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:12,781 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 35,000
+2025-06-18 16:49:12,782 - INFO - Progress: 3.5% (35,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:12,815 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 36,000
+2025-06-18 16:49:12,815 - INFO - Progress: 3.6% (36,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:12,849 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 37,000
+2025-06-18 16:49:12,849 - INFO - Progress: 3.7% (37,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:12,884 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 38,000
+2025-06-18 16:49:12,884 - INFO - Progress: 3.8% (38,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:12,921 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 39,000
+2025-06-18 16:49:12,921 - INFO - Progress: 3.9% (39,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:12,959 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 40,000
+2025-06-18 16:49:12,959 - INFO - Progress: 4.0% (40,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:12,997 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 41,000
+2025-06-18 16:49:12,998 - INFO - Progress: 4.1% (41,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,035 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 42,000
+2025-06-18 16:49:13,036 - INFO - Progress: 4.2% (42,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,072 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 43,000
+2025-06-18 16:49:13,072 - INFO - Progress: 4.3% (43,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,115 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 44,000
+2025-06-18 16:49:13,116 - INFO - Progress: 4.4% (44,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,152 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 45,000
+2025-06-18 16:49:13,152 - INFO - Progress: 4.5% (45,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,192 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 46,000
+2025-06-18 16:49:13,192 - INFO - Progress: 4.6% (46,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,233 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 47,000
+2025-06-18 16:49:13,233 - INFO - Progress: 4.7% (47,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,274 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 48,000
+2025-06-18 16:49:13,274 - INFO - Progress: 4.8% (48,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,312 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 49,000
+2025-06-18 16:49:13,312 - INFO - Progress: 4.9% (49,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,351 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 50,000
+2025-06-18 16:49:13,351 - INFO - Progress: 5.0% (50,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,391 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 51,000
+2025-06-18 16:49:13,392 - INFO - Progress: 5.1% (51,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,434 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 52,000
+2025-06-18 16:49:13,434 - INFO - Progress: 5.2% (52,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,474 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 53,000
+2025-06-18 16:49:13,475 - INFO - Progress: 5.3% (53,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,517 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 54,000
+2025-06-18 16:49:13,518 - INFO - Progress: 5.4% (54,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,559 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 55,000
+2025-06-18 16:49:13,560 - INFO - Progress: 5.5% (55,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,602 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 56,000
+2025-06-18 16:49:13,602 - INFO - Progress: 5.6% (56,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,647 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 57,000
+2025-06-18 16:49:13,647 - INFO - Progress: 5.7% (57,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,688 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 58,000
+2025-06-18 16:49:13,688 - INFO - Progress: 5.8% (58,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,732 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 59,000
+2025-06-18 16:49:13,733 - INFO - Progress: 5.9% (59,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,774 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 60,000
+2025-06-18 16:49:13,775 - INFO - Progress: 6.0% (60,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,819 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 61,000
+2025-06-18 16:49:13,820 - INFO - Progress: 6.1% (61,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,868 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 62,000
+2025-06-18 16:49:13,868 - INFO - Progress: 6.2% (62,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,916 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 63,000
+2025-06-18 16:49:13,916 - INFO - Progress: 6.3% (63,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:13,963 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 64,000
+2025-06-18 16:49:13,964 - INFO - Progress: 6.4% (64,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:14,016 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 65,000
+2025-06-18 16:49:14,017 - INFO - Progress: 6.5% (65,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:14,070 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 66,000
+2025-06-18 16:49:14,071 - INFO - Progress: 6.6% (66,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:14,124 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 67,000
+2025-06-18 16:49:14,124 - INFO - Progress: 6.7% (67,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:14,176 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 68,000
+2025-06-18 16:49:14,176 - INFO - Progress: 6.8% (68,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:14,232 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 69,000
+2025-06-18 16:49:14,232 - INFO - Progress: 6.9% (69,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:14,278 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 70,000
+2025-06-18 16:49:14,279 - INFO - Progress: 7.0% (70,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:14,323 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 71,000
+2025-06-18 16:49:14,323 - INFO - Progress: 7.1% (71,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:14,372 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 72,000
+2025-06-18 16:49:14,373 - INFO - Progress: 7.2% (72,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:14,421 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 73,000
+2025-06-18 16:49:14,422 - INFO - Progress: 7.3% (73,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:14,471 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 74,000
+2025-06-18 16:49:14,472 - INFO - Progress: 7.4% (74,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:14,521 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 75,000
+2025-06-18 16:49:14,521 - INFO - Progress: 7.5% (75,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:14,576 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 76,000
+2025-06-18 16:49:14,576 - INFO - Progress: 7.6% (76,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:14,626 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 77,000
+2025-06-18 16:49:14,626 - INFO - Progress: 7.7% (77,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:14,675 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 78,000
+2025-06-18 16:49:14,676 - INFO - Progress: 7.8% (78,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:14,725 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 79,000
+2025-06-18 16:49:14,726 - INFO - Progress: 7.9% (79,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:14,776 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 80,000
+2025-06-18 16:49:14,777 - INFO - Progress: 8.0% (80,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:14,826 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 81,000
+2025-06-18 16:49:14,826 - INFO - Progress: 8.1% (81,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:14,876 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 82,000
+2025-06-18 16:49:14,877 - INFO - Progress: 8.2% (82,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:14,929 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 83,000
+2025-06-18 16:49:14,929 - INFO - Progress: 8.3% (83,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:14,981 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 84,000
+2025-06-18 16:49:14,982 - INFO - Progress: 8.4% (84,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,033 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 85,000
+2025-06-18 16:49:15,033 - INFO - Progress: 8.5% (85,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,091 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 86,000
+2025-06-18 16:49:15,091 - INFO - Progress: 8.6% (86,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,143 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 87,000
+2025-06-18 16:49:15,143 - INFO - Progress: 8.7% (87,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,206 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 88,000
+2025-06-18 16:49:15,206 - INFO - Progress: 8.8% (88,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,258 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 89,000
+2025-06-18 16:49:15,259 - INFO - Progress: 8.9% (89,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,316 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 90,000
+2025-06-18 16:49:15,317 - INFO - Progress: 9.0% (90,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,372 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 91,000
+2025-06-18 16:49:15,373 - INFO - Progress: 9.1% (91,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,429 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 92,000
+2025-06-18 16:49:15,430 - INFO - Progress: 9.2% (92,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,481 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 93,000
+2025-06-18 16:49:15,482 - INFO - Progress: 9.3% (93,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,535 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 94,000
+2025-06-18 16:49:15,535 - INFO - Progress: 9.4% (94,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,595 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 95,000
+2025-06-18 16:49:15,595 - INFO - Progress: 9.5% (95,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,648 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 96,000
+2025-06-18 16:49:15,648 - INFO - Progress: 9.6% (96,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,703 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 97,000
+2025-06-18 16:49:15,703 - INFO - Progress: 9.7% (97,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,761 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 98,000
+2025-06-18 16:49:15,762 - INFO - Progress: 9.8% (98,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,818 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 99,000
+2025-06-18 16:49:15,819 - INFO - Progress: 9.9% (99,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,877 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 100,000
+2025-06-18 16:49:15,877 - INFO - Progress: 10.0% (100,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,938 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 101,000
+2025-06-18 16:49:15,938 - INFO - Progress: 10.1% (101,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:15,994 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 102,000
+2025-06-18 16:49:15,994 - INFO - Progress: 10.2% (102,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:16,052 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 103,000
+2025-06-18 16:49:16,052 - INFO - Progress: 10.3% (103,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:16,111 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 104,000
+2025-06-18 16:49:16,111 - INFO - Progress: 10.4% (104,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:16,167 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 105,000
+2025-06-18 16:49:16,167 - INFO - Progress: 10.5% (105,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:16,223 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 106,000
+2025-06-18 16:49:16,223 - INFO - Progress: 10.6% (106,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:16,285 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 107,000
+2025-06-18 16:49:16,285 - INFO - Progress: 10.7% (107,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:16,343 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 108,000
+2025-06-18 16:49:16,344 - INFO - Progress: 10.8% (108,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:16,399 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 109,000
+2025-06-18 16:49:16,400 - INFO - Progress: 10.9% (109,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:16,464 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 110,000
+2025-06-18 16:49:16,464 - INFO - Progress: 11.0% (110,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:16,518 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 111,000
+2025-06-18 16:49:16,518 - INFO - Progress: 11.1% (111,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:16,575 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 112,000
+2025-06-18 16:49:16,575 - INFO - Progress: 11.2% (112,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:16,635 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 113,000
+2025-06-18 16:49:16,636 - INFO - Progress: 11.3% (113,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:16,694 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 114,000
+2025-06-18 16:49:16,694 - INFO - Progress: 11.4% (114,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:16,749 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 115,000
+2025-06-18 16:49:16,749 - INFO - Progress: 11.5% (115,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:16,803 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 116,000
+2025-06-18 16:49:16,804 - INFO - Progress: 11.6% (116,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:16,863 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 117,000
+2025-06-18 16:49:16,863 - INFO - Progress: 11.7% (117,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:16,917 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 118,000
+2025-06-18 16:49:16,918 - INFO - Progress: 11.8% (118,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:16,976 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 119,000
+2025-06-18 16:49:16,976 - INFO - Progress: 11.9% (119,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:17,035 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 120,000
+2025-06-18 16:49:17,035 - INFO - Progress: 12.0% (120,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:17,095 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 121,000
+2025-06-18 16:49:17,096 - INFO - Progress: 12.1% (121,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:17,155 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 122,000
+2025-06-18 16:49:17,155 - INFO - Progress: 12.2% (122,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:17,211 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 123,000
+2025-06-18 16:49:17,211 - INFO - Progress: 12.3% (123,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:17,266 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 124,000
+2025-06-18 16:49:17,266 - INFO - Progress: 12.4% (124,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:17,318 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 125,000
+2025-06-18 16:49:17,318 - INFO - Progress: 12.5% (125,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:17,378 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 126,000
+2025-06-18 16:49:17,379 - INFO - Progress: 12.6% (126,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:17,440 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 127,000
+2025-06-18 16:49:17,441 - INFO - Progress: 12.7% (127,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:17,500 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 128,000
+2025-06-18 16:49:17,500 - INFO - Progress: 12.8% (128,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:17,556 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 129,000
+2025-06-18 16:49:17,556 - INFO - Progress: 12.9% (129,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:17,617 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 130,000
+2025-06-18 16:49:17,618 - INFO - Progress: 13.0% (130,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:17,676 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 131,000
+2025-06-18 16:49:17,676 - INFO - Progress: 13.1% (131,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:17,733 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 132,000
+2025-06-18 16:49:17,733 - INFO - Progress: 13.2% (132,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:17,789 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 133,000
+2025-06-18 16:49:17,789 - INFO - Progress: 13.3% (133,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:17,845 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 134,000
+2025-06-18 16:49:17,845 - INFO - Progress: 13.4% (134,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:17,903 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 135,000
+2025-06-18 16:49:17,904 - INFO - Progress: 13.5% (135,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:17,963 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 136,000
+2025-06-18 16:49:17,964 - INFO - Progress: 13.6% (136,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:18,027 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 137,000
+2025-06-18 16:49:18,028 - INFO - Progress: 13.7% (137,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:18,093 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 138,000
+2025-06-18 16:49:18,093 - INFO - Progress: 13.8% (138,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:18,160 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 139,000
+2025-06-18 16:49:18,161 - INFO - Progress: 13.9% (139,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:18,238 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 140,000
+2025-06-18 16:49:18,238 - INFO - Progress: 14.0% (140,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:18,295 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 141,000
+2025-06-18 16:49:18,295 - INFO - Progress: 14.1% (141,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:18,381 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 142,000
+2025-06-18 16:49:18,381 - INFO - Progress: 14.2% (142,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:18,477 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 143,000
+2025-06-18 16:49:18,477 - INFO - Progress: 14.3% (143,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:18,549 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 144,000
+2025-06-18 16:49:18,549 - INFO - Progress: 14.4% (144,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:18,614 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 145,000
+2025-06-18 16:49:18,614 - INFO - Progress: 14.5% (145,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:18,686 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 146,000
+2025-06-18 16:49:18,686 - INFO - Progress: 14.6% (146,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:18,750 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 147,000
+2025-06-18 16:49:18,750 - INFO - Progress: 14.7% (147,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:18,811 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 148,000
+2025-06-18 16:49:18,812 - INFO - Progress: 14.8% (148,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:18,876 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 149,000
+2025-06-18 16:49:18,876 - INFO - Progress: 14.9% (149,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:18,941 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 150,000
+2025-06-18 16:49:18,942 - INFO - Progress: 15.0% (150,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:19,002 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 151,000
+2025-06-18 16:49:19,002 - INFO - Progress: 15.1% (151,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:19,063 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 152,000
+2025-06-18 16:49:19,063 - INFO - Progress: 15.2% (152,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:19,125 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 153,000
+2025-06-18 16:49:19,125 - INFO - Progress: 15.3% (153,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:19,190 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 154,000
+2025-06-18 16:49:19,190 - INFO - Progress: 15.4% (154,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:19,252 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 155,000
+2025-06-18 16:49:19,253 - INFO - Progress: 15.5% (155,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:19,312 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 156,000
+2025-06-18 16:49:19,312 - INFO - Progress: 15.6% (156,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:19,369 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 157,000
+2025-06-18 16:49:19,369 - INFO - Progress: 15.7% (157,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:19,429 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 158,000
+2025-06-18 16:49:19,430 - INFO - Progress: 15.8% (158,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:19,500 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 159,000
+2025-06-18 16:49:19,500 - INFO - Progress: 15.9% (159,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:19,565 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 160,000
+2025-06-18 16:49:19,565 - INFO - Progress: 16.0% (160,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:19,629 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 161,000
+2025-06-18 16:49:19,629 - INFO - Progress: 16.1% (161,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:19,692 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 162,000
+2025-06-18 16:49:19,693 - INFO - Progress: 16.2% (162,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:19,752 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 163,000
+2025-06-18 16:49:19,753 - INFO - Progress: 16.3% (163,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:19,815 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 164,000
+2025-06-18 16:49:19,815 - INFO - Progress: 16.4% (164,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:19,875 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 165,000
+2025-06-18 16:49:19,875 - INFO - Progress: 16.5% (165,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:19,937 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 166,000
+2025-06-18 16:49:19,938 - INFO - Progress: 16.6% (166,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:20,002 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 167,000
+2025-06-18 16:49:20,002 - INFO - Progress: 16.7% (167,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:20,061 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 168,000
+2025-06-18 16:49:20,062 - INFO - Progress: 16.8% (168,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:20,123 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 169,000
+2025-06-18 16:49:20,123 - INFO - Progress: 16.9% (169,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:20,185 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 170,000
+2025-06-18 16:49:20,185 - INFO - Progress: 17.0% (170,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:20,249 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 171,000
+2025-06-18 16:49:20,250 - INFO - Progress: 17.1% (171,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:20,309 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 172,000
+2025-06-18 16:49:20,309 - INFO - Progress: 17.2% (172,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:20,371 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 173,000
+2025-06-18 16:49:20,371 - INFO - Progress: 17.3% (173,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:20,430 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 174,000
+2025-06-18 16:49:20,430 - INFO - Progress: 17.4% (174,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:20,495 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 175,000
+2025-06-18 16:49:20,495 - INFO - Progress: 17.5% (175,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:20,567 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 176,000
+2025-06-18 16:49:20,567 - INFO - Progress: 17.6% (176,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:20,632 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 177,000
+2025-06-18 16:49:20,632 - INFO - Progress: 17.7% (177,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:20,691 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 178,000
+2025-06-18 16:49:20,691 - INFO - Progress: 17.8% (178,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:20,761 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 179,000
+2025-06-18 16:49:20,761 - INFO - Progress: 17.9% (179,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:20,828 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 180,000
+2025-06-18 16:49:20,828 - INFO - Progress: 18.0% (180,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:20,888 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 181,000
+2025-06-18 16:49:20,888 - INFO - Progress: 18.1% (181,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:20,950 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 182,000
+2025-06-18 16:49:20,950 - INFO - Progress: 18.2% (182,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:21,009 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 183,000
+2025-06-18 16:49:21,010 - INFO - Progress: 18.3% (183,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:21,076 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 184,000
+2025-06-18 16:49:21,076 - INFO - Progress: 18.4% (184,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:21,140 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 185,000
+2025-06-18 16:49:21,140 - INFO - Progress: 18.5% (185,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:21,199 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 186,000
+2025-06-18 16:49:21,200 - INFO - Progress: 18.6% (186,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:21,272 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 187,000
+2025-06-18 16:49:21,272 - INFO - Progress: 18.7% (187,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:21,334 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 188,000
+2025-06-18 16:49:21,334 - INFO - Progress: 18.8% (188,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:21,398 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 189,000
+2025-06-18 16:49:21,398 - INFO - Progress: 18.9% (189,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:21,459 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 190,000
+2025-06-18 16:49:21,460 - INFO - Progress: 19.0% (190,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:21,524 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 191,000
+2025-06-18 16:49:21,525 - INFO - Progress: 19.1% (191,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:21,593 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 192,000
+2025-06-18 16:49:21,593 - INFO - Progress: 19.2% (192,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:21,657 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 193,000
+2025-06-18 16:49:21,657 - INFO - Progress: 19.3% (193,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:21,715 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 194,000
+2025-06-18 16:49:21,716 - INFO - Progress: 19.4% (194,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:21,793 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 195,000
+2025-06-18 16:49:21,793 - INFO - Progress: 19.5% (195,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:21,862 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 196,000
+2025-06-18 16:49:21,863 - INFO - Progress: 19.6% (196,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:21,925 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 197,000
+2025-06-18 16:49:21,925 - INFO - Progress: 19.7% (197,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:21,991 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 198,000
+2025-06-18 16:49:21,991 - INFO - Progress: 19.8% (198,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:22,050 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 199,000
+2025-06-18 16:49:22,051 - INFO - Progress: 19.9% (199,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:22,110 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 200,000
+2025-06-18 16:49:22,111 - INFO - Progress: 20.0% (200,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:22,178 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 201,000
+2025-06-18 16:49:22,178 - INFO - Progress: 20.1% (201,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:22,243 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 202,000
+2025-06-18 16:49:22,243 - INFO - Progress: 20.2% (202,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:22,316 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 203,000
+2025-06-18 16:49:22,316 - INFO - Progress: 20.3% (203,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:22,382 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 204,000
+2025-06-18 16:49:22,382 - INFO - Progress: 20.4% (204,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:22,463 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 205,000
+2025-06-18 16:49:22,463 - INFO - Progress: 20.5% (205,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:22,528 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 206,000
+2025-06-18 16:49:22,528 - INFO - Progress: 20.6% (206,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:22,596 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 207,000
+2025-06-18 16:49:22,596 - INFO - Progress: 20.7% (207,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:22,671 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 208,000
+2025-06-18 16:49:22,671 - INFO - Progress: 20.8% (208,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:22,734 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 209,000
+2025-06-18 16:49:22,734 - INFO - Progress: 20.9% (209,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:22,796 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 210,000
+2025-06-18 16:49:22,797 - INFO - Progress: 21.0% (210,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:22,867 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 211,000
+2025-06-18 16:49:22,867 - INFO - Progress: 21.1% (211,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:22,930 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 212,000
+2025-06-18 16:49:22,931 - INFO - Progress: 21.2% (212,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:22,997 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 213,000
+2025-06-18 16:49:22,998 - INFO - Progress: 21.3% (213,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:23,062 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 214,000
+2025-06-18 16:49:23,063 - INFO - Progress: 21.4% (214,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:23,132 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 215,000
+2025-06-18 16:49:23,132 - INFO - Progress: 21.5% (215,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:23,201 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 216,000
+2025-06-18 16:49:23,201 - INFO - Progress: 21.6% (216,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:23,272 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 217,000
+2025-06-18 16:49:23,272 - INFO - Progress: 21.7% (217,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:23,340 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 218,000
+2025-06-18 16:49:23,341 - INFO - Progress: 21.8% (218,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:23,405 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 219,000
+2025-06-18 16:49:23,406 - INFO - Progress: 21.9% (219,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:23,469 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 220,000
+2025-06-18 16:49:23,469 - INFO - Progress: 22.0% (220,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:23,532 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 221,000
+2025-06-18 16:49:23,532 - INFO - Progress: 22.1% (221,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:23,594 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 222,000
+2025-06-18 16:49:23,595 - INFO - Progress: 22.2% (222,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:23,666 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 223,000
+2025-06-18 16:49:23,666 - INFO - Progress: 22.3% (223,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:23,733 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 224,000
+2025-06-18 16:49:23,733 - INFO - Progress: 22.4% (224,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:23,796 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 225,000
+2025-06-18 16:49:23,796 - INFO - Progress: 22.5% (225,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:23,871 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 226,000
+2025-06-18 16:49:23,871 - INFO - Progress: 22.6% (226,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:23,937 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 227,000
+2025-06-18 16:49:23,937 - INFO - Progress: 22.7% (227,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:23,999 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 228,000
+2025-06-18 16:49:23,999 - INFO - Progress: 22.8% (228,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:24,067 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 229,000
+2025-06-18 16:49:24,067 - INFO - Progress: 22.9% (229,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:24,134 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 230,000
+2025-06-18 16:49:24,135 - INFO - Progress: 23.0% (230,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:24,196 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 231,000
+2025-06-18 16:49:24,196 - INFO - Progress: 23.1% (231,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:24,263 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 232,000
+2025-06-18 16:49:24,264 - INFO - Progress: 23.2% (232,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:24,329 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 233,000
+2025-06-18 16:49:24,329 - INFO - Progress: 23.3% (233,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:24,411 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 234,000
+2025-06-18 16:49:24,411 - INFO - Progress: 23.4% (234,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:24,480 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 235,000
+2025-06-18 16:49:24,481 - INFO - Progress: 23.5% (235,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:24,545 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 236,000
+2025-06-18 16:49:24,545 - INFO - Progress: 23.6% (236,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:24,616 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 237,000
+2025-06-18 16:49:24,616 - INFO - Progress: 23.7% (237,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:24,679 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 238,000
+2025-06-18 16:49:24,679 - INFO - Progress: 23.8% (238,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:24,759 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 239,000
+2025-06-18 16:49:24,760 - INFO - Progress: 23.9% (239,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:24,827 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 240,000
+2025-06-18 16:49:24,828 - INFO - Progress: 24.0% (240,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:24,902 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 241,000
+2025-06-18 16:49:24,902 - INFO - Progress: 24.1% (241,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:24,965 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 242,000
+2025-06-18 16:49:24,966 - INFO - Progress: 24.2% (242,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:25,032 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 243,000
+2025-06-18 16:49:25,033 - INFO - Progress: 24.3% (243,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:25,096 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 244,000
+2025-06-18 16:49:25,096 - INFO - Progress: 24.4% (244,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:25,162 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 245,000
+2025-06-18 16:49:25,163 - INFO - Progress: 24.5% (245,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:25,228 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 246,000
+2025-06-18 16:49:25,229 - INFO - Progress: 24.6% (246,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:25,292 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 247,000
+2025-06-18 16:49:25,293 - INFO - Progress: 24.7% (247,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:25,356 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 248,000
+2025-06-18 16:49:25,356 - INFO - Progress: 24.8% (248,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:25,418 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 249,000
+2025-06-18 16:49:25,418 - INFO - Progress: 24.9% (249,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:25,495 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 250,000
+2025-06-18 16:49:25,496 - INFO - Progress: 25.0% (250,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:25,560 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 251,000
+2025-06-18 16:49:25,561 - INFO - Progress: 25.1% (251,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:25,631 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 252,000
+2025-06-18 16:49:25,632 - INFO - Progress: 25.2% (252,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:25,696 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 253,000
+2025-06-18 16:49:25,697 - INFO - Progress: 25.3% (253,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:25,773 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 254,000
+2025-06-18 16:49:25,774 - INFO - Progress: 25.4% (254,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:25,846 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 255,000
+2025-06-18 16:49:25,846 - INFO - Progress: 25.5% (255,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:25,920 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 256,000
+2025-06-18 16:49:25,921 - INFO - Progress: 25.6% (256,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:25,986 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 257,000
+2025-06-18 16:49:25,986 - INFO - Progress: 25.7% (257,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:26,052 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 258,000
+2025-06-18 16:49:26,052 - INFO - Progress: 25.8% (258,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:26,116 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 259,000
+2025-06-18 16:49:26,116 - INFO - Progress: 25.9% (259,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:26,184 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 260,000
+2025-06-18 16:49:26,185 - INFO - Progress: 26.0% (260,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:26,253 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 261,000
+2025-06-18 16:49:26,253 - INFO - Progress: 26.1% (261,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:26,322 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 262,000
+2025-06-18 16:49:26,322 - INFO - Progress: 26.2% (262,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:26,393 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 263,000
+2025-06-18 16:49:26,393 - INFO - Progress: 26.3% (263,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:26,475 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 264,000
+2025-06-18 16:49:26,475 - INFO - Progress: 26.4% (264,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:26,543 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 265,000
+2025-06-18 16:49:26,543 - INFO - Progress: 26.5% (265,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:26,612 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 266,000
+2025-06-18 16:49:26,612 - INFO - Progress: 26.6% (266,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:26,685 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 267,000
+2025-06-18 16:49:26,686 - INFO - Progress: 26.7% (267,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:26,759 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 268,000
+2025-06-18 16:49:26,759 - INFO - Progress: 26.8% (268,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:26,838 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 269,000
+2025-06-18 16:49:26,838 - INFO - Progress: 26.9% (269,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:26,911 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 270,000
+2025-06-18 16:49:26,911 - INFO - Progress: 27.0% (270,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:26,989 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 271,000
+2025-06-18 16:49:26,990 - INFO - Progress: 27.1% (271,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:27,057 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 272,000
+2025-06-18 16:49:27,057 - INFO - Progress: 27.2% (272,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:27,132 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 273,000
+2025-06-18 16:49:27,133 - INFO - Progress: 27.3% (273,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:27,205 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 274,000
+2025-06-18 16:49:27,205 - INFO - Progress: 27.4% (274,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:27,274 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 275,000
+2025-06-18 16:49:27,274 - INFO - Progress: 27.5% (275,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:27,346 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 276,000
+2025-06-18 16:49:27,346 - INFO - Progress: 27.6% (276,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:27,416 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 277,000
+2025-06-18 16:49:27,416 - INFO - Progress: 27.7% (277,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:27,496 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 278,000
+2025-06-18 16:49:27,496 - INFO - Progress: 27.8% (278,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:27,564 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 279,000
+2025-06-18 16:49:27,564 - INFO - Progress: 27.9% (279,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:27,639 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 280,000
+2025-06-18 16:49:27,639 - INFO - Progress: 28.0% (280,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:27,712 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 281,000
+2025-06-18 16:49:27,712 - INFO - Progress: 28.1% (281,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:27,785 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 282,000
+2025-06-18 16:49:27,785 - INFO - Progress: 28.2% (282,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:27,869 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 283,000
+2025-06-18 16:49:27,869 - INFO - Progress: 28.3% (283,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:27,940 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 284,000
+2025-06-18 16:49:27,940 - INFO - Progress: 28.4% (284,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:28,015 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 285,000
+2025-06-18 16:49:28,015 - INFO - Progress: 28.5% (285,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:28,083 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 286,000
+2025-06-18 16:49:28,083 - INFO - Progress: 28.6% (286,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:28,149 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 287,000
+2025-06-18 16:49:28,149 - INFO - Progress: 28.7% (287,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:28,215 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 288,000
+2025-06-18 16:49:28,216 - INFO - Progress: 28.8% (288,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:28,302 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 289,000
+2025-06-18 16:49:28,302 - INFO - Progress: 28.9% (289,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:28,382 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 290,000
+2025-06-18 16:49:28,382 - INFO - Progress: 29.0% (290,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:28,449 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 291,000
+2025-06-18 16:49:28,450 - INFO - Progress: 29.1% (291,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:28,523 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 292,000
+2025-06-18 16:49:28,524 - INFO - Progress: 29.2% (292,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:28,595 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 293,000
+2025-06-18 16:49:28,596 - INFO - Progress: 29.3% (293,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:28,670 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 294,000
+2025-06-18 16:49:28,671 - INFO - Progress: 29.4% (294,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:28,748 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 295,000
+2025-06-18 16:49:28,749 - INFO - Progress: 29.5% (295,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:28,822 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 296,000
+2025-06-18 16:49:28,823 - INFO - Progress: 29.6% (296,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:28,896 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 297,000
+2025-06-18 16:49:28,896 - INFO - Progress: 29.7% (297,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:28,985 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 298,000
+2025-06-18 16:49:28,985 - INFO - Progress: 29.8% (298,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:29,057 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 299,000
+2025-06-18 16:49:29,058 - INFO - Progress: 29.9% (299,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:29,131 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 300,000
+2025-06-18 16:49:29,131 - INFO - Progress: 30.0% (300,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:29,213 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 301,000
+2025-06-18 16:49:29,213 - INFO - Progress: 30.1% (301,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:29,284 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 302,000
+2025-06-18 16:49:29,284 - INFO - Progress: 30.2% (302,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:29,354 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 303,000
+2025-06-18 16:49:29,355 - INFO - Progress: 30.3% (303,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:29,433 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 304,000
+2025-06-18 16:49:29,433 - INFO - Progress: 30.4% (304,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:29,516 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 305,000
+2025-06-18 16:49:29,516 - INFO - Progress: 30.5% (305,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:29,587 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 306,000
+2025-06-18 16:49:29,587 - INFO - Progress: 30.6% (306,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:29,668 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 307,000
+2025-06-18 16:49:29,668 - INFO - Progress: 30.7% (307,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:29,738 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 308,000
+2025-06-18 16:49:29,738 - INFO - Progress: 30.8% (308,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:29,814 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 309,000
+2025-06-18 16:49:29,815 - INFO - Progress: 30.9% (309,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:29,891 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 310,000
+2025-06-18 16:49:29,892 - INFO - Progress: 31.0% (310,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:29,971 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 311,000
+2025-06-18 16:49:29,972 - INFO - Progress: 31.1% (311,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:30,056 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 312,000
+2025-06-18 16:49:30,057 - INFO - Progress: 31.2% (312,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:30,132 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 313,000
+2025-06-18 16:49:30,132 - INFO - Progress: 31.3% (313,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:30,207 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 314,000
+2025-06-18 16:49:30,208 - INFO - Progress: 31.4% (314,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:30,279 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 315,000
+2025-06-18 16:49:30,280 - INFO - Progress: 31.5% (315,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:30,348 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 316,000
+2025-06-18 16:49:30,349 - INFO - Progress: 31.6% (316,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:30,421 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 317,000
+2025-06-18 16:49:30,422 - INFO - Progress: 31.7% (317,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:30,499 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 318,000
+2025-06-18 16:49:30,499 - INFO - Progress: 31.8% (318,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:30,584 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 319,000
+2025-06-18 16:49:30,584 - INFO - Progress: 31.9% (319,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:30,659 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 320,000
+2025-06-18 16:49:30,659 - INFO - Progress: 32.0% (320,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:30,728 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 321,000
+2025-06-18 16:49:30,728 - INFO - Progress: 32.1% (321,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:30,802 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 322,000
+2025-06-18 16:49:30,802 - INFO - Progress: 32.2% (322,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:30,877 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 323,000
+2025-06-18 16:49:30,877 - INFO - Progress: 32.3% (323,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:30,948 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 324,000
+2025-06-18 16:49:30,948 - INFO - Progress: 32.4% (324,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:31,026 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 325,000
+2025-06-18 16:49:31,027 - INFO - Progress: 32.5% (325,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:31,103 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 326,000
+2025-06-18 16:49:31,103 - INFO - Progress: 32.6% (326,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:31,173 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 327,000
+2025-06-18 16:49:31,173 - INFO - Progress: 32.7% (327,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:31,243 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 328,000
+2025-06-18 16:49:31,243 - INFO - Progress: 32.8% (328,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:31,313 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 329,000
+2025-06-18 16:49:31,313 - INFO - Progress: 32.9% (329,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:31,383 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 330,000
+2025-06-18 16:49:31,383 - INFO - Progress: 33.0% (330,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:31,466 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 331,000
+2025-06-18 16:49:31,466 - INFO - Progress: 33.1% (331,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:31,539 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 332,000
+2025-06-18 16:49:31,540 - INFO - Progress: 33.2% (332,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:31,615 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 333,000
+2025-06-18 16:49:31,615 - INFO - Progress: 33.3% (333,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:31,687 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 334,000
+2025-06-18 16:49:31,687 - INFO - Progress: 33.4% (334,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:31,757 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 335,000
+2025-06-18 16:49:31,758 - INFO - Progress: 33.5% (335,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:31,828 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 336,000
+2025-06-18 16:49:31,829 - INFO - Progress: 33.6% (336,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:31,903 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 337,000
+2025-06-18 16:49:31,903 - INFO - Progress: 33.7% (337,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:31,987 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 338,000
+2025-06-18 16:49:31,987 - INFO - Progress: 33.8% (338,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:32,067 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 339,000
+2025-06-18 16:49:32,067 - INFO - Progress: 33.9% (339,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:32,142 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 340,000
+2025-06-18 16:49:32,143 - INFO - Progress: 34.0% (340,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:32,213 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 341,000
+2025-06-18 16:49:32,213 - INFO - Progress: 34.1% (341,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:32,291 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 342,000
+2025-06-18 16:49:32,291 - INFO - Progress: 34.2% (342,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:32,367 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 343,000
+2025-06-18 16:49:32,368 - INFO - Progress: 34.3% (343,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:32,443 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 344,000
+2025-06-18 16:49:32,443 - INFO - Progress: 34.4% (344,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:32,523 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 345,000
+2025-06-18 16:49:32,523 - INFO - Progress: 34.5% (345,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:32,608 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 346,000
+2025-06-18 16:49:32,609 - INFO - Progress: 34.6% (346,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:32,698 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 347,000
+2025-06-18 16:49:32,698 - INFO - Progress: 34.7% (347,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:32,775 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 348,000
+2025-06-18 16:49:32,775 - INFO - Progress: 34.8% (348,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:32,851 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 349,000
+2025-06-18 16:49:32,851 - INFO - Progress: 34.9% (349,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:32,932 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 350,000
+2025-06-18 16:49:32,933 - INFO - Progress: 35.0% (350,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:33,012 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 351,000
+2025-06-18 16:49:33,012 - INFO - Progress: 35.1% (351,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:33,091 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 352,000
+2025-06-18 16:49:33,092 - INFO - Progress: 35.2% (352,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:33,178 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 353,000
+2025-06-18 16:49:33,178 - INFO - Progress: 35.3% (353,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:33,255 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 354,000
+2025-06-18 16:49:33,255 - INFO - Progress: 35.4% (354,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:33,325 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 355,000
+2025-06-18 16:49:33,325 - INFO - Progress: 35.5% (355,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:33,409 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 356,000
+2025-06-18 16:49:33,409 - INFO - Progress: 35.6% (356,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:33,483 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 357,000
+2025-06-18 16:49:33,484 - INFO - Progress: 35.7% (357,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:33,555 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 358,000
+2025-06-18 16:49:33,555 - INFO - Progress: 35.8% (358,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:33,636 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 359,000
+2025-06-18 16:49:33,636 - INFO - Progress: 35.9% (359,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:33,715 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 360,000
+2025-06-18 16:49:33,715 - INFO - Progress: 36.0% (360,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:33,785 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 361,000
+2025-06-18 16:49:33,785 - INFO - Progress: 36.1% (361,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:33,857 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 362,000
+2025-06-18 16:49:33,857 - INFO - Progress: 36.2% (362,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:33,931 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 363,000
+2025-06-18 16:49:33,931 - INFO - Progress: 36.3% (363,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:34,004 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 364,000
+2025-06-18 16:49:34,004 - INFO - Progress: 36.4% (364,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:34,091 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 365,000
+2025-06-18 16:49:34,091 - INFO - Progress: 36.5% (365,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:34,172 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 366,000
+2025-06-18 16:49:34,172 - INFO - Progress: 36.6% (366,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:34,248 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 367,000
+2025-06-18 16:49:34,248 - INFO - Progress: 36.7% (367,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:34,316 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 368,000
+2025-06-18 16:49:34,317 - INFO - Progress: 36.8% (368,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:34,389 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 369,000
+2025-06-18 16:49:34,390 - INFO - Progress: 36.9% (369,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:34,460 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 370,000
+2025-06-18 16:49:34,460 - INFO - Progress: 37.0% (370,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:34,533 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 371,000
+2025-06-18 16:49:34,534 - INFO - Progress: 37.1% (371,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:34,607 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 372,000
+2025-06-18 16:49:34,607 - INFO - Progress: 37.2% (372,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:34,685 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 373,000
+2025-06-18 16:49:34,686 - INFO - Progress: 37.3% (373,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:34,763 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 374,000
+2025-06-18 16:49:34,764 - INFO - Progress: 37.4% (374,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:34,835 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 375,000
+2025-06-18 16:49:34,835 - INFO - Progress: 37.5% (375,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:34,909 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 376,000
+2025-06-18 16:49:34,909 - INFO - Progress: 37.6% (376,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:34,988 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 377,000
+2025-06-18 16:49:34,989 - INFO - Progress: 37.7% (377,000/1,000,000) - ETA: 0.7 minutes
+2025-06-18 16:49:35,061 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 378,000
+2025-06-18 16:49:35,062 - INFO - Progress: 37.8% (378,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:35,139 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 379,000
+2025-06-18 16:49:35,140 - INFO - Progress: 37.9% (379,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:35,218 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 380,000
+2025-06-18 16:49:35,219 - INFO - Progress: 38.0% (380,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:35,300 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 381,000
+2025-06-18 16:49:35,300 - INFO - Progress: 38.1% (381,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:35,372 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 382,000
+2025-06-18 16:49:35,372 - INFO - Progress: 38.2% (382,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:35,447 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 383,000
+2025-06-18 16:49:35,448 - INFO - Progress: 38.3% (383,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:35,521 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 384,000
+2025-06-18 16:49:35,522 - INFO - Progress: 38.4% (384,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:35,601 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 385,000
+2025-06-18 16:49:35,601 - INFO - Progress: 38.5% (385,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:35,677 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 386,000
+2025-06-18 16:49:35,677 - INFO - Progress: 38.6% (386,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:35,757 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 387,000
+2025-06-18 16:49:35,758 - INFO - Progress: 38.7% (387,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:35,829 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 388,000
+2025-06-18 16:49:35,829 - INFO - Progress: 38.8% (388,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:35,902 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 389,000
+2025-06-18 16:49:35,902 - INFO - Progress: 38.9% (389,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:35,975 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 390,000
+2025-06-18 16:49:35,975 - INFO - Progress: 39.0% (390,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:36,046 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 391,000
+2025-06-18 16:49:36,047 - INFO - Progress: 39.1% (391,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:36,124 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 392,000
+2025-06-18 16:49:36,124 - INFO - Progress: 39.2% (392,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:36,204 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 393,000
+2025-06-18 16:49:36,204 - INFO - Progress: 39.3% (393,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:36,280 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 394,000
+2025-06-18 16:49:36,280 - INFO - Progress: 39.4% (394,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:36,356 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 395,000
+2025-06-18 16:49:36,356 - INFO - Progress: 39.5% (395,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:36,425 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 396,000
+2025-06-18 16:49:36,426 - INFO - Progress: 39.6% (396,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:36,513 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 397,000
+2025-06-18 16:49:36,514 - INFO - Progress: 39.7% (397,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:36,584 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 398,000
+2025-06-18 16:49:36,584 - INFO - Progress: 39.8% (398,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:36,664 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 399,000
+2025-06-18 16:49:36,665 - INFO - Progress: 39.9% (399,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:36,748 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 400,000
+2025-06-18 16:49:36,748 - INFO - Progress: 40.0% (400,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:36,829 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 401,000
+2025-06-18 16:49:36,829 - INFO - Progress: 40.1% (401,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:36,908 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 402,000
+2025-06-18 16:49:36,909 - INFO - Progress: 40.2% (402,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:36,989 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 403,000
+2025-06-18 16:49:36,990 - INFO - Progress: 40.3% (403,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:37,081 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 404,000
+2025-06-18 16:49:37,081 - INFO - Progress: 40.4% (404,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:37,159 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 405,000
+2025-06-18 16:49:37,159 - INFO - Progress: 40.5% (405,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:37,252 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 406,000
+2025-06-18 16:49:37,252 - INFO - Progress: 40.6% (406,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:37,331 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 407,000
+2025-06-18 16:49:37,331 - INFO - Progress: 40.7% (407,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:37,412 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 408,000
+2025-06-18 16:49:37,412 - INFO - Progress: 40.8% (408,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:37,488 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 409,000
+2025-06-18 16:49:37,489 - INFO - Progress: 40.9% (409,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:37,564 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 410,000
+2025-06-18 16:49:37,564 - INFO - Progress: 41.0% (410,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:37,648 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 411,000
+2025-06-18 16:49:37,648 - INFO - Progress: 41.1% (411,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:37,720 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 412,000
+2025-06-18 16:49:37,721 - INFO - Progress: 41.2% (412,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:37,803 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 413,000
+2025-06-18 16:49:37,803 - INFO - Progress: 41.3% (413,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:37,882 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 414,000
+2025-06-18 16:49:37,883 - INFO - Progress: 41.4% (414,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:37,961 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 415,000
+2025-06-18 16:49:37,961 - INFO - Progress: 41.5% (415,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:38,033 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 416,000
+2025-06-18 16:49:38,033 - INFO - Progress: 41.6% (416,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:38,100 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 417,000
+2025-06-18 16:49:38,101 - INFO - Progress: 41.7% (417,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:38,177 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 418,000
+2025-06-18 16:49:38,178 - INFO - Progress: 41.8% (418,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:38,272 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 419,000
+2025-06-18 16:49:38,273 - INFO - Progress: 41.9% (419,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:38,351 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 420,000
+2025-06-18 16:49:38,351 - INFO - Progress: 42.0% (420,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:38,427 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 421,000
+2025-06-18 16:49:38,428 - INFO - Progress: 42.1% (421,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:38,510 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 422,000
+2025-06-18 16:49:38,510 - INFO - Progress: 42.2% (422,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:38,597 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 423,000
+2025-06-18 16:49:38,597 - INFO - Progress: 42.3% (423,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:38,680 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 424,000
+2025-06-18 16:49:38,681 - INFO - Progress: 42.4% (424,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:38,752 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 425,000
+2025-06-18 16:49:38,753 - INFO - Progress: 42.5% (425,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:38,840 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 426,000
+2025-06-18 16:49:38,840 - INFO - Progress: 42.6% (426,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:38,913 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 427,000
+2025-06-18 16:49:38,914 - INFO - Progress: 42.7% (427,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:38,990 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 428,000
+2025-06-18 16:49:38,991 - INFO - Progress: 42.8% (428,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:39,068 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 429,000
+2025-06-18 16:49:39,068 - INFO - Progress: 42.9% (429,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:39,149 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 430,000
+2025-06-18 16:49:39,149 - INFO - Progress: 43.0% (430,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:39,227 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 431,000
+2025-06-18 16:49:39,227 - INFO - Progress: 43.1% (431,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:39,305 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 432,000
+2025-06-18 16:49:39,305 - INFO - Progress: 43.2% (432,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:39,388 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 433,000
+2025-06-18 16:49:39,388 - INFO - Progress: 43.3% (433,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:39,477 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 434,000
+2025-06-18 16:49:39,477 - INFO - Progress: 43.4% (434,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:39,548 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 435,000
+2025-06-18 16:49:39,548 - INFO - Progress: 43.5% (435,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:39,619 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 436,000
+2025-06-18 16:49:39,619 - INFO - Progress: 43.6% (436,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:39,690 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 437,000
+2025-06-18 16:49:39,690 - INFO - Progress: 43.7% (437,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:39,761 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 438,000
+2025-06-18 16:49:39,761 - INFO - Progress: 43.8% (438,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:39,835 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 439,000
+2025-06-18 16:49:39,836 - INFO - Progress: 43.9% (439,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:39,914 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 440,000
+2025-06-18 16:49:39,915 - INFO - Progress: 44.0% (440,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:39,984 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 441,000
+2025-06-18 16:49:39,984 - INFO - Progress: 44.1% (441,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:40,055 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 442,000
+2025-06-18 16:49:40,055 - INFO - Progress: 44.2% (442,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:40,133 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 443,000
+2025-06-18 16:49:40,133 - INFO - Progress: 44.3% (443,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:40,205 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 444,000
+2025-06-18 16:49:40,205 - INFO - Progress: 44.4% (444,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:40,278 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 445,000
+2025-06-18 16:49:40,278 - INFO - Progress: 44.5% (445,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:40,358 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 446,000
+2025-06-18 16:49:40,359 - INFO - Progress: 44.6% (446,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:40,433 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 447,000
+2025-06-18 16:49:40,433 - INFO - Progress: 44.7% (447,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:40,506 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 448,000
+2025-06-18 16:49:40,507 - INFO - Progress: 44.8% (448,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:40,580 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 449,000
+2025-06-18 16:49:40,580 - INFO - Progress: 44.9% (449,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:40,652 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 450,000
+2025-06-18 16:49:40,652 - INFO - Progress: 45.0% (450,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:40,725 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 451,000
+2025-06-18 16:49:40,725 - INFO - Progress: 45.1% (451,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:40,793 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 452,000
+2025-06-18 16:49:40,794 - INFO - Progress: 45.2% (452,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:40,885 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 453,000
+2025-06-18 16:49:40,886 - INFO - Progress: 45.3% (453,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:40,971 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 454,000
+2025-06-18 16:49:40,972 - INFO - Progress: 45.4% (454,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:41,042 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 455,000
+2025-06-18 16:49:41,043 - INFO - Progress: 45.5% (455,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:41,114 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 456,000
+2025-06-18 16:49:41,115 - INFO - Progress: 45.6% (456,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:41,185 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 457,000
+2025-06-18 16:49:41,185 - INFO - Progress: 45.7% (457,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:41,268 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 458,000
+2025-06-18 16:49:41,269 - INFO - Progress: 45.8% (458,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:41,346 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 459,000
+2025-06-18 16:49:41,346 - INFO - Progress: 45.9% (459,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:41,420 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 460,000
+2025-06-18 16:49:41,420 - INFO - Progress: 46.0% (460,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:41,507 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 461,000
+2025-06-18 16:49:41,507 - INFO - Progress: 46.1% (461,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:41,594 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 462,000
+2025-06-18 16:49:41,594 - INFO - Progress: 46.2% (462,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:41,664 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 463,000
+2025-06-18 16:49:41,664 - INFO - Progress: 46.3% (463,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:41,740 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 464,000
+2025-06-18 16:49:41,741 - INFO - Progress: 46.4% (464,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:41,816 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 465,000
+2025-06-18 16:49:41,816 - INFO - Progress: 46.5% (465,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:41,890 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 466,000
+2025-06-18 16:49:41,891 - INFO - Progress: 46.6% (466,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:41,968 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 467,000
+2025-06-18 16:49:41,968 - INFO - Progress: 46.7% (467,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:42,042 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 468,000
+2025-06-18 16:49:42,042 - INFO - Progress: 46.8% (468,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:42,118 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 469,000
+2025-06-18 16:49:42,118 - INFO - Progress: 46.9% (469,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:42,196 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 470,000
+2025-06-18 16:49:42,197 - INFO - Progress: 47.0% (470,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:42,276 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 471,000
+2025-06-18 16:49:42,276 - INFO - Progress: 47.1% (471,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:42,366 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 472,000
+2025-06-18 16:49:42,366 - INFO - Progress: 47.2% (472,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:42,483 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 473,000
+2025-06-18 16:49:42,483 - INFO - Progress: 47.3% (473,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:42,594 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 474,000
+2025-06-18 16:49:42,594 - INFO - Progress: 47.4% (474,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:42,672 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 475,000
+2025-06-18 16:49:42,672 - INFO - Progress: 47.5% (475,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:42,750 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 476,000
+2025-06-18 16:49:42,750 - INFO - Progress: 47.6% (476,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:42,825 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 477,000
+2025-06-18 16:49:42,825 - INFO - Progress: 47.7% (477,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:42,904 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 478,000
+2025-06-18 16:49:42,904 - INFO - Progress: 47.8% (478,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:42,983 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 479,000
+2025-06-18 16:49:42,983 - INFO - Progress: 47.9% (479,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:43,064 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 480,000
+2025-06-18 16:49:43,064 - INFO - Progress: 48.0% (480,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:43,139 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 481,000
+2025-06-18 16:49:43,139 - INFO - Progress: 48.1% (481,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:43,210 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 482,000
+2025-06-18 16:49:43,211 - INFO - Progress: 48.2% (482,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:43,285 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 483,000
+2025-06-18 16:49:43,285 - INFO - Progress: 48.3% (483,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:43,359 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 484,000
+2025-06-18 16:49:43,359 - INFO - Progress: 48.4% (484,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:43,431 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 485,000
+2025-06-18 16:49:43,431 - INFO - Progress: 48.5% (485,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:43,511 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 486,000
+2025-06-18 16:49:43,511 - INFO - Progress: 48.6% (486,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:43,582 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 487,000
+2025-06-18 16:49:43,582 - INFO - Progress: 48.7% (487,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:43,668 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 488,000
+2025-06-18 16:49:43,669 - INFO - Progress: 48.8% (488,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:43,748 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 489,000
+2025-06-18 16:49:43,748 - INFO - Progress: 48.9% (489,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:43,822 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 490,000
+2025-06-18 16:49:43,822 - INFO - Progress: 49.0% (490,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:43,899 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 491,000
+2025-06-18 16:49:43,900 - INFO - Progress: 49.1% (491,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:43,986 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 492,000
+2025-06-18 16:49:43,986 - INFO - Progress: 49.2% (492,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:44,072 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 493,000
+2025-06-18 16:49:44,072 - INFO - Progress: 49.3% (493,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:44,153 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 494,000
+2025-06-18 16:49:44,154 - INFO - Progress: 49.4% (494,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:44,236 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 495,000
+2025-06-18 16:49:44,236 - INFO - Progress: 49.5% (495,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:44,310 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 496,000
+2025-06-18 16:49:44,310 - INFO - Progress: 49.6% (496,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:44,384 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 497,000
+2025-06-18 16:49:44,384 - INFO - Progress: 49.7% (497,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:44,458 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 498,000
+2025-06-18 16:49:44,458 - INFO - Progress: 49.8% (498,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:44,543 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 499,000
+2025-06-18 16:49:44,544 - INFO - Progress: 49.9% (499,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:44,630 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 500,000
+2025-06-18 16:49:44,630 - INFO - Progress: 50.0% (500,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:44,701 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 501,000
+2025-06-18 16:49:44,701 - INFO - Progress: 50.1% (501,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:44,776 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 502,000
+2025-06-18 16:49:44,777 - INFO - Progress: 50.2% (502,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:44,853 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 503,000
+2025-06-18 16:49:44,853 - INFO - Progress: 50.3% (503,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:44,928 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 504,000
+2025-06-18 16:49:44,928 - INFO - Progress: 50.4% (504,000/1,000,000) - ETA: 0.6 minutes
+2025-06-18 16:49:45,013 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 505,000
+2025-06-18 16:49:45,013 - INFO - Progress: 50.5% (505,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:45,093 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 506,000
+2025-06-18 16:49:45,093 - INFO - Progress: 50.6% (506,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:45,167 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 507,000
+2025-06-18 16:49:45,167 - INFO - Progress: 50.7% (507,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:45,238 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 508,000
+2025-06-18 16:49:45,238 - INFO - Progress: 50.8% (508,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:45,311 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 509,000
+2025-06-18 16:49:45,312 - INFO - Progress: 50.9% (509,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:45,387 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 510,000
+2025-06-18 16:49:45,387 - INFO - Progress: 51.0% (510,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:45,465 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 511,000
+2025-06-18 16:49:45,465 - INFO - Progress: 51.1% (511,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:45,547 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 512,000
+2025-06-18 16:49:45,547 - INFO - Progress: 51.2% (512,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:45,620 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 513,000
+2025-06-18 16:49:45,620 - INFO - Progress: 51.3% (513,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:45,693 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 514,000
+2025-06-18 16:49:45,694 - INFO - Progress: 51.4% (514,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:45,781 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 515,000
+2025-06-18 16:49:45,781 - INFO - Progress: 51.5% (515,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:45,858 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 516,000
+2025-06-18 16:49:45,858 - INFO - Progress: 51.6% (516,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:45,934 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 517,000
+2025-06-18 16:49:45,934 - INFO - Progress: 51.7% (517,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:46,006 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 518,000
+2025-06-18 16:49:46,007 - INFO - Progress: 51.8% (518,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:46,083 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 519,000
+2025-06-18 16:49:46,083 - INFO - Progress: 51.9% (519,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:46,155 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 520,000
+2025-06-18 16:49:46,156 - INFO - Progress: 52.0% (520,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:46,228 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 521,000
+2025-06-18 16:49:46,228 - INFO - Progress: 52.1% (521,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:46,301 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 522,000
+2025-06-18 16:49:46,302 - INFO - Progress: 52.2% (522,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:46,378 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 523,000
+2025-06-18 16:49:46,379 - INFO - Progress: 52.3% (523,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:46,462 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 524,000
+2025-06-18 16:49:46,463 - INFO - Progress: 52.4% (524,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:46,538 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 525,000
+2025-06-18 16:49:46,538 - INFO - Progress: 52.5% (525,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:46,615 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 526,000
+2025-06-18 16:49:46,615 - INFO - Progress: 52.6% (526,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:46,696 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 527,000
+2025-06-18 16:49:46,696 - INFO - Progress: 52.7% (527,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:46,772 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 528,000
+2025-06-18 16:49:46,772 - INFO - Progress: 52.8% (528,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:46,850 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 529,000
+2025-06-18 16:49:46,851 - INFO - Progress: 52.9% (529,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:46,926 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 530,000
+2025-06-18 16:49:46,926 - INFO - Progress: 53.0% (530,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:47,002 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 531,000
+2025-06-18 16:49:47,002 - INFO - Progress: 53.1% (531,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:47,087 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 532,000
+2025-06-18 16:49:47,087 - INFO - Progress: 53.2% (532,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:47,164 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 533,000
+2025-06-18 16:49:47,165 - INFO - Progress: 53.3% (533,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:47,246 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 534,000
+2025-06-18 16:49:47,246 - INFO - Progress: 53.4% (534,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:47,320 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 535,000
+2025-06-18 16:49:47,320 - INFO - Progress: 53.5% (535,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:47,399 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 536,000
+2025-06-18 16:49:47,400 - INFO - Progress: 53.6% (536,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:47,484 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 537,000
+2025-06-18 16:49:47,484 - INFO - Progress: 53.7% (537,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:47,567 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 538,000
+2025-06-18 16:49:47,567 - INFO - Progress: 53.8% (538,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:47,657 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 539,000
+2025-06-18 16:49:47,657 - INFO - Progress: 53.9% (539,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:47,738 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 540,000
+2025-06-18 16:49:47,738 - INFO - Progress: 54.0% (540,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:47,820 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 541,000
+2025-06-18 16:49:47,820 - INFO - Progress: 54.1% (541,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:47,930 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 542,000
+2025-06-18 16:49:47,930 - INFO - Progress: 54.2% (542,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:48,047 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 543,000
+2025-06-18 16:49:48,048 - INFO - Progress: 54.3% (543,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:48,200 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 544,000
+2025-06-18 16:49:48,200 - INFO - Progress: 54.4% (544,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:48,335 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 545,000
+2025-06-18 16:49:48,335 - INFO - Progress: 54.5% (545,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:48,431 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 546,000
+2025-06-18 16:49:48,432 - INFO - Progress: 54.6% (546,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:48,541 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 547,000
+2025-06-18 16:49:48,542 - INFO - Progress: 54.7% (547,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:48,638 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 548,000
+2025-06-18 16:49:48,638 - INFO - Progress: 54.8% (548,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:48,730 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 549,000
+2025-06-18 16:49:48,731 - INFO - Progress: 54.9% (549,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:48,825 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 550,000
+2025-06-18 16:49:48,826 - INFO - Progress: 55.0% (550,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:48,945 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 551,000
+2025-06-18 16:49:48,945 - INFO - Progress: 55.1% (551,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:49,074 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 552,000
+2025-06-18 16:49:49,074 - INFO - Progress: 55.2% (552,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:49,372 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 553,000
+2025-06-18 16:49:49,417 - INFO - Progress: 55.3% (553,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:49,599 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 554,000
+2025-06-18 16:49:49,600 - INFO - Progress: 55.4% (554,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:49,732 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 555,000
+2025-06-18 16:49:49,732 - INFO - Progress: 55.5% (555,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:49,847 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 556,000
+2025-06-18 16:49:49,847 - INFO - Progress: 55.6% (556,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:49,973 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 557,000
+2025-06-18 16:49:49,973 - INFO - Progress: 55.7% (557,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:50,116 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 558,000
+2025-06-18 16:49:50,116 - INFO - Progress: 55.8% (558,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:50,256 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 559,000
+2025-06-18 16:49:50,257 - INFO - Progress: 55.9% (559,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:50,386 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 560,000
+2025-06-18 16:49:50,386 - INFO - Progress: 56.0% (560,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:50,489 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 561,000
+2025-06-18 16:49:50,490 - INFO - Progress: 56.1% (561,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:50,579 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 562,000
+2025-06-18 16:49:50,579 - INFO - Progress: 56.2% (562,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:50,667 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 563,000
+2025-06-18 16:49:50,667 - INFO - Progress: 56.3% (563,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:50,771 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 564,000
+2025-06-18 16:49:50,771 - INFO - Progress: 56.4% (564,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:50,863 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 565,000
+2025-06-18 16:49:50,864 - INFO - Progress: 56.5% (565,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:50,952 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 566,000
+2025-06-18 16:49:50,953 - INFO - Progress: 56.6% (566,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:51,036 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 567,000
+2025-06-18 16:49:51,037 - INFO - Progress: 56.7% (567,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:51,115 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 568,000
+2025-06-18 16:49:51,115 - INFO - Progress: 56.8% (568,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:51,197 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 569,000
+2025-06-18 16:49:51,198 - INFO - Progress: 56.9% (569,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:51,292 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 570,000
+2025-06-18 16:49:51,292 - INFO - Progress: 57.0% (570,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:51,387 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 571,000
+2025-06-18 16:49:51,388 - INFO - Progress: 57.1% (571,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:51,468 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 572,000
+2025-06-18 16:49:51,468 - INFO - Progress: 57.2% (572,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:51,557 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 573,000
+2025-06-18 16:49:51,557 - INFO - Progress: 57.3% (573,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:51,640 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 574,000
+2025-06-18 16:49:51,640 - INFO - Progress: 57.4% (574,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:51,726 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 575,000
+2025-06-18 16:49:51,726 - INFO - Progress: 57.5% (575,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:51,812 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 576,000
+2025-06-18 16:49:51,812 - INFO - Progress: 57.6% (576,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:51,891 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 577,000
+2025-06-18 16:49:51,892 - INFO - Progress: 57.7% (577,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:51,972 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 578,000
+2025-06-18 16:49:51,973 - INFO - Progress: 57.8% (578,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:52,062 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 579,000
+2025-06-18 16:49:52,063 - INFO - Progress: 57.9% (579,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:52,146 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 580,000
+2025-06-18 16:49:52,146 - INFO - Progress: 58.0% (580,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:52,224 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 581,000
+2025-06-18 16:49:52,224 - INFO - Progress: 58.1% (581,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:52,305 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 582,000
+2025-06-18 16:49:52,305 - INFO - Progress: 58.2% (582,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:52,382 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 583,000
+2025-06-18 16:49:52,383 - INFO - Progress: 58.3% (583,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:52,457 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 584,000
+2025-06-18 16:49:52,457 - INFO - Progress: 58.4% (584,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:52,532 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 585,000
+2025-06-18 16:49:52,532 - INFO - Progress: 58.5% (585,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:52,608 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 586,000
+2025-06-18 16:49:52,608 - INFO - Progress: 58.6% (586,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:52,681 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 587,000
+2025-06-18 16:49:52,682 - INFO - Progress: 58.7% (587,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:52,760 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 588,000
+2025-06-18 16:49:52,761 - INFO - Progress: 58.8% (588,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:52,843 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 589,000
+2025-06-18 16:49:52,843 - INFO - Progress: 58.9% (589,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:52,932 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 590,000
+2025-06-18 16:49:52,932 - INFO - Progress: 59.0% (590,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:53,009 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 591,000
+2025-06-18 16:49:53,009 - INFO - Progress: 59.1% (591,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:53,086 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 592,000
+2025-06-18 16:49:53,086 - INFO - Progress: 59.2% (592,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:53,158 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 593,000
+2025-06-18 16:49:53,158 - INFO - Progress: 59.3% (593,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:53,256 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 594,000
+2025-06-18 16:49:53,256 - INFO - Progress: 59.4% (594,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:53,331 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 595,000
+2025-06-18 16:49:53,331 - INFO - Progress: 59.5% (595,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:53,411 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 596,000
+2025-06-18 16:49:53,412 - INFO - Progress: 59.6% (596,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:53,480 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 597,000
+2025-06-18 16:49:53,481 - INFO - Progress: 59.7% (597,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:53,549 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 598,000
+2025-06-18 16:49:53,549 - INFO - Progress: 59.8% (598,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:53,628 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 599,000
+2025-06-18 16:49:53,628 - INFO - Progress: 59.9% (599,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:53,705 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 600,000
+2025-06-18 16:49:53,705 - INFO - Progress: 60.0% (600,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:53,780 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 601,000
+2025-06-18 16:49:53,780 - INFO - Progress: 60.1% (601,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:53,872 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 602,000
+2025-06-18 16:49:53,873 - INFO - Progress: 60.2% (602,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:53,961 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 603,000
+2025-06-18 16:49:53,961 - INFO - Progress: 60.3% (603,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:54,049 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 604,000
+2025-06-18 16:49:54,050 - INFO - Progress: 60.4% (604,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:54,133 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 605,000
+2025-06-18 16:49:54,133 - INFO - Progress: 60.5% (605,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:54,219 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 606,000
+2025-06-18 16:49:54,219 - INFO - Progress: 60.6% (606,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:54,307 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 607,000
+2025-06-18 16:49:54,307 - INFO - Progress: 60.7% (607,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:54,392 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 608,000
+2025-06-18 16:49:54,393 - INFO - Progress: 60.8% (608,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:54,477 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 609,000
+2025-06-18 16:49:54,477 - INFO - Progress: 60.9% (609,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:54,561 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 610,000
+2025-06-18 16:49:54,562 - INFO - Progress: 61.0% (610,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:54,645 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 611,000
+2025-06-18 16:49:54,645 - INFO - Progress: 61.1% (611,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:54,730 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 612,000
+2025-06-18 16:49:54,730 - INFO - Progress: 61.2% (612,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:54,814 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 613,000
+2025-06-18 16:49:54,815 - INFO - Progress: 61.3% (613,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:54,896 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 614,000
+2025-06-18 16:49:54,896 - INFO - Progress: 61.4% (614,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:54,983 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 615,000
+2025-06-18 16:49:54,983 - INFO - Progress: 61.5% (615,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:55,067 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 616,000
+2025-06-18 16:49:55,068 - INFO - Progress: 61.6% (616,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:55,152 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 617,000
+2025-06-18 16:49:55,152 - INFO - Progress: 61.7% (617,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:55,231 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 618,000
+2025-06-18 16:49:55,231 - INFO - Progress: 61.8% (618,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:55,309 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 619,000
+2025-06-18 16:49:55,309 - INFO - Progress: 61.9% (619,000/1,000,000) - ETA: 0.5 minutes
+2025-06-18 16:49:55,392 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 620,000
+2025-06-18 16:49:55,392 - INFO - Progress: 62.0% (620,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:55,487 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 621,000
+2025-06-18 16:49:55,487 - INFO - Progress: 62.1% (621,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:55,586 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 622,000
+2025-06-18 16:49:55,586 - INFO - Progress: 62.2% (622,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:55,698 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 623,000
+2025-06-18 16:49:55,698 - INFO - Progress: 62.3% (623,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:55,891 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 624,000
+2025-06-18 16:49:55,891 - INFO - Progress: 62.4% (624,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:56,081 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 625,000
+2025-06-18 16:49:56,081 - INFO - Progress: 62.5% (625,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:56,208 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 626,000
+2025-06-18 16:49:56,208 - INFO - Progress: 62.6% (626,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:56,318 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 627,000
+2025-06-18 16:49:56,318 - INFO - Progress: 62.7% (627,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:56,405 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 628,000
+2025-06-18 16:49:56,405 - INFO - Progress: 62.8% (628,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:56,492 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 629,000
+2025-06-18 16:49:56,492 - INFO - Progress: 62.9% (629,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:56,572 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 630,000
+2025-06-18 16:49:56,573 - INFO - Progress: 63.0% (630,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:56,652 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 631,000
+2025-06-18 16:49:56,653 - INFO - Progress: 63.1% (631,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:56,727 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 632,000
+2025-06-18 16:49:56,728 - INFO - Progress: 63.2% (632,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:56,806 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 633,000
+2025-06-18 16:49:56,806 - INFO - Progress: 63.3% (633,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:56,880 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 634,000
+2025-06-18 16:49:56,880 - INFO - Progress: 63.4% (634,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:56,954 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 635,000
+2025-06-18 16:49:56,954 - INFO - Progress: 63.5% (635,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:57,030 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 636,000
+2025-06-18 16:49:57,030 - INFO - Progress: 63.6% (636,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:57,114 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 637,000
+2025-06-18 16:49:57,114 - INFO - Progress: 63.7% (637,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:57,189 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 638,000
+2025-06-18 16:49:57,189 - INFO - Progress: 63.8% (638,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:57,300 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 639,000
+2025-06-18 16:49:57,300 - INFO - Progress: 63.9% (639,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:57,408 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 640,000
+2025-06-18 16:49:57,409 - INFO - Progress: 64.0% (640,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:57,488 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 641,000
+2025-06-18 16:49:57,489 - INFO - Progress: 64.1% (641,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:57,566 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 642,000
+2025-06-18 16:49:57,567 - INFO - Progress: 64.2% (642,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:57,643 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 643,000
+2025-06-18 16:49:57,643 - INFO - Progress: 64.3% (643,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:57,723 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 644,000
+2025-06-18 16:49:57,724 - INFO - Progress: 64.4% (644,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:57,795 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 645,000
+2025-06-18 16:49:57,795 - INFO - Progress: 64.5% (645,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:57,873 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 646,000
+2025-06-18 16:49:57,873 - INFO - Progress: 64.6% (646,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:57,949 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 647,000
+2025-06-18 16:49:57,949 - INFO - Progress: 64.7% (647,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:58,029 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 648,000
+2025-06-18 16:49:58,030 - INFO - Progress: 64.8% (648,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:58,107 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 649,000
+2025-06-18 16:49:58,107 - INFO - Progress: 64.9% (649,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:58,188 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 650,000
+2025-06-18 16:49:58,188 - INFO - Progress: 65.0% (650,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:58,264 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 651,000
+2025-06-18 16:49:58,264 - INFO - Progress: 65.1% (651,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:58,336 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 652,000
+2025-06-18 16:49:58,336 - INFO - Progress: 65.2% (652,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:58,415 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 653,000
+2025-06-18 16:49:58,415 - INFO - Progress: 65.3% (653,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:58,491 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 654,000
+2025-06-18 16:49:58,491 - INFO - Progress: 65.4% (654,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:58,573 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 655,000
+2025-06-18 16:49:58,574 - INFO - Progress: 65.5% (655,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:58,651 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 656,000
+2025-06-18 16:49:58,651 - INFO - Progress: 65.6% (656,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:58,732 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 657,000
+2025-06-18 16:49:58,732 - INFO - Progress: 65.7% (657,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:58,803 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 658,000
+2025-06-18 16:49:58,804 - INFO - Progress: 65.8% (658,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:58,880 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 659,000
+2025-06-18 16:49:58,880 - INFO - Progress: 65.9% (659,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:58,958 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 660,000
+2025-06-18 16:49:58,958 - INFO - Progress: 66.0% (660,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:59,037 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 661,000
+2025-06-18 16:49:59,037 - INFO - Progress: 66.1% (661,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:59,135 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 662,000
+2025-06-18 16:49:59,135 - INFO - Progress: 66.2% (662,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:59,238 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 663,000
+2025-06-18 16:49:59,238 - INFO - Progress: 66.3% (663,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:59,324 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 664,000
+2025-06-18 16:49:59,324 - INFO - Progress: 66.4% (664,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:59,401 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 665,000
+2025-06-18 16:49:59,401 - INFO - Progress: 66.5% (665,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:59,473 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 666,000
+2025-06-18 16:49:59,473 - INFO - Progress: 66.6% (666,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:59,544 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 667,000
+2025-06-18 16:49:59,544 - INFO - Progress: 66.7% (667,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:59,623 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 668,000
+2025-06-18 16:49:59,623 - INFO - Progress: 66.8% (668,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:59,697 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 669,000
+2025-06-18 16:49:59,697 - INFO - Progress: 66.9% (669,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:59,770 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 670,000
+2025-06-18 16:49:59,770 - INFO - Progress: 67.0% (670,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:59,841 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 671,000
+2025-06-18 16:49:59,841 - INFO - Progress: 67.1% (671,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:59,916 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 672,000
+2025-06-18 16:49:59,917 - INFO - Progress: 67.2% (672,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:49:59,990 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 673,000
+2025-06-18 16:49:59,991 - INFO - Progress: 67.3% (673,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:00,083 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 674,000
+2025-06-18 16:50:00,084 - INFO - Progress: 67.4% (674,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:00,165 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 675,000
+2025-06-18 16:50:00,165 - INFO - Progress: 67.5% (675,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:00,239 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 676,000
+2025-06-18 16:50:00,239 - INFO - Progress: 67.6% (676,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:00,316 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 677,000
+2025-06-18 16:50:00,316 - INFO - Progress: 67.7% (677,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:00,396 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 678,000
+2025-06-18 16:50:00,396 - INFO - Progress: 67.8% (678,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:00,471 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 679,000
+2025-06-18 16:50:00,472 - INFO - Progress: 67.9% (679,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:00,549 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 680,000
+2025-06-18 16:50:00,549 - INFO - Progress: 68.0% (680,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:00,631 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 681,000
+2025-06-18 16:50:00,631 - INFO - Progress: 68.1% (681,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:00,706 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 682,000
+2025-06-18 16:50:00,706 - INFO - Progress: 68.2% (682,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:00,783 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 683,000
+2025-06-18 16:50:00,783 - INFO - Progress: 68.3% (683,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:00,863 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 684,000
+2025-06-18 16:50:00,863 - INFO - Progress: 68.4% (684,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:00,941 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 685,000
+2025-06-18 16:50:00,941 - INFO - Progress: 68.5% (685,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:01,010 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 686,000
+2025-06-18 16:50:01,010 - INFO - Progress: 68.6% (686,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:01,102 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 687,000
+2025-06-18 16:50:01,103 - INFO - Progress: 68.7% (687,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:01,196 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 688,000
+2025-06-18 16:50:01,196 - INFO - Progress: 68.8% (688,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:01,292 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 689,000
+2025-06-18 16:50:01,293 - INFO - Progress: 68.9% (689,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:01,374 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 690,000
+2025-06-18 16:50:01,374 - INFO - Progress: 69.0% (690,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:01,454 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 691,000
+2025-06-18 16:50:01,454 - INFO - Progress: 69.1% (691,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:01,527 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 692,000
+2025-06-18 16:50:01,528 - INFO - Progress: 69.2% (692,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:01,610 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 693,000
+2025-06-18 16:50:01,610 - INFO - Progress: 69.3% (693,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:01,686 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 694,000
+2025-06-18 16:50:01,686 - INFO - Progress: 69.4% (694,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:01,758 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 695,000
+2025-06-18 16:50:01,759 - INFO - Progress: 69.5% (695,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:01,852 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 696,000
+2025-06-18 16:50:01,852 - INFO - Progress: 69.6% (696,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:01,940 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 697,000
+2025-06-18 16:50:01,941 - INFO - Progress: 69.7% (697,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:02,014 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 698,000
+2025-06-18 16:50:02,015 - INFO - Progress: 69.8% (698,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:02,092 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 699,000
+2025-06-18 16:50:02,093 - INFO - Progress: 69.9% (699,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:02,179 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 700,000
+2025-06-18 16:50:02,179 - INFO - Progress: 70.0% (700,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:02,258 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 701,000
+2025-06-18 16:50:02,259 - INFO - Progress: 70.1% (701,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:02,330 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 702,000
+2025-06-18 16:50:02,331 - INFO - Progress: 70.2% (702,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:02,411 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 703,000
+2025-06-18 16:50:02,411 - INFO - Progress: 70.3% (703,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:02,493 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 704,000
+2025-06-18 16:50:02,493 - INFO - Progress: 70.4% (704,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:02,576 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 705,000
+2025-06-18 16:50:02,577 - INFO - Progress: 70.5% (705,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:02,657 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 706,000
+2025-06-18 16:50:02,657 - INFO - Progress: 70.6% (706,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:02,733 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 707,000
+2025-06-18 16:50:02,733 - INFO - Progress: 70.7% (707,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:02,804 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 708,000
+2025-06-18 16:50:02,804 - INFO - Progress: 70.8% (708,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:02,877 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 709,000
+2025-06-18 16:50:02,878 - INFO - Progress: 70.9% (709,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:02,949 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 710,000
+2025-06-18 16:50:02,950 - INFO - Progress: 71.0% (710,000/1,000,000) - ETA: 0.4 minutes
+2025-06-18 16:50:03,026 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 711,000
+2025-06-18 16:50:03,026 - INFO - Progress: 71.1% (711,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:03,098 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 712,000
+2025-06-18 16:50:03,098 - INFO - Progress: 71.2% (712,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:03,177 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 713,000
+2025-06-18 16:50:03,177 - INFO - Progress: 71.3% (713,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:03,257 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 714,000
+2025-06-18 16:50:03,258 - INFO - Progress: 71.4% (714,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:03,346 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 715,000
+2025-06-18 16:50:03,346 - INFO - Progress: 71.5% (715,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:03,429 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 716,000
+2025-06-18 16:50:03,429 - INFO - Progress: 71.6% (716,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:03,506 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 717,000
+2025-06-18 16:50:03,506 - INFO - Progress: 71.7% (717,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:03,615 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 718,000
+2025-06-18 16:50:03,615 - INFO - Progress: 71.8% (718,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:03,707 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 719,000
+2025-06-18 16:50:03,707 - INFO - Progress: 71.9% (719,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:03,804 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 720,000
+2025-06-18 16:50:03,804 - INFO - Progress: 72.0% (720,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:03,890 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 721,000
+2025-06-18 16:50:03,890 - INFO - Progress: 72.1% (721,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:03,970 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 722,000
+2025-06-18 16:50:03,970 - INFO - Progress: 72.2% (722,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:04,047 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 723,000
+2025-06-18 16:50:04,047 - INFO - Progress: 72.3% (723,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:04,126 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 724,000
+2025-06-18 16:50:04,126 - INFO - Progress: 72.4% (724,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:04,213 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 725,000
+2025-06-18 16:50:04,213 - INFO - Progress: 72.5% (725,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:04,302 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 726,000
+2025-06-18 16:50:04,302 - INFO - Progress: 72.6% (726,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:04,388 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 727,000
+2025-06-18 16:50:04,388 - INFO - Progress: 72.7% (727,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:04,472 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 728,000
+2025-06-18 16:50:04,472 - INFO - Progress: 72.8% (728,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:04,549 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 729,000
+2025-06-18 16:50:04,550 - INFO - Progress: 72.9% (729,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:04,632 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 730,000
+2025-06-18 16:50:04,633 - INFO - Progress: 73.0% (730,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:04,718 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 731,000
+2025-06-18 16:50:04,718 - INFO - Progress: 73.1% (731,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:04,795 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 732,000
+2025-06-18 16:50:04,796 - INFO - Progress: 73.2% (732,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:04,873 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 733,000
+2025-06-18 16:50:04,873 - INFO - Progress: 73.3% (733,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:04,955 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 734,000
+2025-06-18 16:50:04,956 - INFO - Progress: 73.4% (734,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:05,035 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 735,000
+2025-06-18 16:50:05,036 - INFO - Progress: 73.5% (735,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:05,137 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 736,000
+2025-06-18 16:50:05,138 - INFO - Progress: 73.6% (736,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:05,235 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 737,000
+2025-06-18 16:50:05,235 - INFO - Progress: 73.7% (737,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:05,326 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 738,000
+2025-06-18 16:50:05,326 - INFO - Progress: 73.8% (738,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:05,413 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 739,000
+2025-06-18 16:50:05,413 - INFO - Progress: 73.9% (739,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:05,508 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 740,000
+2025-06-18 16:50:05,508 - INFO - Progress: 74.0% (740,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:05,597 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 741,000
+2025-06-18 16:50:05,598 - INFO - Progress: 74.1% (741,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:05,678 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 742,000
+2025-06-18 16:50:05,679 - INFO - Progress: 74.2% (742,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:05,772 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 743,000
+2025-06-18 16:50:05,773 - INFO - Progress: 74.3% (743,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:05,858 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 744,000
+2025-06-18 16:50:05,858 - INFO - Progress: 74.4% (744,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:05,950 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 745,000
+2025-06-18 16:50:05,951 - INFO - Progress: 74.5% (745,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:06,037 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 746,000
+2025-06-18 16:50:06,037 - INFO - Progress: 74.6% (746,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:06,114 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 747,000
+2025-06-18 16:50:06,114 - INFO - Progress: 74.7% (747,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:06,198 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 748,000
+2025-06-18 16:50:06,199 - INFO - Progress: 74.8% (748,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:06,285 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 749,000
+2025-06-18 16:50:06,285 - INFO - Progress: 74.9% (749,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:06,371 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 750,000
+2025-06-18 16:50:06,372 - INFO - Progress: 75.0% (750,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:06,459 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 751,000
+2025-06-18 16:50:06,459 - INFO - Progress: 75.1% (751,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:06,536 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 752,000
+2025-06-18 16:50:06,536 - INFO - Progress: 75.2% (752,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:06,611 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 753,000
+2025-06-18 16:50:06,611 - INFO - Progress: 75.3% (753,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:06,682 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 754,000
+2025-06-18 16:50:06,683 - INFO - Progress: 75.4% (754,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:06,760 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 755,000
+2025-06-18 16:50:06,760 - INFO - Progress: 75.5% (755,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:06,843 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 756,000
+2025-06-18 16:50:06,843 - INFO - Progress: 75.6% (756,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:06,925 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 757,000
+2025-06-18 16:50:06,925 - INFO - Progress: 75.7% (757,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:07,011 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 758,000
+2025-06-18 16:50:07,011 - INFO - Progress: 75.8% (758,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:07,088 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 759,000
+2025-06-18 16:50:07,088 - INFO - Progress: 75.9% (759,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:07,174 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 760,000
+2025-06-18 16:50:07,175 - INFO - Progress: 76.0% (760,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:07,255 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 761,000
+2025-06-18 16:50:07,255 - INFO - Progress: 76.1% (761,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:07,337 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 762,000
+2025-06-18 16:50:07,338 - INFO - Progress: 76.2% (762,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:07,425 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 763,000
+2025-06-18 16:50:07,425 - INFO - Progress: 76.3% (763,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:07,509 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 764,000
+2025-06-18 16:50:07,509 - INFO - Progress: 76.4% (764,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:07,602 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 765,000
+2025-06-18 16:50:07,603 - INFO - Progress: 76.5% (765,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:07,688 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 766,000
+2025-06-18 16:50:07,689 - INFO - Progress: 76.6% (766,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:07,763 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 767,000
+2025-06-18 16:50:07,763 - INFO - Progress: 76.7% (767,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:07,844 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 768,000
+2025-06-18 16:50:07,844 - INFO - Progress: 76.8% (768,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:07,929 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 769,000
+2025-06-18 16:50:07,929 - INFO - Progress: 76.9% (769,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:08,004 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 770,000
+2025-06-18 16:50:08,005 - INFO - Progress: 77.0% (770,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:08,093 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 771,000
+2025-06-18 16:50:08,093 - INFO - Progress: 77.1% (771,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:08,183 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 772,000
+2025-06-18 16:50:08,183 - INFO - Progress: 77.2% (772,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:08,277 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 773,000
+2025-06-18 16:50:08,277 - INFO - Progress: 77.3% (773,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:08,375 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 774,000
+2025-06-18 16:50:08,375 - INFO - Progress: 77.4% (774,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:08,457 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 775,000
+2025-06-18 16:50:08,457 - INFO - Progress: 77.5% (775,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:08,536 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 776,000
+2025-06-18 16:50:08,537 - INFO - Progress: 77.6% (776,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:08,623 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 777,000
+2025-06-18 16:50:08,624 - INFO - Progress: 77.7% (777,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:08,695 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 778,000
+2025-06-18 16:50:08,695 - INFO - Progress: 77.8% (778,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:08,779 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 779,000
+2025-06-18 16:50:08,779 - INFO - Progress: 77.9% (779,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:08,857 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 780,000
+2025-06-18 16:50:08,857 - INFO - Progress: 78.0% (780,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:08,931 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 781,000
+2025-06-18 16:50:08,931 - INFO - Progress: 78.1% (781,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:09,011 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 782,000
+2025-06-18 16:50:09,012 - INFO - Progress: 78.2% (782,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:09,092 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 783,000
+2025-06-18 16:50:09,092 - INFO - Progress: 78.3% (783,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:09,180 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 784,000
+2025-06-18 16:50:09,180 - INFO - Progress: 78.4% (784,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:09,260 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 785,000
+2025-06-18 16:50:09,261 - INFO - Progress: 78.5% (785,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:09,341 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 786,000
+2025-06-18 16:50:09,341 - INFO - Progress: 78.6% (786,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:09,431 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 787,000
+2025-06-18 16:50:09,432 - INFO - Progress: 78.7% (787,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:09,515 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 788,000
+2025-06-18 16:50:09,515 - INFO - Progress: 78.8% (788,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:09,599 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 789,000
+2025-06-18 16:50:09,600 - INFO - Progress: 78.9% (789,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:09,681 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 790,000
+2025-06-18 16:50:09,682 - INFO - Progress: 79.0% (790,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:09,765 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 791,000
+2025-06-18 16:50:09,766 - INFO - Progress: 79.1% (791,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:09,849 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 792,000
+2025-06-18 16:50:09,849 - INFO - Progress: 79.2% (792,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:09,932 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 793,000
+2025-06-18 16:50:09,932 - INFO - Progress: 79.3% (793,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:10,005 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 794,000
+2025-06-18 16:50:10,005 - INFO - Progress: 79.4% (794,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:10,079 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 795,000
+2025-06-18 16:50:10,079 - INFO - Progress: 79.5% (795,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:10,150 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 796,000
+2025-06-18 16:50:10,150 - INFO - Progress: 79.6% (796,000/1,000,000) - ETA: 0.3 minutes
+2025-06-18 16:50:10,227 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 797,000
+2025-06-18 16:50:10,228 - INFO - Progress: 79.7% (797,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:10,303 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 798,000
+2025-06-18 16:50:10,303 - INFO - Progress: 79.8% (798,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:10,384 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 799,000
+2025-06-18 16:50:10,385 - INFO - Progress: 79.9% (799,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:10,478 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 800,000
+2025-06-18 16:50:10,478 - INFO - Progress: 80.0% (800,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:10,553 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 801,000
+2025-06-18 16:50:10,553 - INFO - Progress: 80.1% (801,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:10,637 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 802,000
+2025-06-18 16:50:10,638 - INFO - Progress: 80.2% (802,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:10,719 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 803,000
+2025-06-18 16:50:10,719 - INFO - Progress: 80.3% (803,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:10,797 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 804,000
+2025-06-18 16:50:10,797 - INFO - Progress: 80.4% (804,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:10,879 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 805,000
+2025-06-18 16:50:10,879 - INFO - Progress: 80.5% (805,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:10,963 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 806,000
+2025-06-18 16:50:10,964 - INFO - Progress: 80.6% (806,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:11,036 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 807,000
+2025-06-18 16:50:11,036 - INFO - Progress: 80.7% (807,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:11,111 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 808,000
+2025-06-18 16:50:11,112 - INFO - Progress: 80.8% (808,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:11,194 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 809,000
+2025-06-18 16:50:11,194 - INFO - Progress: 80.9% (809,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:11,271 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 810,000
+2025-06-18 16:50:11,272 - INFO - Progress: 81.0% (810,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:11,350 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 811,000
+2025-06-18 16:50:11,350 - INFO - Progress: 81.1% (811,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:11,426 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 812,000
+2025-06-18 16:50:11,426 - INFO - Progress: 81.2% (812,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:11,506 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 813,000
+2025-06-18 16:50:11,506 - INFO - Progress: 81.3% (813,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:11,584 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 814,000
+2025-06-18 16:50:11,584 - INFO - Progress: 81.4% (814,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:11,661 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 815,000
+2025-06-18 16:50:11,662 - INFO - Progress: 81.5% (815,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:11,742 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 816,000
+2025-06-18 16:50:11,742 - INFO - Progress: 81.6% (816,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:11,816 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 817,000
+2025-06-18 16:50:11,816 - INFO - Progress: 81.7% (817,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:11,888 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 818,000
+2025-06-18 16:50:11,888 - INFO - Progress: 81.8% (818,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:11,960 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 819,000
+2025-06-18 16:50:11,960 - INFO - Progress: 81.9% (819,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:12,031 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 820,000
+2025-06-18 16:50:12,031 - INFO - Progress: 82.0% (820,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:12,105 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 821,000
+2025-06-18 16:50:12,105 - INFO - Progress: 82.1% (821,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:12,183 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 822,000
+2025-06-18 16:50:12,184 - INFO - Progress: 82.2% (822,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:12,260 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 823,000
+2025-06-18 16:50:12,261 - INFO - Progress: 82.3% (823,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:12,335 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 824,000
+2025-06-18 16:50:12,336 - INFO - Progress: 82.4% (824,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:12,412 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 825,000
+2025-06-18 16:50:12,413 - INFO - Progress: 82.5% (825,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:12,508 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 826,000
+2025-06-18 16:50:12,508 - INFO - Progress: 82.6% (826,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:12,587 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 827,000
+2025-06-18 16:50:12,587 - INFO - Progress: 82.7% (827,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:12,671 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 828,000
+2025-06-18 16:50:12,672 - INFO - Progress: 82.8% (828,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:12,760 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 829,000
+2025-06-18 16:50:12,760 - INFO - Progress: 82.9% (829,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:12,840 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 830,000
+2025-06-18 16:50:12,841 - INFO - Progress: 83.0% (830,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:12,920 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 831,000
+2025-06-18 16:50:12,920 - INFO - Progress: 83.1% (831,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:13,002 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 832,000
+2025-06-18 16:50:13,002 - INFO - Progress: 83.2% (832,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:13,082 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 833,000
+2025-06-18 16:50:13,082 - INFO - Progress: 83.3% (833,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:13,161 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 834,000
+2025-06-18 16:50:13,161 - INFO - Progress: 83.4% (834,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:13,247 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 835,000
+2025-06-18 16:50:13,248 - INFO - Progress: 83.5% (835,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:13,330 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 836,000
+2025-06-18 16:50:13,330 - INFO - Progress: 83.6% (836,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:13,405 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 837,000
+2025-06-18 16:50:13,406 - INFO - Progress: 83.7% (837,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:13,484 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 838,000
+2025-06-18 16:50:13,485 - INFO - Progress: 83.8% (838,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:13,583 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 839,000
+2025-06-18 16:50:13,583 - INFO - Progress: 83.9% (839,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:13,674 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 840,000
+2025-06-18 16:50:13,675 - INFO - Progress: 84.0% (840,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:13,789 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 841,000
+2025-06-18 16:50:13,789 - INFO - Progress: 84.1% (841,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:13,898 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 842,000
+2025-06-18 16:50:13,898 - INFO - Progress: 84.2% (842,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:14,005 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 843,000
+2025-06-18 16:50:14,006 - INFO - Progress: 84.3% (843,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:14,087 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 844,000
+2025-06-18 16:50:14,087 - INFO - Progress: 84.4% (844,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:14,179 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 845,000
+2025-06-18 16:50:14,179 - INFO - Progress: 84.5% (845,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:14,262 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 846,000
+2025-06-18 16:50:14,262 - INFO - Progress: 84.6% (846,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:14,340 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 847,000
+2025-06-18 16:50:14,340 - INFO - Progress: 84.7% (847,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:14,432 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 848,000
+2025-06-18 16:50:14,433 - INFO - Progress: 84.8% (848,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:14,521 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 849,000
+2025-06-18 16:50:14,521 - INFO - Progress: 84.9% (849,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:14,613 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 850,000
+2025-06-18 16:50:14,613 - INFO - Progress: 85.0% (850,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:14,703 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 851,000
+2025-06-18 16:50:14,703 - INFO - Progress: 85.1% (851,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:14,816 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 852,000
+2025-06-18 16:50:14,816 - INFO - Progress: 85.2% (852,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:14,935 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 853,000
+2025-06-18 16:50:14,936 - INFO - Progress: 85.3% (853,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:15,022 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 854,000
+2025-06-18 16:50:15,023 - INFO - Progress: 85.4% (854,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:15,108 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 855,000
+2025-06-18 16:50:15,108 - INFO - Progress: 85.5% (855,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:15,192 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 856,000
+2025-06-18 16:50:15,193 - INFO - Progress: 85.6% (856,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:15,275 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 857,000
+2025-06-18 16:50:15,276 - INFO - Progress: 85.7% (857,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:15,360 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 858,000
+2025-06-18 16:50:15,361 - INFO - Progress: 85.8% (858,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:15,442 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 859,000
+2025-06-18 16:50:15,442 - INFO - Progress: 85.9% (859,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:15,519 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 860,000
+2025-06-18 16:50:15,519 - INFO - Progress: 86.0% (860,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:15,605 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 861,000
+2025-06-18 16:50:15,605 - INFO - Progress: 86.1% (861,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:15,695 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 862,000
+2025-06-18 16:50:15,696 - INFO - Progress: 86.2% (862,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:15,788 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 863,000
+2025-06-18 16:50:15,788 - INFO - Progress: 86.3% (863,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:15,878 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 864,000
+2025-06-18 16:50:15,878 - INFO - Progress: 86.4% (864,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:15,961 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 865,000
+2025-06-18 16:50:15,961 - INFO - Progress: 86.5% (865,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:16,044 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 866,000
+2025-06-18 16:50:16,044 - INFO - Progress: 86.6% (866,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:16,118 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 867,000
+2025-06-18 16:50:16,118 - INFO - Progress: 86.7% (867,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:16,203 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 868,000
+2025-06-18 16:50:16,203 - INFO - Progress: 86.8% (868,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:16,284 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 869,000
+2025-06-18 16:50:16,285 - INFO - Progress: 86.9% (869,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:16,368 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 870,000
+2025-06-18 16:50:16,370 - INFO - Progress: 87.0% (870,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:16,445 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 871,000
+2025-06-18 16:50:16,445 - INFO - Progress: 87.1% (871,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:16,529 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 872,000
+2025-06-18 16:50:16,529 - INFO - Progress: 87.2% (872,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:16,618 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 873,000
+2025-06-18 16:50:16,618 - INFO - Progress: 87.3% (873,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:16,709 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 874,000
+2025-06-18 16:50:16,709 - INFO - Progress: 87.4% (874,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:16,785 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 875,000
+2025-06-18 16:50:16,785 - INFO - Progress: 87.5% (875,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:16,864 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 876,000
+2025-06-18 16:50:16,865 - INFO - Progress: 87.6% (876,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:16,940 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 877,000
+2025-06-18 16:50:16,940 - INFO - Progress: 87.7% (877,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:17,014 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 878,000
+2025-06-18 16:50:17,014 - INFO - Progress: 87.8% (878,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:17,085 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 879,000
+2025-06-18 16:50:17,086 - INFO - Progress: 87.9% (879,000/1,000,000) - ETA: 0.2 minutes
+2025-06-18 16:50:17,161 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 880,000
+2025-06-18 16:50:17,161 - INFO - Progress: 88.0% (880,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:17,233 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 881,000
+2025-06-18 16:50:17,233 - INFO - Progress: 88.1% (881,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:17,304 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 882,000
+2025-06-18 16:50:17,304 - INFO - Progress: 88.2% (882,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:17,383 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 883,000
+2025-06-18 16:50:17,384 - INFO - Progress: 88.3% (883,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:17,462 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 884,000
+2025-06-18 16:50:17,462 - INFO - Progress: 88.4% (884,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:17,536 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 885,000
+2025-06-18 16:50:17,536 - INFO - Progress: 88.5% (885,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:17,613 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 886,000
+2025-06-18 16:50:17,613 - INFO - Progress: 88.6% (886,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:17,694 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 887,000
+2025-06-18 16:50:17,695 - INFO - Progress: 88.7% (887,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:17,766 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 888,000
+2025-06-18 16:50:17,766 - INFO - Progress: 88.8% (888,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:17,843 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 889,000
+2025-06-18 16:50:17,843 - INFO - Progress: 88.9% (889,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:17,916 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 890,000
+2025-06-18 16:50:17,916 - INFO - Progress: 89.0% (890,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:18,000 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 891,000
+2025-06-18 16:50:18,000 - INFO - Progress: 89.1% (891,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:18,082 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 892,000
+2025-06-18 16:50:18,082 - INFO - Progress: 89.2% (892,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:18,166 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 893,000
+2025-06-18 16:50:18,167 - INFO - Progress: 89.3% (893,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:18,251 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 894,000
+2025-06-18 16:50:18,251 - INFO - Progress: 89.4% (894,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:18,329 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 895,000
+2025-06-18 16:50:18,329 - INFO - Progress: 89.5% (895,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:18,422 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 896,000
+2025-06-18 16:50:18,422 - INFO - Progress: 89.6% (896,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:18,504 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 897,000
+2025-06-18 16:50:18,504 - INFO - Progress: 89.7% (897,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:18,585 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 898,000
+2025-06-18 16:50:18,585 - INFO - Progress: 89.8% (898,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:18,674 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 899,000
+2025-06-18 16:50:18,675 - INFO - Progress: 89.9% (899,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:18,758 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 900,000
+2025-06-18 16:50:18,759 - INFO - Progress: 90.0% (900,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:18,846 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 901,000
+2025-06-18 16:50:18,846 - INFO - Progress: 90.1% (901,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:18,928 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 902,000
+2025-06-18 16:50:18,928 - INFO - Progress: 90.2% (902,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:19,003 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 903,000
+2025-06-18 16:50:19,004 - INFO - Progress: 90.3% (903,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:19,098 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 904,000
+2025-06-18 16:50:19,099 - INFO - Progress: 90.4% (904,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:19,181 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 905,000
+2025-06-18 16:50:19,181 - INFO - Progress: 90.5% (905,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:19,261 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 906,000
+2025-06-18 16:50:19,261 - INFO - Progress: 90.6% (906,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:19,340 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 907,000
+2025-06-18 16:50:19,341 - INFO - Progress: 90.7% (907,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:19,421 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 908,000
+2025-06-18 16:50:19,421 - INFO - Progress: 90.8% (908,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:19,515 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 909,000
+2025-06-18 16:50:19,516 - INFO - Progress: 90.9% (909,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:19,601 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 910,000
+2025-06-18 16:50:19,601 - INFO - Progress: 91.0% (910,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:19,672 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 911,000
+2025-06-18 16:50:19,673 - INFO - Progress: 91.1% (911,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:19,767 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 912,000
+2025-06-18 16:50:19,768 - INFO - Progress: 91.2% (912,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:19,842 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 913,000
+2025-06-18 16:50:19,843 - INFO - Progress: 91.3% (913,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:19,932 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 914,000
+2025-06-18 16:50:19,933 - INFO - Progress: 91.4% (914,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:20,010 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 915,000
+2025-06-18 16:50:20,011 - INFO - Progress: 91.5% (915,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:20,103 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 916,000
+2025-06-18 16:50:20,103 - INFO - Progress: 91.6% (916,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:20,182 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 917,000
+2025-06-18 16:50:20,182 - INFO - Progress: 91.7% (917,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:20,266 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 918,000
+2025-06-18 16:50:20,266 - INFO - Progress: 91.8% (918,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:20,348 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 919,000
+2025-06-18 16:50:20,348 - INFO - Progress: 91.9% (919,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:20,430 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 920,000
+2025-06-18 16:50:20,430 - INFO - Progress: 92.0% (920,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:20,516 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 921,000
+2025-06-18 16:50:20,517 - INFO - Progress: 92.1% (921,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:20,615 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 922,000
+2025-06-18 16:50:20,616 - INFO - Progress: 92.2% (922,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:20,740 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 923,000
+2025-06-18 16:50:20,740 - INFO - Progress: 92.3% (923,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:20,845 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 924,000
+2025-06-18 16:50:20,845 - INFO - Progress: 92.4% (924,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:20,995 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 925,000
+2025-06-18 16:50:20,996 - INFO - Progress: 92.5% (925,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:21,098 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 926,000
+2025-06-18 16:50:21,098 - INFO - Progress: 92.6% (926,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:21,196 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 927,000
+2025-06-18 16:50:21,197 - INFO - Progress: 92.7% (927,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:21,292 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 928,000
+2025-06-18 16:50:21,292 - INFO - Progress: 92.8% (928,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:21,406 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 929,000
+2025-06-18 16:50:21,407 - INFO - Progress: 92.9% (929,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:21,508 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 930,000
+2025-06-18 16:50:21,508 - INFO - Progress: 93.0% (930,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:21,596 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 931,000
+2025-06-18 16:50:21,597 - INFO - Progress: 93.1% (931,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:21,683 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 932,000
+2025-06-18 16:50:21,683 - INFO - Progress: 93.2% (932,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:21,783 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 933,000
+2025-06-18 16:50:21,783 - INFO - Progress: 93.3% (933,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:21,861 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 934,000
+2025-06-18 16:50:21,861 - INFO - Progress: 93.4% (934,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:21,946 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 935,000
+2025-06-18 16:50:21,946 - INFO - Progress: 93.5% (935,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:22,026 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 936,000
+2025-06-18 16:50:22,026 - INFO - Progress: 93.6% (936,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:22,104 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 937,000
+2025-06-18 16:50:22,105 - INFO - Progress: 93.7% (937,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:22,187 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 938,000
+2025-06-18 16:50:22,187 - INFO - Progress: 93.8% (938,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:22,265 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 939,000
+2025-06-18 16:50:22,265 - INFO - Progress: 93.9% (939,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:22,349 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 940,000
+2025-06-18 16:50:22,349 - INFO - Progress: 94.0% (940,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:22,439 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 941,000
+2025-06-18 16:50:22,439 - INFO - Progress: 94.1% (941,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:22,522 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 942,000
+2025-06-18 16:50:22,522 - INFO - Progress: 94.2% (942,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:22,601 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 943,000
+2025-06-18 16:50:22,602 - INFO - Progress: 94.3% (943,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:22,691 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 944,000
+2025-06-18 16:50:22,691 - INFO - Progress: 94.4% (944,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:22,778 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 945,000
+2025-06-18 16:50:22,778 - INFO - Progress: 94.5% (945,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:22,871 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 946,000
+2025-06-18 16:50:22,871 - INFO - Progress: 94.6% (946,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:22,970 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 947,000
+2025-06-18 16:50:22,970 - INFO - Progress: 94.7% (947,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:23,067 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 948,000
+2025-06-18 16:50:23,068 - INFO - Progress: 94.8% (948,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:23,157 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 949,000
+2025-06-18 16:50:23,157 - INFO - Progress: 94.9% (949,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:23,278 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 950,000
+2025-06-18 16:50:23,278 - INFO - Progress: 95.0% (950,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:23,369 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 951,000
+2025-06-18 16:50:23,369 - INFO - Progress: 95.1% (951,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:23,491 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 952,000
+2025-06-18 16:50:23,491 - INFO - Progress: 95.2% (952,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:23,585 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 953,000
+2025-06-18 16:50:23,586 - INFO - Progress: 95.3% (953,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:23,670 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 954,000
+2025-06-18 16:50:23,670 - INFO - Progress: 95.4% (954,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:23,761 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 955,000
+2025-06-18 16:50:23,761 - INFO - Progress: 95.5% (955,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:23,852 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 956,000
+2025-06-18 16:50:23,852 - INFO - Progress: 95.6% (956,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:23,933 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 957,000
+2025-06-18 16:50:23,934 - INFO - Progress: 95.7% (957,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:24,010 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 958,000
+2025-06-18 16:50:24,010 - INFO - Progress: 95.8% (958,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:24,080 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 959,000
+2025-06-18 16:50:24,081 - INFO - Progress: 95.9% (959,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:24,166 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 960,000
+2025-06-18 16:50:24,167 - INFO - Progress: 96.0% (960,000/1,000,000) - ETA: 0.1 minutes
+2025-06-18 16:50:24,249 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 961,000
+2025-06-18 16:50:24,249 - INFO - Progress: 96.1% (961,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:24,337 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 962,000
+2025-06-18 16:50:24,338 - INFO - Progress: 96.2% (962,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:24,424 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 963,000
+2025-06-18 16:50:24,425 - INFO - Progress: 96.3% (963,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:24,509 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 964,000
+2025-06-18 16:50:24,509 - INFO - Progress: 96.4% (964,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:24,602 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 965,000
+2025-06-18 16:50:24,603 - INFO - Progress: 96.5% (965,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:24,676 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 966,000
+2025-06-18 16:50:24,677 - INFO - Progress: 96.6% (966,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:24,753 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 967,000
+2025-06-18 16:50:24,754 - INFO - Progress: 96.7% (967,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:24,845 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 968,000
+2025-06-18 16:50:24,846 - INFO - Progress: 96.8% (968,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:24,934 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 969,000
+2025-06-18 16:50:24,934 - INFO - Progress: 96.9% (969,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:25,017 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 970,000
+2025-06-18 16:50:25,018 - INFO - Progress: 97.0% (970,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:25,096 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 971,000
+2025-06-18 16:50:25,096 - INFO - Progress: 97.1% (971,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:25,183 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 972,000
+2025-06-18 16:50:25,184 - INFO - Progress: 97.2% (972,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:25,269 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 973,000
+2025-06-18 16:50:25,269 - INFO - Progress: 97.3% (973,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:25,361 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 974,000
+2025-06-18 16:50:25,361 - INFO - Progress: 97.4% (974,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:25,449 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 975,000
+2025-06-18 16:50:25,449 - INFO - Progress: 97.5% (975,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:25,532 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 976,000
+2025-06-18 16:50:25,532 - INFO - Progress: 97.6% (976,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:25,615 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 977,000
+2025-06-18 16:50:25,615 - INFO - Progress: 97.7% (977,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:25,695 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 978,000
+2025-06-18 16:50:25,695 - INFO - Progress: 97.8% (978,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:25,775 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 979,000
+2025-06-18 16:50:25,776 - INFO - Progress: 97.9% (979,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:25,850 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 980,000
+2025-06-18 16:50:25,850 - INFO - Progress: 98.0% (980,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:25,927 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 981,000
+2025-06-18 16:50:25,928 - INFO - Progress: 98.1% (981,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:26,011 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 982,000
+2025-06-18 16:50:26,011 - INFO - Progress: 98.2% (982,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:26,104 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 983,000
+2025-06-18 16:50:26,104 - INFO - Progress: 98.3% (983,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:26,191 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 984,000
+2025-06-18 16:50:26,192 - INFO - Progress: 98.4% (984,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:26,286 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 985,000
+2025-06-18 16:50:26,287 - INFO - Progress: 98.5% (985,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:26,372 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 986,000
+2025-06-18 16:50:26,372 - INFO - Progress: 98.6% (986,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:26,454 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 987,000
+2025-06-18 16:50:26,454 - INFO - Progress: 98.7% (987,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:26,535 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 988,000
+2025-06-18 16:50:26,535 - INFO - Progress: 98.8% (988,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:26,611 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 989,000
+2025-06-18 16:50:26,611 - INFO - Progress: 98.9% (989,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:26,690 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 990,000
+2025-06-18 16:50:26,690 - INFO - Progress: 99.0% (990,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:26,763 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 991,000
+2025-06-18 16:50:26,763 - INFO - Progress: 99.1% (991,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:26,858 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 992,000
+2025-06-18 16:50:26,858 - INFO - Progress: 99.2% (992,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:26,954 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 993,000
+2025-06-18 16:50:26,954 - INFO - Progress: 99.3% (993,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:27,051 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 994,000
+2025-06-18 16:50:27,051 - INFO - Progress: 99.4% (994,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:27,133 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 995,000
+2025-06-18 16:50:27,133 - INFO - Progress: 99.5% (995,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:27,228 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 996,000
+2025-06-18 16:50:27,229 - INFO - Progress: 99.6% (996,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:27,321 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 997,000
+2025-06-18 16:50:27,321 - INFO - Progress: 99.7% (997,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:27,397 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 998,000
+2025-06-18 16:50:27,397 - INFO - Progress: 99.8% (998,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:27,501 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 999,000
+2025-06-18 16:50:27,502 - INFO - Progress: 99.9% (999,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:27,587 - INFO - Inserted batch of 1000 Q&A pairs. Total generated: 1,000,000
+2025-06-18 16:50:27,587 - INFO - Progress: 100.0% (1,000,000/1,000,000) - ETA: 0.0 minutes
+2025-06-18 16:50:27,660 - INFO - Current Q&A pairs in database: 1,000,000
+2025-06-18 16:50:27,660 - INFO - Training completed!
+2025-06-18 16:50:27,660 - INFO - Total Q&A pairs in database: 1,000,000
+2025-06-18 16:50:27,661 - INFO - Total time: 1.3 minutes
+2025-06-18 16:50:27,661 - INFO - Average speed: 13111 Q&A pairs per second
+2025-06-18 16:50:27,793 - INFO - Jarvis AI training completed successfully!
+2025-06-18 16:50:27,794 - INFO - Database connection closed

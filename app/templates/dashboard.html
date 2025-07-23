@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{# Import Dashboard Components #}
+{% import 'components/dashboard/dashboard_styles.html' as dashboard_styles %}
+{% import 'components/dashboard/dashboard_head.html' as dashboard_head %}
+{% import 'components/dashboard/dashboard_header.html' as dashboard_header %}
+{% import 'components/dashboard/dashboard_main.html' as dashboard_main %}
+{% import 'components/dashboard/dashboard_scripts.html' as dashboard_scripts %}
+
+{% block head %}
+{{ dashboard_head.render_dashboard_head(current_user) }}
+{% endblock %}
+
+{% block content %}
+<!-- Discord-like Dark Dashboard Layout -->
+<div class="discord-dashboard">
+    <!-- Server Sidebar (Discord-like) -->
+    <div class="server-sidebar">
+        <div class="server-icon active" title="Service Desk">
+            <i class="bi bi-headset"></i>
+        </div>
+        <div class="server-icon" title="Tickets">
+            <i class="bi bi-ticket"></i>
+        </div>
+        <div class="server-icon" title="Users">
+            <i class="bi bi-people"></i>
+        </div>
+        <div class="server-icon" title="Reports">
+            <i class="bi bi-graph-up"></i>
+        </div>
+        <div class="server-icon" title="Settings">
+            <i class="bi bi-gear"></i>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- Channel Header (Discord-like) -->
+        <div class="channel-header">
+            <div class="channel-info">
+                <div class="channel-icon">
+                    <i class="bi bi-hash"></i>
+                </div>
+                <div class="channel-details">
+                    <h1 class="channel-name">Service Desk Dashboard</h1>
+                    <p class="channel-description">Real-time monitoring and analytics</p>
+                </div>
+            </div>
+            <div class="channel-actions">
+                <div class="search-container">
+                    <div class="search-input-wrapper">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="text" id="dashboardSearchInput" class="search-input" placeholder="Search tickets, users, reports...">
+                        <button id="searchClearBtn" class="search-clear" style="display: none;">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                    <div id="dashboardSearchResults" class="search-results" style="display: none;">
+                        <div class="search-results-header">
+                            <span id="dashboardResultsCount">0 results</span>
+                        </div>
+                        <div id="dashboardResultsContent" class="search-results-content"></div>
+                    </div>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <img src="{{ current_user.avatar_url or '/static/images/default-avatar.png' }}" alt="{{ current_user.name }}">
+                        <div class="user-status online"></div>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">{{ current_user.name }}</span>
+                        <span class="user-role">{{ current_user.role or 'Service Desk Agent' }}</span>
+                    </div>
+                    <button class="notification-btn" id="notificationBtn">
+                        <i class="bi bi-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Stats Overview -->
+            <div class="stats-overview">
+                <div class="stat-card primary">
+                    <div class="stat-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="totalUsers">156</div>
+                        <div class="stat-label">Total Users</div>
+                        <div class="stat-change positive" id="totalUsersChange">
+                            <i class="bi bi-arrow-up"></i>
+                            <span>+5.2%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card success">
+                    <div class="stat-icon">
+                        <i class="bi bi-activity"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="activeSessions">23</div>
+                        <div class="stat-label">Active Sessions</div>
+                        <div class="stat-change positive" id="activeSessionsChange">
+                            <i class="bi bi-arrow-up"></i>
+                            <span>+2.1%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card info">
+                    <div class="stat-icon">
+                        <i class="bi bi-wifi"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="onlineUsers">23</div>
+                        <div class="stat-label">Online Users</div>
+                        <div class="stat-change positive" id="onlineUsersChange">
+                            <i class="bi bi-arrow-up"></i>
+                            <span>+1.8%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card warning">
+                    <div class="stat-icon">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="systemLoad">45%</div>
+                        <div class="stat-label">System Load</div>
+                        <div class="stat-change negative" id="systemLoadChange">
+                            <i class="bi bi-arrow-down"></i>
+                            <span>-2.3%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="content-grid">
+                <!-- Tickets Chart -->
+                <div class="content-card large">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="bi bi-graph-up"></i>
+                            <span>Tickets Closed Today</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-icon" id="refreshTicketsChart" title="Refresh">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                            <button class="btn-icon" id="exportTicketsData" title="Export">
+                                <i class="bi bi-download"></i>
+                            </button>
+                            <a href="/tickets" class="btn-primary">View All</a>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="ticketsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="bi bi-clock-history"></i>
+                            <span>Recent Activity</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-icon" id="refreshActivity" title="Refresh">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                            <button class="btn-icon" id="filterActivity" title="Filter">
+                                <i class="bi bi-funnel"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="activity-feed">
+                        <div class="activity-item">
+                            <div class="activity-avatar">OS</div>
+                            <div class="activity-content">
+                                <div class="activity-text">
+                                    <strong>Oscar Solis</strong> closed ticket 
+                                    <span class="ticket-link">INC#2025-001</span>
+                                </div>
+                                <div class="activity-time">2 minutes ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-avatar">AC</div>
+                            <div class="activity-content">
+                                <div class="activity-text">
+                                    <strong>Abigail Curry</strong> closed ticket 
+                                    <span class="ticket-link">INC#2025-002</span>
+                                </div>
+                                <div class="activity-time">15 minutes ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-avatar">MJ</div>
+                            <div class="activity-content">
+                                <div class="activity-text">
+                                    <strong>Mike Johnson</strong> closed ticket 
+                                    <span class="ticket-link">INC#2025-003</span>
+                                </div>
+                                <div class="activity-time">1 hour ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-avatar">SL</div>
+                            <div class="activity-content">
+                                <div class="activity-text">
+                                    <strong>Sarah Lee</strong> closed ticket 
+                                    <span class="ticket-link">INC#2025-004</span>
+                                </div>
+                                <div class="activity-time">2 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-avatar">RK</div>
+                            <div class="activity-content">
+                                <div class="activity-text">
+                                    <strong>Robert Kim</strong> closed ticket 
+                                    <span class="ticket-link">INC#2025-005</span>
+                                </div>
+                                <div class="activity-time">3 hours ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secondary Content Grid -->
+            <div class="content-grid">
+                <!-- User Distribution -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="bi bi-pie-chart"></i>
+                            <span>User Distribution</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn-icon" id="refreshUserDistribution" title="Refresh">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                            <button class="btn-icon" id="exportUserData" title="Export">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="userDistributionChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="bi bi-lightning"></i>
+                            <span>Quick Actions</span>
+                        </div>
+                    </div>
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" data-action="add-user">
+                            <i class="bi bi-person-plus"></i>
+                            <span>Add User</span>
+                        </button>
+                        <button class="quick-action-btn success" data-action="new-ticket">
+                            <i class="bi bi-ticket"></i>
+                            <span>New Ticket</span>
+                        </button>
+                        <button class="quick-action-btn info" data-action="create-report">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <span>Create Report</span>
+                        </button>
+                        <button class="quick-action-btn warning" data-action="settings">
+                            <i class="bi bi-gear"></i>
+                            <span>Settings</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="content-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="bi bi-server"></i>
+                        <span>System Status</span>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-icon" id="refreshSystemMetrics" title="Refresh">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="system-metrics">
+                    <div class="system-metric" id="cpuMetric">
+                        <div class="metric-icon">
+                            <i class="bi bi-cpu"></i>
+                        </div>
+                        <div class="metric-info">
+                            <div class="metric-label">CPU Usage</div>
+                            <div class="metric-value" id="realCpuUsage">45%</div>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-progress" style="width: 45%"></div>
+                        </div>
+                    </div>
+                    <div class="system-metric" id="memoryMetric">
+                        <div class="metric-icon">
+                            <i class="bi bi-memory"></i>
+                        </div>
+                        <div class="metric-info">
+                            <div class="metric-label">Memory Usage</div>
+                            <div class="metric-value" id="realMemoryUsage">62%</div>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-progress" style="width: 62%"></div>
+                        </div>
+                    </div>
+                    <div class="system-metric" id="diskMetric">
+                        <div class="metric-icon">
+                            <i class="bi bi-hdd"></i>
+                        </div>
+                        <div class="metric-info">
+                            <div class="metric-label">Disk Usage</div>
+                            <div class="metric-value" id="realDiskUsage">78%</div>
+                        </div>
+                        <div class="metric-bar">
+                            <div class="metric-progress" style="width: 78%"></div>
+                        </div>
+                    </div>
+                    <div class="system-metric" id="networkMetric">
+                        <div class="metric-icon">
+                            <i class="bi bi-wifi"></i>
+                        </div>
+                        <div class="metric-info">
+                            <div class="metric-label">Network</div>
+                            <div class="metric-value" id="realNetworkStatus">Connected</div>
+                        </div>
+                        <div class="metric-status online"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ dashboard_scripts.render_dashboard_scripts() }}
+{% endblock %}

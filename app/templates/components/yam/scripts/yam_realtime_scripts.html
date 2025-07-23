@@ -1,0 +1,314 @@
+<!-- Real-time Update System -->
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+<script>
+// Real-time update system for YAM Dashboard
+window.yamRealtime = {
+    socket: null,
+    realTimeUpdates: true,
+    lastUpdate: Date.now(),
+    
+    // Setup real-time updates with Socket.IO
+    setupRealTimeUpdates() {
+        try {
+            // Initialize Socket.IO connection
+            this.socket = io({
+                transports: ['polling', 'websocket'],
+                upgrade: true,
+                rememberUpgrade: true,
+                timeout: 20000,
+                forceNew: false
+            });
+            
+            // Connection events
+            this.socket.on('connect', () => {
+                console.log('🔌 YAM Dashboard: Real-time connection established');
+                this.updateConnectionStatus(true);
+                this.requestInitialData();
+            });
+            
+            this.socket.on('disconnect', () => {
+                console.log('🔌 YAM Dashboard: Real-time connection lost');
+                this.updateConnectionStatus(false);
+            });
+            
+            this.socket.on('connect_error', (error) => {
+                console.warn('🔌 YAM Dashboard: Connection error:', error);
+                this.updateConnectionStatus(false);
+            });
+            
+            // Real-time update events
+            this.socket.on('dashboard_update', (data) => {
+                console.log('🔄 YAM Dashboard: Received real-time update:', data);
+                this.handleDashboardUpdate(data);
+            });
+            
+            this.socket.on('user_status_update', (data) => {
+                console.log('👤 YAM Dashboard: User status update:', data);
+                this.handleUserStatusUpdate(data);
+            });
+            
+            this.socket.on('system_health_update', (data) => {
+                console.log('💚 YAM Dashboard: System health update:', data);
+                this.handleSystemHealthUpdate(data);
+            });
+            
+            this.socket.on('notification_update', (data) => {
+                console.log('🔔 YAM Dashboard: Notification update:', data);
+                this.handleNotificationUpdate(data);
+            });
+            
+            // File change events (for development)
+            this.socket.on('file_changed', (data) => {
+                console.log('📁 YAM Dashboard: File change detected:', data);
+                this.handleFileChange(data);
+            });
+            
+            this.socket.on('browser_refresh', (data) => {
+                console.log('🔄 YAM Dashboard: Browser refresh requested:', data);
+                this.handleBrowserRefresh(data);
+            });
+            
+            // Heartbeat for connection health
+            this.socket.on('heartbeat', (data) => {
+                this.lastUpdate = Date.now();
+                this.socket.emit('heartbeat_ack', { timestamp: Date.now() });
+            });
+            
+            console.log('🔌 YAM Dashboard: Real-time update system initialized');
+            
+        } catch (error) {
+            console.error('🔌 YAM Dashboard: Failed to setup real-time updates:', error);
+            this.realTimeUpdates = false;
+        }
+    },
+    
+    // Request initial data from server
+    requestInitialData() {
+        if (!this.socket || !this.socket.connected) return;
+        
+        this.socket.emit('request_dashboard_data', {
+            components: ['quick_stats', 'user_analytics', 'system_health', 'notifications'],
+            timestamp: Date.now()
+        });
+    },
+    
+    // Handle dashboard updates
+    handleDashboardUpdate(data) {
+        try {
+            if (data.components) {
+                Object.keys(data.components).forEach(componentName => {
+                    const component = window.yamDashboard.getComponent(componentName);
+                    if (component && typeof component.update === 'function') {
+                        component.update(data.components[componentName]);
+                    }
+                });
+            }
+            
+            // Update last update timestamp
+            this.lastUpdate = Date.now();
+            this.updateLastUpdatedDisplay();
+            
+        } catch (error) {
+            console.error('YAM Dashboard: Error handling dashboard update:', error);
+        }
+    },
+    
+    // Handle user status updates
+    handleUserStatusUpdate(data) {
+        try {
+            // Update user presence indicators
+            const userElements = document.querySelectorAll('[data-user-id]');
+            userElements.forEach(element => {
+                const userId = element.getAttribute('data-user-id');
+                if (data.users && data.users[userId]) {
+                    const userData = data.users[userId];
+                    this.updateUserElement(element, userData);
+                }
+            });
+            
+            // Update online user count
+            if (data.online_count !== undefined) {
+                const onlineCountElement = document.getElementById('online-user-count');
+                if (onlineCountElement) {
+                    onlineCountElement.textContent = data.online_count;
+                }
+            }
+            
+        } catch (error) {
+            console.error('YAM Dashboard: Error handling user status update:', error);
+        }
+    },
+    
+    // Handle system health updates
+    handleSystemHealthUpdate(data) {
+        try {
+            // Update system health indicators
+            if (data.metrics) {
+                Object.keys(data.metrics).forEach(metricName => {
+                    const element = document.getElementById(`system-${metricName}`);
+                    if (element) {
+                        element.textContent = data.metrics[metricName];
+                        element.className = `system-metric ${data.status || 'normal'}`;
+                    }
+                });
+            }
+            
+            // Update status indicators
+            if (data.status_indicators) {
+                Object.keys(data.status_indicators).forEach(indicatorName => {
+                    const element = document.getElementById(`status-${indicatorName}`);
+                    if (element) {
+                        element.className = `status-indicator ${data.status_indicators[indicatorName]}`;
+                    }
+                });
+            }
+            
+        } catch (error) {
+            console.error('YAM Dashboard: Error handling system health update:', error);
+        }
+    },
+    
+    // Handle notification updates
+    handleNotificationUpdate(data) {
+        try {
+            // Update notification count
+            if (data.count !== undefined) {
+                const notificationCountElement = document.getElementById('notification-count');
+                if (notificationCountElement) {
+                    notificationCountElement.textContent = data.count;
+                    notificationCountElement.style.display = data.count > 0 ? 'block' : 'none';
+                }
+            }
+            
+            // Show new notifications
+            if (data.notifications && data.notifications.length > 0) {
+                data.notifications.forEach(notification => {
+                    this.showNotification(notification);
+                });
+            }
+            
+        } catch (error) {
+            console.error('YAM Dashboard: Error handling notification update:', error);
+        }
+    },
+    
+    // Handle file changes (development mode)
+    handleFileChange(data) {
+        try {
+            // Show file change notification
+            this.showNotification({
+                type: 'info',
+                title: 'File Changed',
+                message: `${data.file_path} has been updated`,
+                duration: 3000
+            });
+            
+            // For template changes, offer to refresh
+            if (data.file_type === 'template') {
+                if (confirm('Template file changed. Refresh the page?')) {
+                    window.location.reload();
+                }
+            }
+            
+        } catch (error) {
+            console.error('YAM Dashboard: Error handling file change:', error);
+        }
+    },
+    
+    // Handle browser refresh requests
+    handleBrowserRefresh(data) {
+        try {
+            console.log('🔄 YAM Dashboard: Refreshing page due to file change');
+            window.location.reload();
+        } catch (error) {
+            console.error('YAM Dashboard: Error handling browser refresh:', error);
+        }
+    },
+    
+    // Update connection status display
+    updateConnectionStatus(connected) {
+        const statusElement = document.getElementById('connection-status');
+        if (statusElement) {
+            statusElement.className = `connection-status ${connected ? 'connected' : 'disconnected'}`;
+            statusElement.textContent = connected ? '🟢 Connected' : '🔴 Disconnected';
+        }
+        
+        // Update dashboard container
+        const dashboardContainer = document.getElementById('yamContainer');
+        if (dashboardContainer) {
+            dashboardContainer.classList.toggle('realtime-connected', connected);
+        }
+    },
+    
+    // Update user element with new data
+    updateUserElement(element, userData) {
+        try {
+            // Update online status
+            const onlineIndicator = element.querySelector('.online-indicator');
+            if (onlineIndicator) {
+                onlineIndicator.className = `online-indicator ${userData.is_online ? 'online' : 'offline'}`;
+            }
+            
+            // Update last seen
+            const lastSeenElement = element.querySelector('.last-seen');
+            if (lastSeenElement && userData.last_seen_human) {
+                lastSeenElement.textContent = userData.last_seen_human;
+            }
+            
+            // Update status
+            const statusElement = element.querySelector('.user-status');
+            if (statusElement && userData.status) {
+                statusElement.textContent = userData.status;
+                statusElement.className = `user-status ${userData.status}`;
+            }
+            
+        } catch (error) {
+            console.error('YAM Dashboard: Error updating user element:', error);
+        }
+    },
+    
+    // Show notification
+    showNotification(notification) {
+        try {
+            // Create notification element
+            const notificationElement = document.createElement('div');
+            notificationElement.className = `yam-notification ${notification.type || 'info'}`;
+            notificationElement.innerHTML = `
+                <div class="notification-header">
+                    <span class="notification-title">${notification.title || 'Notification'}</span>
+                    <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+                </div>
+                <div class="notification-message">${notification.message || ''}</div>
+            `;
+            
+            // Add to notification container
+            const container = document.getElementById('notification-container') || document.body;
+            container.appendChild(notificationElement);
+            
+            // Auto-remove after duration
+            if (notification.duration) {
+                setTimeout(() => {
+                    if (notificationElement.parentElement) {
+                        notificationElement.remove();
+                    }
+                }, notification.duration);
+            }
+            
+        } catch (error) {
+            console.error('YAM Dashboard: Error showing notification:', error);
+        }
+    },
+    
+    // Update last updated display
+    updateLastUpdatedDisplay() {
+        const lastUpdatedElements = document.querySelectorAll('.last-updated');
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        
+        lastUpdatedElements.forEach(element => {
+            element.textContent = `Last updated: ${timeString}`;
+        });
+    }
+};
+</script> 

@@ -1,0 +1,1063 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"/>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='assets/styles.css') }}" />
+<style>
+    :root {
+        --primary-bg: #1a1d24;
+        --secondary-bg: #23272f;
+        --card-bg: #262D47;
+        --text-primary: #ffffff;
+        --text-secondary: #8b95a5;
+        --accent-color: #0d6efd;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+    }
+
+    html, body {
+        background: var(--primary-bg) !important;
+        color: var(--text-primary) !important;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .admin-main-content {
+        margin-left: 5.5rem !important;
+        min-height: 100vh;
+        padding: 2rem;
+        background: var(--primary-bg) !important;
+        transition: margin-left 0.3s;
+    }
+
+    .dashboard-title {
+        color: var(--text-primary) !important;
+        font-weight: 600;
+        margin-bottom: 2rem;
+    }
+
+    .dashboard-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .dashboard-metric-card {
+        background: var(--card-bg) !important;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+    }
+
+    .dashboard-metric-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .dashboard-metric-title {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .dashboard-metric-value {
+        color: var(--text-primary);
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .dashboard-section {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .dashboard-section-title {
+        color: var(--text-primary);
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .list-group {
+        background: transparent;
+    }
+
+    .list-group-item {
+        background: var(--secondary-bg);
+        color: var(--text-primary);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid var(--text-secondary);
+        border-radius: 50%;
+        border-top-color: var(--text-primary);
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .user-management-table {
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .user-management-table th {
+        color: var(--text-secondary);
+        font-weight: 500;
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .user-management-table td {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .user-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .user-status {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+    }
+
+    .status-online {
+        background-color: var(--success-color);
+        color: white;
+    }
+
+    .status-offline {
+        background-color: var(--text-secondary);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-main-content">
+    <h1 class="dashboard-title">Admin Dashboard</h1>
+    
+    <!-- Metrics Section -->
+    <div class="dashboard-metrics">
+        <div class="dashboard-metric-card">
+            <div class="dashboard-metric-title">
+                <i class="bi bi-people-fill me-2"></i>Total Users
+            </div>
+            <div class="dashboard-metric-value" id="totalUsers">
+                <span class="loading-spinner"></span>
+            </div>
+        </div>
+        <div class="dashboard-metric-card">
+            <div class="dashboard-metric-title">
+                <i class="bi bi-person-check-fill me-2"></i>Active Sessions
+            </div>
+            <div class="dashboard-metric-value" id="activeSessions">
+                <span class="loading-spinner"></span>
+            </div>
+        </div>
+        <div class="dashboard-metric-card">
+            <div class="dashboard-metric-title">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>Active Outages
+            </div>
+            <div class="dashboard-metric-value" id="activeOutages">
+                <span class="loading-spinner"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Management Section -->
+    <div class="dashboard-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="dashboard-section-title">
+                <i class="bi bi-people-fill me-2"></i>User Management
+            </div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <i class="bi bi-person-plus-fill me-2"></i>Add User
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="user-management-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Birthday</th>
+                        <th>Last Login</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            <span class="loading-spinner me-2"></span>Loading users...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Windows User Management Section -->
+    <div class="dashboard-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="dashboard-section-title">
+                <i class="bi bi-windows me-2"></i>Windows User Management
+            </div>
+            <div>
+                <button class="btn btn-success me-2" onclick="refreshWindowsUsers()">
+                    <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+                </button>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWindowsUserModal">
+                    <i class="bi bi-person-plus-fill me-2"></i>Add Windows User
+                </button>
+            </div>
+        </div>
+        
+        <!-- Windows User Stats -->
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <div class="dashboard-metric-card">
+                    <div class="dashboard-metric-title">
+                        <i class="bi bi-check-circle-fill me-2"></i>Authorized Users
+                    </div>
+                    <div class="dashboard-metric-value" id="authorizedWindowsUsers">
+                        <span class="loading-spinner"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-metric-card">
+                    <div class="dashboard-metric-title">
+                        <i class="bi bi-x-circle-fill me-2"></i>Unauthorized Users
+                    </div>
+                    <div class="dashboard-metric-value" id="unauthorizedWindowsUsers">
+                        <span class="loading-spinner"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-metric-card">
+                    <div class="dashboard-metric-title">
+                        <i class="bi bi-link-45deg me-2"></i>Linked Accounts
+                    </div>
+                    <div class="dashboard-metric-value" id="linkedWindowsUsers">
+                        <span class="loading-spinner"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-metric-card">
+                    <div class="dashboard-metric-title">
+                        <i class="bi bi-clock-fill me-2"></i>Recent Logins
+                    </div>
+                    <div class="dashboard-metric-value" id="recentWindowsLogins">
+                        <span class="loading-spinner"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="user-management-table">
+                <thead>
+                    <tr>
+                        <th>Windows Username</th>
+                        <th>Display Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Linked Account</th>
+                        <th>Last Login</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="windowsUsersTableBody">
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            <span class="loading-spinner me-2"></span>Loading Windows users...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New User</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <div class="mb-3">
+                        <label for="newUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control bg-dark text-light" id="newUsername" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control bg-dark text-light" id="newEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newRole" class="form-label">Role</label>
+                        <select class="form-select bg-dark text-light" id="newRole" required>
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                            <option value="dev">Developer</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newBirthday" class="form-label">Birthday</label>
+                        <input type="date" class="form-control bg-dark text-light" id="newBirthday">
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control bg-dark text-light" id="newPassword" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="addUser()">Add User</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Windows User Modal -->
+<div class="modal fade" id="addWindowsUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Windows User</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addWindowsUserForm">
+                    <div class="mb-3">
+                        <label for="newWindowsUsername" class="form-label">Windows Username *</label>
+                        <input type="text" class="form-control bg-dark text-light" id="newWindowsUsername" required 
+                               placeholder="e.g., john.doe or john_doe">
+                        <div class="form-text text-muted">Enter the Windows username (without domain)</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newDisplayName" class="form-label">Display Name</label>
+                        <input type="text" class="form-control bg-dark text-light" id="newDisplayName" 
+                               placeholder="e.g., John Doe">
+                    </div>
+                    <div class="mb-3">
+                        <label for="newWindowsEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control bg-dark text-light" id="newWindowsEmail" 
+                               placeholder="e.g., john.doe@company.com">
+                    </div>
+                    <div class="mb-3">
+                        <label for="newDepartment" class="form-label">Department</label>
+                        <input type="text" class="form-control bg-dark text-light" id="newDepartment" 
+                               placeholder="e.g., IT, HR, Sales">
+                    </div>
+                    <div class="mb-3">
+                        <label for="newWindowsRole" class="form-label">Role</label>
+                        <select class="form-select bg-dark text-light" id="newWindowsRole" required>
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                            <option value="dev">Developer</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newWindowsNotes" class="form-label">Notes</label>
+                        <textarea class="form-control bg-dark text-light" id="newWindowsNotes" rows="3" 
+                                  placeholder="Additional notes about this user"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="newWindowsActive" checked>
+                            <label class="form-check-label" for="newWindowsActive">
+                                Active (Allow access to YAM)
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="addWindowsUser()">Add Windows User</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Windows User Modal -->
+<div class="modal fade" id="editWindowsUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Windows User</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editWindowsUserForm">
+                    <input type="hidden" id="editWindowsUserId">
+                    <div class="mb-3">
+                        <label for="editWindowsUsername" class="form-label">Windows Username</label>
+                        <input type="text" class="form-control bg-dark text-light" id="editWindowsUsername" required readonly>
+                        <div class="form-text text-muted">Windows username cannot be changed</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDisplayName" class="form-label">Display Name</label>
+                        <input type="text" class="form-control bg-dark text-light" id="editDisplayName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editWindowsEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control bg-dark text-light" id="editWindowsEmail">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDepartment" class="form-label">Department</label>
+                        <input type="text" class="form-control bg-dark text-light" id="editDepartment">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editWindowsRole" class="form-label">Role</label>
+                        <select class="form-select bg-dark text-light" id="editWindowsRole" required>
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                            <option value="dev">Developer</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editWindowsNotes" class="form-label">Notes</label>
+                        <textarea class="form-control bg-dark text-light" id="editWindowsNotes" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="editWindowsActive">
+                            <label class="form-check-label" for="editWindowsActive">
+                                Active (Allow access to YAM)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3" id="linkAccountSection">
+                        <label for="linkToUser" class="form-label">Link to Existing User Account</label>
+                        <select class="form-select bg-dark text-light" id="linkToUser">
+                            <option value="">-- Select User Account --</option>
+                        </select>
+                        <div class="form-text text-muted">Link this Windows user to an existing YAM user account</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="updateWindowsUser()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-light">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit User</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editUserForm">
+                    <input type="hidden" id="editUserId">
+                    <div class="mb-3">
+                        <label for="editUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control bg-dark text-light" id="editUsername" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control bg-dark text-light" id="editEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRole" class="form-label">Role</label>
+                        <select class="form-select bg-dark text-light" id="editRole" required>
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                            <option value="dev">Developer</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editBirthday" class="form-label">Birthday</label>
+                        <input type="date" class="form-control bg-dark text-light" id="editBirthday">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPassword" class="form-label">New Password (leave blank to keep current)</label>
+                        <input type="password" class="form-control bg-dark text-light" id="editPassword">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="updateUser()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to load dashboard data
+    function loadDashboardData() {
+        fetch('/api/admin/dashboard')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Calculate active sessions by counting online users
+                const activeSessions = data.online_users ? 
+                    data.online_users.filter(user => user.is_online).length : 0;
+
+                // Update metrics with proper error handling
+                document.getElementById('totalUsers').textContent = data.total_users || '0';
+                document.getElementById('activeSessions').textContent = activeSessions;
+                document.getElementById('activeOutages').textContent = data.active_outages || '0';
+                
+                // Update users table
+                const usersTableBody = document.getElementById('usersTableBody');
+                if (data.online_users && Array.isArray(data.online_users) && data.online_users.length > 0) {
+                    // Sort users: online first, then by username
+                    const sortedUsers = data.online_users.sort((a, b) => {
+                        if (a.is_online !== b.is_online) {
+                            return b.is_online ? 1 : -1;
+                        }
+                        return a.name.localeCompare(b.name);
+                    });
+
+                    usersTableBody.innerHTML = sortedUsers.map(user => {
+                        const profilePic = user.profile_picture && user.profile_picture !== 'default.png' 
+                            ? `{{ url_for('static', filename='uploads/profile_pictures/') }}${user.profile_picture}`
+                            : `{{ url_for('static', filename='uploads/profile_pictures/boy.png') }}`;
+                            
+                        // Check if this is the current user
+                        const isCurrentUser = parseInt(user.id) === parseInt('{{ current_user.id }}');
+                            
+                        const deleteButton = !isCurrentUser ? 
+                            `<button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>` : '';
+                            
+                        return `
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="${profilePic}" 
+                                         alt="${user.name}" 
+                                         class="rounded-circle me-2" 
+                                         width="32" height="32" 
+                                         style="object-fit: cover;"
+                                         onerror="this.src='{{ url_for('static', filename='uploads/profile_pictures/boy.png') }}'">
+                                    <div>${user.name}</div>
+                                </div>
+                            </td>
+                            <td>${user.email || 'N/A'}</td>
+                            <td>${user.role || 'user'}</td>
+                            <td>
+                                <span class="user-status ${user.is_online ? 'status-online' : 'status-offline'}">
+                                    ${user.is_online ? 'Online' : 'Offline'}
+                                </span>
+                            </td>
+                            <td>${user.birthday ? new Date(user.birthday).toLocaleDateString() : 'Not set'}</td>
+                            <td>${user.last_login ? new Date(user.last_login).toLocaleString() : 'Never'}</td>
+                            <td>
+                                <div class="user-actions">
+                                    <button class="btn btn-sm btn-info" onclick="editUser(${user.id})">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-warning" onclick="resetPassword(${user.id})">
+                                        <i class="bi bi-key"></i>
+                                    </button>
+                                    ${deleteButton}
+                                </div>
+                            </td>
+                        </tr>
+                    `}).join('');
+                } else {
+                    usersTableBody.innerHTML = '<tr><td colspan="7" class="text-center">No users available</td></tr>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading dashboard data:', error);
+                // Show error state with retry button
+                document.getElementById('totalUsers').innerHTML = '<span class="text-danger">Error</span>';
+                document.getElementById('activeSessions').innerHTML = '<span class="text-danger">Error</span>';
+                document.getElementById('activeOutages').innerHTML = '<span class="text-danger">Error</span>';
+                document.getElementById('usersTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            <div class="text-danger mb-2">Error loading data</div>
+                            <button class="btn btn-sm btn-primary" onclick="loadDashboardData()">
+                                <i class="bi bi-arrow-clockwise"></i> Retry
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+    }
+
+    // Load initial data
+    loadDashboardData();
+    
+    // Load Windows users data
+    loadWindowsUsersData();
+    
+    // Refresh data every 30 seconds
+    setInterval(loadDashboardData, 30000);
+    setInterval(loadWindowsUsersData, 30000);
+
+    // Function to load Windows users data
+    function loadWindowsUsersData() {
+        fetch('/api/admin/windows-users')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Update Windows user metrics
+                const authorizedCount = data.windows_users ? data.windows_users.filter(u => u.is_active).length : 0;
+                const unauthorizedCount = data.windows_users ? data.windows_users.filter(u => !u.is_active).length : 0;
+                const linkedCount = data.windows_users ? data.windows_users.filter(u => u.user_id).length : 0;
+                const recentLogins = data.windows_users ? data.windows_users.filter(u => {
+                    if (!u.last_login_attempt) return false;
+                    const lastLogin = new Date(u.last_login_attempt);
+                    const now = new Date();
+                    return (now - lastLogin) < (24 * 60 * 60 * 1000); // Last 24 hours
+                }).length : 0;
+
+                document.getElementById('authorizedWindowsUsers').textContent = authorizedCount;
+                document.getElementById('unauthorizedWindowsUsers').textContent = unauthorizedCount;
+                document.getElementById('linkedWindowsUsers').textContent = linkedCount;
+                document.getElementById('recentWindowsLogins').textContent = recentLogins;
+                
+                // Update Windows users table
+                const windowsUsersTableBody = document.getElementById('windowsUsersTableBody');
+                if (data.windows_users && Array.isArray(data.windows_users) && data.windows_users.length > 0) {
+                    // Sort users: active first, then by username
+                    const sortedUsers = data.windows_users.sort((a, b) => {
+                        if (a.is_active !== b.is_active) {
+                            return b.is_active ? 1 : -1;
+                        }
+                        return a.windows_username.localeCompare(b.windows_username);
+                    });
+
+                    windowsUsersTableBody.innerHTML = sortedUsers.map(user => {
+                        const statusClass = user.is_active ? 'status-online' : 'status-offline';
+                        const statusText = user.is_active ? 'Authorized' : 'Unauthorized';
+                        const linkedAccount = user.linked_user ? user.linked_user.username : 'Not linked';
+                        
+                        return `
+                        <tr>
+                            <td><strong>${user.windows_username}</strong></td>
+                            <td>${user.display_name || 'N/A'}</td>
+                            <td>${user.email || 'N/A'}</td>
+                            <td>${user.department || 'N/A'}</td>
+                            <td>
+                                <span class="badge ${user.role === 'admin' ? 'bg-danger' : user.role === 'dev' ? 'bg-warning' : 'bg-primary'}">
+                                    ${user.role}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="user-status ${statusClass}">
+                                    ${statusText}
+                                </span>
+                            </td>
+                            <td>${linkedAccount}</td>
+                            <td>${user.last_login_attempt ? new Date(user.last_login_attempt).toLocaleString() : 'Never'}</td>
+                            <td>
+                                <div class="user-actions">
+                                    <button class="btn btn-sm btn-info" onclick="editWindowsUser(${user.id})">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm ${user.is_active ? 'btn-warning' : 'btn-success'}" 
+                                            onclick="toggleWindowsUserStatus(${user.id}, ${user.is_active})">
+                                        <i class="bi bi-${user.is_active ? 'pause' : 'play'}"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteWindowsUser(${user.id})">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `}).join('');
+                } else {
+                    windowsUsersTableBody.innerHTML = '<tr><td colspan="9" class="text-center">No Windows users available</td></tr>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading Windows users data:', error);
+                // Show error state with retry button
+                document.getElementById('authorizedWindowsUsers').innerHTML = '<span class="text-danger">Error</span>';
+                document.getElementById('unauthorizedWindowsUsers').innerHTML = '<span class="text-danger">Error</span>';
+                document.getElementById('linkedWindowsUsers').innerHTML = '<span class="text-danger">Error</span>';
+                document.getElementById('recentWindowsLogins').innerHTML = '<span class="text-danger">Error</span>';
+                document.getElementById('windowsUsersTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            <div class="text-danger mb-2">Error loading Windows users data</div>
+                            <button class="btn btn-sm btn-primary" onclick="loadWindowsUsersData()">
+                                <i class="bi bi-arrow-clockwise"></i> Retry
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+    }
+
+    // Function to refresh Windows users
+    window.refreshWindowsUsers = function() {
+        loadWindowsUsersData();
+        showToast('Windows users refreshed', 'success');
+    };
+
+    // Function to add Windows user
+    window.addWindowsUser = function() {
+        const userData = {
+            windows_username: document.getElementById('newWindowsUsername').value,
+            display_name: document.getElementById('newDisplayName').value,
+            email: document.getElementById('newWindowsEmail').value,
+            department: document.getElementById('newDepartment').value,
+            role: document.getElementById('newWindowsRole').value,
+            notes: document.getElementById('newWindowsNotes').value,
+            is_active: document.getElementById('newWindowsActive').checked
+        };
+        
+        fetch('/api/admin/windows-users', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            bootstrap.Modal.getInstance(document.getElementById('addWindowsUserModal')).hide();
+            showToast('Windows user added successfully', 'success');
+            loadWindowsUsersData();
+            
+            // Reset form
+            document.getElementById('addWindowsUserForm').reset();
+        })
+        .catch(error => {
+            console.error('Error adding Windows user:', error);
+            showToast('Error adding Windows user: ' + error.message, 'error');
+        });
+    };
+
+    // Function to edit Windows user
+    window.editWindowsUser = function(userId) {
+        fetch(`/api/admin/windows-users/${userId}`)
+            .then(response => response.json())
+            .then(user => {
+                document.getElementById('editWindowsUserId').value = user.id;
+                document.getElementById('editWindowsUsername').value = user.windows_username;
+                document.getElementById('editDisplayName').value = user.display_name || '';
+                document.getElementById('editWindowsEmail').value = user.email || '';
+                document.getElementById('editDepartment').value = user.department || '';
+                document.getElementById('editWindowsRole').value = user.role;
+                document.getElementById('editWindowsNotes').value = user.notes || '';
+                document.getElementById('editWindowsActive').checked = user.is_active;
+                
+                // Load available users for linking
+                loadAvailableUsersForLinking(user.user_id);
+                
+                const editWindowsUserModal = new bootstrap.Modal(document.getElementById('editWindowsUserModal'));
+                editWindowsUserModal.show();
+            })
+            .catch(error => {
+                console.error('Error loading Windows user data:', error);
+                showToast('Error loading Windows user data', 'error');
+            });
+    };
+
+    // Function to load available users for linking
+    function loadAvailableUsersForLinking(currentUserId) {
+        fetch('/api/admin/users')
+            .then(response => response.json())
+            .then(users => {
+                const linkSelect = document.getElementById('linkToUser');
+                linkSelect.innerHTML = '<option value="">-- Select User Account --</option>';
+                
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = `${user.username} (${user.email})`;
+                    if (user.id == currentUserId) {
+                        option.selected = true;
+                    }
+                    linkSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading users for linking:', error);
+            });
+    }
+
+    // Function to update Windows user
+    window.updateWindowsUser = function() {
+        const userId = document.getElementById('editWindowsUserId').value;
+        const userData = {
+            display_name: document.getElementById('editDisplayName').value,
+            email: document.getElementById('editWindowsEmail').value,
+            department: document.getElementById('editDepartment').value,
+            role: document.getElementById('editWindowsRole').value,
+            notes: document.getElementById('editWindowsNotes').value,
+            is_active: document.getElementById('editWindowsActive').checked,
+            user_id: document.getElementById('linkToUser').value || null
+        };
+        
+        fetch(`/api/admin/windows-users/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            bootstrap.Modal.getInstance(document.getElementById('editWindowsUserModal')).hide();
+            showToast('Windows user updated successfully', 'success');
+            loadWindowsUsersData();
+        })
+        .catch(error => {
+            console.error('Error updating Windows user:', error);
+            showToast('Error updating Windows user: ' + error.message, 'error');
+        });
+    };
+
+    // Function to toggle Windows user status
+    window.toggleWindowsUserStatus = function(userId, currentStatus) {
+        const newStatus = !currentStatus;
+        const action = newStatus ? 'authorize' : 'unauthorize';
+        
+        fetch(`/api/admin/windows-users/${userId}/toggle-status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ is_active: newStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            showToast(`Windows user ${action}d successfully`, 'success');
+            loadWindowsUsersData();
+        })
+        .catch(error => {
+            console.error(`Error ${action}ing Windows user:`, error);
+            showToast(`Error ${action}ing Windows user: ` + error.message, 'error');
+        });
+    };
+
+    // Function to delete Windows user
+    window.deleteWindowsUser = function(userId) {
+        if (confirm('Are you sure you want to delete this Windows user? This action cannot be undone.')) {
+            fetch(`/api/admin/windows-users/${userId}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Failed to delete Windows user');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                showToast('Windows user deleted successfully', 'success');
+                loadWindowsUsersData();
+            })
+            .catch(error => {
+                console.error('Error deleting Windows user:', error);
+                showToast('Error deleting Windows user: ' + error.message, 'error');
+            });
+        }
+    };
+
+    // Function to add user
+    window.addUser = function() {
+        const userData = {
+            username: document.getElementById('newUsername').value,
+            email: document.getElementById('newEmail').value,
+            role: document.getElementById('newRole').value,
+            birthday: document.getElementById('newBirthday').value,
+            password: document.getElementById('newPassword').value
+        };
+        
+        fetch('/api/admin/users', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+            showToast('User added successfully', 'success');
+            loadDashboardData();
+        })
+        .catch(error => {
+            console.error('Error adding user:', error);
+            showToast('Error adding user: ' + error.message, 'error');
+        });
+    };
+
+    // Function to edit user
+    window.editUser = function(userId) {
+        fetch(`/api/admin/users/${userId}`)
+            .then(response => response.json())
+            .then(user => {
+                document.getElementById('editUserId').value = user.id;
+                document.getElementById('editUsername').value = user.username;
+                document.getElementById('editEmail').value = user.email;
+                document.getElementById('editRole').value = user.role;
+                document.getElementById('editBirthday').value = user.birthday ? user.birthday.split('T')[0] : '';
+                document.getElementById('editPassword').value = '';
+                
+                const editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+                editUserModal.show();
+            })
+            .catch(error => {
+                console.error('Error loading user data:', error);
+                showToast('Error loading user data', 'error');
+            });
+    };
+
+    // Function to update user
+    window.updateUser = function() {
+        const userId = document.getElementById('editUserId').value;
+        const userData = {
+            username: document.getElementById('editUsername').value,
+            email: document.getElementById('editEmail').value,
+            role: document.getElementById('editRole').value,
+            birthday: document.getElementById('editBirthday').value,
+            password: document.getElementById('editPassword').value
+        };
+        
+        fetch(`/api/admin/users/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
+            showToast('User updated successfully', 'success');
+            loadDashboardData();
+        })
+        .catch(error => {
+            console.error('Error updating user:', error);
+            showToast('Error updating user: ' + error.message, 'error');
+        });
+    };
+
+    // Function to delete user
+    window.deleteUser = function(userId) {
+        if (confirm('Are you sure you want to delete this user?')) {
+            fetch(`/api/admin/users/${userId}`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    showToast('User deleted successfully', 'success');
+                    loadDashboardData();
+                })
+                .catch(error => {
+                    console.error('Error deleting user:', error);
+                    showToast('Error deleting user: ' + error.message, 'error');
+                });
+        }
+    };
+
+    // Function to reset password
+    window.resetPassword = function(userId) {
+        if (confirm('Reset password for this user?')) {
+            fetch(`/api/admin/users/${userId}/reset-password`, { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    showToast(`New password: ${data.new_password}`, 'success');
+                })
+                .catch(error => {
+                    console.error('Error resetting password:', error);
+                    showToast('Error resetting password: ' + error.message, 'error');
+                });
+        }
+    };
+
+    // Function to show toast messages
+    window.showToast = function(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+        
+        const container = document.createElement('div');
+        container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        container.appendChild(toast);
+        document.body.appendChild(container);
+        
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        toast.addEventListener('hidden.bs.toast', () => {
+            container.remove();
+        });
+    };
+});
+</script>
+{% endblock %} 

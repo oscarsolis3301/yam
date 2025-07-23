@@ -1,0 +1,310 @@
+<!-- YAM Enhanced Hover Animations - Prevents Clipping and Provides Smooth Transitions -->
+<style>
+/* ENHANCED HOVER ANIMATION SYSTEM */
+.yam-hover-safe {
+    /* Base class for elements that need safe hover animations */
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+/* Safe hover animations that don't cause clipping */
+.yam-hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+.yam-hover-lift:hover {
+<<<<<<< HEAD
+z-index: 10;
+=======
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    z-index: 10;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    position: relative;
+}
+
+/* Enhanced card hover with glow effect */
+.yam-hover-glow {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+.yam-hover-glow:hover {
+<<<<<<< HEAD
+border-color: rgba(88, 101, 242, 0.3);
+=======
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 20px 60px rgba(88, 101, 242, 0.2);
+    border-color: rgba(88, 101, 242, 0.3);
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    z-index: 10;
+    position: relative;
+}
+
+/* Button hover animations */
+.yam-btn-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+.yam-btn-hover:hover {
+<<<<<<< HEAD
+z-index: 5;
+=======
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 12px 36px rgba(88, 101, 242, 0.2);
+    z-index: 5;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    position: relative;
+}
+
+/* Container spacing to prevent clipping */
+.yam-hover-container {
+    overflow: visible !important;
+    padding: 4px !important;
+    position: relative;
+}
+
+.yam-hover-container > * {
+    margin: 2px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.yam-hover-container > *:hover {
+    z-index: 10 !important;
+    position: relative;
+}
+
+/* Grid container with safe hover support */
+.yam-grid-hover-safe {
+    display: grid;
+    gap: 1rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: visible !important;
+    padding: 4px !important;
+    position: relative;
+}
+
+.yam-grid-hover-safe > * {
+    margin: 2px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.yam-grid-hover-safe > *:hover {
+    z-index: 10 !important;
+    position: relative;
+}
+
+/* Flex container with safe hover support */
+.yam-flex-hover-safe {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: visible !important;
+    padding: 4px !important;
+    position: relative;
+}
+
+.yam-flex-hover-safe > * {
+    margin: 2px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.yam-flex-hover-safe > *:hover {
+    z-index: 10 !important;
+    position: relative;
+}
+
+/* Enhanced shimmer effect for cards */
+.yam-shimmer-effect {
+    position: relative;
+    overflow: hidden;
+}
+
+.yam-shimmer-effect::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.yam-shimmer-effect:hover::after {
+    left: 100%;
+}
+
+/* Pulse animation for interactive elements */
+.yam-pulse-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+.yam-pulse-hover:hover {
+<<<<<<< HEAD
+z-index: 10;
+=======
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 15px 45px rgba(88, 101, 242, 0.25);
+    animation: yam-pulse 0.6s ease-in-out;
+    z-index: 10;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    position: relative;
+}
+
+@keyframes yam-pulse {
+    0%, 100% {
+        transform: translateY(-2px) scale(1.02);
+    }
+    50% {
+        transform: translateY(-2px) scale(1.03);
+    }
+}
+
+/* Bounce animation for buttons */
+.yam-bounce-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+.yam-bounce-hover:hover {
+<<<<<<< HEAD
+z-index: 5;
+=======
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 12px 36px rgba(88, 101, 242, 0.2);
+    animation: yam-bounce 0.6s ease-in-out;
+    z-index: 5;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    position: relative;
+}
+
+@keyframes yam-bounce {
+    0%, 20%, 53%, 80%, 100% {
+        transform: translateY(-2px) scale(1.02);
+    }
+    40%, 43% {
+        transform: translateY(-4px) scale(1.02);
+    }
+    70% {
+        transform: translateY(-3px) scale(1.02);
+    }
+    90% {
+        transform: translateY(-2px) scale(1.02);
+    }
+}
+
+/* Responsive adjustments for hover animations */
+@media (max-width: 768px) {
+    .yam-hover-container,
+    .yam-grid-hover-safe,
+    .yam-flex-hover-safe {
+        padding: 2px !important;
+    }
+    
+    .yam-hover-container > *,
+    .yam-grid-hover-safe > *,
+    .yam-flex-hover-safe > * {
+        margin: 1px !important;
+    }
+    
+    .yam-hover-lift:hover,
+    .yam-hover-glow:hover,
+    .yam-btn-hover:hover,
+    .yam-pulse-hover:hover,
+    .yam-bounce-hover:hover {
+        transform: translateY(-1px) scale(1.005);
+    }
+}
+
+@media (max-width: 640px) {
+    .yam-hover-container,
+    .yam-grid-hover-safe,
+    .yam-flex-hover-safe {
+        padding: 1px !important;
+    }
+    
+    .yam-hover-container > *,
+    .yam-grid-hover-safe > *,
+    .yam-flex-hover-safe > * {
+        margin: 0.5px !important;
+    }
+    
+    .yam-hover-lift:hover,
+    .yam-hover-glow:hover,
+    .yam-btn-hover:hover,
+    .yam-pulse-hover:hover,
+    .yam-bounce-hover:hover {
+        transform: translateY(-0.5px) scale(1.002);
+    }
+}
+
+/* Performance optimizations */
+.yam-hover-safe,
+.yam-hover-lift,
+.yam-hover-glow,
+.yam-btn-hover,
+.yam-pulse-hover,
+.yam-bounce-hover {
+    will-change: transform, box-shadow !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+}
+
+/* Accessibility improvements */
+.yam-hover-safe:focus,
+.yam-hover-lift:focus,
+.yam-hover-glow:focus,
+.yam-btn-hover:focus,
+.yam-pulse-hover:focus,
+.yam-bounce-hover:focus {
+    outline: 2px solid #5865f2 !important;
+    outline-offset: 2px !important;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .yam-hover-safe,
+    .yam-hover-lift,
+    .yam-hover-glow,
+    .yam-btn-hover,
+    .yam-pulse-hover,
+    .yam-bounce-hover,
+    .yam-hover-container > *,
+    .yam-grid-hover-safe > *,
+    .yam-flex-hover-safe > * {
+        transition: none !important;
+        animation: none !important;
+        transform: none !important;
+    }
+    
+    .yam-hover-lift:hover,
+    .yam-hover-glow:hover,
+    .yam-btn-hover:hover,
+    .yam-pulse-hover:hover,
+    .yam-bounce-hover:hover {
+        transform: none !important;
+        animation: none !important;
+    }
+}
+</style> 

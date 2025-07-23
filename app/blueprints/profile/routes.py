@@ -77,9 +77,11 @@ def upload_profile_picture():
             return jsonify({'error': 'No file selected'}), 400
             
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(current_app.config['UPLOADS_DIR'], 'profile_pictures', filename)
-            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+            filename = secure_filename(f"{current_user.id}_{file.filename}")
+            upload_dir = current_app.config.get('UPLOAD_FOLDER', 'static/uploads')
+            profile_pictures_dir = os.path.join(upload_dir, 'profile_pictures')
+            os.makedirs(profile_pictures_dir, exist_ok=True)
+            filepath = os.path.join(profile_pictures_dir, filename)
             file.save(filepath)
             
             user = User.query.get(current_user.id)

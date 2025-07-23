@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="text-center mb-4">
+                <div id="current-time" class="display-4 mb-2"></div>
+                <div id="current-date" class="h5 text-muted mb-4"></div>
+            </div>
+            <div class="text-center">
+                <input id="clock-id-input" class="form-control" type="text" maxlength="5" autocomplete="off" placeholder="Enter Clock Id">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const currentTime = document.getElementById('current-time');
+    const currentDate = document.getElementById('current-date');
+    const clockIdInput = document.getElementById('clock-id-input');
+
+    // Live update of time and date
+    function updateDateTime() {
+        const now = new Date();
+        currentTime.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        currentDate.textContent = now.toLocaleDateString(undefined, {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    // Optional: focus input on page load
+    clockIdInput.focus();
+
+    // Optional: handle Enter key (live functionality placeholder)
+    clockIdInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            // Placeholder for live functionality (e.g., submit clock id)
+            // You can add AJAX or form submission here
+            alert('Clock ID entered: ' + clockIdInput.value);
+        }
+    });
+});
+</script>
+{% endblock %} 

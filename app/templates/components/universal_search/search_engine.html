@@ -1,0 +1,2388 @@
+<script>
+// --- State Machine for Search Bar Visibility ---
+(function() {
+    let searchState = 'hidden';
+    const container = document.getElementById('universalSearchContainer');
+    const input = document.getElementById('universalSearchInput');
+    const blurOverlay = document.getElementById('searchBlurOverlay');
+    
+    function flyOutSearchBar() {
+        if (container && searchState === 'visible') {
+            container.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.8, 0.2, 1), opacity 0.5s';
+            container.style.transform = 'translate(-50%, -60%) scale(0.95)';
+            container.style.opacity = '0';
+            setTimeout(() => {
+                container.style.display = 'none';
+                container.style.transform = 'translate(-50%, -50%) scale(1)';
+                container.style.opacity = '1';
+                searchState = 'hidden';
+                // Remove blur effect
+                if (blurOverlay) {
+                    blurOverlay.classList.remove('active');
+                }
+                // Notify listeners (e.g., sidebar icon) of close action
+                window.dispatchEvent(new CustomEvent('universalSearchToggled', { detail: 'close' }));
+            }, 600);
+        }
+    }
+    
+    function flyInSearchBar() {
+        if (container && searchState === 'hidden') {
+            container.style.display = 'block';
+            container.style.opacity = '0';
+            container.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.8, 0.2, 1), opacity 0.5s';
+            container.offsetHeight;
+            container.style.transform = 'translate(-50%, -50%) scale(1)';
+            container.style.opacity = '1';
+            setTimeout(() => {
+                searchState = 'visible';
+                if (input) input.focus();
+                // Add blur effect
+                if (blurOverlay) {
+                    blurOverlay.classList.add('active');
+                }
+                // Notify listeners of open action
+                window.dispatchEvent(new CustomEvent('universalSearchToggled', { detail: 'open' }));
+            }, 600);
+        }
+    }
+    
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            if (searchState === 'visible') {
+                flyOutSearchBar();
+            } else if (searchState === 'hidden') {
+                flyInSearchBar();
+            }
+        }
+    });
+
+    // Expose global helpers so other components (e.g., sidebar) can toggle the panel
+    window.openUniversalSearchBar = flyInSearchBar;
+    window.closeUniversalSearchBar = flyOutSearchBar;
+    window.isUniversalSearchOpen = () => searchState === 'visible';
+
+    // Close the search bar when the blurred overlay itself is clicked
+    if (blurOverlay) {
+        blurOverlay.addEventListener('click', function () {
+            if (searchState === 'visible') {
+                flyOutSearchBar();
+            }
+        });
+    }
+})();
+
+// Universal Search Component - Enhanced version with instant suggestions
+(function() {
+    'use strict';
+    
+    // Check if already initialized to prevent duplicate initialization
+    if (window.universalSearchInitialized) {
+        return;
+    }
+    
+    class UniversalSearch {
+        constructor() {
+            // Get all required DOM elements
+            this.searchInput = document.getElementById('universalSearchInput');
+            this.clearBtn = document.getElementById('searchClearBtn');
+            this.loading = document.getElementById('searchLoading');
+            this.results = document.getElementById('searchResults');
+            this.resultsContent = document.getElementById('resultsContent');
+            this.resultsCount = document.getElementById('resultsCount');
+            this.suggestions = document.getElementById('searchSuggestions');
+            this.suggestionsContent = document.getElementById('suggestionsContent');
+            this.filters = document.getElementById('searchFilters');
+            this.viewAllBtn = document.getElementById('viewAllResults');
+            this.blurOverlay = document.getElementById('searchBlurOverlay');
+            
+            // Check if all required elements exist
+            if (!this.searchInput || !this.clearBtn || !this.loading || !this.results || 
+                !this.resultsContent || !this.resultsCount || !this.suggestions || 
+                !this.suggestionsContent || !this.filters || !this.viewAllBtn) {
+                console.warn('Universal search elements not found. Search functionality disabled.');
+                return;
+            }
+            
+            this.currentQuery = '';
+            this.searchTimeout = null;
+            this.suggestionsTimeout = null;
+            this.isSearching = false;
+            this.currentResults = []; // Store current search results
+            this.isInteractingWithSuggestions = false; // Track if user is interacting with suggestions
+            this.currentSearchController = null; // For cancelling search requests
+            this.currentSuggestionsController = null; // For cancelling suggestions requests
+            
+            // Buffer for suggestion HTML so we can merge with results later
+            this._suggestionsMarkup = '';
+            
+            // Caching for instant suggestions
+            this.suggestionCache = new Map();
+            this.userCache = new Map();
+            this.officeCache = new Map();
+            this.workstationCache = new Map();
+            this.cacheExpiry = 5 * 60 * 1000; // 5 minutes
+            
+            // Pre-loaded common suggestions
+            this.commonSuggestions = [];
+            this.preloadedData = {
+                offices: [],
+                workstations: [],
+                recentSearches: []
+            };
+            
+            this.init();
+            this.preloadCommonData();
+        }
+        
+        init() {
+            // Event listeners
+            this.searchInput.addEventListener('input', this.handleInput.bind(this));
+            this.searchInput.addEventListener('focus', this.handleFocus.bind(this));
+            this.searchInput.addEventListener('blur', this.handleBlur.bind(this));
+            this.searchInput.addEventListener('keydown', this.handleKeydown.bind(this));
+            
+            this.clearBtn.addEventListener('click', this.clearSearch.bind(this));
+            this.viewAllBtn.addEventListener('click', this.viewAllResults.bind(this));
+            
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', this.handleFilterClick.bind(this));
+            });
+            
+            // Global keyboard shortcut
+            document.addEventListener('keydown', this.handleGlobalKeydown.bind(this));
+            
+            // Enhanced click outside handling
+            document.addEventListener('click', this.handleClickOutside.bind(this));
+            
+            // Mouse events for suggestions to prevent premature hiding
+            this.suggestions.addEventListener('mouseenter', () => {
+                this.isInteractingWithSuggestions = true;
+            });
+            
+            this.suggestions.addEventListener('mouseleave', () => {
+                this.isInteractingWithSuggestions = false;
+                // Only hide if not focused on input
+                if (!this.searchInput.matches(':focus')) {
+                    setTimeout(() => {
+                        if (!this.isInteractingWithSuggestions && !this.searchInput.matches(':focus')) {
+                            this.hideSuggestions();
+                        }
+                    }, 200); // Increased timeout to prevent premature hiding
+                }
+            });
+            
+            // Prevent suggestion hiding when clicking inside suggestions
+            this.suggestions.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+            
+            // Prevent result hiding when clicking inside results
+            this.results.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        }
+
+        // Pre-load common data for instant suggestions
+        async preloadCommonData() {
+            try {
+                // Load recent searches from localStorage
+                const recentSearches = JSON.parse(localStorage.getItem('universalSearchRecent') || '[]');
+                this.preloadedData.recentSearches = recentSearches.slice(0, 10);
+
+                // Pre-load some common office data (async, non-blocking)
+                this.preloadOfficesAndWorkstations();
+
+                // Generate common smart suggestions
+                this.generateCommonSuggestions();
+            } catch (error) {
+                console.warn('Error preloading data:', error);
+            }
+        }
+
+        async preloadOfficesAndWorkstations() {
+            try {
+                // Pre-load a small set of common offices/workstations for instant suggestions
+                const response = await fetch('/unified_search?q=&limit=20', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Cache-Control': 'max-age=300' // 5 minute cache
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    this.preloadedData.offices = data.offices || [];
+                    this.preloadedData.workstations = data.workstations || [];
+                }
+            } catch (error) {
+                console.warn('Error preloading offices/workstations:', error);
+            }
+        }
+
+        generateCommonSuggestions() {
+            this.commonSuggestions = [
+                { text: 'Search users', icon: 'bi bi-person', subtitle: 'Find people', type: 'text' },
+                { text: 'Search offices', icon: 'bi bi-building', subtitle: 'Find locations', type: 'text' },
+                { text: 'Search workstations', icon: 'bi bi-laptop', subtitle: 'Find devices', type: 'text' },
+                { text: 'Search knowledge base', icon: 'bi bi-journal-text', subtitle: 'Find guides', type: 'text' },
+                { text: 'Search notes', icon: 'bi bi-sticky', subtitle: 'Find public notes', type: 'text' },
+                { text: 'Check outages', icon: 'bi bi-exclamation-triangle', subtitle: 'System status', type: 'text' }
+            ];
+        }
+
+        // Cache management
+        getCachedSuggestions(query) {
+            const cached = this.suggestionCache.get(query.toLowerCase());
+            if (cached && (Date.now() - cached.timestamp) < this.cacheExpiry) {
+                return cached.data;
+            }
+            return null;
+        }
+
+        setCachedSuggestions(query, data) {
+            this.suggestionCache.set(query.toLowerCase(), {
+                data: data,
+                timestamp: Date.now()
+            });
+        }
+
+        // Save recent searches
+        saveRecentSearch(query) {
+            if (!query || query.length < 2) return;
+            
+            let recent = JSON.parse(localStorage.getItem('universalSearchRecent') || '[]');
+            recent = recent.filter(item => item.toLowerCase() !== query.toLowerCase());
+            recent.unshift(query);
+            recent = recent.slice(0, 10); // Keep only 10 recent searches
+            
+            localStorage.setItem('universalSearchRecent', JSON.stringify(recent));
+            this.preloadedData.recentSearches = recent;
+        }
+        
+        handleInput(e) {
+            // Clear previous timeouts first
+            if (this.searchTimeout) {
+                clearTimeout(this.searchTimeout);
+            }
+            if (this.suggestionsTimeout) {
+                clearTimeout(this.suggestionsTimeout);
+            }
+            
+            // Process input immediately without any timeout delays
+            const query = this.searchInput.value.trim();
+            this.currentQuery = query;
+            
+            // Show/hide clear button
+            this.clearBtn.style.display = query ? 'block' : 'none';
+            
+            if (query.length >= 1) {
+                // Show filters immediately for better UX
+                this.filters.style.display = 'block';
+                
+                // INSTANT suggestions with the correct query
+                this.getSuggestionsInstant(query);
+                
+                // Perform search immediately without debouncing
+                this.performSearch(query);
+            } else {
+                this.hideResults();
+                this.hideSuggestions();
+                this.filters.style.display = 'none';
+            }
+        }
+
+        // Instant suggestions without any delay
+        getSuggestionsInstant(query) {
+            // First, show cached suggestions immediately if available
+            const cached = this.getCachedSuggestions(query);
+            if (cached) {
+                this.displaySuggestions(cached);
+            } else {
+                // Show partial suggestions immediately based on pre-loaded data
+                this.displayPartialSuggestions(query);
+            }
+
+            // Then fetch fresh suggestions asynchronously immediately
+            this.getSuggestions(query);
+        }
+
+        // Display partial suggestions immediately from cached/preloaded data
+        displayPartialSuggestions(query) {
+            // Ensure we're working with the absolute latest query
+            const actualQuery = query || this.searchInput.value.trim() || this.currentQuery;
+            const lowerQuery = actualQuery.toLowerCase();
+            const suggestions = {
+                textSuggestions: [],
+                offices: [],
+                workstations: [],
+                clockSuggestions: []
+            };
+
+            // Add recent searches that match
+            suggestions.textSuggestions = this.preloadedData.recentSearches
+                .filter(search => search.toLowerCase().includes(lowerQuery))
+                .slice(0, 3);
+
+            // Add matching preloaded offices
+            suggestions.offices = this.preloadedData.offices
+                .filter(office => 
+                    (office['Internal Name'] || '').toLowerCase().includes(lowerQuery) ||
+                    (office.Number || '').toString().includes(query)
+                )
+                .slice(0, 3);
+
+            // Add matching preloaded workstations
+            suggestions.workstations = this.preloadedData.workstations
+                .filter(ws => 
+                    (ws.name || '').toLowerCase().includes(lowerQuery) ||
+                    (ws.user || '').toLowerCase().includes(lowerQuery)
+                )
+                .slice(0, 3);
+
+            // Generate clock ID suggestions instantly for numeric queries
+            if (/^\d{1,5}$/.test(actualQuery.trim())) {
+                const padded = actualQuery.trim().padStart(5, '0');
+                const originalQuery = actualQuery.trim();
+                
+                // For clock IDs (1-5 digits), only show the user lookup option
+                suggestions.clockSuggestions = [
+                    {
+                        text: `Find user ${padded}`,
+                        icon: 'bi bi-person',
+                        subtitle: 'Lookup user by Clock ID',
+                        type: 'clock_id',
+                        data: { clock_id: padded }
+                    }
+                ];
+            }
+
+            // Add common suggestions if query is short
+            if (query.length <= 2) {
+                suggestions.commonSuggestions = this.commonSuggestions
+                    .filter(s => s.text.toLowerCase().includes(lowerQuery))
+                    .slice(0, 3);
+            }
+            
+            // Add note-specific suggestions for short queries
+            if (query.length <= 3) {
+                const noteSuggestions = [
+                    { text: 'Search notes', icon: 'bi bi-sticky', subtitle: 'Find public notes', type: 'text' },
+                    { text: 'Create note', icon: 'bi bi-plus-circle', subtitle: 'Start a new note', type: 'text' }
+                ];
+                suggestions.noteSuggestions = noteSuggestions
+                    .filter(s => s.text.toLowerCase().includes(lowerQuery))
+                    .slice(0, 2);
+            }
+
+            this.displaySuggestions(suggestions);
+        }
+        
+        handleFocus() {
+            if (this.currentQuery.length >= 2) {
+                this.filters.style.display = 'block';
+                if (this.suggestions.style.display === 'block') {
+                    this.suggestions.style.display = 'block';
+                }
+            }
+            // Ensure blur overlay is active when focused
+            if (this.blurOverlay) {
+                this.blurOverlay.classList.add('active');
+            }
+        }
+        
+        handleBlur() {
+            // Don't immediately hide - let the click outside handler manage this
+            // This prevents the suggestions from disappearing when clicking on them
+            // Minimal delay to allow for clicks on suggestions
+            setTimeout(() => {
+                if (!this.isInteractingWithSuggestions && !this.searchInput.matches(':focus')) {
+                    this.hideSuggestions();
+                }
+            }, 50);
+        }
+        
+        handleKeydown(e) {
+            if (e.key === 'Escape') {
+                this.clearSearch();
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+
+                const q = this.currentQuery.trim();
+                if (!q) return;
+
+                // Open the standalone full-results page right away so users
+                // get the *complete* list for their query (matches Google-style
+                // behaviour). Any inline suggestions/results will be shown on
+                // that page, so there is no need to perform a local search here.
+                this.viewAllResults();
+                return;
+            } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                this.handleArrowNavigation(e.key);
+            }
+        }
+        
+        handleArrowNavigation(key) {
+            const suggestions = document.querySelectorAll('.suggestion-item');
+            const results = document.querySelectorAll('.result-item');
+            const allItems = [...suggestions, ...results];
+            
+            if (allItems.length === 0) return;
+            
+            const currentIndex = allItems.findIndex(item => item.classList.contains('selected'));
+            let newIndex;
+            
+            if (key === 'ArrowDown') {
+                newIndex = currentIndex < allItems.length - 1 ? currentIndex + 1 : 0;
+            } else {
+                newIndex = currentIndex > 0 ? currentIndex - 1 : allItems.length - 1;
+            }
+            
+            // Remove previous selection
+            allItems.forEach(item => item.classList.remove('selected'));
+            
+            // Add selection to new item
+            if (allItems[newIndex]) {
+                allItems[newIndex].classList.add('selected');
+                allItems[newIndex].scrollIntoView({ block: 'nearest' });
+            }
+        }
+        
+        handleGlobalKeydown(e) {
+            // Ctrl+K or Cmd+K to focus search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                this.searchInput.focus();
+            }
+        }
+        
+        handleClickOutside(e) {
+            // Check if click is outside the search interface
+            const searchContainer = document.getElementById('universalSearchContainer');
+            if (!searchContainer.contains(e.target)) {
+                this.hideResults();
+                this.hideSuggestions();
+                this.filters.style.display = 'none';
+
+                // Also close the universal search overlay completely
+                if (window.closeUniversalSearchBar) {
+                    window.closeUniversalSearchBar();
+                }
+                // Remove blur effect when clicking outside
+                if (this.blurOverlay) {
+                    this.blurOverlay.classList.remove('active');
+                }
+            }
+        }
+        
+        handleFilterClick(e) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            e.target.closest('.filter-btn').classList.add('active');
+            
+            // Re-run search with new filter if there's a current query
+            if (this.currentQuery) {
+                this.performSearch(this.currentQuery);
+            }
+        }
+        
+        async performSearch(query) {
+            // Cancel any pending search request
+            if (this.currentSearchController) {
+                this.currentSearchController.abort();
+            }
+            
+            // Create new abort controller for this search
+            this.currentSearchController = new AbortController();
+            
+            this.isSearching = true;
+            this.showLoading(true);
+            
+            try {
+                // Get active filter
+                const activeFilter = document.querySelector('.filter-btn.active');
+                const contentType = activeFilter ? activeFilter.dataset.type : 'all';
+                
+                const params = new URLSearchParams({
+                    q: query,
+                    limit: 20 // Increased to show more high-quality results
+                });
+                
+                let contentTypes = null;
+                if (contentType !== 'all') {
+                    contentTypes = [contentType];
+                }
+                
+                if (contentTypes) {
+                    params.append('content_types', contentTypes.join(','));
+                }
+                
+                const response = await fetch(`/api/universal-search?${params}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    signal: this.currentSearchController.signal
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.message || 'Search failed');
+                }
+                
+                this.displayResults(data.results, data.total);
+                
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    // Request was cancelled, ignore
+                    return;
+                }
+                console.error('Search error:', error);
+                this.displayError(`Search failed: ${error.message}`);
+            } finally {
+                this.isSearching = false;
+                this.showLoading(false);
+            }
+        }
+        
+        async getSuggestions(query) {
+            try {
+                // Cancel any pending suggestions request
+                if (this.currentSuggestionsController) {
+                    this.currentSuggestionsController.abort();
+                }
+                
+                // Create new abort controller for this suggestions request
+                this.currentSuggestionsController = new AbortController();
+                
+                // Check cache first
+                const cached = this.getCachedSuggestions(query);
+                if (cached) {
+                    this.displaySuggestions(cached);
+                    return;
+                }
+
+                // Parallel API calls for better performance
+                const [suggestionsResponse, unifiedResponse] = await Promise.all([
+                    fetch(`/api/universal-search/suggestions?q=${encodeURIComponent(query)}&limit=5`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Cache-Control': 'max-age=60' // 1 minute cache
+                        },
+                        signal: this.currentSuggestionsController.signal
+                    }).catch(() => null),
+                    
+                    fetch(`/unified_search?q=${encodeURIComponent(query)}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Cache-Control': 'max-age=60'
+                        },
+                        signal: this.currentSuggestionsController.signal
+                    }).catch(() => null)
+                ]);
+                
+                let textSuggestions = [];
+                if (suggestionsResponse && suggestionsResponse.ok) {
+                    const suggestionsData = await suggestionsResponse.json();
+                    textSuggestions = suggestionsData.suggestions || [];
+                }
+                
+                let officeData = [];
+                let workstationData = [];
+                
+                if (unifiedResponse && unifiedResponse.ok) {
+                    const unifiedData = await unifiedResponse.json();
+                    officeData = unifiedData.offices || [];
+                    workstationData = unifiedData.workstations || [];
+                }
+                
+                let clockSuggestions = [];
+                let patternSuggestions = [];
+                
+                // Enhanced pattern recognition for clock IDs (1-5 digits)
+                if (/^\d{1,5}$/.test(query.trim())) {
+                    const padded = query.trim().padStart(5, '0');
+                    
+                    // Use the new Clock ID cache API for fast lookups
+                    let cachedUser = null;
+                    try {
+                        const cacheRes = await fetch(`/api/clock-id/suggestions?q=${encodeURIComponent(query.trim())}`);
+                        if (cacheRes.ok) {
+                            const response = await cacheRes.json();
+                            if (response.success && response.suggestions.length > 0) {
+                                // Use the first suggestion (most relevant)
+                                const suggestion = response.suggestions[0];
+                                if (suggestion.type === 'clock_id') {
+                                    clockSuggestions.push({
+                                        text: suggestion.display_text,
+                                        icon: 'bi bi-person-circle',
+                                        subtitle: suggestion.subtitle,
+                                        type: 'clock_id',
+                                        data: { clock_id: suggestion.clock_id }
+                                    });
+                                    
+                                    // Add secondary option for full profile
+                                    clockSuggestions.push({
+                                        text: `View ${suggestion.full_name}'s full profile`,
+                                        icon: 'bi bi-person-badge',
+                                        subtitle: 'Complete user information',
+                                        type: 'clock_id',
+                                        data: { clock_id: suggestion.clock_id }
+                                    });
+                                } else if (suggestion.type === 'clock_id_not_found') {
+                                    // User not found in cache, show generic lookup
+                                    clockSuggestions.push({
+                                        text: suggestion.display_text,
+                                        icon: 'bi bi-person-badge',
+                                        subtitle: suggestion.subtitle,
+                                        type: 'clock_id',
+                                        data: { clock_id: suggestion.clock_id }
+                                    });
+                                }
+                            } else {
+                                // No suggestions returned, show generic lookup
+                                clockSuggestions.push({
+                                    text: `Find user ${padded}`,
+                                    icon: 'bi bi-person-badge',
+                                    subtitle: 'Lookup user by Clock ID',
+                                    type: 'clock_id',
+                                    data: { clock_id: padded }
+                                });
+                            }
+                        } else {
+                            // API error, fallback to generic lookup
+                            clockSuggestions.push({
+                                text: `Find user ${padded}`,
+                                icon: 'bi bi-person-badge',
+                                subtitle: 'Lookup user by Clock ID',
+                                type: 'clock_id',
+                                data: { clock_id: padded }
+                            });
+                        }
+                    } catch (error) {
+                        console.warn('Clock ID cache lookup failed:', error);
+                        // Fallback to generic clock ID lookup
+                        clockSuggestions.push({
+                            text: `Find user ${padded}`,
+                            icon: 'bi bi-person-badge',
+                            subtitle: 'Lookup user by Clock ID',
+                            type: 'clock_id',
+                            data: { clock_id: padded }
+                        });
+                    }
+                }
+                
+                // For longer numeric queries (6+ digits), show general search options
+                if (/^\d{6,}$/.test(query.trim())) {
+                    const originalQuery = query.trim();
+                    
+                    // Pattern-based suggestions for longer numbers
+                    patternSuggestions.push({
+                        text: `Search for ${originalQuery}`,
+                        icon: 'bi bi-search',
+                        subtitle: 'Universal search',
+                        type: 'pattern'
+                    });
+                    
+                    patternSuggestions.push({
+                        text: `Search for workstation matching ${originalQuery}`,
+                        icon: 'bi bi-laptop',
+                        subtitle: 'Device search',
+                        type: 'text'
+                    });
+                    
+                    patternSuggestions.push({
+                        text: `Search for office number ${originalQuery}`,
+                        icon: 'bi bi-building',
+                        subtitle: 'Office search',
+                        type: 'text'
+                    });
+                }
+                
+                // IP address pattern
+                if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(query.trim())) {
+                    patternSuggestions.push({
+                        text: `Search for IP ${query.trim()}`,
+                        icon: 'bi bi-hdd-network',
+                        subtitle: 'Network search',
+                        type: 'pattern'
+                    });
+                    patternSuggestions.push({
+                        text: `Find device ${query.trim()}`,
+                        icon: 'bi bi-laptop',
+                        subtitle: 'Device lookup',
+                        type: 'pattern'
+                    });
+                }
+                
+                // MAC address pattern
+                if (/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/.test(query.trim())) {
+                    patternSuggestions.push({
+                        text: `Search for MAC ${query.trim()}`,
+                        icon: 'bi bi-hdd-network',
+                        subtitle: 'Hardware search',
+                        type: 'pattern'
+                    });
+                    patternSuggestions.push({
+                        text: `Find device ${query.trim()}`,
+                        icon: 'bi bi-laptop',
+                        subtitle: 'Device lookup',
+                        type: 'pattern'
+                    });
+                }
+                
+                // Ticket number pattern
+                if (/^[A-Z]{2,4}-\d{4,6}$/i.test(query.trim())) {
+                    patternSuggestions.push({
+                        text: `Search for ticket ${query.trim().toUpperCase()}`,
+                        icon: 'bi bi-ticket-detailed',
+                        subtitle: 'Support ticket',
+                        type: 'pattern'
+                    });
+                    patternSuggestions.push({
+                        text: `Find case ${query.trim().toUpperCase()}`,
+                        icon: 'bi bi-folder',
+                        subtitle: 'Case lookup',
+                        type: 'pattern'
+                    });
+                }
+                
+                // Email pattern
+                if (/@/.test(query.trim()) && /\./.test(query.trim().split('@')[1])) {
+                    patternSuggestions.push({
+                        text: `Search for email ${query.trim()}`,
+                        icon: 'bi bi-envelope',
+                        subtitle: 'Contact search',
+                        type: 'pattern'
+                    });
+                    patternSuggestions.push({
+                        text: `Find contact ${query.trim()}`,
+                        icon: 'bi bi-person',
+                        subtitle: 'Contact lookup',
+                        type: 'pattern'
+                    });
+                }
+                
+                // Phone number pattern
+                if (/^[\d\s\-\(\)\+]+$/.test(query.trim()) && query.trim().replace(/[\s\-\(\)\+]/g, '').length >= 10) {
+                    patternSuggestions.push({
+                        text: `Search for phone ${query.trim()}`,
+                        icon: 'bi bi-telephone',
+                        subtitle: 'Contact search',
+                        type: 'pattern'
+                    });
+                    patternSuggestions.push({
+                        text: `Find contact ${query.trim()}`,
+                        icon: 'bi bi-person',
+                        subtitle: 'Contact lookup',
+                        type: 'pattern'
+                    });
+                }
+                
+                // Combine all suggestions
+                const allSuggestions = {
+                    textSuggestions: textSuggestions,
+                    offices: officeData,
+                    workstations: workstationData,
+                    clockSuggestions: clockSuggestions,
+                    patternSuggestions: patternSuggestions
+                };
+
+                // Cache the results for future instant access
+                this.setCachedSuggestions(query, allSuggestions);
+                
+                if (allSuggestions.textSuggestions.length > 0 || 
+                    allSuggestions.offices.length > 0 || 
+                    allSuggestions.workstations.length > 0 || 
+                    allSuggestions.clockSuggestions.length > 0) {
+                    this.displaySuggestions(allSuggestions);
+                } else {
+                    this.hideSuggestions();
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    // Request was cancelled, ignore
+                    return;
+                }
+                console.error('Suggestions error:', error);
+                // Don't show error for suggestions - just hide them
+                this.hideSuggestions();
+            }
+        }
+        
+        displaySuggestions(allSuggestions) {
+            const categories = [];
+            
+            // Pattern-based suggestions first (most intelligent)
+            if (allSuggestions.patternSuggestions && allSuggestions.patternSuggestions.length > 0) {
+                categories.push({
+                    title: 'Smart suggestions',
+                    items: allSuggestions.patternSuggestions
+                });
+            }
+            
+            // Clock-ID (and other) smart suggestions
+            if (allSuggestions.clockSuggestions && allSuggestions.clockSuggestions.length > 0) {
+                categories.push({
+                    title: 'Quick actions',
+                    items: allSuggestions.clockSuggestions
+                });
+            }
+            
+            // Add common suggestions (for quick access)
+            if (allSuggestions.commonSuggestions && allSuggestions.commonSuggestions.length > 0) {
+                categories.push({
+                    title: 'Quick search',
+                    items: allSuggestions.commonSuggestions
+                });
+            }
+            
+            // Add offices if available
+            if (allSuggestions.offices && allSuggestions.offices.length > 0) {
+                categories.push({
+                    title: 'Offices',
+                    items: allSuggestions.offices.slice(0, 3).map(office => ({
+                        text: `${office['Internal Name']} (#${office.Number})`,
+                        icon: 'bi bi-building',
+                        subtitle: office.Mnemonic || office.Location || 'Office',
+                        type: 'office',
+                        data: office
+                    }))
+                });
+            }
+            
+            // Add workstations if available - FIX: Use lowercase field names from unified search
+            if (allSuggestions.workstations && allSuggestions.workstations.length > 0) {
+                const workstationItems = allSuggestions.workstations.slice(0, 3).map(ws => ({
+                    text: ws.name || 'Unknown Workstation', // Use lowercase 'name'
+                    icon: 'bi bi-laptop',
+                    subtitle: ws.user || 'No User', // Use lowercase 'user'
+                    type: 'workstation',
+                    data: ws
+                }));
+                
+                categories.push({
+                    title: 'Workstations',
+                    items: workstationItems
+                });
+            }
+            
+            // Add text-based suggestions if available
+            if (allSuggestions.textSuggestions && allSuggestions.textSuggestions.length > 0) {
+                const recentSearches = allSuggestions.textSuggestions.filter(s => s.toLowerCase().includes(this.currentQuery.toLowerCase()) && s.toLowerCase() !== this.currentQuery.toLowerCase()).slice(0, 3);
+                if (recentSearches.length > 0) {
+                    categories.push({
+                        title: 'Recent searches',
+                        items: recentSearches.map(text => ({
+                            text,
+                            icon: 'bi bi-clock-history',
+                            subtitle: 'Previously searched',
+                            type: 'text'
+                        }))
+                    });
+                }
+            }
+            
+            // Add note-specific suggestions if available
+            if (allSuggestions.noteSuggestions && allSuggestions.noteSuggestions.length > 0) {
+                categories.push({
+                    title: 'Notes',
+                    items: allSuggestions.noteSuggestions
+                });
+            }
+            
+            // Add smart suggestions based on query
+            const smartSuggestions = this.generateSmartSuggestions(this.currentQuery);
+            if (smartSuggestions.length > 0) {
+                categories.push({
+                    title: 'Try searching for',
+                    items: smartSuggestions
+                });
+            }
+            
+            // Add note-specific suggestions for better discoverability
+            const noteSuggestions = this.generateNoteSuggestions(this.currentQuery);
+            if (noteSuggestions.length > 0) {
+                categories.push({
+                    title: 'Notes',
+                    items: noteSuggestions
+                });
+            }
+            
+            // Add quick actions
+            const quickActions = this.generateQuickActions(this.currentQuery);
+            if (quickActions.length > 0) {
+                categories.push({
+                    title: 'Quick actions',
+                    items: quickActions
+                });
+            }
+            
+            // ----- Build HTML merged list -----
+            // Deduplicate suggestions across *all* categories based on the
+            // display text (case-insensitive) so we never show identical
+            // entries like "Find user" twice.
+            const seen = new Set();
+            const uniqueItems = [];
+            categories.forEach(cat => {
+                cat.items.forEach(item => {
+                    const key = (item.text || '').toLowerCase();
+                    if (!seen.has(key)) {
+                        seen.add(key);
+                        uniqueItems.push(item);
+                    }
+                });
+            });
+
+            this._suggestionsMarkup = uniqueItems.map(i => this.createSuggestionItem(i)).join('');
+
+            // Suggestions will be merged into the main results list once it
+            // arrives, ensuring we don't create duplicate items or separate
+            // scroll areas.
+            // --- If there are *no* search results rendered yet, show the
+            // suggestions immediately so users are never left with an empty
+            // state while typing (especially helpful for numeric Clock-ID
+            // look-ups).
+            if (this.results && this.results.style.display === 'block') {
+                const hasDirectResults = this.currentResults && this.currentResults.length > 0;
+                if (!hasDirectResults) {
+                    this.resultsContent.innerHTML = this._suggestionsMarkup;
+                    this.resultsCount.textContent = '0+';
+                    // Add event listeners to suggestion items
+                    this.attachResultEventListeners();
+                }
+            }
+        }
+        
+        generateSmartSuggestions(query) {
+            const suggestions = [];
+            const lowerQuery = query.toLowerCase();
+            
+            // Office-related suggestions
+            if (lowerQuery.includes('office') || lowerQuery.includes('location') || lowerQuery.includes('building')) {
+                suggestions.push({
+                    text: `${query} office locations`,
+                    icon: 'bi bi-building',
+                    subtitle: 'Find office information'
+                });
+            }
+            
+            // User-related suggestions
+            if (lowerQuery.includes('user') || lowerQuery.includes('person') || lowerQuery.includes('employee')) {
+                suggestions.push({
+                    text: `${query} users`,
+                    icon: 'bi bi-person',
+                    subtitle: 'Search user directory'
+                });
+            }
+            
+            // Workstation-related suggestions
+            if (lowerQuery.includes('computer') || lowerQuery.includes('workstation') || lowerQuery.includes('device')) {
+                suggestions.push({
+                    text: `${query} workstations`,
+                    icon: 'bi bi-laptop',
+                    subtitle: 'Find device information'
+                });
+            }
+            
+            // Knowledge base suggestions
+            if (lowerQuery.includes('how') || lowerQuery.includes('guide') || lowerQuery.includes('help')) {
+                suggestions.push({
+                    text: `${query} guides`,
+                    icon: 'bi bi-journal-text',
+                    subtitle: 'Knowledge base articles'
+                });
+            }
+            
+            // Note-related suggestions
+            if (lowerQuery.includes('note') || lowerQuery.includes('memo') || lowerQuery.includes('documentation') || 
+                lowerQuery.includes('write') || lowerQuery.includes('document')) {
+                suggestions.push({
+                    text: `${query} notes`,
+                    icon: 'bi bi-sticky',
+                    subtitle: 'Search public notes'
+                });
+            }
+            
+            // Outage-related suggestions
+            if (lowerQuery.includes('outage') || lowerQuery.includes('down') || lowerQuery.includes('issue')) {
+                suggestions.push({
+                    text: `${query} outages`,
+                    icon: 'bi bi-exclamation-triangle',
+                    subtitle: 'Check system status'
+                });
+            }
+            
+            return suggestions.slice(0, 3);
+        }
+        
+        generateQuickActions(query) {
+            const actions = [];
+            const lowerQuery = query.toLowerCase();
+            
+            // Skip clock-ID specific quick actions for numeric queries since they're handled in getSuggestions
+            // This prevents duplicate suggestions like "Find user 00132" and "Find user 132"
+            // Clock ID suggestions are already generated in the getSuggestions method
+
+            // If it looks like an office name, suggest direct office lookup
+            if (lowerQuery.length >= 3 && !lowerQuery.includes(' ')) {
+                actions.push({
+                    text: `Go to ${query} office`,
+                    icon: 'bi bi-building',
+                    subtitle: 'View office details'
+                });
+            }
+
+            // If it looks like a username, suggest user lookup
+            if (lowerQuery.length >= 2 && lowerQuery.match(/^[a-zA-Z]/)) {
+                actions.push({
+                    text: `Find user ${query}`,
+                    icon: 'bi bi-person',
+                    subtitle: 'Search user directory'
+                });
+            }
+
+            // General search action always at bottom
+            actions.push({
+                text: `Search for "${query}"`,
+                icon: 'bi bi-search',
+                subtitle: 'Full search results',
+                type: 'view_all'
+            });
+
+            return actions.slice(0, 5); // cap for cleanliness
+        }
+        
+        generateNoteSuggestions(query) {
+            const suggestions = [];
+            const lowerQuery = query.toLowerCase();
+            
+            // Note-specific suggestions based on query content
+            if (lowerQuery.includes('note') || lowerQuery.includes('memo') || lowerQuery.includes('documentation')) {
+                suggestions.push({
+                    text: `Search notes for "${query}"`,
+                    icon: 'bi bi-sticky',
+                    subtitle: 'Find public notes',
+                    type: 'text'
+                });
+            }
+            
+            // If query looks like it could be a note title or content
+            if (lowerQuery.length >= 3 && !lowerQuery.includes(' ')) {
+                suggestions.push({
+                    text: `Find notes about "${query}"`,
+                    icon: 'bi bi-sticky',
+                    subtitle: 'Search note content',
+                    type: 'text'
+                });
+            }
+            
+            // If query contains common note-related terms
+            const noteTerms = ['how to', 'guide', 'procedure', 'process', 'setup', 'configuration', 'troubleshoot', 'fix', 'solution'];
+            if (noteTerms.some(term => lowerQuery.includes(term))) {
+                suggestions.push({
+                    text: `Find notes about "${query}"`,
+                    icon: 'bi bi-sticky',
+                    subtitle: 'Search for procedures and guides',
+                    type: 'text'
+                });
+            }
+            
+            // If query looks like a technical term or acronym
+            if (/^[A-Z]{2,}$/.test(query) || /^[a-z]+[A-Z]/.test(query)) {
+                suggestions.push({
+                    text: `Search notes for "${query}"`,
+                    icon: 'bi bi-sticky',
+                    subtitle: 'Find technical documentation',
+                    type: 'text'
+                });
+            }
+            
+            return suggestions.slice(0, 2); // Limit to 2 suggestions to avoid clutter
+        }
+        
+        displayResults(results, total) {
+            // Store current results for content type detection
+            this.currentResults = results || [];
+            
+            // Combine cached suggestions (if any) with actual results markup
+            const suggestionsTop = this._suggestionsMarkup || '';
+
+            // --- NEW LOGIC: Always surface smart suggestions when no result ---
+            if ((!results || results.length === 0) && suggestionsTop) {
+                // Show suggestions as standalone list so there is never a dead-end
+                this.resultsContent.innerHTML = suggestionsTop;
+                // Indicate suggestions are shown even if zero direct matches
+                this.resultsCount.textContent = `0+`;
+                // Add event listeners to suggestion items
+                this.attachResultEventListeners();
+            } else if (!results || results.length === 0) {
+                // Fallback – maintain existing "no results" placeholder
+                this.resultsContent.innerHTML = `
+                    <div class="result-item">
+                        <div class="result-content">
+                            <div class="result-title">No results found</div>
+                            <div class="result-description">Try adjusting your search terms or filters</div>
+                        </div>
+                    </div>
+                `;
+                this.resultsCount.textContent = '0';
+            } else {
+                const resultsHtml = results.map(result => this.createResultItem(result)).join('');
+                this.resultsContent.innerHTML = suggestionsTop + resultsHtml;
+                // Update counter – include + if we prefixed suggestions
+                this.resultsCount.textContent = total + (suggestionsTop ? '+' : '');
+                
+                // Add event listeners to result items
+                this.attachResultEventListeners();
+            }
+            
+            // Ensure dropdown is visible
+            this.results.style.display = 'block';
+            // Hide the secondary suggestion list (merged into main list)
+            this.hideSuggestions();
+        }
+        
+        attachResultEventListeners() {
+            // Add click event listeners to all result items
+            const resultItems = this.resultsContent.querySelectorAll('.result-item[data-result]');
+            console.log('Attaching result listeners to', resultItems.length, 'items');
+            resultItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    try {
+                        const resultData = JSON.parse(decodeURIComponent(item.getAttribute('data-result')));
+                        this.navigateToResult(resultData);
+                    } catch (error) {
+                        console.error('Error parsing result data:', error);
+                        // Fallback to URL navigation if available
+                        const resultData = {
+                            url: item.querySelector('.result-url')?.textContent || '',
+                            title: item.querySelector('.result-title')?.textContent || '',
+                            content_type: 'unknown'
+                        };
+                        this.navigateToResult(resultData);
+                    }
+                });
+            });
+            
+            // Add click event listeners to suggestion items
+            const suggestionItems = this.resultsContent.querySelectorAll('.result-item[data-suggestion]');
+            console.log('Attaching suggestion listeners to', suggestionItems.length, 'items');
+            suggestionItems.forEach((item, index) => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log('Suggestion item clicked:', index, item);
+                    
+                    try {
+                        // Safely decode the JSON data from HTML attribute
+                        const rawData = item.getAttribute('data-suggestion');
+                        console.log('Raw suggestion data:', rawData);
+                        const decodedData = rawData.replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+                        console.log('Decoded suggestion data:', decodedData);
+                        const suggestionData = JSON.parse(decodedData);
+                        console.log('Parsed suggestion data:', suggestionData);
+                        this.selectSuggestion(suggestionData.text, suggestionData.type, suggestionData.data || {});
+                    } catch (error) {
+                        console.error('Error parsing suggestion data:', error, item.getAttribute('data-suggestion'));
+                    }
+                });
+            });
+        }
+        
+        createResultItem(result) {
+            const icon = this.getContentTypeIcon(result.content_type);
+            const section = this.getContentTypeTitle(result.content_type);
+            
+            return `
+                <div class="result-item" data-result="${encodeURIComponent(JSON.stringify(result))}">
+                    <div class="result-icon ${result.content_type}">
+                        <i class="bi ${icon}"></i>
+                    </div>
+                    <div class="result-content">
+                        <div class="result-title">${result.highlighted_title || result.title}</div>
+                        <div class="result-description">${result.highlighted_description || result.description || ''}</div>
+                        <div class="result-meta">
+                            <span><i class="bi bi-tag"></i> ${section}</span>
+                            ${result.created_at ? `<span><i class="bi bi-calendar"></i> ${this.formatDate(result.created_at)}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // --- Suggestion item builder (now merged into main list) ---
+        createSuggestionItem(item) {
+            const iconClass = item.icon || this.getContentTypeIcon(item.type);
+            const suggestionId = `suggestion-${Math.random().toString(36).substr(2, 9)}`;
+            
+            // Special-case the "Full search results…" quick-action so it always
+            // performs a hard navigation, guaranteeing that the dedicated
+            // full-results page opens even if inline JS handlers are blocked.
+            if (item.type === 'view_all') {
+                const url = `/universal-search?q=${encodeURIComponent(this.currentQuery)}`;
+                return `
+                    <a href="${url}" class="result-item suggestion-item suggestion-viewall" style="text-decoration:none;">
+                        <div class="result-icon ${item.type}"><i class="${iconClass}"></i></div>
+                        <div class="result-content">
+                            <div class="result-title">${item.text}</div>
+                            ${item.subtitle ? `<div class="result-description">${item.subtitle}</div>` : ''}
+                        </div>
+                    </a>
+                `;
+            }
+            
+            // Safely encode JSON data for HTML attribute
+            const jsonData = JSON.stringify(item).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            
+            return `
+                <div class="result-item suggestion-item clickable-suggestion" id="${suggestionId}" data-suggestion="${jsonData}" style="cursor: pointer;">
+                    <div class="result-icon ${item.type || 'suggestion'}">
+                        <i class="${iconClass}"></i>
+                    </div>
+                    <div class="result-content">
+                        <div class="result-title">${item.text}</div>
+                        ${item.subtitle ? `<div class="result-description">${item.subtitle}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+        
+        selectSuggestion(suggestion, type = 'text', data = {}) {
+            console.log('selectSuggestion called:', { suggestion, type, data });
+            
+            if (type === 'view_all') {
+                this.viewAllResults();
+                return;
+            }
+            if (type === 'clock_id') {
+                const cid = (data.clock_id || suggestion).toString().replace(/\D/g, '').padStart(5, '0');
+                console.log('Clock ID lookup:', cid);
+                if (cid) {
+                    this.lookupClockId(cid);
+                }
+                return;
+            } else if (type === 'pattern') {
+                // Handle pattern-based suggestions
+                this.handlePatternSuggestion(suggestion);
+                return;
+            } else if (type === 'office' && data) {
+                // Show office detail modal
+                console.log('Office detail:', data);
+                window.showUniversalSearchDetail('office', data['Internal Name'] || data.name || suggestion);
+                return;
+            } else if (type === 'workstation' && data) {
+                // Show workstation detail modal - FIX: Use lowercase field names
+                console.log('Workstation detail:', data);
+                window.showUniversalSearchDetail('workstation', data.name || suggestion);
+                return;
+            } else {
+                // Handle text-based suggestions as before
+                console.log('Text-based suggestion:', suggestion);
+                this.searchInput.value = suggestion;
+                this.currentQuery = suggestion;
+                this.clearBtn.style.display = 'block';
+                this.performSearch(suggestion);
+            }
+        }
+        
+        handlePatternSuggestion(suggestion) {
+            // Extract the actual search term from pattern suggestions
+            let searchTerm = suggestion;
+            
+            // Remove prefixes like "Search for", "Find", etc.
+            searchTerm = searchTerm.replace(/^(Search for|Find)\s+/i, '');
+            
+            // For clock ID patterns, extract just the number
+            if (searchTerm.includes('Clock ID') || searchTerm.includes('employee')) {
+                const match = searchTerm.match(/\d+/);
+                if (match) {
+                    searchTerm = match[0];
+                }
+            }
+            
+            // Update the search input and perform search
+            this.searchInput.value = searchTerm;
+            this.currentQuery = searchTerm;
+            this.clearBtn.style.display = 'block';
+            this.performSearch(searchTerm);
+            
+            // Save to recent searches
+            this.saveRecentSearch(searchTerm);
+        }
+        
+        navigateToResult(result) {
+            // Store search context for highlighting
+            sessionStorage.setItem('searchContext', JSON.stringify({
+                query: this.currentQuery,
+                resultId: result.id,
+                timestamp: Date.now()
+            }));
+
+            // Handle different content types with appropriate actions
+            const url = result.url;
+            const type = result.content_type || '';
+
+            // Handle notes - open modal instead of navigation
+            if (type === 'note') {
+                this.openNoteModal(result);
+                return;
+            }
+
+            // Handle PDFs - open modal instead of new tab
+            if (type === 'document' || this.isPdfUrl(url)) {
+                this.openPdfModal(result);
+                return;
+            }
+
+            // Handle KB articles that are PDFs
+            if (type === 'kb_article' && this.isPdfUrl(url)) {
+                this.openPdfModal(result);
+                return;
+            }
+
+            // Intercept office/workstation URLs and show modal instead of redirect
+            if (url.startsWith('/users/')) {
+                const userId = url.split('/users/')[1];
+                window.showUniversalSearchDetail('user', userId);
+                return;
+            }
+
+            if (url.startsWith('/unified?q=')) {
+                const query = decodeURIComponent(url.split('q=')[1] || '');
+                // Find the result by URL in our stored results
+                const resultItem = this.currentResults.find(r => r.url === url);
+                if (resultItem) {
+                    if (resultItem.content_type === 'office') {
+                        window.showUniversalSearchDetail('office', query);
+                        return;
+                    } else if (resultItem.content_type === 'workstation') {
+                        window.showUniversalSearchDetail('workstation', query);
+                        return;
+                    }
+                }
+            }
+            
+            // Animate search bar flying up and hide it
+            const container = document.getElementById('universalSearchContainer');
+            if (container) {
+                container.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.8, 0.2, 1), opacity 0.5s';
+                container.style.transform = 'translate(-50%, -60%) scale(0.95)';
+                container.style.opacity = '0';
+                setTimeout(() => {
+                    container.style.display = 'none';
+                    container.style.transform = 'translate(-50%, -50%) scale(1)';
+                    container.style.opacity = '1';
+                }, 600);
+            }
+            
+            // Remove blur effect
+            if (this.blurOverlay) {
+                this.blurOverlay.classList.remove('active');
+            }
+            
+            if (!url) {
+                console.warn('No URL provided for navigation');
+                return;
+            }
+            
+            // For all other resources use standard navigation
+            if (url.startsWith('/')) {
+                window.location.href = url;
+            } else if (url.startsWith('http://') || url.startsWith('https://')) {
+                // External URL - open in new tab
+                window.open(url, '_blank');
+            } else {
+                // Assume it's a relative URL and add leading slash
+                window.location.href = '/' + url;
+            }
+        }
+        
+        isPdfUrl(url) {
+            return url && (url.toLowerCase().endsWith('.pdf') || url.includes('/static/docs/'));
+        }
+
+        async openNoteModal(result) {
+            console.log('openNoteModal called with:', result);
+            try {
+                // Extract note ID from the result - try multiple sources
+                let noteId = result.id;
+                
+                // If the ID has the "note_" prefix, extract the numeric part
+                if (noteId && typeof noteId === 'string' && noteId.startsWith('note_')) {
+                    noteId = noteId.replace('note_', '');
+                }
+                
+                // If no direct ID, try to extract from URL
+                if (!noteId && result.url) {
+                    noteId = this.extractNoteIdFromUrl(result.url);
+                }
+                
+                // If still no ID, try to extract from other result fields
+                if (!noteId && result.note_id) {
+                    noteId = result.note_id;
+                }
+                
+                // If still no ID, try to parse from result data
+                if (!noteId && result.data && result.data.id) {
+                    noteId = result.data.id;
+                }
+                
+                console.log('Final note ID:', noteId);
+                
+                if (!noteId) {
+                    console.error('Could not determine note ID from result:', result);
+                    this.showNoteErrorModal(result, 'Could not identify note ID');
+                    return;
+                }
+
+                console.log('Fetching note data for ID:', noteId);
+                
+                // First try to fetch as owner
+                let response = await fetch(`/notes/api/notes/${noteId}`);
+                
+                console.log('Owner fetch response status:', response.status);
+                
+                if (response.status === 403) {
+                    // User doesn't own this note - try public endpoint
+                    console.log('User not owner, trying public endpoint');
+                    response = await fetch(`/notes/api/notes/public/${noteId}`);
+                    
+                    console.log('Public fetch response status:', response.status);
+                    
+                    if (response.status === 403) {
+                        // Note is private and user doesn't own it
+                        this.showNoteAccessDeniedModal(result);
+                        return;
+                    }
+                    
+                    if (response.status === 404) {
+                        this.showNoteErrorModal(result, 'Note not found');
+                        return;
+                    }
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch public note: ${response.status} ${response.statusText}`);
+                    }
+                    
+                    const noteData = await response.json();
+                    console.log('Public note data received:', noteData);
+                    // Show view-only modal for public notes from other users
+                    this.showNoteViewOnlyModal(result, noteData);
+                    return;
+                }
+                
+                if (response.status === 404) {
+                    this.showNoteErrorModal(result, 'Note not found');
+                    return;
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch note: ${response.status} ${response.statusText}`);
+                }
+                
+                const noteData = await response.json();
+                console.log('Owner note data received:', noteData);
+                
+                // User owns this note - show editable modal
+                this.showNoteEditableModal(noteData);
+                
+            } catch (error) {
+                console.error('Error opening note modal:', error);
+                this.showNoteErrorModal(result, `Error loading note: ${error.message}`);
+            }
+        }
+
+        extractNoteIdFromUrl(url) {
+            console.log('Extracting note ID from URL:', url);
+            
+            // Extract note ID from various URL patterns
+            const patterns = [
+                /\/notes\/(\d+)/,           // /notes/123
+                /\/note\/(\d+)/,            // /note/123
+                /note_id=(\d+)/,            // ?note_id=123
+                /noteId=(\d+)/,             // ?noteId=123
+                /id=(\d+)/,                 // ?id=123
+                /notes.*\/(\d+)/,           // /notes/anything/123
+                /\/(\d+)$/                  // ends with /123
+            ];
+            
+            for (const pattern of patterns) {
+                const match = url.match(pattern);
+                if (match) {
+                    console.log('Note ID extracted:', parseInt(match[1]));
+                    return parseInt(match[1]);
+                }
+            }
+            
+            console.log('Could not extract note ID from URL:', url);
+            return null;
+        }
+
+        getOrCreateNoteModal() {
+            let modal = document.getElementById('universalSearchNoteModal');
+            if (!modal) {
+                // Create note modal elements
+                const modalHtml = `
+                    <div class="note-modal" id="universalSearchNoteModal">
+                        <div class="note-modal-header">
+                            <h3 class="note-modal-title" id="universalSearchNoteModalTitle">Note</h3>
+                            <div class="note-modal-actions">
+                                <button type="button" class="btn btn-sm btn-primary" id="universalSearchNoteEditBtn" style="display: none;">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </button>
+                                <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="
+                                    document.getElementById('universalSearchNoteModal').classList.remove('active');
+                                    document.getElementById('universalSearchNoteModalOverlay').classList.remove('active');
+                                "></button>
+                            </div>
+                        </div>
+                        <div class="note-modal-content" id="universalSearchNoteModalContent"></div>
+                    </div>
+                    <div class="note-modal-overlay" id="universalSearchNoteModalOverlay"></div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                modal = document.getElementById('universalSearchNoteModal');
+                
+                // Add click-to-close functionality
+                const overlay = document.getElementById('universalSearchNoteModalOverlay');
+                if (overlay) {
+                    overlay.addEventListener('click', () => {
+                        modal.classList.remove('active');
+                        overlay.classList.remove('active');
+                    });
+                }
+            }
+            return modal;
+        }
+
+        showNoteViewOnlyModal(result, noteData) {
+            const modal = this.getOrCreateNoteModal();
+            const overlay = document.getElementById('universalSearchNoteModalOverlay');
+            const content = document.getElementById('universalSearchNoteModalContent');
+            const titleEl = document.getElementById('universalSearchNoteModalTitle');
+            const editBtn = document.getElementById('universalSearchNoteEditBtn');
+            
+            if (!modal || !overlay || !content || !titleEl) {
+                // Fallback to regular navigation if modal elements don't exist
+                window.location.href = result.url;
+                return;
+            }
+
+            // Use note data if provided, otherwise use result data
+            const displayData = noteData || result;
+            
+            titleEl.textContent = displayData.title || 'Note';
+            
+            // Hide edit button for view-only mode
+            if (editBtn) {
+                editBtn.style.display = 'none';
+            }
+            
+            // Parse and display content with proper formatting
+            let displayContent = '';
+            
+            if (noteData && noteData.content) {
+                // Use full note data from API - render with full Quill support including images
+                try {
+                    const contentData = JSON.parse(noteData.content);
+                    if (contentData.ops && Array.isArray(contentData.ops)) {
+                        // Process Quill Delta operations with full rendering (including images)
+                        displayContent = this.renderQuillDelta(contentData.ops);
+                    } else {
+                        // Fallback to plain text
+                        displayContent = noteData.content;
+                    }
+                } catch (e) {
+                    // If not JSON, treat as plain text
+                    displayContent = noteData.content;
+                }
+            } else {
+                // Use search result description (which should now be clean plain text)
+                displayContent = result.highlighted_description || result.description || 'No content available';
+            }
+            
+            // Ensure we have some content to display
+            if (!displayContent || displayContent.trim() === '') {
+                displayContent = '<em style="color: rgba(255, 255, 255, 0.5);">This note appears to be empty.</em>';
+            }
+            
+            // Show note content
+            content.innerHTML = `
+                <div class="note-view-only">
+                    <div class="note-content-display">
+                        <div class="note-text-content">${displayContent}</div>
+                    </div>
+                    <div class="note-meta-info">
+                        <div><strong>Author:</strong> ${displayData.author || 'Unknown'}</div>
+                        <div><strong>Created:</strong> ${displayData.created_at ? new Date(displayData.created_at).toLocaleDateString() : 'Unknown'}</div>
+                        <div><strong>Updated:</strong> ${displayData.updated_at ? new Date(displayData.updated_at).toLocaleDateString() : 'Unknown'}</div>
+                        ${displayData.tags ? `<div><strong>Tags:</strong> ${this.renderNoteTags(displayData.tags)}</div>` : ''}
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+            overlay.classList.add('active');
+        }
+
+        showNoteEditableModal(noteData) {
+            const modal = this.getOrCreateNoteModal();
+            const overlay = document.getElementById('universalSearchNoteModalOverlay');
+            const content = document.getElementById('universalSearchNoteModalContent');
+            const titleEl = document.getElementById('universalSearchNoteModalTitle');
+            const editBtn = document.getElementById('universalSearchNoteEditBtn');
+            
+            if (!modal || !overlay || !content || !titleEl) {
+                // Fallback to notes page if modal elements don't exist
+                window.location.href = '/notes';
+                return;
+            }
+
+            titleEl.textContent = noteData.title || 'Untitled Note';
+            
+            // Show edit button for owners
+            if (editBtn) {
+                editBtn.style.display = 'inline-flex';
+                editBtn.onclick = () => {
+                    if (window.universalSearchInstance && window.universalSearchInstance.enableNoteEditing) {
+                        window.universalSearchInstance.enableNoteEditing(noteData);
+                    } else {
+                        console.error('Note editing not available');
+                        alert('Note editing is not available. Please try refreshing the page.');
+                    }
+                };
+            }
+            
+            // Parse and display content with proper formatting
+            let displayContent = '';
+            
+            if (noteData.content) {
+                try {
+                    // Try to parse as Quill Delta JSON
+                    const contentData = JSON.parse(noteData.content);
+                    if (contentData.ops && Array.isArray(contentData.ops)) {
+                        // Process Quill Delta operations with image support
+                        displayContent = this.renderQuillDelta(contentData.ops);
+                    } else {
+                        // Fallback to plain text
+                        displayContent = noteData.content;
+                    }
+                } catch (e) {
+                    // If not JSON, treat as plain text
+                    displayContent = noteData.content;
+                }
+            }
+            
+            content.innerHTML = `
+                <div class="note-editable-view">
+                    <div class="note-content-display">
+                        <div class="note-text-content">${displayContent || '<em style="opacity: 0.6;">No content</em>'}</div>
+                    </div>
+                    <div class="note-meta-info">
+                        ${noteData.tags ? `<div class="note-tags" style="margin-bottom: 0.75rem;">${this.renderNoteTags(noteData.tags)}</div>` : ''}
+                        <div class="note-metadata" style="display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.9rem;">
+                            <div class="note-privacy">
+                                <i class="bi ${noteData.is_public ? 'bi-unlock' : 'bi-lock-fill'}" style="margin-right: 0.25rem; color: ${noteData.is_public ? '#34c759' : '#ff3b30'};"></i>
+                                ${noteData.is_public ? 'Public' : 'Private'}
+                            </div>
+                            <div class="note-dates">
+                                <i class="bi bi-calendar" style="margin-right: 0.25rem;"></i>
+                                Updated: ${new Date(noteData.updated_at).toLocaleDateString()}
+                            </div>
+                            <div class="note-owner-info">
+                                <i class="bi bi-person-check" style="margin-right: 0.25rem; color: #007aff;"></i> You own this note
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            
+            modal.classList.add('active');
+            overlay.classList.add('active');
+        }
+
+        showNoteAccessDeniedModal(result) {
+            const modal = this.getOrCreateNoteModal();
+            const overlay = document.getElementById('universalSearchNoteModalOverlay');
+            const content = document.getElementById('universalSearchNoteModalContent');
+            const titleEl = document.getElementById('universalSearchNoteModalTitle');
+            const editBtn = document.getElementById('universalSearchNoteEditBtn');
+            
+            if (!modal || !overlay || !content || !titleEl) {
+                // Fallback: show alert and try to navigate to notes page
+                alert('Access denied: This note is private and you do not have permission to view it.');
+                window.location.href = '/notes';
+                return;
+            }
+
+            titleEl.textContent = result.title || 'Access Denied';
+            
+            // Hide edit button
+            if (editBtn) {
+                editBtn.style.display = 'none';
+            }
+            
+            content.innerHTML = `
+                <div class="note-access-denied" style="text-align: center; padding: 2rem;">
+                    <div class="access-denied-icon">
+                        <i class="bi bi-shield-exclamation" style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;"></i>
+                    </div>
+                    <h4 style="color: #fff; margin-bottom: 1rem;">Access Denied</h4>
+                    <p style="color: rgba(255, 255, 255, 0.7); text-align: center; line-height: 1.6; margin-bottom: 1.5rem;">
+                        This note is private and you do not have permission to view it.
+                    </p>
+                    <div class="access-denied-actions">
+                        <button class="btn btn-primary me-2" onclick="window.location.href='/notes'">
+                            <i class="bi bi-journal-text"></i> Go to My Notes
+                        </button>
+                        <button class="btn btn-secondary" onclick="
+                            document.getElementById('universalSearchNoteModal').classList.remove('active');
+                            document.getElementById('universalSearchNoteModalOverlay').classList.remove('active');
+                        ">
+                            <i class="bi bi-x"></i> Close
+                        </button>
+                    </div>
+                </div>`;
+            
+            modal.classList.add('active');
+            overlay.classList.add('active');
+        }
+
+        showNoteErrorModal(result, errorMessage) {
+            const modal = this.getOrCreateNoteModal();
+            const overlay = document.getElementById('universalSearchNoteModalOverlay');
+            const content = document.getElementById('universalSearchNoteModalContent');
+            const titleEl = document.getElementById('universalSearchNoteModalTitle');
+            const editBtn = document.getElementById('universalSearchNoteEditBtn');
+            
+            if (!modal || !overlay || !content || !titleEl) {
+                // Fallback: show alert and try to navigate to notes page
+                alert(`Note Error: ${errorMessage}`);
+                window.location.href = '/notes';
+                return;
+            }
+
+            titleEl.textContent = result.title || 'Note Error';
+            
+            // Hide edit button
+            if (editBtn) {
+                editBtn.style.display = 'none';
+            }
+            
+            content.innerHTML = `
+                <div class="note-error" style="text-align: center; padding: 2rem;">
+                    <div class="error-icon">
+                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem; color: #ffc107; margin-bottom: 1rem;"></i>
+                    </div>
+                    <h4 style="color: #fff; margin-bottom: 1rem;">Unable to Load Note</h4>
+                    <p style="color: rgba(255, 255, 255, 0.7); text-align: center; line-height: 1.6; margin-bottom: 1.5rem;">
+                        ${errorMessage}
+                    </p>
+                    <div class="error-actions">
+                        <button class="btn btn-primary me-2" onclick="window.location.href='/notes'">
+                            <i class="bi bi-journal-text"></i> Go to Notes
+                        </button>
+                        <button class="btn btn-secondary" onclick="
+                            document.getElementById('universalSearchNoteModal').classList.remove('active');
+                            document.getElementById('universalSearchNoteModalOverlay').classList.remove('active');
+                        ">
+                            <i class="bi bi-x"></i> Close
+                        </button>
+                    </div>
+                </div>`;
+            
+            modal.classList.add('active');
+            overlay.classList.add('active');
+        }
+
+        renderQuillDelta(ops) {
+            let html = '';
+            
+            for (const op of ops) {
+                if (op.insert && typeof op.insert === 'string') {
+                    let text = op.insert;
+                    
+                    // Convert newlines to proper HTML
+                    text = text.replace(/\n/g, '<br>');
+                    
+                    // Apply formatting if attributes exist
+                    if (op.attributes) {
+                        if (op.attributes.bold) {
+                            text = `<strong>${text}</strong>`;
+                        }
+                        if (op.attributes.italic) {
+                            text = `<em>${text}</em>`;
+                        }
+                        if (op.attributes.underline) {
+                            text = `<u>${text}</u>`;
+                        }
+                        if (op.attributes.strike) {
+                            text = `<del>${text}</del>`;
+                        }
+                        if (op.attributes.link) {
+                            text = `<a href="${op.attributes.link}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+                        }
+                        if (op.attributes.color) {
+                            text = `<span style="color: ${op.attributes.color};">${text}</span>`;
+                        }
+                        if (op.attributes.background) {
+                            text = `<span style="background-color: ${op.attributes.background};">${text}</span>`;
+                        }
+                        if (op.attributes.size) {
+                            text = `<span style="font-size: ${op.attributes.size};">${text}</span>`;
+                        }
+                        if (op.attributes.font) {
+                            text = `<span style="font-family: ${op.attributes.font};">${text}</span>`;
+                        }
+                        if (op.attributes.code) {
+                            text = `<code style="background: rgba(255, 255, 255, 0.1); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: monospace;">${text}</code>`;
+                        }
+                        if (op.attributes['code-block']) {
+                            text = `<pre style="background: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 0.5rem; overflow-x: auto; font-family: monospace;"><code>${text}</code></pre>`;
+                        }
+                    }
+                    
+                    html += text;
+                } else if (op.insert && typeof op.insert === 'object') {
+                    // Handle embeds (images, etc.) but don't include them in search previews
+                    if (op.insert.image) {
+                        // For search results, we skip images to keep previews clean
+                        // Images are only rendered in full note view
+                        html += `<span class="note-image-placeholder" style="color: rgba(255, 255, 255, 0.5); font-style: italic;">[Image]</span>`;
+                    } else if (op.insert.video) {
+                        html += `<span class="note-video-placeholder" style="color: rgba(255, 255, 255, 0.5); font-style: italic;">[Video]</span>`;
+                    } else if (op.insert.formula) {
+                        // Handle math formulas
+                        html += `<span class="note-formula" style="background: rgba(255, 255, 255, 0.1); padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: monospace;">${op.insert.formula}</span>`;
+                    }
+                }
+            }
+            
+            return html;
+        }
+
+        renderNoteTags(tags) {
+            if (!tags) return '';
+            
+            const tagList = tags.split(',').map(tag => tag.trim()).filter(tag => tag);
+            return tagList.map(tag => 
+                `<span class="note-tag" style="background: rgba(126, 203, 255, 0.1); color: #7ecbff; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.875rem; font-weight: 500; border: 1px solid rgba(126, 203, 255, 0.2);">${tag}</span>`
+            ).join('');
+        }
+
+        openPdfModal(result) {
+            // Enhanced PDF modal implementation
+            console.log('Opening PDF modal for:', result);
+            
+            const modal = document.getElementById('universalSearchDetailModal');
+            if (!modal) {
+                console.error('universalSearchDetailModal not found');
+                // Fallback to opening in new tab
+                if (result.url) {
+                    window.open(result.url, '_blank');
+                }
+                return;
+            }
+            
+            modal.style.display = 'flex';
+            const content = document.getElementById('universalSearchDetailContent');
+            if (!content) {
+                console.error('universalSearchDetailContent not found');
+                return;
+            }
+            
+            content.innerHTML = `
+                <button class="modal-close-btn" aria-label="Close" onclick="document.getElementById('universalSearchDetailModal').style.display='none'">×</button>
+                <div class="pdf-modal-header">
+                    <h3 class="modal-title">${result.title || 'Document'}</h3>
+                </div>
+                <div class="pdf-modal-content" style="padding: 0; height: calc(100% - 80px);">
+                    <iframe 
+                        src="${result.url}" 
+                        style="width: 100%; height: 100%; border: none; border-radius: 0 0 1.5rem 1.5rem;"
+                        title="PDF Viewer">
+                    </iframe>
+                </div>
+            `;
+        }
+        
+        // ---------------------------------------------
+        // Clock-ID lookup helper (using new cache system)
+        // ---------------------------------------------
+        async lookupClockId(clockId) {
+            try {
+                // Normalize clock ID (remove leading zeros)
+                const normalizedId = clockId.replace(/^0+/, '');
+                
+                // Show loading with personalized message
+                const genericPhrases = [
+                    'Obtaining user profile…',
+                    'Searching for user account…',
+                    'Fetching account information…'
+                ];
+                let personalisedMessage = genericPhrases[Math.floor(Math.random() * genericPhrases.length)];
+                
+                // Try to get personalized message from cache first
+                try {
+                    const cacheRes = await fetch(`/api/clock-id/lookup/${normalizedId}`);
+                    if (cacheRes.ok) {
+                        const cached = await cacheRes.json();
+                        if (cached.success && cached.user && cached.user.first_name) {
+                            const personalized = [
+                                `Fetching ${cached.user.first_name}'s account information…`,
+                                `Grabbing ${cached.user.first_name}'s credentials…`,
+                                `Preparing ${cached.user.first_name}'s profile…`
+                            ];
+                            personalisedMessage = personalized[Math.floor(Math.random() * personalized.length)];
+                            
+                            // Show the cached user data immediately
+                            this.showLoading(true, personalisedMessage);
+                            window.showClockIdUserModal(cached.user);
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Cache lookup failed, trying fallback:', error);
+                }
+                
+                // If cache lookup failed or user not found, try fallback to PowerShell
+                this.showLoading(true, personalisedMessage);
+                
+                try {
+                    // Try fallback to PowerShell lookup
+                    const fallbackRes = await fetch(`/api/clock-id/fallback/${normalizedId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    if (fallbackRes.ok) {
+                        const data = await fallbackRes.json();
+                        if (data.success && data.user) {
+                            // Map PowerShell output to modal-friendly format
+                            const mapped = {
+                                username: data.user.Username || data.user.username || normalizedId,
+                                full_name: data.user.FullName || data.user.full_name || '',
+                                email: data.user.Email || data.user.email || '',
+                                role: data.user.Title || 'User',
+                                title: data.user.Title || '',
+                                clock_id: data.user.ClockID || normalizedId,
+                                profile_picture: null,
+                                phone: data.user.Phone || '',
+                                password_last_reset: data.user.PasswordLastReset || data.user.password_last_reset || '',
+                                account_status: data.user.AccountStatus || data.user.account_status || '',
+                                locked_out: data.user.LockedOut ?? data.user.locked_out,
+                                password_expired: data.user.PasswordExpired ?? data.user.password_expired,
+                                email_license: data.user.EmailLicense || data.user.Email_License || data.user.email_license || null,
+                                department: data.user.Department || data.user.department || '',
+                                epic_status: data.user.EpicStatus || data.user.epic_status || '',
+                                epic_block: data.user.EpicBlock || data.user.epic_block || '',
+                                immutable_id: data.user.ImmutableID || data.user.immutable_id || '',
+                                not_locked_out: data.user.NotLockedOut ?? data.user.not_locked_out,
+                                password_not_expired: data.user.PasswordNotExpired ?? data.user.password_not_expired,
+                                group_membership: data.user.GroupMembership || data.user.group_membership || [],
+                                password_expiration_date: data.user.PasswordExpirationDate || data.user.password_expiration_date || '',
+                                mfa_status: data.user.MFAStatus || data.user.mfa_status || '',
+                                device_logon_history: data.user.DeviceLogonHistory || data.user.device_logon_history || []
+                            };
+                            
+                            window.showClockIdUserModal(mapped);
+                            return;
+                        }
+                    }
+                } catch (fallbackError) {
+                    console.warn('Fallback lookup failed:', fallbackError);
+                }
+                
+                // If both cache and fallback failed, show error
+                this.displayError(`No user found for Clock ID ${clockId}`);
+                
+            } catch (err) {
+                console.error('Clock ID lookup error:', err);
+                this.displayError('Clock ID lookup failed.');
+            } finally {
+                this.showLoading(false);
+            }
+        }
+        
+        displayError(message) {
+            this.resultsContent.innerHTML = `
+                <div class="result-item">
+                    <div class="result-content">
+                        <div class="result-title">Error</div>
+                        <div class="result-description">${message}</div>
+                    </div>
+                </div>
+            `;
+            this.resultsCount.textContent = '0';
+            this.results.style.display = 'block';
+        }
+        
+        clearSearch() {
+            this.searchInput.value = '';
+            this.currentQuery = '';
+            this.clearBtn.style.display = 'none';
+            this.hideResults();
+            this.hideSuggestions();
+            this.filters.style.display = 'none';
+            this.searchInput.focus();
+        }
+        
+        showLoading(show, message = '') {
+            // Toggle loader visibility
+            this.loading.style.display = show ? 'flex' : 'none';
+            // Disable / enable input & clear button to prevent concurrent searches only for clock-ID lookups (when a message is provided)
+            const shouldDisable = show && message;
+            this.searchInput.disabled = shouldDisable;
+            this.clearBtn.disabled = shouldDisable;
+
+            // Handle dynamic status text inside loader
+            let statusEl = this.loading.querySelector('.loading-status-text');
+            if (show && message) {
+                if (!statusEl) {
+                    statusEl = document.createElement('span');
+                    statusEl.className = 'loading-status-text';
+                    this.loading.appendChild(statusEl);
+                }
+                statusEl.textContent = message;
+
+                // Hide input elements entirely so only loader + text remain
+                if (!this._origPlaceholder) {
+                    this._origPlaceholder = this.searchInput.placeholder;
+                }
+                this.searchInput.value = '';
+                this.searchInput.placeholder = '';
+                this.searchInput.style.display = 'none';
+                if (this.searchIcon) this.searchIcon.style.display = 'none';
+                this.clearBtn.style.display = 'none';
+
+            } else if (statusEl) {
+                statusEl.textContent = '';
+
+                // Restore input elements once loading finishes
+                this.searchInput.style.display = 'block';
+                if (this.searchIcon) this.searchIcon.style.display = '';
+                this.searchInput.placeholder = this._origPlaceholder || 'Search everything...';
+                // Show clear button only if there is text
+                this.clearBtn.style.display = this.currentQuery ? 'block' : 'none';
+            }
+        }
+        
+        hideSuggestions() {
+            this.suggestions.style.display = 'none';
+        }
+        
+        hideResults() {
+            this.results.style.display = 'none';
+        }
+        
+        viewAllResults() {
+            if (this.currentQuery) {
+                // Save to recent searches
+                this.saveRecentSearch(this.currentQuery);
+                
+                const params = new URLSearchParams({ q: this.currentQuery });
+                window.location.href = `/universal-search?${params}`;
+            }
+        }
+        
+        getContentTypeIcon(contentType) {
+            const icons = {
+                'kb_article': 'bi-journal-text',
+                'outage': 'bi-exclamation-triangle',
+                'user': 'bi-person',
+                'office': 'bi-building',
+                'workstation': 'bi-laptop',
+                'document': 'bi-file-earmark-text',
+                'note': 'bi-sticky'
+            };
+            return icons[contentType] || 'bi-file-earmark';
+        }
+        
+        getContentTypeTitle(contentType) {
+            const titles = {
+                'kb_article': 'Knowledge Base',
+                'outage': 'Outages',
+                'user': 'Users',
+                'office': 'Offices',
+                'workstation': 'Workstations',
+                'document': 'Documents',
+                'note': 'Notes'
+            };
+            return titles[contentType] || 'Other';
+        }
+        
+        formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 1) {
+                return 'Today';
+            } else if (diffDays === 2) {
+                return 'Yesterday';
+            } else if (diffDays <= 7) {
+                return `${diffDays - 1} days ago`;
+            } else {
+                return date.toLocaleDateString();
+            }
+        }
+
+        // Additional utility methods
+        
+        extractPlainTextFromQuill(content) {
+            try {
+                if (!content) return '';
+                
+                // Try to parse as JSON
+                const data = typeof content === 'string' ? JSON.parse(content) : content;
+                
+                // Check if it's Quill Delta format
+                if (data && data.ops && Array.isArray(data.ops)) {
+                    const textParts = [];
+                    
+                    for (const op of data.ops) {
+                        if (op && typeof op.insert === 'string') {
+                            // Only process text inserts, skip images and other embeds
+                            let text = op.insert;
+                            // Clean up excessive newlines but preserve structure
+                            text = text.replace(/\n\n\n+/g, '\n\n');
+                            textParts.push(text);
+                        }
+                        // Skip non-string inserts (images, videos, etc.)
+                    }
+                    
+                    return textParts.join(' ').trim();
+                } else {
+                    // If not Quill format, return as-is (fallback for plain text)
+                    return content;
+                }
+            } catch (e) {
+                // If parsing fails, treat as plain text
+                return content || '';
+            }
+        }
+    }
+    
+    // Initialize universal search when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Only initialize if the search container exists and hasn't been initialized
+        if (document.getElementById('universalSearchContainer') && !window.universalSearchInitialized) {
+            window.universalSearchInstance = new UniversalSearch();
+            window.universalSearchInitialized = true;
+        }
+    });
+})();
+
+// Global image modal function for note images
+window.openImageModal = function(imageUrl) {
+    // Create image modal if it doesn't exist
+    let imageModal = document.getElementById('universalSearchImageModal');
+    if (!imageModal) {
+        const modalHtml = `
+            <div class="image-modal-overlay" id="universalSearchImageModalOverlay">
+                <div class="image-modal" id="universalSearchImageModal">
+                    <div class="image-modal-header">
+                        <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="closeImageModal()"></button>
+                    </div>
+                    <div class="image-modal-content">
+                        <img id="universalSearchImageModalImg" src="" alt="Image" style="max-width: 100%; max-height: 90vh; object-fit: contain;">
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        // Add styles for image modal
+        const imageModalStyles = `
+            <style>
+                .image-modal-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    background: rgba(0, 0, 0, 0.9);
+                    z-index: 12000;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    backdrop-filter: blur(8px);
+                    cursor: pointer;
+                }
+                
+                .image-modal {
+                    position: relative;
+                    max-width: 95vw;
+                    max-height: 95vh;
+                    cursor: default;
+                }
+                
+                .image-modal-header {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    z-index: 1001;
+                }
+                
+                .image-modal-header .btn-close {
+                    background: rgba(0, 0, 0, 0.5);
+                    border-radius: 50%;
+                    padding: 8px;
+                    backdrop-filter: blur(4px);
+                }
+                
+                .image-modal-content {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                
+                .image-modal img {
+                    border-radius: 8px;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+                }
+            </style>
+        `;
+        document.head.insertAdjacentHTML('beforeend', imageModalStyles);
+        
+        imageModal = document.getElementById('universalSearchImageModal');
+        const overlay = document.getElementById('universalSearchImageModalOverlay');
+        
+        // Close modal when clicking overlay
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                closeImageModal();
+            }
+        });
+        
+        // Close modal with escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && overlay.style.display === 'flex') {
+                closeImageModal();
+            }
+        });
+    }
+    
+    // Show modal with image
+    const img = document.getElementById('universalSearchImageModalImg');
+    const overlay = document.getElementById('universalSearchImageModalOverlay');
+    
+    img.src = imageUrl;
+    overlay.style.display = 'flex';
+    
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+};
+
+window.closeImageModal = function() {
+    const overlay = document.getElementById('universalSearchImageModalOverlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+        // Restore body scroll
+        document.body.style.overflow = '';
+    }
+};
+
+// Debounce utility
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
+// ... inside UniversalSearch class ...
+
+// Replace direct suggestion logic with debounced version
+this.debouncedSuggest = debounce(async (query) => {
+    // Enhanced pattern recognition for clock IDs (1-5 digits)
+    if (/^\d{1,5}$/.test(query.trim())) {
+        const padded = query.trim().padStart(5, '0');
+        // Always use the latest query value
+        let cachedUser = null;
+        try {
+            const cacheRes = await fetch(`/users/cache/${padded}`);
+            if (cacheRes.ok) {
+                const cached = await cacheRes.json();
+                if (cached && cached.success && cached.first_name) {
+                    cachedUser = cached;
+                }
+            }
+        } catch (_) { /* ignore cache errors */ }
+        // If we have cached user data, show personalized suggestion first
+        if (cachedUser) {
+            const fullName = `${cachedUser.first_name} ${cachedUser.last_name || ''}`.trim();
+            this.displaySuggestions({
+                clockSuggestions: [{
+                    text: `${fullName}'s Account`,
+                    icon: 'bi bi-person-circle',
+                    subtitle: `Clock ID: ${padded}`,
+                    type: 'clock_id',
+                    data: { clock_id: padded }
+                }, {
+                    text: `View ${fullName}'s full profile`,
+                    icon: 'bi bi-person-badge',
+                    subtitle: 'Complete user information',
+                    type: 'clock_id',
+                    data: { clock_id: padded }
+                }]
+            });
+        } else {
+            this.displaySuggestions({
+                clockSuggestions: [{
+                    text: `Find user ${padded}`,
+                    icon: 'bi bi-person-badge',
+                    subtitle: 'Lookup user by Clock ID',
+                    type: 'clock_id',
+                    data: { clock_id: padded }
+                }]
+            });
+        }
+        return;
+    }
+    // ... fallback to other suggestion logic ...
+    // (rest of the suggestion logic remains unchanged)
+}, 300);
+
+// In the input event handler, replace direct call with debouncedSuggest
+this.inputElement.addEventListener('input', (e) => {
+    const query = e.target.value;
+    this.debouncedSuggest(query);
+});
+
+// On Enter, trigger immediate lookup
+this.inputElement.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        const query = this.inputElement.value.trim();
+        if (/^\d{1,5}$/.test(query)) {
+            this.debouncedSuggest.cancel && this.debouncedSuggest.cancel();
+            // Immediate suggestion/lookup logic here
+            // ...
+        }
+    }
+});
+</script> 
+</script> 

@@ -1,0 +1,362 @@
+{% macro render_socket_manager() %}
+<script>
+// Global socket state management to prevent duplicate connections
+window.socketState = {
+    socket: null,
+    isInitialized: false,
+    isConnecting: false,
+    connectionAttempts: 0,
+    maxConnectionAttempts: 3,
+    heartbeatInterval: null,
+    dashboardInterval: null,
+    lastDisconnectTime: null,
+    hideTimeout: null,
+    lastOnlineUsers: [],
+    isUpdating: false,
+    connectionId: null
+};
+
+// Prevent multiple socket initializations - SINGLETON PATTERN
+if (window.socketManagerInitialized) {
+    console.log('Socket manager already initialized, skipping...');
+} else {
+    window.socketManagerInitialized = true;
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        // Single socket initialization point
+        initializeSocketManagerOnce();
+    });
+}
+
+function initializeSocketManagerOnce() {
+    if (window.socketState.isInitialized) {
+        console.log('Socket manager already initialized, skipping duplicate initialization');
+        return;
+    }
+    
+    console.log('🔌 Initializing socket manager (single instance)...');
+    window.socketState.isInitialized = true;
+    
+    // Generate unique connection ID to prevent conflicts
+    window.socketState.connectionId = 'socket_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    
+    // Initialize socket connection
+    initializeSocketConnection();
+    
+    // Set up event handlers
+    setupSocketEventHandlers();
+    
+    // Set up periodic heartbeat
+    setupPeriodicHeartbeat();
+}
+
+function initializeSocketConnection() {
+    // Prevent multiple connection attempts
+    if (window.socketState.isConnecting || window.socketState.socket) {
+        console.log('Socket connection already in progress or exists, skipping...');
+        return;
+    }
+    
+    window.socketState.isConnecting = true;
+    
+    try {
+        // Use existing YAM Socket Manager if available
+        if (window.yamSocketManager && window.yamSocketManager.socket) {
+            window.socketState.socket = window.yamSocketManager.socket;
+            console.log('✅ Using existing YAM Socket Manager');
+            window.socketState.isConnecting = false;
+            return;
+        }
+        
+        // Create new socket connection with optimized settings
+        window.socketState.socket = io({
+            withCredentials: true,
+            reconnection: true,
+            reconnectionAttempts: 3, // Reduced to prevent infinite loops
+            reconnectionDelay: 2000, // Increased for stability
+            reconnectionDelayMax: 10000, // Increased max delay
+            timeout: 30000, // Increased timeout
+            transports: ['polling'], // Force polling for stability
+            upgrade: false, // Disable upgrade to prevent connection issues
+            rememberUpgrade: false,
+            forceNew: false,
+            query: {
+                connection_id: window.socketState.connectionId,
+                timestamp: Date.now()
+            }
+        });
+        
+        console.log('✅ Created optimized socket connection with ID:', window.socketState.connectionId);
+        
+    } catch (error) {
+        console.error('❌ Error creating socket connection:', error);
+        window.socketState.isConnecting = false;
+        // Fallback to HTTP polling
+        startHTTPFallback();
+    }
+    
+    window.socketState.isConnecting = false;
+}
+
+function setupSocketEventHandlers() {
+    const socket = window.socketState.socket;
+    if (!socket) return;
+    
+    socket.on('connect', () => {
+        console.log('✅ Socket connected successfully');
+        window.socketState.connectionAttempts = 0;
+        window.socketState.lastDisconnectTime = null;
+        
+        if (window.socketState.hideTimeout) {
+            clearTimeout(window.socketState.hideTimeout);
+            window.socketState.hideTimeout = null;
+        }
+        
+        restoreIcons();
+        
+        // Send initial heartbeat
+        socket.emit('heartbeat');
+        
+        // Load initial data after connection
+        setTimeout(() => {
+            loadInitialDataWithRetry();
+        }, 2000); // Increased delay for stability
+        
+        // Show connection status
+        if (typeof updateConnectionStatus === 'function') {
+            updateConnectionStatus(true);
+        }
+    });
+
+    socket.on('disconnect', (reason) => {
+        console.log('❌ Socket disconnected:', reason);
+        window.socketState.lastDisconnectTime = Date.now();
+        
+        if (typeof updateConnectionStatus === 'function') {
+            updateConnectionStatus(false);
+        }
+
+        // Schedule hide after 2 minutes if not reconnected
+        window.socketState.hideTimeout = setTimeout(() => {
+            if (!socket.connected && Date.now() - window.socketState.lastDisconnectTime >= 120000) {
+                console.log('Hiding icons after 2 minutes of disconnect');
+                hideIcons();
+            }
+        }, 120000);
+        
+        // Show reconnection message
+        if (typeof showReconnectionMessage === 'function') {
+            showReconnectionMessage();
+        }
+    });
+
+    socket.on('connect_error', (error) => {
+        console.error('❌ Socket connection error:', error);
+        window.socketState.connectionAttempts++;
+        
+        if (window.socketState.connectionAttempts >= window.socketState.maxConnectionAttempts) {
+            console.log('Max connection attempts reached, falling back to HTTP');
+            startHTTPFallback();
+        } else {
+            // Attempt to reconnect with exponential backoff
+            setTimeout(() => {
+                if (!socket.connected) {
+                    socket.connect();
+                }
+            }, Math.min(3000 * Math.pow(2, window.socketState.connectionAttempts), 15000));
+        }
+    });
+
+    socket.on('reconnect', (attemptNumber) => {
+        console.log('✅ Socket reconnected after', attemptNumber, 'attempts');
+        window.socketState.connectionAttempts = 0;
+        socket.emit('heartbeat');
+        
+        if (typeof updateConnectionStatus === 'function') {
+            updateConnectionStatus(true);
+        }
+    });
+
+    socket.on('reconnect_attempt', (attemptNumber) => {
+        console.log('🔄 Socket reconnection attempt:', attemptNumber);
+    });
+
+    socket.on('reconnect_error', (error) => {
+        console.error('❌ Socket reconnection error:', error);
+    });
+
+    socket.on('reconnect_failed', () => {
+        console.error('❌ Socket reconnection failed, using HTTP fallback');
+        startHTTPFallback();
+    });
+
+    // User presence events
+    socket.on('online_users_update', function(users) {
+        console.log('👥 Received online users update:', users.length, 'users');
+        
+        if (!window.socketState.isUpdating) {
+            window.socketState.isUpdating = true;
+            try {
+                if (typeof updateOnlineUsers === 'function') {
+                    updateOnlineUsers(users);
+                }
+                if (typeof updateLastRefreshTime === 'function') {
+                    updateLastRefreshTime();
+                }
+            } finally {
+                window.socketState.isUpdating = false;
+            }
+        }
+    });
+
+    socket.on('presence_stats_update', function(stats) {
+        console.log('📊 Received presence stats update:', stats);
+        if (typeof updatePresenceStats === 'function') {
+            updatePresenceStats(stats);
+        }
+    });
+
+    socket.on('heartbeat_ack', function(data) {
+        console.debug('💓 Heartbeat acknowledged:', data);
+        if (typeof updateConnectionStatus === 'function') {
+            updateConnectionStatus(true);
+        }
+        if (typeof updateLastHeartbeatTime === 'function') {
+            updateLastHeartbeatTime();
+        }
+    });
+
+    socket.on('error', function(error) {
+        console.error('❌ Socket error:', error);
+        if (typeof showConnectionError === 'function') {
+            showConnectionError('Socket connection error: ' + error.message);
+        }
+    });
+}
+
+function setupPeriodicHeartbeat() {
+    // Clear any existing intervals
+    if (window.socketState.heartbeatInterval) {
+        clearInterval(window.socketState.heartbeatInterval);
+    }
+    if (window.socketState.dashboardInterval) {
+        clearInterval(window.socketState.dashboardInterval);
+    }
+    
+    // Set up heartbeat (every 45 seconds - increased for stability)
+    window.socketState.heartbeatInterval = setInterval(() => {
+        const socket = window.socketState.socket;
+        if (socket && socket.connected) {
+            socket.emit('heartbeat');
+            console.debug('💓 Heartbeat sent');
+        } else if (socket && !socket.connected) {
+            console.log('🔄 Attempting to reconnect...');
+            socket.connect();
+        }
+    }, 45000); // Increased from 30 seconds
+    
+    // Set up periodic dashboard updates (every 90 seconds - increased for stability)
+    window.socketState.dashboardInterval = setInterval(() => {
+        const socket = window.socketState.socket;
+        if (socket && socket.connected) {
+            if (typeof requestAdminDashboardData === 'function') {
+                requestAdminDashboardData();
+            }
+        }
+    }, 90000); // Increased from 60 seconds
+}
+
+function startHTTPFallback() {
+    console.log('🌐 Starting HTTP fallback for user data');
+    
+    // Load initial data via HTTP
+    if (typeof fetchUsersViaHTTP === 'function') {
+        fetchUsersViaHTTP();
+    }
+    
+    // Set up periodic HTTP polling
+    setInterval(() => {
+        if (typeof fetchUsersViaHTTP === 'function') {
+            fetchUsersViaHTTP();
+        }
+    }, 45000); // Increased interval for stability
+}
+
+// Utility functions
+function updateConnectionStatus(isConnected, message = '') {
+    // This function will be implemented in the main template
+    console.log('Connection status:', isConnected, message);
+}
+
+function showReconnectionMessage() {
+    // This function will be implemented in the main template
+    console.log('Showing reconnection message');
+}
+
+function showConnectionError(message) {
+    // This function will be implemented in the main template
+    console.error('Connection error:', message);
+}
+
+function hideIcons() {
+    const icons = document.querySelectorAll('.user-icon');
+    icons.forEach(icon => {
+        icon.style.opacity = '0.3';
+    });
+}
+
+function restoreIcons() {
+    const icons = document.querySelectorAll('.user-icon');
+    icons.forEach(icon => {
+        icon.style.opacity = '1';
+    });
+}
+
+// Load initial data with retry mechanism
+function loadInitialDataWithRetry() {
+    console.log('📊 Loading initial data...');
+    
+    // Request initial user data via socket
+    const socket = window.socketState.socket;
+    if (socket && socket.connected) {
+        socket.emit('get_online_users');
+    }
+    
+    // Also try HTTP fallback after a delay
+    setTimeout(() => {
+        if (typeof fetchUsersViaHTTP === 'function') {
+            fetchUsersViaHTTP();
+        }
+    }, 3000); // Increased delay
+}
+
+// Ensure current user is marked as online
+function ensureCurrentUserOnline() {
+    const socket = window.socketState.socket;
+    if (socket && socket.connected) {
+        socket.emit('heartbeat');
+    }
+}
+
+// Set up enhanced user presence management
+function setupUserPresence() {
+    // Set up a fallback to check if users are loaded after 15 seconds
+    setTimeout(() => {
+        const onlineUsersContainer = document.getElementById('onlineUsers');
+        if (onlineUsersContainer && onlineUsersContainer.children.length === 0) {
+            console.log('No users loaded after 15 seconds, forcing refresh');
+            if (typeof refreshUserList === 'function') {
+                refreshUserList();
+            } else if (typeof fetchUsersViaHTTP === 'function') {
+                fetchUsersViaHTTP();
+            }
+        }
+    }, 15000); // Increased timeout
+}
+
+// Make functions globally available
+window.fetchUsersViaHTTP = fetchUsersViaHTTP;
+window.ensureCurrentUserOnline = ensureCurrentUserOnline;
+window.setupUserPresence = setupUserPresence;
+</script>
+{% endmacro %} 

@@ -1,0 +1,322 @@
+{% macro render_recent_activity(current_user) %}
+<!-- Recent Activity Component -->
+<div class="yam-component recent-activity-component" id="recentActivityComponent">
+    <div class="component-header">
+        <h5><i class="bi bi-clock-history"></i> Recent Activity</h5>
+        <div class="header-actions">
+            <button class="btn btn-sm btn-outline-primary refresh-btn" onclick="recentActivity.refresh()">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div class="component-content">
+        <div class="activity-list" id="activityList">
+            <div class="loading-state">
+                <i class="bi bi-hourglass-split"></i>
+                <span>Loading activities...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Recent Activity Component
+window.recentActivity = {
+    activities: [],
+    refreshInterval: null,
+    
+    init() {
+        this.loadActivities();
+        this.startAutoRefresh();
+        this.setupSocketListener();
+        console.log('Recent Activity component initialized');
+    },
+    
+    async loadActivities() {
+        try {
+            const response = await fetch('/api/activity/recent');
+            if (response.ok) {
+                const data = await response.json();
+                this.activities = data.activities || [];
+                this.renderActivities();
+            } else {
+                this.showError('Failed to load activities');
+            }
+        } catch (error) {
+            console.error('Error loading activities:', error);
+            this.showError('Error loading activities');
+        }
+    },
+    
+    renderActivities() {
+        const container = document.getElementById('activityList');
+        if (!container) return;
+        
+        if (this.activities.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <span>No recent activity</span>
+                </div>
+            `;
+            return;
+        }
+        
+        const activitiesHtml = this.activities.map(activity => this.renderActivityItem(activity)).join('');
+        container.innerHTML = activitiesHtml;
+    },
+    
+    renderActivityItem(activity) {
+        const icon = this.getActivityIcon(activity.action);
+        const timeAgo = this.getTimeAgo(activity.timestamp);
+        const user = activity.user || 'Unknown';
+        
+        return `
+            <div class="activity-item">
+                <div class="activity-icon ${activity.action}">
+                    <i class="bi ${icon}"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-text">
+                        <strong>${user}</strong> ${this.getActivityText(activity.action)}
+                    </div>
+                    <div class="activity-time">${timeAgo}</div>
+                </div>
+            </div>
+        `;
+    },
+    
+    getActivityIcon(action) {
+        const icons = {
+            'login': 'bi-box-arrow-in-right',
+            'logout': 'bi-box-arrow-left',
+            'search': 'bi-search',
+            'note_create': 'bi-file-earmark-plus',
+            'note_edit': 'bi-pencil',
+            'note_delete': 'bi-trash',
+            'file_upload': 'bi-cloud-upload',
+            'file_download': 'bi-cloud-download',
+            'status_change': 'bi-toggle-on',
+            'message': 'bi-chat',
+            'default': 'bi-activity'
+        };
+        return icons[action] || icons.default;
+    },
+    
+    getActivityText(action) {
+        const texts = {
+            'login': 'logged in',
+            'logout': 'logged out',
+            'search': 'performed a search',
+            'note_create': 'created a note',
+            'note_edit': 'edited a note',
+            'note_delete': 'deleted a note',
+            'file_upload': 'uploaded a file',
+            'file_download': 'downloaded a file',
+            'status_change': 'changed status',
+            'message': 'sent a message',
+            'default': 'performed an action'
+        };
+        return texts[action] || texts.default;
+    },
+    
+    getTimeAgo(timestamp) {
+        const now = new Date();
+        const activityTime = new Date(timestamp);
+        const diffMs = now - activityTime;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+        
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins}m ago`;
+        if (diffHours < 24) return `${diffHours}h ago`;
+        if (diffDays < 7) return `${diffDays}d ago`;
+        return activityTime.toLocaleDateString();
+    },
+    
+    setupSocketListener() {
+        // Listen for new activities from socket
+        window.addEventListener('onlineUsersUpdate', (event) => {
+            // Refresh activities when users come online/offline
+            setTimeout(() => this.loadActivities(), 1000);
+        });
+    },
+    
+    startAutoRefresh() {
+        this.refreshInterval = setInterval(() => {
+            this.loadActivities();
+        }, 60000); // Refresh every minute
+    },
+    
+    stopAutoRefresh() {
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+            this.refreshInterval = null;
+        }
+    },
+    
+    refresh() {
+        this.loadActivities();
+    },
+    
+    showError(message) {
+        const container = document.getElementById('activityList');
+        if (container) {
+            container.innerHTML = `
+                <div class="error-state">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+        }
+    },
+    
+    destroy() {
+        this.stopAutoRefresh();
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.recentActivity.init();
+});
+</script>
+
+<style>
+.recent-activity-component {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.activity-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 1rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.activity-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(4px);
+}
+
+.activity-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.activity-icon.login {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+}
+
+.activity-icon.logout {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+}
+
+.activity-icon.search {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+}
+
+.activity-icon.note_create,
+.activity-icon.note_edit {
+    background: linear-gradient(135deg, #FF9800, #F57C00);
+}
+
+.activity-icon.note_delete {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+}
+
+.activity-icon.file_upload,
+.activity-icon.file_download {
+    background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+}
+
+.activity-icon.status_change {
+    background: linear-gradient(135deg, #00BCD4, #0097A7);
+}
+
+.activity-icon.message {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+}
+
+.activity-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.activity-text {
+    color: #fff;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    margin-bottom: 0.25rem;
+}
+
+.activity-time {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+}
+
+.loading-state,
+.empty-state,
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    gap: 0.5rem;
+}
+
+.loading-state i,
+.empty-state i,
+.error-state i {
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.error-state {
+    color: #f44336;
+}
+
+.error-state i {
+    color: #f44336;
+}
+
+@media (max-width: 768px) {
+    .activity-item {
+        padding: 0.5rem;
+    }
+    
+    .activity-text {
+        font-size: 0.8rem;
+    }
+    
+    .activity-time {
+        font-size: 0.7rem;
+    }
+}
+</style>
+{% endmacro %} 

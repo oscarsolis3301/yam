@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{# Import Index2 main layout component #}
+{% import 'components/index2/main_layout.html' as main_layout %}
+
+{% block head %}
+<!-- Authentication detection element -->
+{% if current_user and current_user.is_authenticated %}
+<div class="authenticated-content" data-user="{{ current_user.username if current_user.username else 'Unknown' }}" style="display: none;"></div>
+{% endif %}
+
+<!-- Modern CSS Framework -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Custom Styles -->
+<link rel="stylesheet" href="{{ url_for('static', filename='CSS/styles.css') }}" />
+{% endblock %}
+
+{% block content %}
+<!-- Render the main layout with all Index2 components -->
+{{ main_layout.render_main_layout(name, current_user) }}
+{% endblock %}
+
+{% block scripts %}
+<!-- Bootstrap JS for modals -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Socket.IO for real-time updates -->
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+
+<!-- Session Monitor for Stable Connections -->
+<script src="{{ url_for('static', filename='JS/session-monitor.js') }}"></script>
+
+<!-- Initialize socket connection for Index2 components -->
+<script>
+// Initialize socket connection for Index2 components
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize socket connection if not already done
+    if (typeof window.socketState === 'undefined') {
+        window.socketState = {
+            socket: io(),
+            connected: false
+        };
+        
+        window.socketState.socket.on('connect', () => {
+            window.socketState.connected = true;
+            console.log('Socket connected for Index2 components');
+        });
+        
+        window.socketState.socket.on('disconnect', () => {
+            window.socketState.connected = false;
+            console.log('Socket disconnected');
+        });
+    }
+    
+    // Test functions for development (only in development environment)
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        window.testIndex2Components = {
+            testOutageBanner: function() {
+                if (window.outageBanner) {
+                    window.outageBanner.showOutage({
+                        title: 'Test Outage',
+                        description: 'This is a test outage for Index2 components'
+                    });
+                }
+            },
+            
+            testToast: function() {
+                if (window.showToast) {
+                    window.showToast('Index2 components are working!', 'success');
+                }
+            },
+            
+            testUserModal: function() {
+                const userItems = document.querySelectorAll('.user-item');
+                if (userItems.length > 0) {
+                    userItems[0].click();
+                }
+            }
+        };
+        
+        // Add test controls to the page
+        setTimeout(() => {
+            const testDiv = document.createElement('div');
+            testDiv.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                background: rgba(0, 0, 0, 0.9);
+                padding: 1rem;
+                border-radius: 12px;
+                z-index: 10000;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            `;
+            
+            testDiv.innerHTML = `
+                <h6 style="color: white; margin-bottom: 0.75rem; font-size: 0.9rem;">Index2 Test Controls</h6>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <button onclick="testIndex2Components.testOutageBanner()" style="padding: 0.5rem; border-radius: 6px; border: none; background: #dc3545; color: white; cursor: pointer; font-size: 0.8rem;">Test Outage</button>
+                    <button onclick="testIndex2Components.testToast()" style="padding: 0.5rem; border-radius: 6px; border: none; background: #28a745; color: white; cursor: pointer; font-size: 0.8rem;">Test Toast</button>
+                    <button onclick="testIndex2Components.testUserModal()" style="padding: 0.5rem; border-radius: 6px; border: none; background: #007bff; color: white; cursor: pointer; font-size: 0.8rem;">Test Modal</button>
+                </div>
+            `;
+            
+            document.body.appendChild(testDiv);
+        }, 2000);
+    }
+});
+</script>
+{% endblock %}

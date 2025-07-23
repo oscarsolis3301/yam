@@ -1,0 +1,234 @@
+{% macro render_dashboard_main(current_user) %}
+<div class="dashboard-content">
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-title">Total Users</div>
+                <div class="stat-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+            </div>
+            <div class="stat-value" id="totalUsers">-</div>
+            <div class="stat-change positive">
+                <i class="bi bi-arrow-up"></i>
+                <span id="totalUsersChange">Loading...</span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-title">Active Sessions</div>
+                <div class="stat-icon">
+                    <i class="bi bi-activity"></i>
+                </div>
+            </div>
+            <div class="stat-value" id="activeSessions">-</div>
+            <div class="stat-change positive">
+                <i class="bi bi-arrow-up"></i>
+                <span id="activeSessionsChange">Loading...</span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-title">Online Users</div>
+                <div class="stat-icon">
+                    <i class="bi bi-wifi"></i>
+                </div>
+            </div>
+            <div class="stat-value" id="onlineUsers">-</div>
+            <div class="stat-change positive">
+                <i class="bi bi-arrow-up"></i>
+                <span id="onlineUsersChange">Loading...</span>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-title">System Load</div>
+                <div class="stat-icon">
+                    <i class="bi bi-cpu"></i>
+                </div>
+            </div>
+            <div class="stat-value" id="systemLoad">-</div>
+            <div class="stat-change" id="systemLoadChange">
+                <i class="bi bi-arrow-down"></i>
+                <span>Loading...</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Content Grid -->
+    <div class="content-grid">
+        <!-- Main Chart -->
+        <div class="content-card">
+            <div class="card-header">
+                <h3 class="card-title">Tickets Closed Today</h3>
+                <div class="card-actions">
+                    <button class="btn-icon" id="refreshTicketsChart" title="Refresh Chart">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                    <button class="btn-icon" id="exportTicketsData" title="Export Data">
+                        <i class="bi bi-download"></i>
+                    </button>
+                    <a href="/tickets" class="card-action">View Details</a>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="ticketsChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="content-card">
+            <div class="card-header">
+                <h3 class="card-title">Recent Activity</h3>
+                <div class="card-actions">
+                    <button class="btn-icon" id="refreshActivity" title="Refresh Activity">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                    <button class="btn-icon" id="filterActivity" title="Filter Activity">
+                        <i class="bi bi-funnel"></i>
+                    </button>
+                    <a href="/activity" class="card-action">View All</a>
+                </div>
+            </div>
+            <ul class="activity-list" id="recentActivityList">
+                <li class="activity-item">
+                    <div class="activity-avatar">OS</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Oscar Solis closed ticket <span class="ticket-number">INC#2025-001</span></div>
+                        <div class="activity-time">2 minutes ago</div>
+                    </div>
+                </li>
+                <li class="activity-item">
+                    <div class="activity-avatar">AC</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Abigail Curry closed ticket <span class="ticket-number">INC#2025-002</span></div>
+                        <div class="activity-time">15 minutes ago</div>
+                    </div>
+                </li>
+                <li class="activity-item">
+                    <div class="activity-avatar">MJ</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Mike Johnson closed ticket <span class="ticket-number">INC#2025-003</span></div>
+                        <div class="activity-time">1 hour ago</div>
+                    </div>
+                </li>
+                <li class="activity-item">
+                    <div class="activity-avatar">SL</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Sarah Lee closed ticket <span class="ticket-number">INC#2025-004</span></div>
+                        <div class="activity-time">2 hours ago</div>
+                    </div>
+                </li>
+                <li class="activity-item">
+                    <div class="activity-avatar">RK</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Robert Kim closed ticket <span class="ticket-number">INC#2025-005</span></div>
+                        <div class="activity-time">3 hours ago</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Additional Content Grid -->
+    <div class="content-grid">
+        <!-- User Distribution -->
+        <div class="content-card">
+            <div class="card-header">
+                <h3 class="card-title">User Distribution</h3>
+                <div class="card-actions">
+                    <button class="btn-icon" id="refreshUserDistribution" title="Refresh Chart">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                    <button class="btn-icon" id="exportUserData" title="Export Data">
+                        <i class="bi bi-download"></i>
+                    </button>
+                    <a href="/users" class="card-action">View Details</a>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="userDistributionChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="content-card">
+            <div class="card-header">
+                <h3 class="card-title">Quick Actions</h3>
+            </div>
+            <div class="quick-actions">
+                <button class="quick-action-btn" id="addUserBtn" data-action="add-user">
+                    <i class="bi bi-person-plus"></i>
+                    <span>Add User</span>
+                </button>
+                <button class="quick-action-btn" id="newTicketBtn" data-action="new-ticket">
+                    <i class="bi bi-ticket"></i>
+                    <span>New Ticket</span>
+                </button>
+                <button class="quick-action-btn" id="createReportBtn" data-action="create-report">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>Create Report</span>
+                </button>
+                <button class="quick-action-btn" id="settingsBtn" data-action="settings">
+                    <i class="bi bi-gear"></i>
+                    <span>Settings</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- System Status -->
+    <div class="content-card">
+        <div class="card-header">
+            <h3 class="card-title">System Status</h3>
+            <div class="card-actions">
+                <button class="btn-icon" id="refreshSystemMetrics" title="Refresh System Metrics">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+            </div>
+        </div>
+        <div class="system-metrics">
+            <div class="system-metric" id="cpuMetric">
+                <div class="metric-info">
+                    <div class="metric-label">CPU Usage</div>
+                    <div class="metric-value" id="realCpuUsage">-</div>
+                </div>
+                <div class="metric-icon">
+                    <i class="bi bi-cpu"></i>
+                </div>
+            </div>
+            <div class="system-metric" id="memoryMetric">
+                <div class="metric-info">
+                    <div class="metric-label">Memory Usage</div>
+                    <div class="metric-value" id="realMemoryUsage">-</div>
+                </div>
+                <div class="metric-icon">
+                    <i class="bi bi-memory"></i>
+                </div>
+            </div>
+            <div class="system-metric" id="diskMetric">
+                <div class="metric-info">
+                    <div class="metric-label">Disk Usage</div>
+                    <div class="metric-value" id="realDiskUsage">-</div>
+                </div>
+                <div class="metric-icon">
+                    <i class="bi bi-hdd"></i>
+                </div>
+            </div>
+            <div class="system-metric" id="networkMetric">
+                <div class="metric-info">
+                    <div class="metric-label">Network</div>
+                    <div class="metric-value" id="realNetworkStatus">-</div>
+                </div>
+                <div class="metric-icon">
+                    <i class="bi bi-wifi"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %} 

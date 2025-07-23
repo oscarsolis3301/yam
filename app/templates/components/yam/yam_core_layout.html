@@ -1,0 +1,878 @@
+{% import 'components/yam/welcome_banner.html' as yam_welcome %}
+{% import 'components/yam/socket_manager_fixed.html' as yam_socket_fixed %}
+{% import 'components/yam/quick_stats.html' as yam_quick_stats %}
+{% import 'components/yam/status_indicator.html' as yam_status_indicator %}
+{% import 'components/yam/user_quick_view.html' as yam_user_quick_view %}
+{% import 'components/yam/connection_status.html' as yam_connection_status %}
+
+{# Import all components for modals #}
+{% import 'components/yam/user_presence_map.html' as yam_user_presence_map %}
+{% import 'components/yam/user_analytics.html' as yam_user_analytics %}
+{% import 'components/yam/user_activity_heatmap.html' as yam_user_activity_heatmap %}
+{% import 'components/yam/advanced_user_status.html' as yam_advanced_user_status %}
+{% import 'components/yam/system_monitor.html' as yam_system_monitor %}
+{% import 'components/yam/system_health_monitor.html' as yam_system_health_monitor %}
+{% import 'components/yam/team_performance_analytics.html' as yam_team_performance_analytics %}
+{% import 'components/yam/team_collaboration.html' as yam_team_collaboration %}
+{% import 'components/yam/recent_activity.html' as yam_recent_activity %}
+{% import 'components/yam/user_activity_tracker.html' as yam_user_activity_tracker %}
+{% import 'components/yam/notifications.html' as yam_notifications %}
+{% import 'components/yam/team_chat.html' as yam_team_chat %}
+
+{% macro render_yam_core_layout(name, current_user) %}
+<!-- YAM Dashboard - Minimalistic Layout -->
+<div class="yam-dashboard-minimal" id="yamDashboard">
+    <div class="yam-dashboard-content">
+        <!-- Welcome Banner Section -->
+        <div class="yam-welcome-section">
+            {{ yam_welcome.render_welcome_banner(name, current_user) }}
+        </div>
+        
+        <!-- Fixed Socket Manager (Hidden) -->
+        {{ yam_socket_fixed.render_socket_manager_fixed() }}
+        
+        <!-- Critical Alerts Section -->
+        <div class="yam-alerts-section" id="yamAlertsSection">
+            <!-- Alerts will be dynamically loaded here -->
+        </div>
+        
+        <!-- Essential Information Dashboard -->
+        <div class="yam-essential-dashboard" id="yamEssentialDashboard">
+            <!-- Critical Stats Row -->
+            <div class="yam-critical-stats">
+                <div class="yam-stats-grid">
+                    <div class="yam-stat-card">
+                        {{ yam_quick_stats.render_quick_stats(current_user) }}
+                    </div>
+                    <div class="yam-stat-card">
+                        {{ yam_status_indicator.render_status_indicator(current_user) }}
+                    </div>
+                    <div class="yam-stat-card">
+                        {{ yam_user_quick_view.render_user_quick_view(current_user) }}
+                    </div>
+                    <div class="yam-stat-card">
+                        {{ yam_connection_status.render_connection_status(current_user) }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons for Detailed Views -->
+            <div class="yam-action-panel">
+                <div class="yam-action-grid">
+                    <!-- Team & Analytics Actions -->
+                    <div class="yam-action-group">
+                        <h4><i class="bi bi-people-fill"></i> Team & Analytics</h4>
+                        <div class="yam-action-buttons">
+                            <button class="yam-action-btn" onclick="yamModals.openModal('userPresenceModal')">
+                                <i class="bi bi-map"></i>
+                                <span>User Presence Map</span>
+                            </button>
+                            <button class="yam-action-btn" onclick="yamModals.openModal('userAnalyticsModal')">
+                                <i class="bi bi-graph-up"></i>
+                                <span>User Analytics</span>
+                            </button>
+                            <button class="yam-action-btn" onclick="yamModals.openModal('activityHeatmapModal')">
+                                <i class="bi bi-calendar-heatmap"></i>
+                                <span>Activity Heatmap</span>
+                            </button>
+                            <button class="yam-action-btn" onclick="yamModals.openModal('advancedStatusModal')">
+                                <i class="bi bi-person-badge"></i>
+                                <span>Advanced Status</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- System & Monitoring Actions -->
+                    <div class="yam-action-group">
+                        <h4><i class="bi bi-gear-fill"></i> System & Monitoring</h4>
+                        <div class="yam-action-buttons">
+                            <button class="yam-action-btn" onclick="yamModals.openModal('systemMonitorModal')">
+                                <i class="bi bi-cpu"></i>
+                                <span>System Monitor</span>
+                            </button>
+                            <button class="yam-action-btn" onclick="yamModals.openModal('systemHealthModal')">
+                                <i class="bi bi-heart-pulse"></i>
+                                <span>System Health</span>
+                            </button>
+                            <button class="yam-action-btn" onclick="yamModals.openModal('teamPerformanceModal')">
+                                <i class="bi bi-trophy"></i>
+                                <span>Team Performance</span>
+                            </button>
+                            <button class="yam-action-btn" onclick="yamModals.openModal('teamCollaborationModal')">
+                                <i class="bi bi-people"></i>
+                                <span>Team Collaboration</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Activity & Communication Actions -->
+                    <div class="yam-action-group">
+                        <h4><i class="bi bi-activity"></i> Activity & Communication</h4>
+                        <div class="yam-action-buttons">
+                            <button class="yam-action-btn" onclick="yamModals.openModal('recentActivityModal')">
+                                <i class="bi bi-clock-history"></i>
+                                <span>Recent Activity</span>
+                            </button>
+                            <button class="yam-action-btn" onclick="yamModals.openModal('activityTrackerModal')">
+                                <i class="bi bi-activity"></i>
+                                <span>Activity Tracker</span>
+                            </button>
+                            <button class="yam-action-btn" onclick="yamModals.openModal('notificationsModal')">
+                                <i class="bi bi-bell"></i>
+                                <span>Notifications</span>
+                            </button>
+                            <button class="yam-action-btn" onclick="yamModals.openModal('teamChatModal')">
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Team Chat</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal System -->
+<div class="yam-modal-overlay" id="yamModalOverlay">
+    <div class="yam-modal-container" id="yamModalContainer">
+        <div class="yam-modal-header">
+            <h3 id="yamModalTitle">Modal Title</h3>
+            <button class="yam-modal-close" onclick="yamModals.closeModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="yam-modal-content" id="yamModalContent">
+            <!-- Modal content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<!-- Modal Content Templates (Hidden) -->
+<div style="display: none;">
+    <!-- User Presence Map Modal -->
+    <div id="userPresenceModalContent">
+        {{ yam_user_presence_map.render_user_presence_map(current_user) }}
+    </div>
+    
+    <!-- User Analytics Modal -->
+    <div id="userAnalyticsModalContent">
+        {{ yam_user_analytics.render_user_analytics(current_user) }}
+    </div>
+    
+    <!-- Activity Heatmap Modal -->
+    <div id="activityHeatmapModalContent">
+        {{ yam_user_activity_heatmap.render_user_activity_heatmap(current_user) }}
+    </div>
+    
+    <!-- Advanced Status Modal -->
+    <div id="advancedStatusModalContent">
+        {{ yam_advanced_user_status.render_advanced_user_status(current_user) }}
+    </div>
+    
+    <!-- System Monitor Modal -->
+    <div id="systemMonitorModalContent">
+        {{ yam_system_monitor.render_system_monitor(current_user) }}
+    </div>
+    
+    <!-- System Health Modal -->
+    <div id="systemHealthModalContent">
+        {{ yam_system_health_monitor.render_system_health_monitor(current_user) }}
+    </div>
+    
+    <!-- Team Performance Modal -->
+    <div id="teamPerformanceModalContent">
+        {{ yam_team_performance_analytics.render_team_performance_analytics(current_user) }}
+    </div>
+    
+    <!-- Team Collaboration Modal -->
+    <div id="teamCollaborationModalContent">
+        {{ yam_team_collaboration.render_team_collaboration(current_user) }}
+    </div>
+    
+    <!-- Recent Activity Modal -->
+    <div id="recentActivityModalContent">
+        {{ yam_recent_activity.render_recent_activity(current_user) }}
+    </div>
+    
+    <!-- Activity Tracker Modal -->
+    <div id="activityTrackerModalContent">
+        {{ yam_user_activity_tracker.render_user_activity_tracker(current_user) }}
+    </div>
+    
+    <!-- Notifications Modal -->
+    <div id="notificationsModalContent">
+        {{ yam_notifications.render_notifications(current_user) }}
+    </div>
+    
+    <!-- Team Chat Modal -->
+    <div id="teamChatModalContent">
+        {{ yam_team_chat.render_team_chat(current_user) }}
+    </div>
+</div>
+
+<style>
+/* Discord-style Dashboard Styles */
+.yam-dashboard-minimal {
+    min-height: 100vh;
+    background: #36393f; /* Discord dark theme background */
+    color: #dcddde; /* Discord light text color */
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    margin-left: 3.5rem; /* Account for sidebar */
+    width: calc(100vw - 3.5rem); /* Full width minus sidebar */
+    max-width: calc(100vw - 3.5rem);
+    /* Ensure proper positioning with outage banner */
+    position: relative;
+    z-index: 1;
+}
+
+.yam-dashboard-minimal.with-outage-banner {
+    padding-top: 0 !important; /* Remove top padding to prevent 5px spacing */
+    transition: padding-top 0.2s;
+}
+
+.yam-dashboard-content {
+    padding: 2rem;
+    width: 100%;
+    max-width: none; /* Remove max-width constraint for full width */
+    margin: 0;
+}
+
+/* Alerts Section */
+.yam-alerts-section {
+    margin-bottom: 2rem;
+}
+
+.yam-alert {
+    background: #2f3136; /* Discord secondary background */
+    border-radius: 8px; /* Discord border radius */
+    border-left: 4px solid;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: alertSlideIn 0.3s ease-out;
+}
+
+@keyframes alertSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.yam-alert.critical {
+    border-left-color: #dc3545;
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.yam-alert.warning {
+    border-left-color: #ffc107;
+    background: rgba(255, 193, 7, 0.1);
+}
+
+.yam-alert.info {
+    border-left-color: #17a2b8;
+    background: rgba(23, 162, 184, 0.1);
+}
+
+.yam-alert.success {
+    border-left-color: #28a745;
+    background: rgba(40, 167, 69, 0.1);
+}
+
+.yam-alert-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.yam-alert-content {
+    flex: 1;
+}
+
+.yam-alert-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+}
+
+.yam-alert-message {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.yam-alert-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background 0.3s ease;
+    flex-shrink: 0;
+}
+
+.yam-alert-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Essential Dashboard */
+.yam-essential-dashboard {
+    margin-top: 2rem;
+}
+
+/* Critical Stats */
+.yam-critical-stats {
+    margin-bottom: 3rem;
+}
+
+.yam-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.yam-stat-card {
+    background: #2f3136; /* Discord secondary background */
+    border-radius: 8px; /* Discord border radius */
+    border: 1px solid #202225; /* Discord border color */
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+}
+
+.yam-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    background: #40444b; /* Discord hover background */
+}
+
+/* Action Panel */
+.yam-action-panel {
+    background: #2f3136; /* Discord secondary background */
+    border-radius: 8px; /* Discord border radius */
+    border: 1px solid #202225; /* Discord border color */
+    padding: 2rem;
+}
+
+.yam-action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+.yam-action-group h4 {
+    color: #dcddde; /* Discord light text */
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.yam-action-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.yam-action-btn {
+    background: #40444b; /* Discord button background */
+    border: 1px solid #202225; /* Discord border color */
+    border-radius: 4px; /* Discord border radius */
+    padding: 1rem;
+    color: #dcddde; /* Discord light text */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.yam-action-btn:hover {
+    background: #4f545c; /* Discord hover background */
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.yam-action-btn i {
+    font-size: 1.5rem;
+    color: #dcddde; /* Discord light text */
+}
+
+/* Modal Styles */
+.yam-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.yam-modal-container {
+    background: #36393f; /* Discord dark theme background */
+    border-radius: 8px; /* Discord border radius */
+    max-width: 90vw;
+    max-height: 90vh;
+    width: 100%;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: modalSlideIn 0.3s ease-out;
+    border: 1px solid #202225; /* Discord border color */
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.yam-modal-header {
+    background: #2f3136; /* Discord secondary background */
+    color: #dcddde; /* Discord light text */
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #202225; /* Discord border color */
+}
+
+.yam-modal-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #dcddde; /* Discord light text */
+}
+
+.yam-modal-close {
+    background: none;
+    border: none;
+    color: #dcddde; /* Discord light text */
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px; /* Discord border radius */
+    transition: background 0.2s ease;
+}
+
+.yam-modal-close:hover {
+    background: #40444b; /* Discord hover background */
+}
+
+.yam-modal-content {
+    padding: 2rem;
+    max-height: calc(90vh - 100px);
+    overflow-y: auto;
+    background: #36393f; /* Discord dark theme background */
+    color: #dcddde; /* Discord light text */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .yam-dashboard-minimal {
+        margin-left: 0; /* Remove sidebar margin on mobile */
+        width: 100vw; /* Full width on mobile */
+        max-width: 100vw;
+    }
+    
+    .yam-dashboard-content {
+        padding: 1rem;
+    }
+    
+    .yam-stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .yam-action-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .yam-action-buttons {
+        grid-template-columns: 1fr;
+    }
+    
+    .yam-modal-container {
+        max-width: 95vw;
+        margin: 1rem;
+    }
+    
+    .yam-modal-content {
+        padding: 1rem;
+    }
+}
+
+/* Component Overrides for Discord Design */
+.yam-component {
+    background: #2f3136 !important; /* Discord secondary background */
+    border: 1px solid #202225 !important; /* Discord border color */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+.component-header {
+    background: #36393f !important; /* Discord primary background */
+    border-bottom: 1px solid #202225 !important; /* Discord border color */
+    padding-bottom: 0.5rem !important;
+}
+
+.component-header h5 {
+    color: #dcddde !important; /* Discord light text */
+    font-size: 1rem !important;
+    margin: 0 !important;
+}
+
+.component-content {
+    padding: 1rem !important;
+    background: #2f3136 !important; /* Discord secondary background */
+    color: #dcddde !important; /* Discord light text */
+}
+</style>
+
+<script>
+// YAM Alert System
+window.yamAlerts = {
+    alerts: [],
+    
+    addAlert(type, title, message, duration = 0) {
+        const alert = {
+            id: Date.now() + Math.random(),
+            type,
+            title,
+            message,
+            duration
+        };
+        
+        this.alerts.push(alert);
+        this.renderAlerts();
+        
+        if (duration > 0) {
+            setTimeout(() => {
+                this.removeAlert(alert.id);
+            }, duration);
+        }
+        
+        return alert.id;
+    },
+    
+    removeAlert(alertId) {
+        this.alerts = this.alerts.filter(alert => alert.id !== alertId);
+        this.renderAlerts();
+    },
+    
+    renderAlerts() {
+        const alertsSection = document.getElementById('yamAlertsSection');
+        if (!alertsSection) return;
+        
+        if (this.alerts.length === 0) {
+            alertsSection.style.display = 'none';
+            return;
+        }
+        
+        alertsSection.style.display = 'block';
+        alertsSection.innerHTML = this.alerts.map(alert => `
+            <div class="yam-alert ${alert.type}" id="alert-${alert.id}">
+                <div class="yam-alert-icon">
+                    ${this.getAlertIcon(alert.type)}
+                </div>
+                <div class="yam-alert-content">
+                    <div class="yam-alert-title">${alert.title}</div>
+                    <div class="yam-alert-message">${alert.message}</div>
+                </div>
+                <button class="yam-alert-close" onclick="yamAlerts.removeAlert(${alert.id})">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+        `).join('');
+    },
+    
+    getAlertIcon(type) {
+        const icons = {
+            critical: '<i class="bi bi-exclamation-triangle-fill"></i>',
+            warning: '<i class="bi bi-exclamation-circle"></i>',
+            info: '<i class="bi bi-info-circle"></i>',
+            success: '<i class="bi bi-check-circle"></i>'
+        };
+        return icons[type] || icons.info;
+    },
+    
+    checkSystemAlerts() {
+        // Check for critical system issues
+        fetch('/api/system/alerts')
+            .then(response => response.json())
+            .then(data => {
+                if (data.alerts && data.alerts.length > 0) {
+                    data.alerts.forEach(alert => {
+                        this.addAlert(alert.type, alert.title, alert.message, alert.duration);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error checking system alerts:', error);
+            });
+    }
+};
+
+// YAM Modal System
+window.yamModals = {
+    currentModal: null,
+    
+    openModal(modalId) {
+        const overlay = document.getElementById('yamModalOverlay');
+        const container = document.getElementById('yamModalContainer');
+        const content = document.getElementById('yamModalContent');
+        const title = document.getElementById('yamModalTitle');
+        
+        // Get modal content
+        const modalContent = document.getElementById(modalId + 'Content');
+        if (!modalContent) {
+            console.error('Modal content not found:', modalId);
+            return;
+        }
+        
+        // Set modal title
+        const modalTitles = {
+            'userPresenceModal': 'User Presence Map',
+            'userAnalyticsModal': 'User Analytics',
+            'activityHeatmapModal': 'Activity Heatmap',
+            'advancedStatusModal': 'Advanced User Status',
+            'systemMonitorModal': 'System Monitor',
+            'systemHealthModal': 'System Health Monitor',
+            'teamPerformanceModal': 'Team Performance Analytics',
+            'teamCollaborationModal': 'Team Collaboration',
+            'recentActivityModal': 'Recent Activity',
+            'activityTrackerModal': 'User Activity Tracker',
+            'notificationsModal': 'Notifications',
+            'teamChatModal': 'Team Chat'
+        };
+        
+        title.textContent = modalTitles[modalId] || 'Modal';
+        
+        // Set modal content
+        content.innerHTML = modalContent.innerHTML;
+        
+        // Show modal
+        overlay.style.display = 'flex';
+        this.currentModal = modalId;
+        
+        // Prevent body scroll
+        document.body.style.overflow = 'hidden';
+        
+        // Initialize components in modal
+        this.initializeModalComponents(modalId);
+    },
+    
+    closeModal() {
+        const overlay = document.getElementById('yamModalOverlay');
+        overlay.style.display = 'none';
+        this.currentModal = null;
+        
+        // Restore body scroll
+        document.body.style.overflow = 'auto';
+    },
+    
+    initializeModalComponents(modalId) {
+        // Initialize specific components based on modal type
+        setTimeout(() => {
+            switch(modalId) {
+                case 'userPresenceModal':
+                    if (window.userPresenceMap && window.userPresenceMap.init) {
+                        window.userPresenceMap.init();
+                    }
+                    break;
+                case 'userAnalyticsModal':
+                    if (window.userAnalytics && window.userAnalytics.init) {
+                        window.userAnalytics.init();
+                    }
+                    break;
+                case 'systemMonitorModal':
+                    if (window.systemMonitor && window.systemMonitor.init) {
+                        window.systemMonitor.init();
+                    }
+                    break;
+                // Add more cases as needed
+            }
+        }, 100);
+    }
+};
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    // Close modal when clicking overlay
+    const overlay = document.getElementById('yamModalOverlay');
+    if (overlay) {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) {
+                yamModals.closeModal();
+            }
+        });
+    }
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && yamModals.currentModal) {
+            yamModals.closeModal();
+        }
+    });
+    
+    // Initialize alerts
+    yamAlerts.checkSystemAlerts();
+    
+    // Check for alerts every 30 seconds
+    setInterval(() => {
+        yamAlerts.checkSystemAlerts();
+    }, 30000);
+    
+    console.log('YAM Minimalistic Dashboard initialized');
+});
+
+// Add missing functions to fix JavaScript errors
+window.updateConnectionStatus = function(isConnected, message = '') {
+    console.log('Connection status updated:', isConnected, message);
+    
+    // Update connection status indicators
+    const statusElements = document.querySelectorAll('[id*="connectionStatus"], [id*="ConnectionStatus"]');
+    statusElements.forEach(element => {
+        if (element) {
+            if (isConnected) {
+                element.textContent = 'Connected';
+                element.className = element.className.replace('disconnected', 'connected');
+                if (element.closest('.status-item')) {
+                    const icon = element.closest('.status-item').querySelector('.status-icon');
+                    if (icon) {
+                        icon.className = icon.className.replace('disconnected', 'connected');
+                    }
+                }
+            } else {
+                element.textContent = 'Disconnected';
+                element.className = element.className.replace('connected', 'disconnected');
+                if (element.closest('.status-item')) {
+                    const icon = element.closest('.status-item').querySelector('.status-icon');
+                    if (icon) {
+                        icon.className = icon.className.replace('connected', 'disconnected');
+                    }
+                }
+            }
+        }
+    });
+    
+    // Show connection alert
+    if (!isConnected) {
+        yamAlerts.addAlert('warning', 'Connection Lost', 'Connection to server has been lost. Attempting to reconnect...', 5000);
+    } else if (message) {
+        yamAlerts.addAlert('success', 'Connected', message, 3000);
+    }
+};
+
+// Add missing socket utility functions
+window.getYamSocket = function() {
+    if (window.yamSocketManager && window.yamSocketManager.socket) {
+        return window.yamSocketManager.socket;
+    }
+    if (window.socketState && window.socketState.socket) {
+        return window.socketState.socket;
+    }
+    return null;
+};
+
+window.isYamSocketConnected = function() {
+    const socket = window.getYamSocket();
+    return socket && socket.connected;
+};
+
+// Add missing event handling functions
+window.updateOnlineUsers = function(users) {
+    console.log('Updating online users:', users.length);
+    // This will be implemented by individual components
+};
+
+window.updatePresenceStats = function(stats) {
+    console.log('Updating presence stats:', stats);
+    // This will be implemented by individual components
+};
+
+window.updateLastRefreshTime = function() {
+    const now = new Date().toLocaleTimeString();
+    console.log('Last refresh time updated:', now);
+    // This will be implemented by individual components
+};
+
+window.updateLastHeartbeatTime = function() {
+    const now = new Date().toLocaleTimeString();
+    console.log('Last heartbeat time updated:', now);
+    // This will be implemented by individual components
+};
+
+window.showReconnectionMessage = function() {
+    yamAlerts.addAlert('info', 'Reconnecting', 'Connection lost. Attempting to reconnect...', 0);
+};
+
+window.showConnectionError = function(message) {
+    yamAlerts.addAlert('critical', 'Connection Error', message, 0);
+};
+
+window.requestAdminDashboardData = function() {
+    console.log('Requesting admin dashboard data');
+    // This will be implemented by individual components
+};
+
+window.fetchUsersViaHTTP = function() {
+    console.log('Fetching users via HTTP fallback');
+    // This will be implemented by individual components
+};
+
+// Add error handling for missing DOM elements
+window.safeQuerySelector = function(selector, parent = document) {
+    try {
+        return parent.querySelector(selector);
+    } catch (error) {
+        console.warn('Safe querySelector failed for:', selector, error);
+        return null;
+    }
+};
+
+window.safeGetElementById = function(id) {
+    try {
+        return document.getElementById(id);
+    } catch (error) {
+        console.warn('Safe getElementById failed for:', id, error);
+        return null;
+    }
+};
+
+// Add global error handler for fetch failures
+window.addEventListener('unhandledrejection', function(event) {
+    if (event.reason && event.reason.message && event.reason.message.includes('Failed to fetch')) {
+        console.warn('Network request failed, server may be offline:', event.reason);
+        yamAlerts.addAlert('warning', 'Network Error', 'Unable to connect to server. Please check your connection.', 5000);
+    }
+});
+
+// Add connection status monitoring
+setInterval(() => {
+    const socket = window.getYamSocket();
+    const isConnected = window.isYamSocketConnected();
+    window.updateConnectionStatus(isConnected);
+}, 10000); // Check every 10 seconds 
+
+{% endmacro %} 

@@ -1,0 +1,15 @@
+<!-- Modularized Universal Search Component -->
+<!-- Include Quill Rich Text Editor CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<!-- Include main search input component (this includes filters, results, and suggestions) -->
+{% include 'components/universal_search/search_input.html' %}
+
+<!-- Include all component styles and functionality -->
+{% include 'components/universal_search/search_styles.html' %}
+{% include 'components/universal_search/modal_styles.html' %}
+{% include 'components/universal_search/modals.html' %}
+{% include 'components/universal_search/dark_theme.html' %}
+
+<!-- Include JavaScript functionality (includes state manager and search engine) -->
+{% include 'components/universal_search/search_engine.html' %} 

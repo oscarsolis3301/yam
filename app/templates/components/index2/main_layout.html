@@ -1,0 +1,586 @@
+{% macro render_main_layout(name, current_user) %}
+<!-- Import Index2 components -->
+{% from 'components/index2/outage_banner.html' import render_outage_banner as outage_banner %}
+{% from 'components/index2/welcome_banner.html' import render_welcome_banner as welcome_banner %}
+{% from 'components/index2/users_online.html' import render_users_online as users_online %}
+{% from 'components/index2/debug.html' import render_debug_panel as debug %}
+
+<!-- Main Layout Container -->
+<div class="main-content">
+    <!-- Outage Banner (rendered at top level) -->
+    {{ outage_banner() }}
+    
+    <!-- Welcome Banner -->
+    {{ welcome_banner(name, current_user) }}
+    
+    <!-- Users Online Section -->
+    {{ users_online(current_user) }}
+    
+    <!-- Debug Panel (only in development) -->
+    {{ debug() }}
+</div>
+
+<style>
+/* Main Layout Styles */
+.main-content {
+    padding: 2rem;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+    color: #fff;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    transition: padding-top 0.3s ease;
+}
+
+/* Global Styles */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #0f1419;
+    color: #fff;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow-x: hidden;
+}
+
+/* Ensure all interactive elements are clickable */
+button, 
+.action-btn, 
+.user-item, 
+.outage-close-btn {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    z-index: 100 !important;
+    position: relative !important;
+}
+
+/* Modal z-index management - ensure modals are above everything */
+.modal {
+    z-index: 1055 !important;
+}
+
+.modal-backdrop {
+    z-index: 1054 !important;
+}
+
+.modal-dialog {
+    z-index: 1056 !important;
+}
+
+.modal-content {
+    z-index: 1057 !important;
+}
+
+/* Ensure modals are interactive */
+.modal *,
+.modal-dialog *,
+.modal-content * {
+    pointer-events: auto !important;
+}
+
+/* Use Bootstrap's default modal z-index stacking */
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-content {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-content {
+        padding: 0.75rem;
+    }
+}
+
+/* Loading and Animation States */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .main-content {
+        background: #000;
+    }
+    
+    .welcome-banner,
+    .users-online-section {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+}
+</style>
+
+<script>
+// Main Layout Management with Enhanced Error Handling
+class MainLayout {
+    constructor() {
+        this.errors = [];
+        this.warnings = [];
+        this.init();
+    }
+    
+    init() {
+        try {
+            this.setupGlobalEventHandlers();
+            this.adjustForOutageBanner();
+            this.validateComponents();
+            this.logInfo('MainLayout initialized successfully');
+        } catch (error) {
+            this.logError('MainLayout initialization failed', error.message);
+        }
+    }
+    
+    setupGlobalEventHandlers() {
+        try {
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                this.adjustForOutageBanner();
+            });
+            
+            // Handle scroll to top
+            window.addEventListener('scroll', () => {
+                this.handleScroll();
+            });
+            
+            this.logInfo('Global event handlers setup complete');
+        } catch (error) {
+            this.logError('Failed to setup global event handlers', error.message);
+        }
+    }
+    
+    adjustForOutageBanner() {
+        try {
+            const outageBanner = document.getElementById('outageBanner');
+            const mainContent = document.querySelector('.main-content');
+            
+            if (!outageBanner) {
+                this.logWarning('Outage banner element not found');
+                return;
+            }
+            
+            if (!mainContent) {
+                this.logWarning('Main content element not found');
+                return;
+            }
+            
+            const isVisible = outageBanner.style.display !== 'none' && 
+                             outageBanner.offsetHeight > 0;
+            
+            if (isVisible) {
+                mainContent.style.paddingTop = '60px';
+            } else {
+                mainContent.style.paddingTop = '0';
+            }
+        } catch (error) {
+            this.logError('Failed to adjust for outage banner', error.message);
+        }
+    }
+    
+    handleScroll() {
+        try {
+            // Add scroll-based effects if needed
+            const scrolled = window.pageYOffset;
+            const parallax = document.querySelector('.main-content');
+            
+            if (parallax) {
+                const speed = scrolled * 0.5;
+                parallax.style.transform = `translateY(${speed}px)`;
+            }
+        } catch (error) {
+            this.logError('Failed to handle scroll', error.message);
+        }
+    }
+    
+    validateComponents() {
+        try {
+            const requiredElements = [
+                'outageBanner',
+                'currentDate',
+                'currentTime',
+                'connectionStatus',
+                'usersList',
+                'userCount'
+            ];
+            
+            const missingElements = [];
+            
+            requiredElements.forEach(elementId => {
+                const element = document.getElementById(elementId);
+                if (!element) {
+                    missingElements.push(elementId);
+                }
+            });
+            
+            if (missingElements.length > 0) {
+                this.logWarning('Missing required elements', missingElements.join(', '));
+            } else {
+                this.logInfo('All required elements found');
+            }
+            
+            // Check for CSS conflicts
+            this.checkCSSConflicts();
+            
+        } catch (error) {
+            this.logError('Component validation failed', error.message);
+        }
+    }
+    
+    checkCSSConflicts() {
+        try {
+            const styles = document.styleSheets;
+            let conflicts = [];
+            
+            for (let i = 0; i < styles.length; i++) {
+                try {
+                    const rules = styles[i].cssRules || styles[i].rules;
+                    if (rules) {
+                        for (let j = 0; j < rules.length; j++) {
+                            const rule = rules[j];
+                            if (rule.selectorText && rule.selectorText.includes('!important')) {
+                                conflicts.push({
+                                    selector: rule.selectorText,
+                                    source: styles[i].href || 'inline'
+                                });
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // CORS error or other issue
+                }
+            }
+            
+            if (conflicts.length > 0) {
+                this.logWarning('CSS conflicts detected', `${conflicts.length} rules with !important found`);
+            }
+        } catch (error) {
+            this.logError('CSS conflict check failed', error.message);
+        }
+    }
+    
+    // Utility method to show loading state
+    showLoading() {
+        try {
+            document.body.classList.add('loading');
+        } catch (error) {
+            this.logError('Failed to show loading state', error.message);
+        }
+    }
+    
+    // Utility method to hide loading state
+    hideLoading() {
+        try {
+            document.body.classList.remove('loading');
+        } catch (error) {
+            this.logError('Failed to hide loading state', error.message);
+        }
+    }
+    
+    // Utility method to show toast notifications
+    showToast(message, type = 'info') {
+        try {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            
+            // Add toast styles
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#17a2b8'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                z-index: 100000;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 3000);
+            
+            this.logInfo('Toast notification shown', `${type}: ${message}`);
+        } catch (error) {
+            this.logError('Failed to show toast notification', error.message);
+        }
+    }
+    
+    // Logging methods
+    logError(message, details) {
+        this.errors.push({
+            message,
+            details,
+            timestamp: new Date().toISOString()
+        });
+        
+        if (window.index2Debugger) {
+            window.index2Debugger.logError(message, details);
+        }
+        
+        console.error(`[MainLayout] ${message}:`, details);
+    }
+    
+    logWarning(message, details) {
+        this.warnings.push({
+            message,
+            details,
+            timestamp: new Date().toISOString()
+        });
+        
+        if (window.index2Debugger) {
+            window.index2Debugger.logWarning(message, details);
+        }
+        
+        console.warn(`[MainLayout] ${message}:`, details);
+    }
+    
+    logInfo(message, details = '') {
+        this.info = this.info || [];
+        this.info.push({
+            message,
+            details,
+            timestamp: new Date().toISOString()
+        });
+        
+        if (window.index2Debugger) {
+            window.index2Debugger.logInfo(message, details);
+        }
+        
+        console.log(`[MainLayout] ${message}`, details);
+    }
+    
+    // Get debug information
+    getDebugInfo() {
+        return {
+            errors: this.errors,
+            warnings: this.warnings,
+            info: this.info || []
+        };
+    }
+}
+
+// Add toast animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        window.mainLayout = new MainLayout();
+        
+        // Add fade-in animation to main content
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) {
+            mainContent.classList.add('fade-in');
+        }
+        
+        // Log initialization success
+        console.log('[Index2] Main layout initialized successfully');
+        
+    } catch (error) {
+        console.error('[Index2] Failed to initialize main layout:', error);
+        
+        // Show error toast
+        if (window.mainLayout) {
+            window.mainLayout.showToast('Failed to initialize dashboard', 'error');
+        }
+    }
+});
+
+// Global utility functions
+window.showToast = function(message, type) {
+    if (window.mainLayout) {
+        window.mainLayout.showToast(message, type);
+    }
+};
+
+window.showLoading = function() {
+    if (window.mainLayout) {
+        window.mainLayout.showLoading();
+    }
+};
+
+window.hideLoading = function() {
+    if (window.mainLayout) {
+        window.mainLayout.hideLoading();
+    }
+};
+
+window.getMainLayoutDebugInfo = function() {
+    if (window.mainLayout) {
+        return window.mainLayout.getDebugInfo();
+    }
+    return null;
+};
+
+// Modal utility functions
+window.showModal = function(modalId, content) {
+    try {
+        const modalElement = document.getElementById(modalId);
+        if (!modalElement) {
+            console.error(`Modal with id "${modalId}" not found`);
+            return;
+        }
+        
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        } else {
+            // Custom modal implementation
+            modalElement.style.display = 'block';
+            modalElement.classList.add('show');
+            document.body.classList.add('modal-open');
+        }
+        
+        if (content) {
+            const contentElement = modalElement.querySelector('.modal-body');
+            if (contentElement) {
+                contentElement.innerHTML = content;
+            }
+        }
+        
+    } catch (error) {
+        console.error('Error showing modal:', error);
+    }
+};
+
+window.hideModal = function(modalId) {
+    try {
+        const modalElement = document.getElementById(modalId);
+        if (!modalElement) {
+            console.error(`Modal with id "${modalId}" not found`);
+            return;
+        }
+        
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            }
+        } else {
+            // Custom modal hide
+            modalElement.classList.remove('show');
+            setTimeout(() => {
+                modalElement.style.display = 'none';
+            }, 300);
+            document.body.classList.remove('modal-open');
+        }
+        
+    } catch (error) {
+        console.error('Error hiding modal:', error);
+    }
+};
+
+window.testModal = function() {
+    const testContent = `
+        <div style="text-align: center; padding: 2rem;">
+            <h4>Test Modal</h4>
+            <p>This is a test modal to verify functionality.</p>
+            <button onclick="hideModal('testModal')" class="btn btn-primary">Close</button>
+        </div>
+    `;
+    
+    // Create test modal if it doesn't exist
+    if (!document.getElementById('testModal')) {
+        const modalHtml = `
+            <div class="modal fade" id="testModal" tabindex="-1" aria-labelledby="testModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="testModalLabel">Test Modal</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            ${testContent}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+    
+    showModal('testModal', testContent);
+};
+
+// Error boundary for unhandled errors
+window.addEventListener('error', (event) => {
+    console.error('[Index2] Unhandled error:', event.error);
+    
+    if (window.mainLayout) {
+        window.mainLayout.logError('Unhandled Error', `${event.message} at ${event.filename}:${event.lineno}`);
+        window.mainLayout.showToast('An unexpected error occurred', 'error');
+    }
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+    console.error('[Index2] Unhandled promise rejection:', event.reason);
+    
+    if (window.mainLayout) {
+        window.mainLayout.logError('Unhandled Promise Rejection', event.reason);
+        window.mainLayout.showToast('A network error occurred', 'error');
+    }
+});
+</script>
+{% endmacro %} 

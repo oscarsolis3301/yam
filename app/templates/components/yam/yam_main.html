@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{# Import YAM dashboard components #}
+{% import 'components/yam/yam_layout.html' as yam_layout %}
+{% import 'components/yam/welcome_banner.html' as yam_welcome %}
+{% import 'components/yam/quick_stats.html' as yam_quick_stats %}
+{% import 'components/yam/user_quick_view.html' as yam_user_quick_view %}
+{% import 'components/yam/daily_analytics.html' as yam_daily_analytics %}
+{% import 'components/yam/user_presence_map.html' as yam_user_presence_map %}
+{% import 'components/yam/user_analytics.html' as yam_user_analytics %}
+{% import 'components/yam/notifications.html' as yam_notifications %}
+{% import 'components/yam/team_chat.html' as yam_team_chat %}
+{% import 'components/yam/recent_activity.html' as yam_recent_activity %}
+{% import 'components/yam/system_monitor.html' as yam_system_monitor %}
+{% import 'components/yam/system_health_monitor.html' as yam_system_health_monitor %}
+{% import 'components/yam/team_performance_analytics.html' as yam_team_performance_analytics %}
+{% import 'components/yam/team_collaboration.html' as yam_team_collaboration %}
+{% import 'components/yam/user_activity_heatmap.html' as yam_user_activity_heatmap %}
+{% import 'components/yam/user_activity_tracker.html' as yam_user_activity_tracker %}
+{% import 'components/yam/advanced_user_status.html' as yam_advanced_user_status %}
+
+{% block head %}
+<!-- Include modular head components -->
+{% include 'components/yam/head/yam_head_meta.html' %}
+{% include 'components/yam/head/yam_head_resources.html' %}
+{% include 'components/yam/head/yam_head_styles.html' %}
+{% endblock %}
+
+{% block content %}
+<!-- Enhanced YAM Dashboard - Premium Feel -->
+<div class="yam-dashboard-full yam-page" id="yamDashboard">
+    <!-- Include modal prevention script -->
+    {% include 'components/yam/scripts/yam_modal_prevention.html' %}
+    
+    <!-- Include connection status -->
+    {% include 'components/yam/components/yam_connection_status.html' %}
+    
+    <!-- Include notification container -->
+    {% include 'components/yam/components/yam_notification_container.html' %}
+    
+    <div class="yam-container-full yam-viewport-fit" id="yamContainer">
+        <!-- Enhanced Welcome Section -->
+        <div class="yam-welcome-section">
+            {{ yam_welcome.render_welcome_banner(name, current_user) }}
+        </div>
+        
+        <!-- Enhanced Main Content Grid -->
+        <div class="yam-main-content-grid">
+            <!-- Enhanced User Quick View -->
+            <div class="yam-user-section">
+                <div class="yam-card-enhanced yam-user-card">
+                    {{ yam_user_quick_view.render_user_quick_view(current_user) }}
+                </div>
+            </div>
+            
+            <!-- Enhanced Daily Analytics -->
+            <div class="yam-analytics-section">
+                <div class="yam-card-enhanced yam-analytics-card">
+                    {{ yam_daily_analytics.render_daily_analytics(current_user) }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Enhanced Quick Stats Section -->
+        <div class="yam-quick-stats-section">
+            <div class="yam-card-enhanced yam-stats-card-compact">
+                {{ yam_quick_stats.render_quick_stats(current_user) }}
+            </div>
+        </div>
+        
+        <!-- Enhanced Action Buttons Section -->
+        <div class="yam-actions-section">
+            {% include 'components/yam/sections/yam_actions_section.html' %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal System -->
+{% include 'components/yam/sections/yam_modal_system.html' %}
+
+<!-- Modal Content Templates (Hidden) -->
+{% include 'components/yam/sections/yam_modal_content_templates.html' %}
+{% endblock %}
+
+{% block scripts %}
+<!-- Include modular scripts -->
+{% include 'components/yam/scripts/yam_core_scripts.html' %}
+{% include 'components/yam/scripts/yam_modal_scripts.html' %}
+{% include 'components/yam/scripts/yam_data_scripts.html' %}
+{% include 'components/yam/scripts/yam_utils_scripts.html' %}
+{% include 'components/yam/scripts/yam_realtime_scripts.html' %}
+{% include 'components/yam/scripts/yam_dashboard_init.html' %}
+{% endblock %} 

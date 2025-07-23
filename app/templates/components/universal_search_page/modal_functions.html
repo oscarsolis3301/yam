@@ -1,0 +1,364 @@
+<!-- Universal Search Page Modal Functions Component -->
+<script>
+// Extend UniversalSearchPage with modal functionality
+if (window.searchPageInstance) {
+    const searchInstance = window.searchPageInstance;
+    
+    // User Profile Modal Functions
+    window.showClockIdUserModal = function(userData) {
+        const modal = document.getElementById('universalSearchDetailModal');
+        const overlay = document.getElementById('universalSearchDetailModalOverlay');
+        if (!modal || !overlay) {
+            console.error('User modal elements not found');
+            return;
+        }
+        
+        const content = document.getElementById('universalSearchDetailContent');
+        if (!content) {
+            console.error('User modal content element not found');
+            return;
+        }
+        
+        content.innerHTML = createUserProfileModal(userData);
+        modal.style.display = 'flex';
+        overlay.style.display = 'block';
+        
+        // Add click to close functionality
+        overlay.onclick = function() {
+            modal.style.display = 'none';
+            overlay.style.display = 'none';
+        };
+    };
+    
+    // User Profile Modal Creation Function
+    function createUserProfileModal(data) {
+        const avatarUrl = data.profile_picture ? `/static/uploads/profile_pictures/${data.profile_picture}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username)}&background=random&bold=true`;
+
+        const locked = data.locked_out === true;
+        const disabled = (data.account_status || '').toString().toLowerCase().includes('disabled');
+        const pwdExpired = data.password_expired === true;
+
+        const badge = (txt, cls) => `<span class="mac-status-badge ${cls}">${txt}</span>`;
+        const lockedBadge = locked ? badge('Locked', 'mac-badge-locked') : badge('Unlocked', 'mac-badge-ok');
+        const accountBadge = disabled ? badge('Disabled', 'mac-badge-disabled') : badge('Enabled', 'mac-badge-ok');
+        const pwdBadge = pwdExpired ? badge('Expired', 'mac-badge-expired') : badge('Valid', 'mac-badge-ok');
+
+        // Calculate time since password reset
+        function getPasswordResetTimeAgo(dateString) {
+            if (!dateString || dateString === 'N/A') return 'N/A';
+            try {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                if (diffDays === 0) return 'Today';
+                if (diffDays === 1) return '1 day ago';
+                return `${diffDays} days ago`;
+            } catch (e) {
+                return 'N/A';
+            }
+        }
+
+        const passwordResetDisplay = data.password_last_reset && data.password_last_reset !== 'N/A' 
+            ? `${data.password_last_reset} (${getPasswordResetTimeAgo(data.password_last_reset)})`
+            : 'N/A';
+
+        return `
+            <div class="user-profile-modal">
+                <button class="mac-close-btn" aria-label="Close" onclick="
+                    document.getElementById('universalSearchDetailModal').style.display='none';
+                    document.getElementById('universalSearchDetailModalOverlay').style.display='none';
+                ">×</button>
+                
+                <div class="mac-modal-header">
+                    <img src="${avatarUrl}" alt="Avatar" class="mac-user-avatar" />
+                    <div class="mac-user-info">
+                        <h3 class="mac-user-name">${data.full_name || data.username}</h3>
+                        <p class="mac-user-role">${data.role || data.title || 'User'}</p>
+                        <div class="mac-action-buttons">
+                            <button class="mac-action-btn" title="Create Ticket" onclick="handleButtonClick(this, () => openTicketModal('${data.username}','${data.email}','${data.full_name || data.username}'))">🎫</button>
+                            <button class="mac-action-btn" title="Reset Password" onclick="handleButtonClick(this, () => openPasswordResetModal('${data.username}','${data.email}','${data.full_name || data.username}'))">🔑</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mac-modal-content">
+                    <div class="mac-info-section">
+                        <h4 class="mac-section-title">Contact Information</h4>
+                        <div class="mac-info-grid">
+                            <div class="mac-info-label">Email</div>
+                            <div class="mac-info-value"><a href="mailto:${data.email}">${data.email}</a></div>
+                            ${data.phone ? `<div class="mac-info-label">Phone</div><div class="mac-info-value"><a href="tel:${data.phone}">${data.phone}</a></div>` : ''}
+                            ${data.clock_id ? `<div class="mac-info-label">Clock ID</div><div class="mac-info-value">${data.clock_id}</div>` : ''}
+                            ${data.department ? `<div class="mac-info-label">Department</div><div class="mac-info-value">${data.department}</div>` : ''}
+                            ${data.title ? `<div class="mac-info-label">Title</div><div class="mac-info-value">${data.title}</div>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="mac-info-section">
+                        <h4 class="mac-section-title">Account Status</h4>
+                        <div class="mac-info-grid">
+                            <div class="mac-info-label">Account</div>
+                            <div class="mac-info-value">${accountBadge}</div>
+                            <div class="mac-info-label">Lock Status</div>
+                            <div class="mac-info-value">${lockedBadge}</div>
+                            <div class="mac-info-label">Password</div>
+                            <div class="mac-info-value">${pwdBadge}</div>
+                            <div class="mac-info-label">Bad Logon Count</div>
+                            <div class="mac-info-value">${data.bad_logon_count ?? '0'}</div>
+                        </div>
+                    </div>
+
+                    <div class="mac-info-section">
+                        <h4 class="mac-section-title">Password Information</h4>
+                        <div class="mac-info-grid">
+                            <div class="mac-info-label">Last Reset</div>
+                            <div class="mac-info-value">${passwordResetDisplay}</div>
+                            ${data.password_expiration_date ? `<div class="mac-info-label">Expires</div><div class="mac-info-value">${data.password_expiration_date}</div>` : ''}
+                            ${data.mfa_status ? `<div class="mac-info-label">MFA Status</div><div class="mac-info-value">${data.mfa_status}</div>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="mac-info-section">
+                        <h4 class="mac-section-title">Additional Information</h4>
+                        <div class="mac-info-grid">
+                            ${data.epic_status ? `<div class="mac-info-label">Epic Status</div><div class="mac-info-value">${data.epic_status}</div>` : ''}
+                            ${data.epic_block ? `<div class="mac-info-label">Epic Block</div><div class="mac-info-value">${data.epic_block}</div>` : ''}
+                            ${data.email_license ? `<div class="mac-info-label">Email License</div><div class="mac-info-value">${data.email_license}</div>` : ''}
+                            ${data.immutable_id ? `<div class="mac-info-label">Immutable ID</div><div class="mac-info-value" style="font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; font-size: 0.8125rem;">${data.immutable_id}</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Button click handler with visual feedback
+    window.handleButtonClick = function(button, callback) {
+        // Add visual feedback
+        const originalTransform = button.style.transform;
+        const originalBackground = button.style.background;
+        
+        button.style.transform = 'scale(0.95)';
+        button.style.background = 'rgba(0, 123, 255, 0.6)';
+        
+        setTimeout(() => {
+            button.style.transform = originalTransform;
+            button.style.background = originalBackground;
+            callback();
+        }, 150);
+    };
+
+    // Ticket Modal Functions
+    window.openTicketModal = function(username, email, fullName) {
+        const modal = document.getElementById('universalSearchTicketModal');
+        const overlay = document.getElementById('universalSearchTicketModalOverlay');
+        const titleEl = document.getElementById('universalSearchTicketModalTitle');
+        const userInfoEl = document.getElementById('universalSearchTicketUserInfo');
+        
+        if (!modal || !overlay || !titleEl || !userInfoEl) return;
+        
+        titleEl.textContent = 'Create Service Desk Ticket';
+        userInfoEl.innerHTML = `
+            <div class="ticket-user-info">
+                <i class="bi bi-person-circle" style="color: #007bff; margin-right: 0.5rem;"></i>
+                <strong>${fullName}</strong> (${username})
+                <br><small style="color: rgba(255,255,255,0.7);">${email}</small>
+            </div>
+        `;
+        
+        modal.style.display = 'flex';
+        overlay.style.display = 'block';
+        
+        // Store user data for form submission
+        window._currentTicketUser = { username, email, fullName };
+        
+        // Add click to close functionality
+        overlay.onclick = function() {
+            modal.style.display = 'none';
+            overlay.style.display = 'none';
+        };
+    };
+
+    // Password Reset Modal Functions
+    window.openPasswordResetModal = function(username, email, fullName) {
+        const modal = document.getElementById('universalSearchPasswordResetModal');
+        const overlay = document.getElementById('universalSearchPasswordResetModalOverlay');
+        const titleEl = document.getElementById('universalSearchPasswordResetModalTitle');
+        const userInfoEl = document.getElementById('universalSearchPasswordResetUserInfo');
+        
+        if (!modal || !overlay || !titleEl || !userInfoEl) return;
+        
+        titleEl.textContent = 'Reset User Password';
+        userInfoEl.innerHTML = `
+            <div class="password-reset-user-info">
+                <i class="bi bi-person-circle" style="color: #dc3545; margin-right: 0.5rem;"></i>
+                <strong>${fullName}</strong> (${username})
+                <br><small style="color: rgba(255,255,255,0.7);">${email}</small>
+            </div>
+        `;
+        
+        modal.style.display = 'flex';
+        overlay.style.display = 'block';
+        
+        // Store user data for form submission
+        window._currentPasswordResetUser = { username, email, fullName };
+        
+        // Add click to close functionality
+        overlay.onclick = function() {
+            modal.style.display = 'none';
+            overlay.style.display = 'none';
+        };
+    };
+
+    // Password Reset Handler
+    window.handlePasswordReset = async function() {
+        if (!window._currentPasswordResetUser) {
+            alert('No user data available for password reset');
+            return;
+        }
+
+        const { username } = window._currentPasswordResetUser;
+        
+        try {
+            const response = await fetch('/reset_password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username: username })
+            });
+
+            if (response.ok) {
+                alert('Password reset successfully!');
+                document.getElementById('universalSearchPasswordResetModal').style.display = 'none';
+                document.getElementById('universalSearchPasswordResetModalOverlay').style.display = 'none';
+            } else {
+                const error = await response.text();
+                alert(`Password reset failed: ${error}`);
+            }
+        } catch (error) {
+            console.error('Password reset error:', error);
+            alert('Password reset failed. Please try again.');
+        }
+    };
+
+    // Ticket Form Handler
+    document.addEventListener('DOMContentLoaded', function() {
+        const ticketForm = document.getElementById('ticketCreationForm');
+        if (ticketForm) {
+            ticketForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (!window._currentTicketUser) {
+                    alert('No user data available for ticket creation');
+                    return;
+                }
+
+                const formData = {
+                    category: document.getElementById('ticketCategory').value,
+                    priority: document.getElementById('ticketPriority').value,
+                    subject: document.getElementById('ticketSubject').value,
+                    description: document.getElementById('ticketDescription').value,
+                    requestor: window._currentTicketUser.email || window._currentTicketUser.username
+                };
+
+                try {
+                    const response = await fetch('/create_ticket', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        alert(result.message || 'Ticket created successfully!');
+                        document.getElementById('universalSearchTicketModal').style.display = 'none';
+                        document.getElementById('universalSearchTicketModalOverlay').style.display = 'none';
+                        ticketForm.reset();
+                    } else {
+                        const error = await response.text();
+                        alert(`Ticket creation failed: ${error}`);
+                    }
+                } catch (error) {
+                    console.error('Ticket creation error:', error);
+                    alert('Ticket creation failed. Please try again.');
+                }
+            });
+        }
+    });
+    
+    // PDF Modal Functions
+    searchInstance.openPdfModal = function(result) {
+        const modal = document.getElementById('universalSearchPdfModal');
+        const overlay = document.getElementById('universalSearchPdfModalOverlay');
+        const content = document.getElementById('universalSearchPdfModalContent');
+        const titleEl = document.getElementById('universalSearchPdfModalTitle');
+        
+        if (!modal || !overlay || !content || !titleEl) {
+            // Fallback to opening in new tab if modal elements don't exist
+            window.open(result.url, '_blank');
+            return;
+        }
+
+        titleEl.textContent = result.title || 'Document';
+        
+        // Show loading state
+        content.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        
+        modal.classList.add('active');
+        overlay.classList.add('active');
+        
+        // Extract filename for PDF URLs
+        let pdfUrl = result.url;
+        if (result.url.includes('/static/docs/')) {
+            pdfUrl = result.url;
+        } else if (result.url.toLowerCase().endsWith('.pdf')) {
+            pdfUrl = result.url;
+        }
+        
+        // Add PDF viewer parameters for better display
+        if (pdfUrl.includes('?')) {
+            pdfUrl += '&toolbar=1&navpanes=0&scrollbar=1';
+        } else {
+            pdfUrl += '#toolbar=1&navpanes=0&scrollbar=1';
+        }
+        
+        // Load PDF with proper viewer
+        content.innerHTML = `
+            <div class="pdf-viewer-container" style="width:100%;height:calc(100vh - 80px);position:relative;background:#2c2c2c;">
+                <div class="pdf-toolbar" style="background:#1e1e1e;padding:8px 16px;border-bottom:1px solid #444;display:flex;align-items:center;justify-content:space-between;">
+                    <div class="pdf-controls">
+                        <button class="btn btn-sm btn-outline-light me-2" onclick="window.open('${pdfUrl}', '_blank')" title="Open in new tab">
+                            <i class="bi bi-box-arrow-up-right"></i> Open in New Tab
+                        </button>
+                        <button class="btn btn-sm btn-outline-light" onclick="this.closest('.pdf-viewer-container').querySelector('iframe').contentWindow.print()" title="Print">
+                            <i class="bi bi-printer"></i> Print
+                        </button>
+                    </div>
+                    <div class="pdf-title" style="color:#fff;font-weight:500;flex:1;text-align:center;margin:0 1rem;">
+                        ${result.title || 'Document'}
+                    </div>
+                    <div class="pdf-info" style="color:#aaa;font-size:0.8rem;">
+                        PDF Document
+                    </div>
+                </div>
+                <iframe src="${pdfUrl}#toolbar=1&navpanes=1&scrollbar=1&view=FitH" 
+                        style="width:100%;height:calc(100% - 60px);border:none;background:#fff;" 
+                        title="PDF Viewer"
+                        onerror="this.parentNode.innerHTML='<div class=\\'error-container\\' style=\\'display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#fff;\\'>\\
+                            <i class=\\'bi bi-file-earmark-x\\' style=\\'font-size:3rem;color:#dc3545;margin-bottom:1rem;\\'></i>\\
+                            <h4>PDF Failed to Load</h4>\\
+                            <p style=\\'color:#aaa;text-align:center;margin-bottom:1rem;\\'>The PDF document could not be displayed in the viewer.</p>\\
+                            <a href=\\'${pdfUrl}\\' target=\\'_blank\\' class=\\'btn btn-primary\\'>\\
+                                <i class=\\'bi bi-download\\' style=\\'margin-right:0.5rem;\\'></i>Download PDF\\
+                            </a>\\
+                        </div>';" 
+                        allowfullscreen>
+                </iframe>
+            </div>`;
+    };
+}
+</script> 

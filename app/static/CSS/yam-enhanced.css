@@ -1,0 +1,669 @@
+/* YAM Dashboard Enhanced Styles - Production Ready */
+
+/* CSS Custom Properties for Theming */
+:root {
+    /* Discord-inspired Color Palette */
+    --yam-primary: #5865f2;
+    --yam-primary-hover: #4752c4;
+    --yam-secondary: #7289da;
+    --yam-success: #43b581;
+    --yam-warning: #faa61a;
+    --yam-danger: #f04747;
+    --yam-info: #00b0f4;
+    
+    /* Background Colors */
+    --yam-bg-primary: #36393f;
+    --yam-bg-secondary: #2f3136;
+    --yam-bg-tertiary: #202225;
+    --yam-bg-elevated: #40444b;
+    --yam-bg-hover: #4f545c;
+    
+    /* Text Colors */
+    --yam-text-primary: #dcddde;
+    --yam-text-secondary: #b9bbbe;
+    --yam-text-muted: #72767d;
+    --yam-text-link: #00b0f4;
+    
+    /* Border Colors */
+    --yam-border-primary: #202225;
+    --yam-border-secondary: #40444b;
+    --yam-border-focus: #5865f2;
+    
+    /* Shadow System */
+    --yam-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    --yam-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12);
+    --yam-shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+    --yam-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+    
+    /* Spacing System */
+    --yam-spacing-xs: 0.25rem;
+    --yam-spacing-sm: 0.5rem;
+    --yam-spacing-md: 1rem;
+    --yam-spacing-lg: 1.5rem;
+    --yam-spacing-xl: 2rem;
+    --yam-spacing-2xl: 3rem;
+    
+    /* Border Radius */
+    --yam-radius-sm: 4px;
+    --yam-radius-md: 8px;
+    --yam-radius-lg: 12px;
+    --yam-radius-xl: 16px;
+    --yam-radius-full: 9999px;
+    
+    /* Typography */
+    --yam-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --yam-font-size-xs: 0.75rem;
+    --yam-font-size-sm: 0.875rem;
+    --yam-font-size-base: 1rem;
+    --yam-font-size-lg: 1.125rem;
+    --yam-font-size-xl: 1.25rem;
+    --yam-font-size-2xl: 1.5rem;
+    --yam-font-size-3xl: 1.875rem;
+    
+    /* Transitions */
+    --yam-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --yam-transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --yam-transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Z-Index Scale */
+    --yam-z-dropdown: 1000;
+    --yam-z-sticky: 1020;
+    --yam-z-fixed: 1030;
+    --yam-z-modal-backdrop: 1040;
+    --yam-z-modal: 1050;
+    --yam-z-popover: 1060;
+    --yam-z-tooltip: 1070;
+    --yam-z-toast: 1080;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    :root {
+        --yam-border-primary: #ffffff;
+        --yam-border-secondary: #ffffff;
+        --yam-text-primary: #ffffff;
+        --yam-text-secondary: #ffffff;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --yam-transition-fast: 0ms;
+        --yam-transition-base: 0ms;
+        --yam-transition-slow: 0ms;
+    }
+}
+
+/* Base Styles */
+.yam-enhanced * {
+    box-sizing: border-box;
+}
+
+.yam-enhanced {
+    font-family: var(--yam-font-family);
+    font-size: var(--yam-font-size-base);
+    line-height: 1.5;
+    color: var(--yam-text-primary);
+    background: var(--yam-bg-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Enhanced Card Components */
+.yam-card {
+    background: var(--yam-bg-secondary);
+    border: 1px solid var(--yam-border-primary);
+    border-radius: var(--yam-radius-lg);
+    box-shadow: var(--yam-shadow-md);
+    transition: all var(--yam-transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.yam-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--yam-primary), var(--yam-secondary), var(--yam-primary));
+    background-size: 200% 100%;
+    animation: yam-shimmer 3s ease-in-out infinite;
+}
+
+.yam-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--yam-shadow-lg);
+    border-color: var(--yam-primary);
+}
+
+.yam-card:focus-within {
+    outline: 2px solid var(--yam-border-focus);
+    outline-offset: 2px;
+}
+
+/* Card Variants */
+.yam-card--elevated {
+    background: var(--yam-bg-elevated);
+    box-shadow: var(--yam-shadow-lg);
+}
+
+.yam-card--interactive {
+    cursor: pointer;
+    user-select: none;
+}
+
+.yam-card--interactive:hover {
+    background: var(--yam-bg-hover);
+}
+
+.yam-card--loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.yam-card--loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: yam-loading 1.5s infinite;
+}
+
+/* Enhanced Button System */
+.yam-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--yam-spacing-sm);
+    padding: var(--yam-spacing-md) var(--yam-spacing-lg);
+    border: 1px solid transparent;
+    border-radius: var(--yam-radius-md);
+    font-family: inherit;
+    font-size: var(--yam-font-size-sm);
+    font-weight: 500;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--yam-transition-base);
+    user-select: none;
+    white-space: nowrap;
+    min-height: 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+.yam-btn:focus-visible {
+    outline: 2px solid var(--yam-border-focus);
+    outline-offset: 2px;
+}
+
+.yam-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Button Variants */
+.yam-btn--primary {
+    background: var(--yam-primary);
+    color: white;
+    border-color: var(--yam-primary);
+}
+
+.yam-btn--primary:hover:not(:disabled) {
+    background: var(--yam-primary-hover);
+    border-color: var(--yam-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--yam-shadow-md);
+}
+
+.yam-btn--secondary {
+    background: var(--yam-bg-elevated);
+    color: var(--yam-text-primary);
+    border-color: var(--yam-border-secondary);
+}
+
+.yam-btn--secondary:hover:not(:disabled) {
+    background: var(--yam-bg-hover);
+    border-color: var(--yam-primary);
+}
+
+.yam-btn--ghost {
+    background: transparent;
+    color: var(--yam-text-primary);
+    border-color: transparent;
+}
+
+.yam-btn--ghost:hover:not(:disabled) {
+    background: var(--yam-bg-elevated);
+    border-color: var(--yam-border-secondary);
+}
+
+.yam-btn--danger {
+    background: var(--yam-danger);
+    color: white;
+    border-color: var(--yam-danger);
+}
+
+.yam-btn--danger:hover:not(:disabled) {
+    background: #d73a49;
+    border-color: #d73a49;
+    transform: translateY(-1px);
+    box-shadow: var(--yam-shadow-md);
+}
+
+/* Button Sizes */
+.yam-btn--sm {
+    padding: var(--yam-spacing-sm) var(--yam-spacing-md);
+    font-size: var(--yam-font-size-xs);
+    min-height: 32px;
+}
+
+.yam-btn--lg {
+    padding: var(--yam-spacing-lg) var(--yam-spacing-xl);
+    font-size: var(--yam-font-size-lg);
+    min-height: 48px;
+}
+
+/* Enhanced Grid System */
+.yam-grid {
+    display: grid;
+    gap: var(--yam-spacing-lg);
+}
+
+.yam-grid--cols-1 { grid-template-columns: repeat(1, 1fr); }
+.yam-grid--cols-2 { grid-template-columns: repeat(2, 1fr); }
+.yam-grid--cols-3 { grid-template-columns: repeat(3, 1fr); }
+.yam-grid--cols-4 { grid-template-columns: repeat(4, 1fr); }
+.yam-grid--cols-auto { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.yam-grid--cols-auto-sm { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+.yam-grid--cols-auto-lg { grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); }
+
+/* Enhanced Modal System */
+.yam-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--yam-z-modal);
+    padding: var(--yam-spacing-lg);
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--yam-transition-base);
+}
+
+.yam-modal--open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.yam-modal__container {
+    background: var(--yam-bg-secondary);
+    border-radius: var(--yam-radius-lg);
+    border: 1px solid var(--yam-border-primary);
+    box-shadow: var(--yam-shadow-xl);
+    max-width: 90vw;
+    max-height: 90vh;
+    width: 600px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: scale(0.9);
+    transition: transform var(--yam-transition-base);
+}
+
+.yam-modal--open .yam-modal__container {
+    transform: scale(1);
+}
+
+.yam-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--yam-spacing-lg);
+    border-bottom: 1px solid var(--yam-border-primary);
+    background: var(--yam-bg-primary);
+}
+
+.yam-modal__title {
+    font-size: var(--yam-font-size-xl);
+    font-weight: 600;
+    color: var(--yam-text-primary);
+    margin: 0;
+}
+
+.yam-modal__close {
+    background: var(--yam-bg-elevated);
+    border: 1px solid var(--yam-border-secondary);
+    color: var(--yam-text-secondary);
+    padding: var(--yam-spacing-sm);
+    border-radius: var(--yam-radius-md);
+    cursor: pointer;
+    transition: all var(--yam-transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+.yam-modal__close:hover {
+    background: var(--yam-bg-hover);
+    color: var(--yam-text-primary);
+}
+
+.yam-modal__content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--yam-spacing-lg);
+    max-height: calc(90vh - 120px);
+}
+
+/* Enhanced Form Components */
+.yam-form-group {
+    margin-bottom: var(--yam-spacing-lg);
+}
+
+.yam-form-label {
+    display: block;
+    font-size: var(--yam-font-size-sm);
+    font-weight: 500;
+    color: var(--yam-text-primary);
+    margin-bottom: var(--yam-spacing-sm);
+}
+
+.yam-form-input {
+    width: 100%;
+    padding: var(--yam-spacing-md);
+    background: var(--yam-bg-elevated);
+    border: 1px solid var(--yam-border-secondary);
+    border-radius: var(--yam-radius-md);
+    color: var(--yam-text-primary);
+    font-family: inherit;
+    font-size: var(--yam-font-size-base);
+    transition: all var(--yam-transition-base);
+}
+
+.yam-form-input:focus {
+    outline: none;
+    border-color: var(--yam-border-focus);
+    box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.1);
+}
+
+.yam-form-input::placeholder {
+    color: var(--yam-text-muted);
+}
+
+/* Enhanced Alert System */
+.yam-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--yam-spacing-md);
+    padding: var(--yam-spacing-lg);
+    border-radius: var(--yam-radius-md);
+    border: 1px solid transparent;
+    margin-bottom: var(--yam-spacing-lg);
+    position: relative;
+}
+
+.yam-alert--success {
+    background: rgba(67, 181, 129, 0.1);
+    border-color: var(--yam-success);
+    color: var(--yam-success);
+}
+
+.yam-alert--warning {
+    background: rgba(250, 166, 26, 0.1);
+    border-color: var(--yam-warning);
+    color: var(--yam-warning);
+}
+
+.yam-alert--danger {
+    background: rgba(240, 71, 71, 0.1);
+    border-color: var(--yam-danger);
+    color: var(--yam-danger);
+}
+
+.yam-alert--info {
+    background: rgba(0, 176, 244, 0.1);
+    border-color: var(--yam-info);
+    color: var(--yam-info);
+}
+
+.yam-alert__icon {
+    flex-shrink: 0;
+    font-size: var(--yam-font-size-lg);
+}
+
+.yam-alert__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.yam-alert__title {
+    font-weight: 600;
+    margin-bottom: var(--yam-spacing-xs);
+}
+
+.yam-alert__message {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.yam-alert__close {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: var(--yam-spacing-xs);
+    border-radius: var(--yam-radius-sm);
+    transition: background var(--yam-transition-base);
+    flex-shrink: 0;
+}
+
+.yam-alert__close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced Loading States */
+.yam-loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.yam-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: yam-loading 1.5s infinite;
+}
+
+.yam-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--yam-border-secondary);
+    border-top: 2px solid var(--yam-primary);
+    border-radius: 50%;
+    animation: yam-spin 1s linear infinite;
+}
+
+.yam-spinner--lg {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+}
+
+/* Enhanced Typography */
+.yam-text-xs { font-size: var(--yam-font-size-xs); }
+.yam-text-sm { font-size: var(--yam-font-size-sm); }
+.yam-text-base { font-size: var(--yam-font-size-base); }
+.yam-text-lg { font-size: var(--yam-font-size-lg); }
+.yam-text-xl { font-size: var(--yam-font-size-xl); }
+.yam-text-2xl { font-size: var(--yam-font-size-2xl); }
+.yam-text-3xl { font-size: var(--yam-font-size-3xl); }
+
+.yam-font-light { font-weight: 300; }
+.yam-font-normal { font-weight: 400; }
+.yam-font-medium { font-weight: 500; }
+.yam-font-semibold { font-weight: 600; }
+.yam-font-bold { font-weight: 700; }
+
+.yam-text-primary { color: var(--yam-text-primary); }
+.yam-text-secondary { color: var(--yam-text-secondary); }
+.yam-text-muted { color: var(--yam-text-muted); }
+.yam-text-success { color: var(--yam-success); }
+.yam-text-warning { color: var(--yam-warning); }
+.yam-text-danger { color: var(--yam-danger); }
+.yam-text-info { color: var(--yam-info); }
+
+/* Enhanced Spacing Utilities */
+.yam-p-xs { padding: var(--yam-spacing-xs); }
+.yam-p-sm { padding: var(--yam-spacing-sm); }
+.yam-p-md { padding: var(--yam-spacing-md); }
+.yam-p-lg { padding: var(--yam-spacing-lg); }
+.yam-p-xl { padding: var(--yam-spacing-xl); }
+
+.yam-m-xs { margin: var(--yam-spacing-xs); }
+.yam-m-sm { margin: var(--yam-spacing-sm); }
+.yam-m-md { margin: var(--yam-spacing-md); }
+.yam-m-lg { margin: var(--yam-spacing-lg); }
+.yam-m-xl { margin: var(--yam-spacing-xl); }
+
+/* Enhanced Responsive Design */
+@media (max-width: 640px) {
+    .yam-grid--cols-auto { grid-template-columns: 1fr; }
+    .yam-grid--cols-auto-sm { grid-template-columns: 1fr; }
+    .yam-grid--cols-auto-lg { grid-template-columns: 1fr; }
+    
+    .yam-modal__container {
+        width: 95vw;
+        max-height: 95vh;
+    }
+    
+    .yam-modal__content {
+        max-height: calc(95vh - 120px);
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    .yam-grid--cols-auto { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .yam-grid--cols-auto-sm { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .yam-grid--cols-auto-lg { grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); }
+}
+
+/* Enhanced Accessibility */
+.yam-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.yam-focus-visible:focus-visible {
+    outline: 2px solid var(--yam-border-focus);
+    outline-offset: 2px;
+    border-radius: var(--yam-radius-sm);
+}
+
+/* Enhanced Animations */
+@keyframes yam-shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes yam-loading {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+@keyframes yam-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes yam-fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes yam-slide-in {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+/* Enhanced Print Styles */
+@media print {
+    .yam-modal,
+    .yam-btn,
+    .yam-alert__close {
+        display: none !important;
+    }
+    
+    .yam-card {
+        box-shadow: none !important;
+        border: 1px solid #000 !important;
+        break-inside: avoid;
+    }
+    
+    .yam-text-primary,
+    .yam-text-secondary {
+        color: #000 !important;
+    }
+}
+
+/* Enhanced Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --yam-bg-primary: #1a1a1a;
+        --yam-bg-secondary: #2d2d2d;
+        --yam-bg-tertiary: #404040;
+        --yam-bg-elevated: #333333;
+        --yam-bg-hover: #404040;
+    }
+}
+
+/* Enhanced High DPI Support */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .yam-card,
+    .yam-btn,
+    .yam-form-input {
+        border-width: 0.5px;
+    }
+}
+
+/* Enhanced Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .yam-card::before,
+    .yam-loading::after,
+    .yam-spinner {
+        animation: none;
+    }
+    
+    .yam-modal,
+    .yam-modal__container,
+    .yam-btn {
+        transition: none;
+    }
+} 

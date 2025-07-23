@@ -1,0 +1,138 @@
+{% import 'components/yam/user_presence_map.html' as yam_user_presence_map %}
+{% import 'components/yam/user_analytics.html' as yam_user_analytics %}
+{% import 'components/yam/user_activity_heatmap.html' as yam_user_activity_heatmap %}
+{% import 'components/yam/advanced_user_status.html' as yam_advanced_user_status %}
+{% macro render_overview_section(current_user) %}
+<!-- Team Overview & Analytics Section - FIXED LAYOUT -->
+<div class="yam-full-width-section" id="yamOverviewSection">
+    <div class="yam-component-header">
+        <h3 class="yam-component-title">
+            <i class="bi bi-people-fill"></i>
+            Team Overview & Analytics
+        </h3>
+        <div class="yam-component-controls">
+            <button class="yam-control-btn" id="refreshOverviewBtn" title="Refresh">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <button class="yam-control-btn" id="toggleOverviewBtn" title="Toggle View">
+                <i class="bi bi-grid-3x3"></i>
+            </button>
+        </div>
+    </div>
+    <div class="yam-scrollable-content" id="yamOverviewContent">
+        <div class="yam-component-grid" id="yamOverviewGrid">
+            <!-- User Presence Map Component -->
+            <div class="yam-component-item yam-user-presence-container" id="yamUserPresenceContainer">
+                <div class="yam-data-content">
+                    {{ yam_user_presence_map.render_user_presence_map(current_user) }}
+                </div>
+            </div>
+            
+            <!-- User Analytics Component -->
+            <div class="yam-component-item yam-analytics-container" id="yamAnalyticsContainer">
+                <div class="yam-data-content">
+                    {{ yam_user_analytics.render_user_analytics(current_user) }}
+                </div>
+            </div>
+            
+            <!-- User Activity Heatmap Component -->
+            <div class="yam-component-item yam-heatmap-container" id="yamHeatmapContainer">
+                <div class="yam-data-content">
+                    {{ yam_user_activity_heatmap.render_user_activity_heatmap(current_user) }}
+                </div>
+            </div>
+            
+            <!-- Advanced User Status Component -->
+            <div class="yam-component-item yam-status-container" id="yamStatusContainer">
+                <div class="yam-data-content">
+                    {{ yam_advanced_user_status.render_advanced_user_status(current_user) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Specific styles for overview section */
+#yamOverviewSection {
+    min-height: 500px;
+    height: auto;
+    overflow: visible;
+}
+
+#yamOverviewContent {
+    min-height: 400px;
+    height: auto;
+    overflow-y: auto;
+    overflow-x: visible;
+}
+
+#yamOverviewGrid {
+    min-height: 350px;
+    height: auto;
+    overflow: visible;
+}
+
+.yam-user-presence-container,
+.yam-analytics-container,
+.yam-heatmap-container,
+.yam-status-container {
+    min-height: 250px;
+    height: auto;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+}
+
+.yam-user-presence-container .yam-data-content,
+.yam-analytics-container .yam-data-content,
+.yam-heatmap-container .yam-data-content,
+.yam-status-container .yam-data-content {
+    min-height: 200px;
+    height: auto;
+    overflow: visible;
+    flex: 1;
+}
+</style>
+
+<script>
+// Ensure overview section components are properly visible
+document.addEventListener('DOMContentLoaded', function() {
+    const overviewSection = document.getElementById('yamOverviewSection');
+    const overviewContent = document.getElementById('yamOverviewContent');
+    const overviewGrid = document.getElementById('yamOverviewGrid');
+    
+    if (overviewSection) {
+        overviewSection.style.height = 'auto';
+        overviewSection.style.minHeight = '500px';
+        overviewSection.style.overflow = 'visible';
+    }
+    
+    if (overviewContent) {
+        overviewContent.style.height = 'auto';
+        overviewContent.style.minHeight = '400px';
+        overviewContent.style.overflowY = 'auto';
+        overviewContent.style.overflowX = 'visible';
+    }
+    
+    if (overviewGrid) {
+        overviewGrid.style.height = 'auto';
+        overviewGrid.style.minHeight = '350px';
+        overviewGrid.style.overflow = 'visible';
+    }
+    
+    // Ensure all container components are visible
+    const containers = ['yamUserPresenceContainer', 'yamAnalyticsContainer', 'yamHeatmapContainer', 'yamStatusContainer'];
+    containers.forEach(containerId => {
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.style.display = 'flex';
+            container.style.flexDirection = 'column';
+            container.style.height = 'auto';
+            container.style.minHeight = '250px';
+            container.style.overflow = 'visible';
+        }
+    });
+});
+</script>
+{% endmacro %} 

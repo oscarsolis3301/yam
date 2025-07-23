@@ -1,0 +1,119 @@
+/* THIS IS FROM THE myStyleDashBoard2.css File. Removing to allow all 6 icons in one row. */
+
+@media (769px <= width <= 800px){
+    .level.is-mobile {
+        flex-direction: column-reverse;
+    }
+    .is-widget-label{
+        display: flex;
+        flex-direction: column;
+        align-items: center; 
+    }
+    .level-item.flexShrink{
+        margin-right: 0 !important;
+    }
+}
+
+
+@media screen and (min-width: 769px){
+    div.chartWrapper {
+        flex: 1;
+        
+    }
+    .cardShadowDark.tile.is-child.notification.has-background-white.maxHeight400.overFlowAutoY{
+        /*max-height: 500px;*/
+        flex: 1;
+    }
+}
+
+
+@media screen and (min-width: 1408px){
+    .container:not(.is-max-desktop):not(.is-max-widescreen) {
+        max-width: 1800px;
+        /*max-width: 100%;*/
+    }
+    div.chartWrapper{
+        height: 318px;
+        flex: none !important;
+    }
+    .cardShadowDark.tile.is-child.notification.has-background-white.maxHeight400.overFlowAutoY{
+        height: 400px;
+        flex: none !important;
+    }
+}    
+
+@media only screen and (max-width: 600px) {
+    .topNavBarItem{
+        margin-left: 0.5rem !important;
+    }
+    
+    div.spaceBetweenDropArrow{
+    margin-right: 0 !important;
+    }
+
+}
+
+@media only screen and (width >= 501px) {
+    .magnifyingButton{
+        display: none !important;
+    }
+}
+
+@media only screen and (width <= 500px) {
+    .searchButton{
+        display: none !important;
+    }
+    .searchInput{
+        padding-right: 0 !important;
+    }
+    .magnifyingButton{
+        padding-right: .50rem !important;
+        padding-left: .50rem !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+}
+
+@media only screen and (1520px <= width <= 1780px) {
+    .doughnutWrapper{
+        /*height:max(100%, 41.1vh) !important;*/
+    }
+}
+
+@media only screen and (1408px <= width <= 1520px) {
+    .doughnutWrapper{
+        height:480px !important;
+    }
+}
+
+@media only screen and (1320px <= width <= 1407px) {
+    p.title{
+        font-size: min(1.4rem, 3vw) !important;
+    }
+    h4.title{
+        font-size: min(1.5rem, 3vw) !important;
+    }
+    .doughnutWrapper{
+        /*height:550px !important;*/
+        height: 100% !important;
+    }
+}
+
+@media only screen and (769px <= width <= 1320px) {
+    p.title{
+        font-size: min(2rem, 3vw) !important;
+    }
+    h4.title{
+        font-size: min(2rem, 3vw) !important;
+    }
+    .clinicalContainer.is-ancestor{
+        flex-wrap: wrap !important;
+    }
+    .licensesTile{
+        flex-basis: 100% !important;
+    }
+    .tile.is-vertical.is-2{
+        flex: none !important;
+        width: 50% !important;
+    }
+}

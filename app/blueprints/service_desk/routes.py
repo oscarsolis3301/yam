@@ -280,7 +280,6 @@ def get_recent_tickets():
             'error': 'Failed to fetch recent tickets'
         }), 500
 
-<<<<<<< HEAD
 def convert_tickets_to_dashboard_format(tickets):
     """Convert ticket data to dashboard format."""
     try:
@@ -349,22 +348,6 @@ def get_performance_metrics():
                 'satisfaction_scores': [round(random.uniform(4.0, 5.0), 1) for _ in range(7)]
             }
             current_app.logger.info("Using fallback performance metrics data")
-=======
-@bp.route('/api/performance-metrics')
-@login_required
-def get_performance_metrics():
-    """Get performance metrics for charts."""
-    try:
-        # Simulate performance data for the last 7 days
-        dates = [(datetime.utcnow() - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(6, -1, -1)]
-        
-        metrics = {
-            'dates': dates,
-            'tickets_created': [random.randint(15, 30) for _ in range(7)],
-            'tickets_resolved': [random.randint(12, 25) for _ in range(7)],
-            'response_times': [random.randint(2, 10) for _ in range(7)],
-            'satisfaction_scores': [round(random.uniform(4.0, 5.0), 1) for _ in range(7)]
-        }
         
         return jsonify({
             'success': True,
@@ -476,7 +459,4 @@ def reports():
 @login_required
 def settings():
     """Render the settings page."""
-    return render_template('service_desk/settings.html', active_page='service_desk_settings') 
-=======
-        }), 500 
->>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    return render_template('service_desk/settings.html', active_page='service_desk_settings')

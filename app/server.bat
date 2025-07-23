@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 echo ========================================
 echo    YAM SERVER - NETWORK ACCESS MODE
 echo    WITH HOT RELOADING ENABLED
@@ -13,19 +14,74 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Check if server.py exists
+REM Check if server.py exists in current directory
 if not exist "server.py" (
     echo [ERROR] server.py not found in current directory
-    echo [TIP] Please run this script from the YAM directory
+    echo [TIP] Please run this script from the app directory where server.py is located
     pause
     exit /b 1
 )
 
-REM Kill any existing processes on port 5000
-echo [INFO] Clearing port 5000...
+REM Enhanced port clearing with better process detection
+echo [INFO] Checking for processes on port 5000...
+set PORT_CLEARED=0
+
+REM Method 1: Use netstat to find processes on port 5000
 for /f "tokens=5" %%a in ('netstat -aon ^| findstr :5000 ^| findstr LISTENING 2^>nul') do (
-    taskkill /PID %%a /F >nul 2>&1
+    set PID=%%a
+    if not "!PID!"=="" (
+        echo [INFO] Found process !PID! using port 5000
+        REM Check if it's not our own process (we'll start later)
+        tasklist /FI "PID eq !PID!" /FO CSV | findstr /I "python.exe" >nul 2>&1
+        if not errorlevel 1 (
+            echo [INFO] Terminating Python process !PID! on port 5000
+            taskkill /PID !PID! /F >nul 2>&1
+            if !errorlevel! equ 0 (
+                echo [SUCCESS] Process !PID! terminated successfully
+                set PORT_CLEARED=1
+            ) else (
+                echo [WARNING] Failed to terminate process !PID!
+            )
+        ) else (
+            echo [INFO] Process !PID! is not Python, checking if it's blocking port 5000
+            taskkill /PID !PID! /F >nul 2>&1
+            if !errorlevel! equ 0 (
+                echo [SUCCESS] Blocking process !PID! terminated
+                set PORT_CLEARED=1
+            )
+        )
+    )
 )
+
+REM Method 2: Use PowerShell for more robust process detection (if netstat method didn't work)
+if %PORT_CLEARED%==0 (
+    echo [INFO] Using PowerShell to check for port 5000 processes...
+    powershell -Command "Get-NetTCPConnection -LocalPort 5000 -State Listen | ForEach-Object { $process = Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue; if ($process) { Write-Host $process.Id, $process.ProcessName; Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue } }" >nul 2>&1
+    if !errorlevel! equ 0 (
+        echo [SUCCESS] PowerShell cleared port 5000
+        set PORT_CLEARED=1
+    )
+)
+
+REM Method 3: Final cleanup - kill any remaining Python processes that might be using port 5000
+if %PORT_CLEARED%==0 (
+    echo [INFO] Final cleanup - checking for any Python processes...
+    for /f "tokens=2" %%a in ('tasklist /FI "IMAGENAME eq python.exe" /FO CSV ^| findstr /I "python.exe"') do (
+        echo [INFO] Found Python process, checking if it's using port 5000...
+        netstat -ano | findstr :5000 | findstr %%a >nul 2>&1
+        if not errorlevel 1 (
+            echo [INFO] Terminating Python process using port 5000
+            taskkill /IM python.exe /F >nul 2>&1
+            timeout /t 2 /nobreak >nul
+            set PORT_CLEARED=1
+            goto :port_cleared
+        )
+    )
+)
+
+:port_cleared
+echo [INFO] Port 5000 status check complete
+echo.
 
 echo [INFO] Starting YAM server with network access and HOT RELOADING...
 echo [INFO] Server will be accessible from all devices on your network
@@ -50,9 +106,19 @@ set ELECTRON_MODE=0
 set PYTHONUNBUFFERED=1
 set PYTHONDONTWRITEBYTECODE=1
 set FLASK_RUN_EXTRA_FILES=app/templates,app/static
+set WERKZEUG_DISABLE_RELOADER=0
 
-REM Start the server with network access and hot reloading enabled
-python server.py --host 0.0.0.0 --port 5000 --mode web --debug --debugger-mode
+REM Check if user wants debugger mode (enhanced hot reloading)
+set /p USE_DEBUGGER_MODE="Do you want to use enhanced debugger mode for better hot reloading? (y/n): "
+if /i "%USE_DEBUGGER_MODE%"=="y" (
+    echo [INFO] Starting with ENHANCED DEBUGGER MODE...
+    echo [INFO] This provides real-time file monitoring and browser auto-refresh
+    python server.py --host 0.0.0.0 --port 5000 --mode web --debug --debugger-mode
+) else (
+    echo [INFO] Starting with STANDARD DEBUG MODE...
+    echo [INFO] This provides basic hot reloading for templates and static files
+    python server.py --host 0.0.0.0 --port 5000 --mode web --debug
+)
 
 echo.
 echo [INFO] Server stopped

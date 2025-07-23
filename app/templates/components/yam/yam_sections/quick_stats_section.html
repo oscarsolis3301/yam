@@ -1,0 +1,28 @@
+{% import 'components/yam/quick_stats.html' as yam_quick_stats %}
+{% import 'components/yam/status_indicator.html' as yam_status_indicator %}
+{% import 'components/yam/user_quick_view.html' as yam_user_quick_view %}
+{% import 'components/yam/connection_status.html' as yam_connection_status %}
+{% macro render_quick_stats_section(current_user) %}
+<!-- Top Row - Quick Stats and Status -->
+<div class="yam-dashboard-grid">
+    <!-- Quick Stats Component -->
+    <div class="yam-grid-item">
+        {{ yam_quick_stats.render_quick_stats(current_user) }}
+    </div>
+    
+    <!-- Status Indicator Component -->
+    <div class="yam-grid-item">
+        {{ yam_status_indicator.render_status_indicator(current_user) }}
+    </div>
+    
+    <!-- User Quick View Component -->
+    <div class="yam-grid-item">
+        {{ yam_user_quick_view.render_user_quick_view(current_user) }}
+    </div>
+    
+    <!-- Connection Status Component -->
+    <div class="yam-grid-item">
+        {{ yam_connection_status.render_connection_status(current_user) }}
+    </div>
+</div>
+{% endmacro %} 

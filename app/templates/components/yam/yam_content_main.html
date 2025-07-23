@@ -1,0 +1,145 @@
+<!-- YAM Main Content Structure -->
+{% macro render_yam_content_main(name, current_user, yam_welcome, yam_daily_analytics, yam_quick_stats, yam_status_indicator, yam_user_quick_view, yam_connection_status) %}
+<!-- Modern YAM Dashboard - CONTAINER OPTIMIZED -->
+<div class="yam-dashboard-full yam-page" id="yamDashboard">
+    <div class="yam-container-full">
+        <!-- Welcome Section - LARGER AND PROMINENT -->
+        <div class="yam-welcome-full">
+            {{ yam_welcome.render_welcome_banner(name, current_user) }}
+        </div>
+        
+        <!-- Daily Analytics Section - Only 2 charts -->
+        <div class="yam-analytics-grid">
+            {{ yam_daily_analytics.render_daily_analytics(current_user) }}
+        </div>
+        
+        <!-- Stats Grid - 2x2 layout -->
+        <div class="yam-stats-grid-full">
+            <!-- Quick Stats -->
+            <div class="yam-card-enhanced">
+                {{ yam_quick_stats.render_quick_stats(current_user) }}
+            </div>
+            
+            <!-- Status Button -->
+            <button class="yam-card-enhanced yam-focus-visible" onclick="yamModals.openModal('statusModal')" tabindex="0">
+                {{ yam_status_indicator.render_status_indicator(current_user) }}
+            </button>
+            
+            <!-- User Quick View -->
+            <div class="yam-card-enhanced">
+                {{ yam_user_quick_view.render_user_quick_view(current_user) }}
+            </div>
+            
+            <!-- Connection Health Container -->
+            <div class="yam-card-enhanced">
+                {{ yam_connection_status.render_connection_status(current_user) }}
+            </div>
+        </div>
+        
+        <!-- Action Buttons - 3 columns -->
+        <div class="yam-actions-grid-full">
+            <!-- Team & Analytics -->
+            <div class="yam-action-group">
+                <h3>
+                    <i class="bi bi-people-fill" aria-hidden="true"></i>
+                    Team & Analytics
+                </h3>
+                <div class="yam-action-buttons">
+                    <button class="yam-action-btn yam-focus-visible" 
+                            onclick="yamModals.openModal('userPresenceModal')"
+                            aria-label="Open User Presence Map">
+                        <i class="bi bi-map" aria-hidden="true"></i>
+                        <span>User Presence Map</span>
+                    </button>
+                    <button class="yam-action-btn yam-focus-visible" 
+                            onclick="yamModals.openModal('userAnalyticsModal')"
+                            aria-label="Open User Analytics">
+                        <i class="bi bi-graph-up" aria-hidden="true"></i>
+                        <span>User Analytics</span>
+                    </button>
+                    <button class="yam-action-btn yam-focus-visible" 
+                            onclick="yamModals.openModal('activityHeatmapModal')"
+                            aria-label="Open Activity Heatmap">
+                        <i class="bi bi-calendar-heatmap" aria-hidden="true"></i>
+                        <span>Activity Heatmap</span>
+                    </button>
+                    <button class="yam-action-btn yam-focus-visible" 
+                            onclick="yamModals.openModal('advancedStatusModal')"
+                            aria-label="Open Advanced Status">
+                        <i class="bi bi-person-badge" aria-hidden="true"></i>
+                        <span>Advanced Status</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- System & Monitoring -->
+            <div class="yam-action-group">
+                <h3>
+                    <i class="bi bi-gear-fill" aria-hidden="true"></i>
+                    System & Monitoring
+                </h3>
+                <div class="yam-action-buttons">
+                    <button class="yam-action-btn yam-focus-visible" 
+                            onclick="yamModals.openModal('systemMonitorModal')"
+                            aria-label="Open System Monitor">
+                        <i class="bi bi-cpu" aria-hidden="true"></i>
+                        <span>System Monitor</span>
+                    </button>
+                    <button class="yam-action-btn yam-focus-visible" 
+                            onclick="yamModals.openModal('systemHealthModal')"
+                            aria-label="Open System Health">
+                        <i class="bi bi-heart-pulse" aria-hidden="true"></i>
+                        <span>System Health</span>
+                    </button>
+                    <button class="yam-action-btn yam-focus-visible" 
+                            onclick="yamModals.openModal('teamPerformanceModal')"
+                            aria-label="Open Team Performance">
+                        <i class="bi bi-trophy" aria-hidden="true"></i>
+                        <span>Team Performance</span>
+                    </button>
+                    <button class="yam-action-btn yam-focus-visible" 
+                            onclick="yamModals.openModal('teamCollaborationModal')"
+                            aria-label="Open Team Collaboration">
+                        <i class="bi bi-people" aria-hidden="true"></i>
+                        <span>Team Collaboration</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Activity & Communication -->
+            <div class="yam-action-group">
+                <h3>
+                    <i class="bi bi-activity" aria-hidden="true"></i>
+                    Activity & Communication
+                </h3>
+                <div class="yam-action-buttons">
+                    <button class="yam-action-btn yam-focus-visible" 
+                            onclick="yamModals.openModal('recentActivityModal')"
+                            aria-label="Open Recent Activity">
+                        <i class="bi bi-clock-history" aria-hidden="true"></i>
+                        <span>Recent Activity</span>
+                    </button>
+                    <button class="yam-action-btn yam-focus-visible" 
+                            onclick="yamModals.openModal('activityTrackerModal')"
+                            aria-label="Open Activity Tracker">
+                        <i class="bi bi-activity" aria-hidden="true"></i>
+                        <span>Activity Tracker</span>
+                    </button>
+                    <button class="yam-action-btn yam-focus-visible" 
+                            onclick="yamModals.openModal('notificationsModal')"
+                            aria-label="Open Notifications">
+                        <i class="bi bi-bell" aria-hidden="true"></i>
+                        <span>Notifications</span>
+                    </button>
+                    <button class="yam-action-btn yam-focus-visible" 
+                            onclick="yamModals.openModal('teamChatModal')"
+                            aria-label="Open Team Chat">
+                        <i class="bi bi-chat-dots" aria-hidden="true"></i>
+                        <span>Team Chat</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %} 

@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} - Knowledge Base{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+.article-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+}
+
+.article-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.article-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.article-meta {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.article-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.article-content {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.7;
+    font-size: 1.1rem;
+}
+
+.article-tags {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tag {
+    display: inline-block;
+    background: rgba(0, 123, 255, 0.2);
+    color: #007bff;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin: 0.25rem;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #007bff;
+    text-decoration: none;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.back-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .article-container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+    
+    .article-title {
+        font-size: 1.5rem;
+    }
+    
+    .article-content {
+        font-size: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="article-container">
+    <a href="#" class="back-link" onclick="window.history.back(); return false;">
+        <i class="bi bi-arrow-left"></i>
+        Back
+    </a>
+    
+    <div class="article-header">
+        <h1 class="article-title">{{ article.title }}</h1>
+        <div class="article-meta">
+            {% if article.author %}
+            <span><i class="bi bi-person"></i> {{ article.author }}</span>
+            {% endif %}
+            {% if article.created_at %}
+            <span><i class="bi bi-calendar"></i> {{ article.created_at.strftime('%B %d, %Y') }}</span>
+            {% endif %}
+            {% if article.category %}
+            <span><i class="bi bi-folder"></i> {{ article.category }}</span>
+            {% endif %}
+            {% if article.status %}
+            <span><i class="bi bi-check-circle"></i> {{ article.status }}</span>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="article-content">
+        {% if article.description %}
+        <div class="article-description">
+            <p><strong>{{ article.description }}</strong></p>
+        </div>
+        {% endif %}
+        
+        {% if article.content %}
+        <div class="article-body">
+            {{ article.content | safe }}
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if article.tags %}
+    <div class="article-tags">
+        <strong>Tags:</strong>
+        {% for tag in article.tags.split(',') %}
+        <span class="tag">{{ tag.strip() }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

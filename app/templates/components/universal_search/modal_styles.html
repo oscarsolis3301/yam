@@ -1,0 +1,1588 @@
+<!-- Modal Styles Component -->
+<style>
+/* Universal Search Detail Modal */
+.universal-search-detail-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: opacity 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.universal-search-detail-content {
+    /* This container will be replaced by individual modal content */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+    position: relative;
+    color: inherit;
+    flex-direction: column;
+}
+
+/* Legacy styles for backward compatibility */
+.universal-search-detail-content:not(:has(.user-profile-modal)) {
+    background: #23272f;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    width: 75vw;
+    height: 75vh;
+    max-width: 1200px;
+    min-width: 800px;
+    min-height: 600px;
+    overflow-y: auto;
+    box-shadow: 0 8px 48px rgba(0, 0, 0, 0.4);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Profile Actions */
+.profile-actions {
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+    margin-top: .25rem;
+}
+
+.icon-btn {
+    padding: .25rem .5rem;
+    font-size: 1rem;
+    line-height: 1;
+    border-radius: 6px;
+    min-width: 32px;
+}
+
+/* Toast Notifications */
+#toastContainer {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 11000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.toast-msg {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: .75rem 1rem;
+    min-width: 200px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+[data-bs-theme="dark"] .toast-msg {
+    background: rgba(50, 50, 50, 0.9);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Legacy modal container - keeping for non-profile modals */
+.macos-modal {
+    background: linear-gradient(180deg, #fafafa 0%, #f0f0f3 100%);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-radius: 14px;
+    padding: 24px;
+    max-width: 900px;
+    width: 90vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    color: #1d1d1f;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    animation: modalFadeIn 0.25s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(20px) scale(.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+[data-bs-theme="dark"] .macos-modal {
+    background: #2b2b2d;
+    color: #ececec;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    color: #6e6e73;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.modal-close-btn:hover {
+    background: rgba(60, 60, 67, 0.1);
+    color: #000;
+}
+
+[data-bs-theme="dark"] .modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.modal-title {
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.modal-section {
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+}
+
+[data-bs-theme="dark"] .modal-section {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.modal-section h4 {
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #3c3c43;
+}
+
+[data-bs-theme="dark"] .modal-section h4 {
+    color: #f1f1f4;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    row-gap: 8px;
+    column-gap: 16px;
+    font-size: 0.9rem;
+}
+
+.info-label {
+    color: #6e6e73;
+}
+
+[data-bs-theme="dark"] .info-label {
+    color: #b5b5b9;
+}
+
+.info-value {
+    font-weight: 500;
+    word-break: break-all;
+}
+
+.status-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.status-text {
+    font-size: 0.85rem;
+}
+
+.status-text.muted { color: #888; }
+[data-bs-theme="dark"] .status-text.muted { color: #aaa; }
+
+.warning-text {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #d87700;
+}
+
+.button-group {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+}
+
+.button-group.wrap { flex-wrap: wrap; }
+
+.macos-btn {
+    appearance: none;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.9);
+    color: #111;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.macos-btn:hover {
+    background: rgba(255, 255, 255, 1);
+}
+
+.macos-btn:active {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.macos-btn.outline {
+    background: transparent;
+}
+
+.macos-btn.lite {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+[data-bs-theme="dark"] .macos-btn {
+    background: rgba(255, 255, 255, 0.06);
+    color: #eee;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+[data-bs-theme="dark"] .macos-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+.badge-locked { background: #ff3b30; color: #fff; }
+.badge-disabled { background: #6c757d; color: #fff; }
+.badge-password-expired { background: #ffcc00; color: #000; }
+.badge-ok { background: #4caf50; color: #fff; }
+
+.loading-status-text {
+    margin-left: 6px;
+    font-size: .8rem;
+    color: #6c757d;
+}
+
+/* Lists styling */
+.group-list, .device-history-list {
+    margin: 0;
+    padding-left: 1.2rem;
+    font-size: .85rem;
+}
+
+/* Responsive adjustments for legacy modals */
+@media (max-width: 768px) {
+    .universal-search-detail-content:not(:has(.user-profile-modal)) {
+        width: 95vw;
+        height: 85vh;
+        min-width: 320px;
+        padding: 1.5rem;
+    }
+}
+
+/* Ticket Modal Styles */
+.ticket-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(24, 26, 26, 0.55);
+    z-index: 3000;
+    backdrop-filter: blur(8px);
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.ticket-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.ticket-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    background: #23272f;
+    z-index: 3100;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.4);
+    border-radius: 1.5rem;
+    width: min(90vw, 700px);
+    max-height: min(85vh, 600px);
+    min-width: 320px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1), transform 0.25s cubic-bezier(.4,0,.2,1);
+}
+
+.ticket-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.ticket-modal-header {
+    position: sticky;
+    top: 0;
+    background: #23272f;
+    padding: 1.2rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    z-index: 10;
+    border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.ticket-modal-title {
+    color: #7ecbff;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.ticket-modal-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 2rem;
+    background: #181a1a;
+    border-radius: 0 0 1.5rem 1.5rem;
+}
+
+.ticket-user-info {
+    background: rgba(0, 123, 255, 0.1);
+    border: 1px solid rgba(0, 123, 255, 0.2);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    color: #fff;
+}
+
+.ticket-form .form-label {
+    color: #fff;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.ticket-form .form-control,
+.ticket-form .form-select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    color: #fff;
+    padding: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.ticket-form .form-control:focus,
+.ticket-form .form-select:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    color: #fff;
+}
+
+.ticket-form .form-check-label {
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+.ticket-form .form-check-label small {
+    color: rgba(255, 255, 255, 0.6);
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.ticket-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 1.5rem;
+}
+
+/* Password Reset Modal Styles */
+.password-reset-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(24, 26, 26, 0.55);
+    z-index: 3000;
+    backdrop-filter: blur(8px);
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.password-reset-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.password-reset-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    background: #23272f;
+    z-index: 3100;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.4);
+    border-radius: 1.5rem;
+    width: min(90vw, 700px);
+    max-height: min(85vh, 600px);
+    min-width: 320px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1), transform 0.25s cubic-bezier(.4,0,.2,1);
+}
+
+.password-reset-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.password-reset-modal-header {
+    position: sticky;
+    top: 0;
+    background: #23272f;
+    padding: 1.2rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    z-index: 10;
+    border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.password-reset-modal-title {
+    color: #ff6b6b;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.password-reset-modal-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 2rem;
+    background: #181a1a;
+    border-radius: 0 0 1.5rem 1.5rem;
+}
+
+.password-reset-user-info {
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    color: #fff;
+}
+
+/* Step Indicator Styles */
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.step-indicator::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    z-index: 1;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.step.active .step-number {
+    background: #007bff;
+    color: #fff;
+}
+
+.step-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+    transition: color 0.3s ease;
+}
+
+.step.active .step-label {
+    color: #fff;
+    font-weight: 500;
+}
+
+/* Step Content Styles */
+.step-content {
+    color: #fff;
+}
+
+.step-content h4 {
+    color: #fff;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.step-content .text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+    margin-bottom: 1.5rem;
+}
+
+.verification-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.verification-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.verification-option:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.verification-option input[type="radio"] {
+    margin-top: 0.25rem;
+}
+
+.verification-option label {
+    flex: 1;
+    cursor: pointer;
+    color: #fff;
+}
+
+.verification-option label strong {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.verification-option label small {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+}
+
+.verification-option label i {
+    color: #007bff;
+    margin-right: 0.5rem;
+}
+
+.reset-options {
+    margin-bottom: 1.5rem;
+}
+
+.reset-options .form-label {
+    color: #fff;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.reset-options .form-check-label {
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+.reset-options .form-check-label small {
+    color: rgba(255, 255, 255, 0.6);
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.confirmation-details {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-item strong {
+    color: #fff;
+}
+
+.success-details {
+    background: rgba(40, 167, 69, 0.1);
+    border: 1px solid rgba(40, 167, 69, 0.2);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.step-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 1.5rem;
+}
+
+.reset-execution,
+.reset-success {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.reset-success h4 {
+    color: #28a745;
+    margin-bottom: 1rem;
+}
+
+/* Alert Styles */
+.alert {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid;
+}
+
+.alert-info {
+    background: rgba(0, 123, 255, 0.1);
+    border-color: rgba(0, 123, 255, 0.2);
+    color: #7ecbff;
+}
+
+.alert-warning {
+    background: rgba(255, 193, 7, 0.1);
+    border-color: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+}
+
+.alert i {
+    margin-right: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .ticket-modal,
+    .password-reset-modal {
+        width: 95vw;
+        max-height: 90vh;
+    }
+    
+    .ticket-modal-content,
+    .password-reset-modal-content {
+        padding: 1.5rem;
+    }
+    
+    .step-indicator {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .step-indicator::before {
+        display: none;
+    }
+    
+    .step {
+        flex-direction: row;
+        gap: 1rem;
+    }
+    
+    .step-number {
+        margin-bottom: 0;
+    }
+    
+    .step-actions {
+        flex-direction: column;
+    }
+    
+    .step-actions .btn {
+        width: 100%;
+    }
+}
+
+/* Animation keyframes */
+@keyframes slideIn {
+    from { 
+        transform: translateX(100%); 
+        opacity: 0; 
+    }
+    to { 
+        transform: translateX(0); 
+        opacity: 1; 
+    }
+}
+
+/* Responsive breakpoints */
+@media (max-width: 768px) {
+    .mac-modal-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .mac-user-info {
+        align-items: center;
+    }
+    
+    .mac-action-buttons {
+        justify-content: center;
+    }
+    
+    .mac-info-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .mac-info-label {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+}
+
+/* Office Modal Styles - Dark MacOS Theme */
+.office-modal {
+    background: rgba(28, 28, 30, 0.95);
+    border: 1px solid rgba(84, 84, 88, 0.6);
+    border-radius: 20px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6), 
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    color: #ffffff;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 98%;
+    max-width: 1400px;
+    height: 90vh;
+    max-height: 90vh;
+    margin: 0;
+    animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+    padding: 1.5rem;
+    font-size: 14px;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+}
+
+.mac-full-width {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+}
+
+.mac-tech-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem;
+    margin-top: 0.75rem;
+}
+
+.mac-tech-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(84, 84, 88, 0.3);
+}
+
+.mac-tech-item:last-child {
+    border-bottom: none;
+}
+
+.mac-tech-label {
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+}
+
+.mac-tech-value {
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-weight: 600;
+    color: #ffffff;
+    background: rgba(44, 44, 46, 0.8);
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    border: 1px solid rgba(84, 84, 88, 0.4);
+    font-size: 0.9rem;
+}
+
+.mac-scan-button {
+    background: linear-gradient(145deg, #007AFF, #0056D6);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+.mac-scan-button:hover {
+    background: linear-gradient(145deg, #0056D6, #003D99);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+}
+
+.mac-office-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(84, 84, 88, 0.3);
+    flex-shrink: 0;
+}
+
+.mac-office-info h3 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+}
+
+.mac-office-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 0.25rem;
+    font-weight: 500;
+}
+
+.mac-action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.mac-action-btn {
+    background: rgba(44, 44, 46, 0.8);
+    color: #ffffff;
+    border: 1px solid rgba(84, 84, 88, 0.4);
+    border-radius: 8px;
+    padding: 0.6rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    position: relative;
+}
+
+.mac-action-btn:hover {
+    background: rgba(58, 58, 60, 0.9);
+    border-color: rgba(84, 84, 88, 0.6);
+    transform: translateY(-1px);
+}
+
+.mac-action-btn.primary {
+    background: linear-gradient(145deg, #34C759, #28A745);
+    border-color: rgba(52, 199, 89, 0.6);
+}
+
+.mac-action-btn.primary:hover {
+    background: linear-gradient(145deg, #28A745, #1E7E34);
+}
+
+.mac-action-btn.secondary {
+    background: linear-gradient(145deg, #FF9500, #FF8C00);
+    border-color: rgba(255, 149, 0, 0.6);
+}
+
+.mac-action-btn.secondary:hover {
+    background: linear-gradient(145deg, #FF8C00, #E6780A);
+}
+
+/* Tooltip for action buttons */
+.mac-action-btn::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(28, 28, 30, 0.95);
+    color: #ffffff;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 1000;
+    border: 1px solid rgba(84, 84, 88, 0.4);
+}
+
+.mac-action-btn:hover::after {
+    opacity: 1;
+    visibility: visible;
+    bottom: -40px;
+}
+
+/* Main Content Layout - Side by Side */
+.mac-office-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.mac-left-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.mac-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    flex-shrink: 0;
+}
+
+.mac-info-section {
+    background: rgba(44, 44, 46, 0.6);
+    border: 1px solid rgba(84, 84, 88, 0.3);
+    border-radius: 12px;
+    padding: 1.2rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.mac-info-section h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 0.8rem 0;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.mac-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(84, 84, 88, 0.2);
+}
+
+.mac-info-item:last-child {
+    border-bottom: none;
+}
+
+.mac-info-label {
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+}
+
+.mac-info-value {
+    font-weight: 600;
+    color: #ffffff;
+    text-align: right;
+    font-size: 0.95rem;
+}
+
+.mac-info-value.clickable {
+    color: #007AFF;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.mac-info-value.clickable:hover {
+    color: #0056D6;
+    text-decoration: underline;
+}
+
+/* Technical Information Section - Fixed Height */
+.mac-info-section.mac-full-width {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* Tickets Section - Matches Left Section Height */
+.mac-tickets-section {
+    background: rgba(44, 44, 46, 0.6);
+    border: 1px solid rgba(84, 84, 88, 0.3);
+    border-radius: 12px;
+    padding: 1.2rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.mac-tickets-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    flex-shrink: 0;
+}
+
+.mac-tickets-header h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.mac-ticket-count {
+    background: rgba(99, 99, 102, 0.8);
+    color: #ffffff;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.mac-view-all-btn {
+    background: transparent;
+    color: #007AFF;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.mac-view-all-btn:hover {
+    background: rgba(0, 122, 255, 0.1);
+    color: #0056D6;
+}
+
+.mac-tickets-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(84, 84, 88, 0.6) transparent;
+}
+
+.mac-tickets-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mac-tickets-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.mac-tickets-list::-webkit-scrollbar-thumb {
+    background: rgba(84, 84, 88, 0.6);
+    border-radius: 3px;
+}
+
+.mac-tickets-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(84, 84, 88, 0.8);
+}
+
+.mac-ticket-item {
+    background: rgba(58, 58, 60, 0.6);
+    border: 1px solid rgba(84, 84, 88, 0.3);
+    border-radius: 8px;
+    padding: 0.7rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.mac-ticket-item:hover {
+    background: rgba(72, 72, 74, 0.8);
+    border-color: rgba(84, 84, 88, 0.5);
+    transform: translateY(-1px);
+}
+
+.mac-ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.4rem;
+}
+
+.mac-ticket-id {
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #007AFF;
+}
+
+.mac-ticket-priority {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.mac-ticket-priority.critical {
+    background: #FF453A;
+    color: white;
+}
+
+.mac-ticket-priority.high {
+    background: #FF9500;
+    color: white;
+}
+
+.mac-ticket-priority.medium {
+    background: #FFD60A;
+    color: #1D1D1F;
+}
+
+.mac-ticket-priority.low {
+    background: #34C759;
+    color: white;
+}
+
+.mac-ticket-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 0.3rem;
+    line-height: 1.4;
+}
+
+.mac-ticket-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.mac-ticket-status {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    text-transform: capitalize;
+}
+
+.mac-ticket-status.resolved {
+    background: rgba(52, 199, 89, 0.2);
+    color: #34C759;
+    border: 1px solid rgba(52, 199, 89, 0.3);
+}
+
+.mac-ticket-status.open {
+    background: rgba(255, 69, 58, 0.2);
+    color: #FF453A;
+    border: 1px solid rgba(255, 69, 58, 0.3);
+}
+
+.mac-ticket-status.pending {
+    background: rgba(255, 149, 0, 0.2);
+    color: #FF9500;
+    border: 1px solid rgba(255, 149, 0, 0.3);
+}
+
+/* Network Scanner Modal */
+.network-scanner-modal {
+    background: rgba(28, 28, 30, 0.95);
+    border: 1px solid rgba(84, 84, 88, 0.6);
+    border-radius: 20px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6), 
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    color: #ffffff;
+    max-width: 600px;
+    width: 90%;
+    margin: 0 auto;
+    animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.scanner-header {
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid rgba(84, 84, 88, 0.3);
+}
+
+.scanner-header h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.scanner-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 0.5rem;
+}
+
+.scanner-options {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.scan-option {
+    background: rgba(44, 44, 46, 0.8);
+    border: 1px solid rgba(84, 84, 88, 0.4);
+    border-radius: 12px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.scan-option:hover {
+    background: rgba(58, 58, 60, 0.9);
+    border-color: rgba(84, 84, 88, 0.6);
+    transform: translateY(-2px);
+}
+
+.scan-option h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.scan-option p {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.scan-range {
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-weight: 600;
+    color: #007AFF;
+}
+
+/* Toast Notifications */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.toast {
+    background: rgba(28, 28, 30, 0.95);
+    border: 1px solid rgba(84, 84, 88, 0.6);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 500;
+    max-width: 350px;
+    animation: toastSlideIn 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.toast.success {
+    border-left: 4px solid #34C759;
+}
+
+.toast.error {
+    border-left: 4px solid #FF453A;
+}
+
+.toast.info {
+    border-left: 4px solid #007AFF;
+}
+
+.toast.warning {
+    border-left: 4px solid #FF9500;
+}
+
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Workstation Modal Styles - Dark MacOS Theme */
+.workstation-modal {
+    background: rgba(28, 28, 30, 0.95);
+    border: 1px solid rgba(84, 84, 88, 0.6);
+    border-radius: 20px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6), 
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    color: #ffffff;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 98%;
+    max-width: 1200px;
+    height: 90vh;
+    max-height: 90vh;
+    margin: 0;
+    animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+    padding: 1.5rem;
+    font-size: 14px;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+}
+
+.mac-workstation-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(84, 84, 88, 0.3);
+    flex-shrink: 0;
+}
+
+.mac-workstation-info h3 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+}
+
+.mac-workstation-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 0.25rem;
+    font-weight: 500;
+}
+
+.mac-status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+}
+
+.mac-status-indicator.online {
+    background: rgba(52, 199, 89, 0.2);
+    color: #34C759;
+    border: 1px solid rgba(52, 199, 89, 0.3);
+}
+
+.mac-status-indicator.offline {
+    background: rgba(255, 69, 58, 0.2);
+    color: #FF453A;
+    border: 1px solid rgba(255, 69, 58, 0.3);
+}
+
+.mac-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .mac-office-content {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+    }
+    
+    .mac-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .mac-tech-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .office-modal,
+    .workstation-modal {
+        width: 98%;
+        max-width: 98%;
+        padding: 1.2rem;
+        height: 95vh;
+        max-height: 95vh;
+        font-size: 15px;
+    }
+    
+    .mac-office-header,
+    .mac-workstation-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.8rem;
+    }
+    
+    .mac-office-info,
+    .mac-workstation-info {
+        align-items: center;
+    }
+    
+    .mac-action-buttons {
+        justify-content: center;
+    }
+    
+    .mac-info-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .mac-info-label {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .mac-tech-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .mac-office-content {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+    }
+    
+    .mac-office-info h3,
+    .mac-workstation-info h3 {
+        font-size: 1.4rem;
+    }
+    
+    .mac-office-subtitle,
+    .mac-workstation-subtitle {
+        font-size: 0.95rem;
+    }
+}
+</style> 

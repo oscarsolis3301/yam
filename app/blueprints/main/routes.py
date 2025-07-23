@@ -223,7 +223,7 @@ def dashboard_simple():
         email = current_user.email
         name = user.split('.')[0].title() if '.' in user else user.title()
         
-        return render_template('YAM.html', user=user, user_email=email, name=name,
+        return render_template('dashboard.html', user=user, user_email=email, name=name,
                                active_page='home')
     except Exception as e:
         return jsonify({
@@ -240,7 +240,7 @@ def test_dashboard():
         email = current_user.email
         name = user.split('.')[0].title() if '.' in user else user.title()
         
-        return render_template('YAM.html', user=user, user_email=email, name=name,
+        return render_template('dashboard.html', user=user, user_email=email, name=name,
                                current_user=current_user, active_page='home')
     except Exception as e:
         return jsonify({

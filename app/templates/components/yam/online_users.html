@@ -1,0 +1,1765 @@
+{% macro render_online_users(current_user) %}
+<!-- YAM Online Users Component -->
+<div id="yamOnlineUsers" class="yam-online-users">
+    <div class="section-header">
+        <h3 class="section-title">
+            <i class="bi bi-people-fill"></i>
+            Team Members Online
+            <span class="online-indicator" id="onlineIndicator">
+                <i class="bi bi-circle-fill"></i>
+            </span>
+        </h3>
+        <div class="section-actions">
+            <button class="action-btn refresh-btn" id="yamRefreshUsersBtn" title="Refresh Users">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <div class="user-count-badge" id="yamUserCount">
+                <span class="count-number">0</span>
+                <span class="count-label">online</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="users-container">
+        <div id="yamUsersList" class="users-list">
+            <!-- Loading state -->
+            <div class="loading-state">
+                <i class="bi bi-people"></i>
+                <div>Loading team members...</div>
+                <div class="loading-subtitle">Establishing secure connection</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Connection Status Bar -->
+    <div class="connection-status" id="yamConnectionStatus">
+        <div class="status-item">
+            <i class="bi bi-wifi"></i>
+            <span>Real-time connection active</span>
+        </div>
+        <div class="status-item">
+            <i class="bi bi-clock"></i>
+            <span id="lastUpdateTime">Just now</span>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div class="modal fade" id="yamUserDetailsModal" tabindex="-1" aria-labelledby="yamUserDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="yamUserDetailsModalLabel">
+                    <i class="bi bi-person-circle"></i>
+                    User Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="yamUserDetailsContent">
+                <!-- User details will be populated here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.yam-online-users {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.yam-online-users::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #4caf50, #8bc34a, #4caf50);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-title i {
+    color: #4caf50;
+    font-size: 1.25rem;
+}
+
+.online-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 400;
+}
+
+.online-indicator i {
+    color: #4caf50;
+    font-size: 0.75rem;
+    animation: pulse 2s infinite;
+}
+
+.section-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.75rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    position: relative;
+    overflow: hidden;
+}
+
+.action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.action-btn:hover::before {
+    left: 100%;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.action-btn:active {
+    transform: scale(0.95);
+}
+
+.action-btn.loading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.user-count-badge {
+    background: linear-gradient(135deg, #4caf50, #8bc34a);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    min-width: 80px;
+    justify-content: center;
+}
+
+.count-number {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.count-label {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+.users-container {
+    max-height: 500px;
+    overflow-y: auto;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.users-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.users-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.users-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.users-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.user-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.user-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #4caf50, #8bc34a);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.user-item.online::before {
+    opacity: 1;
+}
+
+.user-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateX(8px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.user-item:active {
+    transform: translateX(8px) scale(0.98);
+}
+
+.user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+    position: relative;
+    flex-shrink: 0;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-avatar.online::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    background: #4caf50;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+    animation: pulse 2s infinite;
+}
+
+.user-avatar.offline::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    background: #f44336;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.user-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.25rem;
+    word-wrap: break-word;
+}
+
+.user-status {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.user-status.online {
+    color: #4caf50;
+}
+
+.user-status.offline {
+    color: #f44336;
+}
+
+.user-role {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.5rem;
+    display: inline-block;
+}
+
+.user-actions {
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.user-item:hover .user-actions {
+    opacity: 1;
+}
+
+.user-action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+}
+
+.user-action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    transform: scale(1.1);
+}
+
+.connection-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-item i {
+    color: #4caf50;
+}
+
+/* Loading and Error States */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    gap: 1rem;
+    text-align: center;
+}
+
+.loading-state i {
+    font-size: 3rem;
+    color: #4caf50;
+    animation: pulse 2s infinite;
+}
+
+.loading-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    color: #f44336;
+    gap: 1rem;
+    text-align: center;
+}
+
+.error-state i {
+    font-size: 3rem;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    color: rgba(255, 255, 255, 0.5);
+    gap: 1rem;
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Warning Banner */
+.warning-banner {
+    background: rgba(255, 193, 7, 0.15);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    color: #ffc107;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    animation: slideInDown 0.3s ease-out;
+}
+
+.warning-banner i {
+    font-size: 1rem;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Fallback State */
+.fallback-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    gap: 1rem;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fallback-state i {
+    font-size: 2.5rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.fallback-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.fallback-actions .action-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    min-width: 120px;
+}
+
+/* Modal Styles */
+.modal-content {
+    background: #1a1f2e;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+}
+
+.modal-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+}
+
+.modal-title i {
+    color: #667eea;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .yam-online-users {
+        padding: 1.5rem;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .section-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .users-container {
+        max-height: 400px;
+    }
+    
+    .user-item {
+        padding: 1rem;
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .connection-status {
+        flex-direction: column;
+        gap: 0.75rem;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .yam-online-users {
+        padding: 1rem;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+    }
+    
+    .user-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+    
+    .user-info {
+        text-align: center;
+    }
+    
+    .user-actions {
+        opacity: 1;
+        justify-content: center;
+    }
+}
+
+/* Empty state styles */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    gap: 1rem;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 1rem;
+}
+
+.empty-state .loading-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+    max-width: 300px;
+    line-height: 1.4;
+}
+
+.empty-state .action-btn {
+    margin-top: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.empty-state .action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+/* Offline and disconnected state styles */
+.offline-state,
+.disconnected-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    gap: 1rem;
+}
+
+.offline-state i,
+.disconnected-state i {
+    font-size: 3rem;
+    color: #f44336;
+    margin-bottom: 1rem;
+}
+
+.offline-state .loading-subtitle,
+.disconnected-state .loading-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+    max-width: 300px;
+    line-height: 1.4;
+}
+
+/* Fallback state styles */
+.fallback-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    gap: 1rem;
+}
+
+.fallback-state i {
+    font-size: 2.5rem;
+    color: #ff9800;
+    margin-bottom: 0.5rem;
+}
+
+.fallback-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.fallback-actions .action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.fallback-actions .action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+
+/* Warning banner styles */
+.warning-banner {
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    animation: slideInDown 0.3s ease;
+    box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+}
+
+.warning-banner i {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.warning-banner span {
+    flex: 1;
+}
+
+.warning-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s ease;
+}
+
+.warning-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Persistent connection indicator */
+.connection-status {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.connection-status.stable {
+    background: rgba(76, 175, 80, 0.9);
+}
+
+.connection-status.unstable {
+    background: rgba(255, 152, 0, 0.9);
+}
+
+.connection-status.offline {
+    background: rgba(244, 67, 54, 0.9);
+}
+</style>
+
+<script>
+// Global session health coordinator to prevent conflicts
+window.sessionHealthCoordinator = {
+    lastCheck: 0,
+    debounceTime: 10000, // 10 seconds
+    listeners: [],
+    
+    checkHealth() {
+        const now = Date.now();
+        if (now - this.lastCheck < this.debounceTime) {
+            return Promise.resolve({ healthy: true, debounced: true });
+        }
+        this.lastCheck = now;
+        
+        return fetch('/api/users/session-health', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Notify all listeners
+            this.listeners.forEach(listener => {
+                try {
+                    listener(data);
+                } catch (e) {
+                    console.error('Session health listener error:', e);
+                }
+            });
+            return data;
+        })
+        .catch(error => {
+            console.error('Session health coordinator error:', error);
+            return { healthy: false, error: error.message };
+        });
+    },
+    
+    addListener(listener) {
+        this.listeners.push(listener);
+    },
+    
+    removeListener(listener) {
+        const index = this.listeners.indexOf(listener);
+        if (index > -1) {
+            this.listeners.splice(index, 1);
+        }
+    }
+};
+
+// YAM Online Users Component - Ultra Stable Version with Persistent Sessions
+window.yamOnlineUsers = {
+    users: [],
+    cachedUsers: [], // Persistent user cache
+    isLoading: false,
+    lastUpdate: null,
+    lastSuccessfulUpdate: null,
+    connectionAttempts: 0,
+    maxConnectionAttempts: 10, // Increased for better stability
+    fallbackMode: false,
+    socketConnected: false,
+    apiFallbackInterval: null,
+    healthCheckInterval: null,
+    heartbeatInterval: null, // New: Persistent heartbeat
+    sessionKeepAliveInterval: null, // New: Session keep-alive
+    healthCheckFailures: 0,
+    lastHealthCheck: null,
+    persistentMode: true, // New: Always maintain user data
+    reconnectAttempts: 0,
+    maxReconnectAttempts: 20,
+    stableConnection: false,
+    lastStableConnection: null,
+    
+    // --- INITIALIZATION ---
+    init() {
+        console.log('YAM Online Users: Initializing persistent component');
+        
+        // Load cached data first (if available)
+        this.loadCachedData();
+        
+        // Set up socket listeners
+        this.setupSocketListeners();
+        
+        // Set up event listeners
+        this.setupEventListeners();
+        
+        // Start persistent heartbeat
+        this.startPersistentHeartbeat();
+        
+        // Start session keep-alive
+        this.startSessionKeepAlive();
+        
+        // Start auto-refresh with persistent mode
+        this.startAutoRefresh();
+        
+        // Start health checks
+        this.startHealthChecks();
+        
+        // Load initial data with fallback to cache
+        this.loadUsersWithFallback();
+        
+        // Add session health coordinator listener
+        if (window.sessionHealthCoordinator) {
+            window.sessionHealthCoordinator.addListener(this.handleSessionHealthUpdate.bind(this));
+        }
+        
+        // Mark as stable connection after successful initialization
+        this.markStableConnection();
+        
+        console.log('YAM Online Users: Persistent component initialized');
+    },
+    
+    setupEventListeners() {
+        // Set up refresh button
+        const refreshBtn = document.getElementById('yamRefreshUsersBtn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                this.loadUsersWithFallback();
+            });
+        }
+        
+        // Set up page visibility handling for persistent sessions
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                this.onPageVisible();
+            } else {
+                this.onPageHidden();
+            }
+        });
+        
+        // Set up window focus handling
+        window.addEventListener('focus', () => {
+            this.onWindowFocus();
+        });
+        
+        // Set up beforeunload to maintain session
+        window.addEventListener('beforeunload', () => {
+            this.onPageUnload();
+        });
+    },
+    
+    // --- PERSISTENT DATA MANAGEMENT ---
+    loadCachedData() {
+        try {
+            const cached = localStorage.getItem('yamOnlineUsersCache');
+            if (cached) {
+                const data = JSON.parse(cached);
+                if (data.users && data.timestamp) {
+                    const cacheAge = Date.now() - data.timestamp;
+                    // Use cache if it's less than 5 minutes old
+                    if (cacheAge < 5 * 60 * 1000) {
+                        this.cachedUsers = data.users;
+                        console.log(`YAM Online Users: Loaded ${this.cachedUsers.length} cached users`);
+                        return true;
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn('YAM Online Users: Failed to load cached data:', error);
+        }
+        return false;
+    },
+    
+    saveCachedData() {
+        try {
+            const data = {
+                users: this.users,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('yamOnlineUsersCache', JSON.stringify(data));
+        } catch (error) {
+            console.warn('YAM Online Users: Failed to save cached data:', error);
+        }
+    },
+    
+    // --- PERSISTENT DATA LOADING ---
+    async loadUsersWithFallback() {
+        if (this.isLoading) {
+            console.log('YAM Online Users: Already loading, skipping request');
+            return;
+        }
+        
+        this.setLoadingState(true);
+        console.log('YAM Online Users: Loading users with persistent fallback...');
+        
+        try {
+            const response = await fetch('/api/users/online', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.users && Array.isArray(data.users)) {
+                this.updateUsers(data.users);
+                this.lastUpdate = new Date();
+                this.lastSuccessfulUpdate = new Date();
+                this.saveCachedData();
+                this.markStableConnection();
+                console.log(`YAM Online Users: Loaded ${data.users.length} users successfully`);
+            } else {
+                throw new Error('Invalid response format');
+            }
+            
+        } catch (error) {
+            console.error('YAM Online Users: Error loading users:', error);
+            
+            // Use cached data as fallback
+            if (this.cachedUsers.length > 0) {
+                console.log('YAM Online Users: Using cached data as fallback');
+                this.updateUsers(this.cachedUsers);
+                this.showWarningState('Using cached data - connection issues detected');
+            } else {
+                this.showErrorState(`Failed to load users: ${error.message}`);
+            }
+        } finally {
+            this.setLoadingState(false);
+        }
+    },
+    
+    // Legacy function for backward compatibility
+    async loadUsers() {
+        return this.loadUsersWithFallback();
+    },
+    
+    // --- USER UPDATES ---
+    updateUsers(users) {
+        this.users = users || [];
+        this.cachedUsers = [...this.users]; // Keep cache in sync
+        this.updateUsersList();
+        this.updateUserCount();
+        this.updateLastUpdateTime();
+        this.saveCachedData();
+        
+        console.log(`YAM Online Users: Updated with ${this.users.length} users (persistent)`);
+    },
+    
+    updateUserStatus(userData) {
+        const userIndex = this.users.findIndex(u => u.id == userData.id);
+        if (userIndex !== -1) {
+            this.users[userIndex] = { ...this.users[userIndex], ...userData };
+            this.updateUsersList();
+            this.updateUserCount();
+        }
+    },
+    
+    updateUsersList() {
+        const container = document.getElementById('yamUsersList');
+        if (!container) return;
+        
+        if (this.users.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-people"></i>
+                    <div>No team members currently online</div>
+                    <div class="loading-subtitle">This is normal if no one is currently active</div>
+                    <button class="action-btn" onclick="yamOnlineUsers.loadUsers()" style="margin-top: 1rem;">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Refresh
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        const usersHtml = this.users.map(user => this.renderUserItem(user)).join('');
+        container.innerHTML = usersHtml;
+    },
+    
+    renderUserItem(user) {
+        const isOnline = user.is_online || user.status === 'online';
+        const username = user.username || user.name || 'Unknown';
+        const email = user.email || 'No email';
+        const role = user.role || 'User';
+        const lastSeen = user.last_seen_human || user.last_seen || 'Unknown';
+        
+        return `
+            <div class="user-item ${isOnline ? 'online' : 'offline'}" onclick="yamOnlineUsers.showUserDetails(${user.id}, '${username}')">
+                <div class="user-avatar ${isOnline ? 'online' : 'offline'}">
+                    ${username.charAt(0).toUpperCase()}
+                </div>
+                <div class="user-info">
+                    <div class="user-name">${username}</div>
+                    <div class="user-status ${isOnline ? 'online' : 'offline'}">
+                        <i class="bi bi-circle-fill"></i>
+                        ${isOnline ? 'Online' : 'Offline'}
+                    </div>
+                    <div class="user-role">${role}</div>
+                </div>
+                <div class="user-actions">
+                    <button class="user-action-btn" onclick="event.stopPropagation(); yamOnlineUsers.sendMessage(${user.id})" title="Send Message">
+                        <i class="bi bi-chat"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    },
+    
+    updateUserCount() {
+        const countElement = document.getElementById('yamUserCount');
+        if (countElement) {
+            const onlineCount = this.users.filter(u => u.is_online || u.status === 'online').length;
+            const countNumber = countElement.querySelector('.count-number');
+            if (countNumber) {
+                countNumber.textContent = onlineCount;
+            }
+        }
+    },
+    
+    updateLastUpdateTime() {
+        const timeElement = document.getElementById('lastUpdateTime');
+        if (timeElement) {
+            timeElement.textContent = 'Just now';
+        }
+    },
+    
+    // --- SESSION HEALTH ---
+    handleSessionHealthUpdate(data) {
+        if (data && data.healthy === false) {
+            console.log('YAM Online Users: Session health check failed, user may be logged out');
+            this.handleLogout();
+        } else if (data && data.healthy === true) {
+            this.healthCheckFailures = 0; // Reset failure counter
+        }
+    },
+    
+    // --- PERSISTENT CONNECTION MANAGEMENT ---
+    startPersistentHeartbeat() {
+        // Clear any existing heartbeat
+        if (this.heartbeatInterval) {
+            clearInterval(this.heartbeatInterval);
+        }
+        
+        // Send heartbeat every 15 seconds to maintain connection
+        this.heartbeatInterval = setInterval(() => {
+            this.sendHeartbeat();
+        }, 15000);
+        
+        // Send initial heartbeat
+        setTimeout(() => {
+            this.sendHeartbeat();
+        }, 1000);
+    },
+    
+    startSessionKeepAlive() {
+        // Clear any existing keep-alive
+        if (this.sessionKeepAliveInterval) {
+            clearInterval(this.sessionKeepAliveInterval);
+        }
+        
+        // Keep session alive every 30 seconds
+        this.sessionKeepAliveInterval = setInterval(() => {
+            this.keepSessionAlive();
+        }, 30000);
+    },
+    
+    sendHeartbeat() {
+        try {
+            // Send heartbeat to maintain connection
+            if (window.yamDashboard && window.yamDashboard.socket && this.socketConnected) {
+                window.yamDashboard.socket.emit('heartbeat');
+            }
+            
+            // Also send API heartbeat for redundancy
+            fetch('/api/users/session-health', {
+                method: 'GET',
+                credentials: 'include',
+                headers: { 'Accept': 'application/json' }
+            }).catch(() => {
+                // Ignore errors, just keep trying
+            });
+        } catch (error) {
+            console.debug('YAM Online Users: Heartbeat error (non-critical):', error);
+        }
+    },
+    
+    keepSessionAlive() {
+        try {
+            // Update user presence
+            fetch('/api/users/online', {
+                method: 'GET',
+                credentials: 'include',
+                headers: { 'Accept': 'application/json' }
+            }).then(response => {
+                if (response.ok) {
+                    this.markStableConnection();
+                }
+            }).catch(() => {
+                // Ignore errors, just keep trying
+            });
+        } catch (error) {
+            console.debug('YAM Online Users: Session keep-alive error (non-critical):', error);
+        }
+    },
+    
+    markStableConnection() {
+        this.stableConnection = true;
+        this.lastStableConnection = new Date();
+        this.healthCheckFailures = 0;
+        this.reconnectAttempts = 0;
+    },
+    
+    onPageVisible() {
+        console.log('YAM Online Users: Page became visible, refreshing data');
+        // Refresh data when page becomes visible
+        setTimeout(() => {
+            this.loadUsersWithFallback();
+        }, 500);
+    },
+    
+    onPageHidden() {
+        console.log('YAM Online Users: Page hidden, maintaining session');
+        // Keep session alive even when page is hidden
+    },
+    
+    onWindowFocus() {
+        console.log('YAM Online Users: Window focused, checking connection');
+        // Check connection when window gains focus
+        setTimeout(() => {
+            this.loadUsersWithFallback();
+        }, 300);
+    },
+    
+    onPageUnload() {
+        console.log('YAM Online Users: Page unloading, maintaining session');
+        // Don't clear data on page unload, keep it persistent
+    },
+    
+    // --- ENHANCEMENT: Handle logout and disconnect for instant UI update ---
+    handleLogout() {
+        // Clear users and show offline message
+        this.users = [];
+        this.cachedUsers = [];
+        this.updateUsersList();
+        this.saveCachedData();
+        this.showOfflineState();
+    },
+
+    showOfflineState() {
+        const container = document.getElementById('yamUsersList');
+        if (container) {
+            container.innerHTML = `
+                <div class="offline-state">
+                    <i class="bi bi-person-x"></i>
+                    <div>You are offline</div>
+                    <div class="loading-subtitle">You have logged out or lost connection</div>
+                </div>
+            `;
+        }
+        this.isLoading = false;
+    },
+
+    // --- ENHANCEMENT: Robust Socket.IO disconnect handling ---
+    setupSocketListeners() {
+        if (window.yamDashboard && window.yamDashboard.socket) {
+            const socket = window.yamDashboard.socket;
+            
+            socket.on('connect', () => {
+                this.socketConnected = true;
+                this.connectionAttempts = 0;
+                this.fallbackMode = false;
+                console.log('YAM Online Users: Socket connected');
+                this.updateConnectionStatus(true);
+                // Request initial data
+                socket.emit('get_online_users');
+            });
+            
+            socket.on('disconnect', () => {
+                this.socketConnected = false;
+                console.log('YAM Online Users: Socket disconnected');
+                this.updateConnectionStatus(false);
+                this.showDisconnectedState();
+                this.enableFallbackMode();
+            });
+            
+            socket.on('online_users_update', (users) => {
+                this.socketConnected = true;
+                this.fallbackMode = false;
+                this.updateUsers(users);
+            });
+            
+            socket.on('user_status_change', (userData) => {
+                this.updateUserStatus(userData);
+            });
+            
+            socket.on('error', (error) => {
+                console.error('YAM Online Users: Socket error:', error);
+                this.enableFallbackMode();
+            });
+        } else {
+            console.warn('YAM Online Users: Socket not available, using fallback mode');
+            this.enableFallbackMode();
+        }
+    },
+
+    showDisconnectedState() {
+        const container = document.getElementById('yamUsersList');
+        if (container) {
+            container.innerHTML = `
+                <div class="disconnected-state">
+                    <i class="bi bi-wifi-off"></i>
+                    <div>Disconnected</div>
+                    <div class="loading-subtitle">Lost connection to server</div>
+                </div>
+            `;
+        }
+        this.isLoading = false;
+    },
+
+    // --- ENHANCEMENT: Prevent loading spinner from getting stuck ---
+    setLoadingState(loading) {
+        this.isLoading = loading;
+        const container = document.getElementById('yamUsersList');
+        const refreshBtn = document.getElementById('yamRefreshUsersBtn');
+        
+        if (loading && container) {
+            // Show loading state but keep it brief
+            container.innerHTML = `
+                <div class="loading-state">
+                    <i class="bi bi-people"></i>
+                    <div>Loading team members...</div>
+                    <div class="loading-subtitle">Establishing secure connection</div>
+                </div>
+            `;
+            
+            // Set a timeout to prevent infinite loading
+            setTimeout(() => {
+                if (this.isLoading && this.users.length === 0) {
+                    console.log('YAM Online Users: Loading timeout, showing fallback content');
+                    this.showFallbackContent();
+                    this.isLoading = false; // Force stop loading
+                }
+            }, 8000); // 8 second timeout (reduced from 10)
+        } else if (!loading && container && this.users.length === 0) {
+            // If not loading and no users, show empty state
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-people"></i>
+                    <div>No team members currently online</div>
+                    <div class="loading-subtitle">This is normal if no one is currently active</div>
+                    <button class="action-btn" onclick="yamOnlineUsers.loadUsers()" style="margin-top: 1rem;">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Refresh
+                    </button>
+                </div>
+            `;
+        }
+        
+        if (refreshBtn) {
+            if (loading) {
+                refreshBtn.classList.add('loading');
+            } else {
+                refreshBtn.classList.remove('loading');
+            }
+        }
+    },
+    
+    showFallbackContent() {
+        const container = document.getElementById('yamUsersList');
+        if (!container) return;
+        
+        // Show fallback content that's always visible
+        container.innerHTML = `
+            <div class="fallback-state">
+                <i class="bi bi-people"></i>
+                <div>Team Members</div>
+                <div class="loading-subtitle">Connection issues detected - showing cached data</div>
+                <div class="fallback-actions">
+                    <button class="action-btn" onclick="yamOnlineUsers.loadUsers()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Retry Connection
+                    </button>
+                    <button class="action-btn" onclick="yamOnlineUsers.enableFallbackMode()">
+                        <i class="bi bi-wifi-off"></i>
+                        Use Fallback Mode
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        this.isLoading = false;
+    },
+    
+    showErrorState(message) {
+        const container = document.getElementById('yamUsersList');
+        if (container) {
+            container.innerHTML = `
+                <div class="error-state">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <div>${message}</div>
+                    <button class="action-btn" onclick="yamOnlineUsers.loadUsersWithFallback()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Retry
+                    </button>
+                </div>
+            `;
+        }
+    },
+    
+    showWarningState(message) {
+        const container = document.getElementById('yamUsersList');
+        if (container) {
+            // Show warning but keep existing users visible
+            const warningDiv = document.createElement('div');
+            warningDiv.className = 'warning-banner';
+            warningDiv.innerHTML = `
+                <i class="bi bi-exclamation-triangle"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" class="warning-close">×</button>
+            `;
+            
+            // Insert warning at the top
+            container.insertBefore(warningDiv, container.firstChild);
+            
+            // Auto-remove warning after 10 seconds
+            setTimeout(() => {
+                if (warningDiv.parentElement) {
+                    warningDiv.remove();
+                }
+            }, 10000);
+        }
+    },
+    
+    showUserDetails(userId, username) {
+        const user = this.users.find(u => u.id == userId);
+        if (!user) return;
+        
+        const modal = new bootstrap.Modal(document.getElementById('yamUserDetailsModal'));
+        const content = document.getElementById('yamUserDetailsContent');
+        
+        if (content) {
+            content.innerHTML = `
+                <div class="user-details">
+                    <div class="user-detail-item">
+                        <strong>Username:</strong> ${user.username || user.name || 'Unknown'}
+                    </div>
+                    <div class="user-detail-item">
+                        <strong>Email:</strong> ${user.email || 'Not available'}
+                    </div>
+                    <div class="user-detail-item">
+                        <strong>Role:</strong> ${user.role || 'User'}
+                    </div>
+                    <div class="user-detail-item">
+                        <strong>Status:</strong> 
+                        <span class="status-badge ${user.is_online ? 'online' : 'offline'}">
+                            ${user.is_online ? 'Online' : 'Offline'}
+                        </span>
+                    </div>
+                    <div class="user-detail-item">
+                        <strong>Last Seen:</strong> ${user.last_seen_human || user.last_seen || 'Unknown'}
+                    </div>
+                </div>
+            `;
+        }
+        
+        modal.show();
+    },
+    
+    sendMessage(userId) {
+        // Placeholder for messaging functionality
+        console.log(`Send message to user ${userId}`);
+        // You can implement messaging functionality here
+    },
+    
+    startAutoRefresh() {
+        // Clear any existing intervals
+        if (this.apiFallbackInterval) {
+            clearInterval(this.apiFallbackInterval);
+        }
+        
+        // Refresh every 30 seconds with persistent fallback
+        this.apiFallbackInterval = setInterval(() => {
+            if (!this.isLoading) {
+                this.loadUsersWithFallback();
+            }
+        }, 30000);
+    },
+    
+    startHealthChecks() {
+        // Clear any existing health check intervals
+        if (this.healthCheckInterval) {
+            clearInterval(this.healthCheckInterval);
+        }
+        
+        // Check health every 60 seconds
+        this.healthCheckInterval = setInterval(() => {
+            this.performHealthCheck();
+        }, 60000);
+    },
+    
+    performHealthCheck() {
+        // Check if we have recent data
+        const now = new Date();
+        const timeSinceLastUpdate = this.lastUpdate ? (now - this.lastUpdate) / 1000 : 999;
+        const timeSinceSuccessfulUpdate = this.lastSuccessfulUpdate ? (now - this.lastSuccessfulUpdate) / 1000 : 999;
+        
+        // If no recent updates and we're not loading, try to refresh
+        if (timeSinceLastUpdate > 120 && !this.isLoading) {
+            console.log('YAM Online Users: Health check - no recent updates, refreshing');
+            this.loadUsersWithFallback();
+        }
+        
+        // If no successful updates for a while, try to reconnect
+        if (timeSinceSuccessfulUpdate > 300 && !this.isLoading) {
+            console.log('YAM Online Users: Health check - no successful updates, attempting reconnection');
+            this.attemptReconnection();
+        }
+        
+        // Check connection status
+        if (this.fallbackMode && window.yamDashboard && window.yamDashboard.socket) {
+            this.attemptReconnection();
+        }
+        
+        // Check session health
+        this.checkSessionHealth();
+        
+        // Update connection status based on stability
+        this.updateConnectionStatus(this.stableConnection);
+    },
+    
+    checkSessionHealth() {
+        // Use the global session health coordinator to prevent conflicts
+        if (window.sessionHealthCoordinator) {
+            window.sessionHealthCoordinator.checkHealth();
+        } else {
+            // Fallback to direct check if coordinator not available
+            this.performDirectHealthCheck();
+        }
+    },
+    
+    performDirectHealthCheck() {
+        // Add a small delay to prevent rapid successive calls
+        if (this.lastHealthCheck && (Date.now() - this.lastHealthCheck) < 5000) {
+            return;
+        }
+        this.lastHealthCheck = Date.now();
+        
+        fetch('/api/users/session-health', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            this.handleSessionHealthUpdate(data);
+        })
+        .catch(error => {
+            console.error('YAM Online Users: Session health check error:', error);
+            this.healthCheckFailures++;
+            
+            // Don't immediately enable fallback mode on network errors
+            // Only enable if we have multiple failures
+            if (this.healthCheckFailures >= 3) {
+                console.log('YAM Online Users: Multiple health check failures, enabling fallback mode');
+                this.enableFallbackMode();
+            }
+        });
+    },
+    
+    enableFallbackMode() {
+        if (!this.fallbackMode) {
+            console.log('YAM Online Users: Enabling fallback mode');
+            this.fallbackMode = true;
+            this.updateConnectionStatus(false);
+            
+            // Switch to API-based updates
+            this.loadUsers();
+        }
+    },
+    
+    attemptReconnection() {
+        if (this.connectionAttempts >= this.maxConnectionAttempts) {
+            console.log('YAM Online Users: Max reconnection attempts reached');
+            return;
+        }
+        
+        this.connectionAttempts++;
+        console.log(`YAM Online Users: Attempting reconnection (${this.connectionAttempts}/${this.maxConnectionAttempts})`);
+        
+        if (window.yamDashboard && window.yamDashboard.socket) {
+            window.yamDashboard.socket.connect();
+        }
+    },
+    
+    updateConnectionStatus(connected) {
+        const statusElement = document.getElementById('yamConnectionStatus');
+        if (statusElement) {
+            const statusText = statusElement.querySelector('.status-item:first-child span');
+            const statusIcon = statusElement.querySelector('.status-item:first-child i');
+            
+            if (connected && this.stableConnection) {
+                statusText.textContent = 'Stable connection active';
+                statusIcon.className = 'bi bi-wifi';
+            } else if (connected) {
+                statusText.textContent = 'Real-time connection active';
+                statusIcon.className = 'bi bi-wifi';
+            } else {
+                statusText.textContent = this.fallbackMode ? 'Using persistent fallback' : 'Connection lost';
+                statusIcon.className = 'bi bi-wifi-off';
+            }
+        }
+        
+        // Also update the main connection indicator
+        this.updateMainConnectionIndicator(connected);
+    },
+    
+    updateMainConnectionIndicator(connected) {
+        let indicator = document.getElementById('yamMainConnectionIndicator');
+        if (!indicator) {
+            indicator = document.createElement('div');
+            indicator.id = 'yamMainConnectionIndicator';
+            indicator.className = 'connection-status';
+            document.body.appendChild(indicator);
+        }
+        
+        if (connected && this.stableConnection) {
+            indicator.innerHTML = '<i class="bi bi-wifi"></i> Stable';
+            indicator.className = 'connection-status stable';
+        } else if (connected) {
+            indicator.innerHTML = '<i class="bi bi-wifi"></i> Connected';
+            indicator.className = 'connection-status unstable';
+        } else {
+            indicator.innerHTML = '<i class="bi bi-wifi-off"></i> Fallback';
+            indicator.className = 'connection-status offline';
+        }
+    },
+    
+    showWarningState(message) {
+        const container = document.getElementById('yamUsersList');
+        if (container) {
+            // Show warning but keep existing users visible
+            const warningDiv = document.createElement('div');
+            warningDiv.className = 'warning-banner';
+            warningDiv.innerHTML = `
+                <i class="bi bi-exclamation-triangle"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" class="warning-close">×</button>
+            `;
+            
+            // Insert warning at the top
+            container.insertBefore(warningDiv, container.firstChild);
+            
+            // Auto-remove warning after 10 seconds
+            setTimeout(() => {
+                if (warningDiv.parentElement) {
+                    warningDiv.remove();
+                }
+            }, 10000);
+        }
+    },
+    
+    destroy() {
+        // Clean up intervals
+        if (this.apiFallbackInterval) {
+            clearInterval(this.apiFallbackInterval);
+            this.apiFallbackInterval = null;
+        }
+        
+        if (this.healthCheckInterval) {
+            clearInterval(this.healthCheckInterval);
+            this.healthCheckInterval = null;
+        }
+        
+        // Remove session health coordinator listener
+        if (window.sessionHealthCoordinator) {
+            window.sessionHealthCoordinator.removeListener(this.handleSessionHealthUpdate.bind(this));
+        }
+        
+        // Remove event listeners
+        if (window.yamDashboard && window.yamDashboard.socket) {
+            window.yamDashboard.socket.off('online_users_update');
+            window.yamDashboard.socket.off('user_status_change');
+            window.yamDashboard.socket.off('connect');
+            window.yamDashboard.socket.off('disconnect');
+            window.yamDashboard.socket.off('error');
+        }
+        
+        console.log('YAM Online Users: Component destroyed');
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.yamOnlineUsers) {
+        window.yamOnlineUsers.init();
+    }
+});
+
+// Register with YAM Dashboard if available
+if (window.yamDashboard) {
+    window.yamDashboard.registerComponent('onlineUsers', window.yamOnlineUsers);
+}
+</script>
+{% endmacro %} 

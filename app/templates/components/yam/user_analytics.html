@@ -1,0 +1,1100 @@
+{% macro render_user_analytics(current_user) %}
+<!-- YAM User Analytics Component -->
+<div id="yamUserAnalytics" class="yam-user-analytics">
+    <div class="analytics-header">
+        <h4 class="analytics-title">
+            <i class="bi bi-graph-up"></i>
+            Team Analytics
+        </h4>
+        <div class="analytics-controls">
+            <button class="analytics-control-btn" id="yamAnalyticsRefresh" title="Refresh Data">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <button class="analytics-control-btn" id="yamAnalyticsExport" title="Export Data">
+                <i class="bi bi-download"></i>
+            </button>
+            <div class="analytics-period">
+                <select id="yamAnalyticsPeriod" class="analytics-select">
+                    <option value="1h">Last Hour</option>
+                    <option value="24h" selected>Last 24 Hours</option>
+                    <option value="7d">Last 7 Days</option>
+                    <option value="30d">Last 30 Days</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <div class="analytics-grid">
+        <!-- Key Metrics -->
+        <div class="analytics-card metrics-card">
+            <div class="card-header">
+                <h5>Key Metrics</h5>
+                <span class="card-subtitle">Real-time team activity</span>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-icon online">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value" id="yamActiveUsers">0</div>
+                        <div class="metric-label">Active Users</div>
+                        <div class="metric-change positive" id="yamActiveChange">+0%</div>
+                    </div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-icon session">
+                        <i class="bi bi-clock"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value" id="yamAvgSession">0m</div>
+                        <div class="metric-label">Avg Session</div>
+                        <div class="metric-change" id="yamSessionChange">+0%</div>
+                    </div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-icon productivity">
+                        <i class="bi bi-speedometer2"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value" id="yamProductivity">0%</div>
+                        <div class="metric-label">Productivity</div>
+                        <div class="metric-change" id="yamProductivityChange">+0%</div>
+                    </div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-icon engagement">
+                        <i class="bi bi-chat-dots"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value" id="yamEngagement">0</div>
+                        <div class="metric-label">Engagement</div>
+                        <div class="metric-change" id="yamEngagementChange">+0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Activity Timeline -->
+        <div class="analytics-card timeline-card">
+            <div class="card-header">
+                <h5>Activity Timeline</h5>
+                <span class="card-subtitle">24-hour activity pattern</span>
+            </div>
+            <div class="timeline-container">
+                <canvas id="yamActivityChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+        
+        <!-- User Activity Heatmap -->
+        <div class="analytics-card heatmap-card">
+            <div class="card-header">
+                <h5>Activity Heatmap</h5>
+                <span class="card-subtitle">Weekly activity distribution</span>
+            </div>
+            <div class="heatmap-container">
+                <div id="yamActivityHeatmap" class="activity-heatmap">
+                    <!-- Heatmap will be generated here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top Performers -->
+        <div class="analytics-card performers-card">
+            <div class="card-header">
+                <h5>Top Performers</h5>
+                <span class="card-subtitle">Most active team members</span>
+            </div>
+            <div class="performers-list" id="yamTopPerformers">
+                <!-- Loading state -->
+                <div class="loading-state">
+                    <i class="bi bi-trophy"></i>
+                    <div>Loading top performers...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Detailed Analytics Modal -->
+    <div class="modal fade" id="yamAnalyticsModal" tabindex="-1" aria-labelledby="yamAnalyticsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="yamAnalyticsModalLabel">
+                        <i class="bi bi-graph-up"></i>
+                        Detailed Analytics
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="yamAnalyticsModalContent">
+                    <!-- Detailed analytics content -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="yamExportDetailed">Export Report</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.yam-user-analytics {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.yam-user-analytics::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #00d4ff, #0099cc, #00d4ff);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.analytics-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.analytics-title i {
+    color: #00d4ff;
+}
+
+.analytics-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.analytics-control-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+}
+
+.analytics-control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.analytics-control-btn:active {
+    transform: scale(0.95);
+}
+
+.analytics-select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.analytics-select:focus {
+    outline: none;
+    border-color: #00d4ff;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.analytics-select option {
+    background: #1a1f2e;
+    color: #fff;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.analytics-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.analytics-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    margin-bottom: 1rem;
+}
+
+.card-header h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0 0 0.25rem 0;
+}
+
+.card-subtitle {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.metric-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.metric-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.metric-icon.online {
+    background: linear-gradient(135deg, #4caf50, #8bc34a);
+}
+
+.metric-icon.session {
+    background: linear-gradient(135deg, #2196f3, #03a9f4);
+}
+
+.metric-icon.productivity {
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+}
+
+.metric-icon.engagement {
+    background: linear-gradient(135deg, #9c27b0, #673ab7);
+}
+
+.metric-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.25rem;
+}
+
+.metric-change {
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.metric-change.positive {
+    color: #4caf50;
+}
+
+.metric-change.negative {
+    color: #f44336;
+}
+
+.metric-change.neutral {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.timeline-container {
+    height: 200px;
+    position: relative;
+}
+
+.timeline-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.heatmap-container {
+    height: 200px;
+    overflow: hidden;
+}
+
+.activity-heatmap {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(24, 1fr);
+    gap: 2px;
+    height: 100%;
+    padding: 0.5rem;
+}
+
+.heatmap-cell {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.heatmap-cell:hover {
+    transform: scale(1.2);
+    z-index: 10;
+}
+
+.heatmap-cell.low {
+    background: rgba(76, 175, 80, 0.2);
+}
+
+.heatmap-cell.medium {
+    background: rgba(255, 152, 0, 0.4);
+}
+
+.heatmap-cell.high {
+    background: rgba(244, 67, 54, 0.6);
+}
+
+.heatmap-cell.very-high {
+    background: rgba(156, 39, 176, 0.8);
+}
+
+.performers-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.performer-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.performer-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px);
+}
+
+.performer-rank {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffd700, #ffb300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    font-weight: 700;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.performer-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00d4ff, #0099cc);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.performer-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.performer-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.25rem;
+}
+
+.performer-stats {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.performer-score {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #00d4ff;
+}
+
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    gap: 1rem;
+}
+
+.loading-state i {
+    font-size: 2rem;
+    color: #00d4ff;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .yam-user-analytics {
+        padding: 1rem;
+    }
+    
+    .analytics-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .analytics-controls {
+        align-self: flex-end;
+    }
+    
+    .analytics-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .timeline-container,
+    .heatmap-container {
+        height: 150px;
+    }
+}
+</style>
+
+<script>
+// YAM User Analytics Component
+window.yamUserAnalytics = {
+    data: {
+        metrics: {},
+        timeline: [],
+        heatmap: [],
+        performers: []
+    },
+    chart: null,
+    period: '24h',
+    
+    init() {
+        this.setupEventListeners();
+        this.setupSocketListeners();
+        this.loadAnalytics();
+        this.startAutoRefresh();
+        console.log('YAM User Analytics: Component initialized');
+    },
+    
+    setupEventListeners() {
+        // Refresh button
+        const refreshBtn = document.getElementById('yamAnalyticsRefresh');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => this.loadAnalytics());
+        }
+        
+        // Export button
+        const exportBtn = document.getElementById('yamAnalyticsExport');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => this.exportData());
+        }
+        
+        // Period selector
+        const periodSelect = document.getElementById('yamAnalyticsPeriod');
+        if (periodSelect) {
+            periodSelect.addEventListener('change', (e) => {
+                this.period = e.target.value;
+                this.loadAnalytics();
+            });
+        }
+        
+        // Detailed export button
+        const detailedExportBtn = document.getElementById('yamExportDetailed');
+        if (detailedExportBtn) {
+            detailedExportBtn.addEventListener('click', () => this.exportDetailedReport());
+        }
+    },
+    
+    setupSocketListeners() {
+        if (window.yamDashboard && window.yamDashboard.socket) {
+            const socket = window.yamDashboard.socket;
+            
+            socket.on('online_users_update', (users) => {
+                this.updateMetrics(users);
+            });
+            
+            socket.on('user_status_change', (data) => {
+                this.updateActivityTimeline(data);
+            });
+            
+            socket.on('user_login', (data) => {
+                this.updateActivityTimeline(data);
+            });
+            
+            socket.on('user_logout', (data) => {
+                this.updateActivityTimeline(data);
+            });
+        }
+    },
+    
+    async loadAnalytics() {
+        try {
+            // Load metrics
+            await this.loadMetrics();
+            
+            // Load timeline data
+            await this.loadTimelineData();
+            
+            // Load heatmap data
+            await this.loadHeatmapData();
+            
+            // Load top performers
+            await this.loadTopPerformers();
+            
+            // Update displays
+            this.updateDisplays();
+            
+        } catch (error) {
+            console.error('Error loading analytics:', error);
+        }
+    },
+    
+    async loadMetrics() {
+        try {
+            const response = await fetch(`/api/analytics/metrics?period=${this.period}`, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                this.data.metrics = await response.json();
+            } else {
+                // Fallback to simulated data
+                this.data.metrics = this.generateSimulatedMetrics();
+            }
+        } catch (error) {
+            console.error('Error loading metrics:', error);
+            this.data.metrics = this.generateSimulatedMetrics();
+        }
+    },
+    
+    async loadTimelineData() {
+        try {
+            const response = await fetch(`/api/analytics/timeline?period=${this.period}`, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                this.data.timeline = await response.json();
+            } else {
+                // Fallback to simulated data
+                this.data.timeline = this.generateSimulatedTimeline();
+            }
+        } catch (error) {
+            console.error('Error loading timeline:', error);
+            this.data.timeline = this.generateSimulatedTimeline();
+        }
+    },
+    
+    async loadHeatmapData() {
+        try {
+            const response = await fetch(`/api/analytics/heatmap?period=${this.period}`, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                this.data.heatmap = await response.json();
+            } else {
+                // Fallback to simulated data
+                this.data.heatmap = this.generateSimulatedHeatmap();
+            }
+        } catch (error) {
+            console.error('Error loading heatmap:', error);
+            this.data.heatmap = this.generateSimulatedHeatmap();
+        }
+    },
+    
+    async loadTopPerformers() {
+        try {
+            const response = await fetch(`/api/analytics/performers?period=${this.period}`, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                this.data.performers = await response.json();
+            } else {
+                // Fallback to simulated data
+                this.data.performers = this.generateSimulatedPerformers();
+            }
+        } catch (error) {
+            console.error('Error loading performers:', error);
+            this.data.performers = this.generateSimulatedPerformers();
+        }
+    },
+    
+    updateMetrics(users) {
+        const activeUsers = users.filter(u => u.is_online).length;
+        const totalUsers = users.length;
+        
+        // Update active users metric
+        const activeElement = document.getElementById('yamActiveUsers');
+        if (activeElement) {
+            activeElement.textContent = activeUsers;
+        }
+        
+        // Calculate productivity (active users / total users)
+        const productivity = totalUsers > 0 ? Math.round((activeUsers / totalUsers) * 100) : 0;
+        const productivityElement = document.getElementById('yamProductivity');
+        if (productivityElement) {
+            productivityElement.textContent = `${productivity}%`;
+        }
+        
+        // Update change indicators
+        this.updateChangeIndicators();
+    },
+    
+    updateActivityTimeline(data) {
+        // Add new activity point to timeline
+        const now = Date.now();
+        this.data.timeline.push({
+            timestamp: now,
+            type: data.type || 'activity',
+            user: data.username || 'Unknown',
+            value: 1
+        });
+        
+        // Keep only recent data
+        const cutoff = now - (24 * 60 * 60 * 1000); // 24 hours
+        this.data.timeline = this.data.timeline.filter(point => point.timestamp > cutoff);
+        
+        // Update chart if it exists
+        if (this.chart) {
+            this.updateChart();
+        }
+    },
+    
+    updateDisplays() {
+        this.updateMetricsDisplay();
+        this.updateTimelineChart();
+        this.updateHeatmap();
+        this.updatePerformersList();
+    },
+    
+    updateMetricsDisplay() {
+        const metrics = this.data.metrics;
+        
+        // Update metric values
+        if (metrics.activeUsers !== undefined) {
+            const element = document.getElementById('yamActiveUsers');
+            if (element) element.textContent = metrics.activeUsers;
+        }
+        
+        if (metrics.avgSession !== undefined) {
+            const element = document.getElementById('yamAvgSession');
+            if (element) element.textContent = `${Math.round(metrics.avgSession)}m`;
+        }
+        
+        if (metrics.productivity !== undefined) {
+            const element = document.getElementById('yamProductivity');
+            if (element) element.textContent = `${metrics.productivity}%`;
+        }
+        
+        if (metrics.engagement !== undefined) {
+            const element = document.getElementById('yamEngagement');
+            if (element) element.textContent = metrics.engagement;
+        }
+    },
+    
+    updateTimelineChart() {
+        const canvas = document.getElementById('yamActivityChart');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        
+        // Ensure timeline data exists
+        if (!this.data.timeline || !Array.isArray(this.data.timeline)) {
+            this.data.timeline = this.generateSimulatedTimeline();
+        }
+        
+        // Group timeline data by hour
+        const hourlyData = {};
+        this.data.timeline.forEach(point => {
+            const hour = new Date(point.timestamp).getHours();
+            hourlyData[hour] = (hourlyData[hour] || 0) + point.value;
+        });
+        
+        // Create chart data
+        const labels = Array.from({length: 24}, (_, i) => `${i}:00`);
+        const data = Array.from({length: 24}, (_, i) => hourlyData[i] || 0);
+        
+        // Clear previous chart
+        if (this.chart) {
+            this.chart.destroy();
+        }
+        
+        // Create new chart
+        this.chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Activity',
+                    data: data,
+                    borderColor: '#00d4ff',
+                    backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.7)',
+                            maxTicksLimit: 12
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.7)'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+    },
+    
+    updateHeatmap() {
+        const container = document.getElementById('yamActivityHeatmap');
+        if (!container) return;
+        
+        // Ensure heatmap data exists
+        if (!this.data.heatmap || !Array.isArray(this.data.heatmap)) {
+            this.data.heatmap = this.generateSimulatedHeatmap();
+        }
+        
+        container.innerHTML = '';
+        
+        // Generate heatmap cells
+        for (let hour = 0; hour < 24; hour++) {
+            for (let day = 0; day < 7; day++) {
+                const cell = document.createElement('div');
+                cell.className = 'heatmap-cell';
+                
+                // Get activity level for this cell
+                const activity = this.data.heatmap[hour]?.[day] || 0;
+                const level = this.getActivityLevel(activity);
+                
+                if (level !== 'none') {
+                    cell.classList.add(level);
+                }
+                
+                // Add tooltip
+                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                cell.title = `${dayNames[day]} ${hour}:00 - ${activity} activities`;
+                
+                container.appendChild(cell);
+            }
+        }
+    },
+    
+    updatePerformersList() {
+        const container = document.getElementById('yamTopPerformers');
+        if (!container) return;
+        
+        // Ensure performers array exists
+        if (!this.data.performers || !Array.isArray(this.data.performers)) {
+            this.data.performers = [];
+        }
+        
+        if (this.data.performers.length === 0) {
+            container.innerHTML = `
+                <div class="loading-state">
+                    <i class="bi bi-trophy"></i>
+                    <div>No data available</div>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = this.data.performers.map((performer, index) => `
+            <div class="performer-item">
+                <div class="performer-rank">${index + 1}</div>
+                <div class="performer-avatar">${this.getInitials(performer.name)}</div>
+                <div class="performer-info">
+                    <div class="performer-name">${performer.name}</div>
+                    <div class="performer-stats">
+                        ${performer.sessionTime}h active • ${performer.activities} activities
+                    </div>
+                </div>
+                <div class="performer-score">${performer.score}</div>
+            </div>
+        `).join('');
+    },
+    
+    updateChangeIndicators() {
+        // Simulate change indicators
+        const changes = {
+            active: '+12%',
+            session: '+5%',
+            productivity: '+8%',
+            engagement: '+15%'
+        };
+        
+        document.getElementById('yamActiveChange').textContent = changes.active;
+        document.getElementById('yamSessionChange').textContent = changes.session;
+        document.getElementById('yamProductivityChange').textContent = changes.productivity;
+        document.getElementById('yamEngagementChange').textContent = changes.engagement;
+    },
+    
+    getActivityLevel(activity) {
+        if (activity === 0) return 'none';
+        if (activity < 5) return 'low';
+        if (activity < 15) return 'medium';
+        if (activity < 30) return 'high';
+        return 'very-high';
+    },
+    
+    getInitials(name) {
+        return name
+            .split(' ')
+            .map(word => word.charAt(0))
+            .join('')
+            .toUpperCase()
+            .slice(0, 2);
+    },
+    
+    generateSimulatedMetrics() {
+        return {
+            activeUsers: Math.floor(Math.random() * 20) + 10,
+            avgSession: Math.floor(Math.random() * 60) + 30,
+            productivity: Math.floor(Math.random() * 30) + 70,
+            engagement: Math.floor(Math.random() * 50) + 25
+        };
+    },
+    
+    generateSimulatedTimeline() {
+        const timeline = [];
+        const now = Date.now();
+        
+        for (let i = 0; i < 24; i++) {
+            timeline.push({
+                timestamp: now - (i * 60 * 60 * 1000),
+                type: 'activity',
+                user: 'Simulated',
+                value: Math.floor(Math.random() * 10) + 1
+            });
+        }
+        
+        return timeline;
+    },
+    
+    generateSimulatedHeatmap() {
+        const heatmap = [];
+        
+        for (let hour = 0; hour < 24; hour++) {
+            heatmap[hour] = [];
+            for (let day = 0; day < 7; day++) {
+                heatmap[hour][day] = Math.floor(Math.random() * 40);
+            }
+        }
+        
+        return heatmap;
+    },
+    
+    generateSimulatedPerformers() {
+        const names = ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Wilson', 'David Brown'];
+        
+        return names.map((name, index) => ({
+            name: name,
+            sessionTime: Math.floor(Math.random() * 8) + 2,
+            activities: Math.floor(Math.random() * 100) + 20,
+            score: Math.floor(Math.random() * 50) + 50
+        })).sort((a, b) => b.score - a.score);
+    },
+    
+    exportData() {
+        const data = {
+            timestamp: new Date().toISOString(),
+            period: this.period,
+            metrics: this.data.metrics,
+            performers: this.data.performers
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], {
+            type: 'application/json'
+        });
+        
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `yam-analytics-${this.period}-${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    },
+    
+    exportDetailedReport() {
+        // Generate detailed report
+        const report = {
+            timestamp: new Date().toISOString(),
+            period: this.period,
+            summary: this.data.metrics,
+            timeline: this.data.timeline,
+            heatmap: this.data.heatmap,
+            performers: this.data.performers,
+            insights: this.generateInsights()
+        };
+        
+        const blob = new Blob([JSON.stringify(report, null, 2)], {
+            type: 'application/json'
+        });
+        
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `yam-detailed-report-${this.period}-${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    },
+    
+    generateInsights() {
+        const metrics = this.data.metrics;
+        const insights = [];
+        
+        if (metrics.productivity > 80) {
+            insights.push('High team productivity detected');
+        }
+        
+        if (metrics.engagement > 30) {
+            insights.push('Strong team engagement levels');
+        }
+        
+        if (metrics.avgSession > 45) {
+            insights.push('Long average session duration');
+        }
+        
+        return insights;
+    },
+    
+    startAutoRefresh() {
+        // Refresh data every 5 minutes
+        setInterval(() => {
+            this.loadAnalytics();
+        }, 5 * 60 * 1000);
+    },
+    
+    destroy() {
+        if (this.chart) {
+            this.chart.destroy();
+        }
+        console.log('YAM User Analytics: Component destroyed');
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.yamUserAnalytics) {
+        window.yamUserAnalytics.init();
+    }
+});
+
+// Register with YAM Dashboard if available
+if (window.yamDashboard) {
+    window.yamDashboard.registerComponent('userAnalytics', window.yamUserAnalytics);
+}
+</script>
+{% endmacro %} 

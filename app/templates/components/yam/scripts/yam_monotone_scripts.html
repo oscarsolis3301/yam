@@ -1,0 +1,296 @@
+<!-- YAM Monotone Scripts - Manage Colors and Animations -->
+<script>
+// YAM Monotone Management System
+window.yamMonotone = {
+    // Configuration
+    config: {
+        enableMonotone: true,
+        showColorsOnHover: true,
+        showColorsOnFocus: true,
+        showColorsOnError: true,
+        showColorsOnSuccess: true,
+        showColorsOnWarning: true,
+        showColorsOnLoading: true,
+        respectReducedMotion: true
+    },
+    
+    // Initialize the monotone system
+    init() {
+        this.setupEventListeners();
+        this.setupAccessibility();
+        this.setupPerformanceOptimizations();
+        console.log('YAM Monotone system initialized');
+    },
+    
+    // Setup event listeners for interactive elements
+    setupEventListeners() {
+        // Add hover listeners to cards
+        const cards = document.querySelectorAll('.yam-card-enhanced, .yam-action-group, .yam-welcome-banner');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => this.onCardHover(card));
+            card.addEventListener('mouseleave', () => this.onCardLeave(card));
+            card.addEventListener('focus', () => this.onCardFocus(card));
+            card.addEventListener('blur', () => this.onCardBlur(card));
+        });
+        
+        // Add click listeners to action buttons
+        const buttons = document.querySelectorAll('.yam-action-btn');
+        buttons.forEach(button => {
+            button.addEventListener('click', () => this.onButtonClick(button));
+        });
+        
+        // Add keyboard navigation support
+        document.addEventListener('keydown', (e) => this.onKeyDown(e));
+    },
+    
+    // Setup accessibility features
+    setupAccessibility() {
+        // Check for reduced motion preference
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            this.config.respectReducedMotion = true;
+            this.disableAllAnimations();
+        }
+        
+        // Listen for changes in reduced motion preference
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
+                this.config.respectReducedMotion = e.matches;
+                if (e.matches) {
+                    this.disableAllAnimations();
+                }
+            });
+        }
+    },
+    
+    // Setup performance optimizations
+    setupPerformanceOptimizations() {
+        // Use Intersection Observer to only animate visible elements
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    } else {
+                        entry.target.classList.remove('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            // Observe all cards
+            const cards = document.querySelectorAll('.yam-card-enhanced, .yam-action-group, .yam-welcome-banner');
+            cards.forEach(card => observer.observe(card));
+        }
+    },
+    
+    // Card hover event handler
+    onCardHover(card) {
+        if (!this.config.showColorsOnHover) return;
+        
+        card.classList.add('hovered');
+        this.addColorToCard(card);
+    },
+    
+    // Card leave event handler
+    onCardLeave(card) {
+        card.classList.remove('hovered');
+        this.removeColorFromCard(card);
+    },
+    
+    // Card focus event handler
+    onCardFocus(card) {
+        if (!this.config.showColorsOnFocus) return;
+        
+        card.classList.add('focused');
+        this.addColorToCard(card);
+    },
+    
+    // Card blur event handler
+    onCardBlur(card) {
+        card.classList.remove('focused');
+        this.removeColorFromCard(card);
+    },
+    
+    // Button click event handler
+    onButtonClick(button) {
+        // Add a brief color flash on click
+        button.classList.add('clicked');
+        setTimeout(() => {
+            button.classList.remove('clicked');
+        }, 300);
+    },
+    
+    // Keyboard navigation handler
+    onKeyDown(e) {
+        // Add colors when navigating with keyboard
+        if (e.key === 'Tab' || e.key === 'Enter' || e.key === ' ') {
+            const focusedElement = document.activeElement;
+            if (focusedElement && (focusedElement.classList.contains('yam-card-enhanced') || 
+                                  focusedElement.classList.contains('yam-action-btn'))) {
+                this.addColorToElement(focusedElement);
+            }
+        }
+    },
+    
+    // Add color to a card
+    addColorToCard(card) {
+        if (this.config.respectReducedMotion) return;
+        
+        // Add shimmer effect
+        const beforeElement = card.querySelector('::before') || card;
+        beforeElement.style.background = 'linear-gradient(90deg, #667eea, #764ba2, #f093fb, #667eea)';
+        beforeElement.style.backgroundSize = '200% 100%';
+        beforeElement.style.animation = 'shimmer 3s ease-in-out infinite';
+        
+        // Add color to icons
+        const icons = card.querySelectorAll('i');
+        icons.forEach(icon => {
+            icon.style.color = '#667eea';
+        });
+    },
+    
+    // Remove color from a card
+    removeColorFromCard(card) {
+        if (this.config.respectReducedMotion) return;
+        
+        // Remove shimmer effect
+        const beforeElement = card.querySelector('::before') || card;
+        beforeElement.style.background = 'rgba(255, 255, 255, 0.05)';
+        beforeElement.style.animation = 'none';
+        
+        // Remove color from icons
+        const icons = card.querySelectorAll('i');
+        icons.forEach(icon => {
+            icon.style.color = '#ffffff';
+        });
+    },
+    
+    // Add color to any element
+    addColorToElement(element) {
+        if (this.config.respectReducedMotion) return;
+        
+        element.style.transition = 'all 0.3s ease';
+        element.style.borderColor = 'rgba(102, 126, 234, 0.3)';
+        
+        setTimeout(() => {
+            element.style.borderColor = '';
+        }, 1000);
+    },
+    
+    // Disable all animations
+    disableAllAnimations() {
+        const style = document.createElement('style');
+        style.textContent = `
+            .yam-welcome-banner::before,
+            .yam-card-enhanced::before,
+            .yam-stats-card::before,
+            .yam-status-card::before,
+            .yam-user-card::before,
+            .yam-connection-card::before,
+            .yam-analytics-card::before,
+            .yam-stats-card-compact::before,
+            .yam-action-group::before,
+            .welcome-emoji {
+                animation: none !important;
+            }
+        `;
+        document.head.appendChild(style);
+    },
+    
+    // Show error state with red colors
+    showError(card) {
+        if (!this.config.showColorsOnError) return;
+        
+        card.classList.add('error');
+        card.classList.remove('success', 'warning', 'loading');
+        
+        const beforeElement = card.querySelector('::before') || card;
+        beforeElement.style.background = 'linear-gradient(90deg, #ef4444, #dc2626, #b91c1c, #ef4444)';
+        beforeElement.style.backgroundSize = '200% 100%';
+        beforeElement.style.animation = 'shimmer 2s ease-in-out infinite';
+    },
+    
+    // Show success state with green colors
+    showSuccess(card) {
+        if (!this.config.showColorsOnSuccess) return;
+        
+        card.classList.add('success');
+        card.classList.remove('error', 'warning', 'loading');
+        
+        const beforeElement = card.querySelector('::before') || card;
+        beforeElement.style.background = 'linear-gradient(90deg, #22c55e, #16a34a, #15803d, #22c55e)';
+        beforeElement.style.backgroundSize = '200% 100%';
+        beforeElement.style.animation = 'shimmer 2s ease-in-out infinite';
+    },
+    
+    // Show warning state with yellow colors
+    showWarning(card) {
+        if (!this.config.showColorsOnWarning) return;
+        
+        card.classList.add('warning');
+        card.classList.remove('error', 'success', 'loading');
+        
+        const beforeElement = card.querySelector('::before') || card;
+        beforeElement.style.background = 'linear-gradient(90deg, #eab308, #ca8a04, #a16207, #eab308)';
+        beforeElement.style.backgroundSize = '200% 100%';
+        beforeElement.style.animation = 'shimmer 2s ease-in-out infinite';
+    },
+    
+    // Show loading state with blue colors
+    showLoading(card) {
+        if (!this.config.showColorsOnLoading) return;
+        
+        card.classList.add('loading');
+        card.classList.remove('error', 'success', 'warning');
+        
+        const beforeElement = card.querySelector('::before') || card;
+        beforeElement.style.background = 'linear-gradient(90deg, #667eea, #764ba2, #f093fb, #667eea)';
+        beforeElement.style.backgroundSize = '200% 100%';
+        beforeElement.style.animation = 'shimmer 1.5s infinite';
+    },
+    
+    // Clear all states
+    clearStates(card) {
+        card.classList.remove('error', 'success', 'warning', 'loading');
+        
+        const beforeElement = card.querySelector('::before') || card;
+        beforeElement.style.background = 'rgba(255, 255, 255, 0.05)';
+        beforeElement.style.animation = 'none';
+    },
+    
+    // Toggle monotone mode
+    toggleMonotone() {
+        this.config.enableMonotone = !this.config.enableMonotone;
+        
+        if (this.config.enableMonotone) {
+            document.body.classList.add('yam-monotone-mode');
+        } else {
+            document.body.classList.remove('yam-monotone-mode');
+        }
+        
+        console.log('Monotone mode:', this.config.enableMonotone ? 'enabled' : 'disabled');
+    },
+    
+    // Update configuration
+    updateConfig(newConfig) {
+        this.config = { ...this.config, ...newConfig };
+        console.log('YAM Monotone config updated:', this.config);
+    },
+    
+    // Get current configuration
+    getConfig() {
+        return { ...this.config };
+    }
+};
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.yamMonotone.init();
+    });
+} else {
+    window.yamMonotone.init();
+}
+
+// Export for global access
+window.YAMMonotone = window.yamMonotone;
+</script> 

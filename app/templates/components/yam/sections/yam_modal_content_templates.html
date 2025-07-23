@@ -1,0 +1,267 @@
+<!-- Modal Content Templates (Hidden) -->
+<div style="display: none;" aria-hidden="true">
+<<<<<<< HEAD
+<!-- Profile Settings Modal -->
+    <div id="profileSettingsModalContent">
+        <div class="yam-modal-full-content">
+            <div class="profile-settings-container">
+                <!-- Profile Header -->
+                <div class="profile-header">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar-large">
+                            <img id="profileAvatar" src="{{ url_for('static', filename='uploads/profile_pictures/' + (current_user.profile_picture if current_user and current_user.profile_picture else 'boy.png')) }}"
+                                 alt="Profile Picture" 
+                                 onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/PFP/boy.png') }}';">
+                            <div class="avatar-upload-overlay">
+                                <label for="avatarUpload" class="avatar-upload-btn">
+                                    <i class="bi bi-camera"></i>
+                                </label>
+                                <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="profile-info">
+                            <h4 id="profileUsername">{{ current_user.username if current_user else 'Unknown User' }}</h4>
+                            <p id="profileRole">{{ current_user.role.title() if current_user and current_user.role else 'User' }}</p>
+                            <span class="profile-status online">
+                                <i class="bi bi-circle-fill"></i>
+                                Online
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Settings Tabs -->
+                <div class="profile-tabs">
+                    <button class="profile-tab active" data-tab="general">
+                        <i class="bi bi-person"></i>
+                        General
+                    </button>
+                    <button class="profile-tab" data-tab="security">
+                        <i class="bi bi-shield-lock"></i>
+                        Security
+                    </button>
+                    <button class="profile-tab" data-tab="preferences">
+                        <i class="bi bi-gear"></i>
+                        Preferences
+                    </button>
+                    <button class="profile-tab" data-tab="notifications">
+                        <i class="bi bi-bell"></i>
+                        Notifications
+                    </button>
+                </div>
+
+                <!-- Profile Content -->
+                <div class="profile-content">
+                    <!-- General Tab -->
+                    <div class="profile-tab-content active" id="general-tab">
+                        <div class="settings-section">
+                            <h5>Personal Information</h5>
+                            <div class="form-group">
+                                <label for="displayName">Display Name</label>
+                                <input type="text" id="displayName" class="form-control" value="{{ current_user.username if current_user else '' }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" class="form-control" value="{{ current_user.email if current_user and current_user.email else '' }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="bio">Bio</label>
+                                <textarea id="bio" class="form-control" rows="3" placeholder="Tell us about yourself...">{{ current_user.bio if current_user and current_user.bio else '' }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h5>Contact Information</h5>
+                            <div class="form-group">
+                                <label for="phone">Phone</label>
+                                <input type="tel" id="phone" class="form-control" value="{{ current_user.phone if current_user and current_user.phone else '' }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="department">Department</label>
+                                <input type="text" id="department" class="form-control" value="{{ current_user.department if current_user and current_user.department else '' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Tab -->
+                    <div class="profile-tab-content" id="security-tab">
+                        <div class="settings-section">
+                            <h5>Password</h5>
+                            <div class="form-group">
+                                <label for="currentPassword">Current Password</label>
+                                <input type="password" id="currentPassword" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="newPassword">New Password</label>
+                                <input type="password" id="newPassword" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm New Password</label>
+                                <input type="password" id="confirmPassword" class="form-control">
+                            </div>
+                            <button class="yam-btn-primary" onclick="profileSettings.changePassword()">
+                                <i class="bi bi-key"></i>
+                                Change Password
+                            </button>
+                        </div>
+
+                        <div class="settings-section">
+                            <h5>Two-Factor Authentication</h5>
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input type="checkbox" id="enable2FA" class="form-check-input">
+                                    <label for="enable2FA" class="form-check-label">Enable Two-Factor Authentication</label>
+                                </div>
+                            </div>
+                            <p class="text-muted">Add an extra layer of security to your account</p>
+                        </div>
+                    </div>
+
+                    <!-- Preferences Tab -->
+                    <div class="profile-tab-content" id="preferences-tab">
+                        <div class="settings-section">
+                            <h5>Theme Preferences</h5>
+                            <div class="form-group">
+                                <label for="themeSelect">Theme</label>
+                                <select id="themeSelect" class="form-control">
+                                    <option value="auto">Auto (System)</option>
+                                    <option value="light">Light</option>
+                                    <option value="dark">Dark</option>
+                                    <option value="monotone">Monotone</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="accentColor">Accent Color</label>
+                                <input type="color" id="accentColor" class="form-control" value="#667eea">
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h5>Display Preferences</h5>
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input type="checkbox" id="compactMode" class="form-check-input">
+                                    <label for="compactMode" class="form-check-label">Compact Mode</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input type="checkbox" id="showAnimations" class="form-check-input" checked>
+                                    <label for="showAnimations" class="form-check-label">Show Animations</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications Tab -->
+                    <div class="profile-tab-content" id="notifications-tab">
+                        <div class="settings-section">
+                            <h5>Email Notifications</h5>
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input type="checkbox" id="emailNotifications" class="form-check-input" checked>
+                                    <label for="emailNotifications" class="form-check-label">Enable Email Notifications</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input type="checkbox" id="weeklyDigest" class="form-check-input">
+                                    <label for="weeklyDigest" class="form-check-label">Weekly Activity Digest</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h5>In-App Notifications</h5>
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input type="checkbox" id="inAppNotifications" class="form-check-input" checked>
+                                    <label for="inAppNotifications" class="form-check-label">Enable In-App Notifications</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input type="checkbox" id="soundNotifications" class="form-check-input">
+                                    <label for="soundNotifications" class="form-check-label">Sound Notifications</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Actions -->
+                <div class="profile-actions">
+                    <button class="yam-btn-secondary" onclick="yamModals.closeModal()">
+                        <i class="bi bi-x"></i>
+                        Cancel
+                    </button>
+                    <button class="yam-btn-primary" onclick="profileSettings.saveSettings()">
+                        <i class="bi bi-check"></i>
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div><!-- User Presence Map Modal -->
+=======
+    <!-- User Presence Map Modal -->
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    <div id="userPresenceModalContent">
+        {{ yam_user_presence_map.render_user_presence_map(current_user) }}
+    </div>
+    
+    <!-- User Analytics Modal -->
+    <div id="userAnalyticsModalContent">
+        {{ yam_user_analytics.render_user_analytics(current_user) }}
+    </div>
+    
+    <!-- Activity Heatmap Modal -->
+    <div id="activityHeatmapModalContent">
+        {{ yam_user_activity_heatmap.render_user_activity_heatmap(current_user) }}
+    </div>
+    
+    <!-- Advanced Status Modal -->
+    <div id="advancedStatusModalContent">
+        {{ yam_advanced_user_status.render_advanced_user_status(current_user) }}
+    </div>
+    
+    <!-- System Monitor Modal -->
+    <div id="systemMonitorModalContent">
+        {{ yam_system_monitor.render_system_monitor(current_user) }}
+    </div>
+    
+    <!-- System Health Modal -->
+    <div id="systemHealthModalContent">
+        {{ yam_system_health_monitor.render_system_health_monitor(current_user) }}
+    </div>
+    
+    <!-- Team Performance Modal -->
+    <div id="teamPerformanceModalContent">
+        {{ yam_team_performance_analytics.render_team_performance_analytics(current_user) }}
+    </div>
+    
+    <!-- Team Collaboration Modal -->
+    <div id="teamCollaborationModalContent">
+        {{ yam_team_collaboration.render_team_collaboration(current_user) }}
+    </div>
+    
+    <!-- Recent Activity Modal -->
+    <div id="recentActivityModalContent">
+        {{ yam_recent_activity.render_recent_activity(current_user) }}
+    </div>
+    
+    <!-- Activity Tracker Modal -->
+    <div id="activityTrackerModalContent">
+        {{ yam_user_activity_tracker.render_user_activity_tracker(current_user) }}
+    </div>
+    
+    <!-- Notifications Modal -->
+    <div id="notificationsModalContent">
+        {{ yam_notifications.render_notifications(current_user) }}
+    </div>
+    
+    <!-- Team Chat Modal -->
+    <div id="teamChatModalContent">
+        {{ yam_team_chat.render_team_chat(current_user) }}
+    </div>
+</div> 

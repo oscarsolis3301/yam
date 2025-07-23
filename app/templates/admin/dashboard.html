@@ -1,0 +1,1169 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"/>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='assets/styles.css') }}" />
+<style>
+    :root {
+        --primary-bg: #1a1d24;
+        --secondary-bg: #23272f;
+        --card-bg: #262D47;
+        --text-primary: #ffffff;
+        --text-secondary: #8b95a5;
+        --accent-color: #0d6efd;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+    }
+
+    html, body {
+        background: var(--primary-bg) !important;
+        color: var(--text-primary) !important;
+        font-family: 'Montserrat', sans-serif;
+    }
+
+    .admin-main-content {
+        margin-left: 5.5rem !important;
+        min-height: 100vh;
+        padding: 2rem;
+        background: var(--primary-bg) !important;
+        transition: margin-left 0.3s;
+    }
+
+    .dashboard-title {
+        color: var(--text-primary) !important;
+        font-weight: 600;
+        margin-bottom: 2rem;
+    }
+
+    .dashboard-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .dashboard-metric-card {
+        background: var(--card-bg) !important;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+    }
+
+    .dashboard-metric-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .dashboard-metric-title {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .dashboard-metric-value {
+        color: var(--text-primary);
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .dashboard-section {
+        background: var(--card-bg) !important;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .dashboard-section-title {
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .list-group-item {
+        background: transparent !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        color: var(--text-primary) !important;
+        padding: 1rem;
+    }
+
+    .table {
+        color: var(--text-primary) !important;
+    }
+
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .modal-content {
+        background: var(--card-bg) !important;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-footer {
+        border-top-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .form-control, .form-select {
+        background: var(--secondary-bg) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        color: var(--text-primary) !important;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--accent-color) !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    }
+
+    #terminalWindow {
+        background: var(--secondary-bg);
+        color: #39FF14;
+        font-family: 'Consolas', monospace;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        padding: 1rem;
+        height: 300px;
+        overflow-y: auto;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .user-status {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 0.5rem;
+    }
+
+    .status-online {
+        background-color: var(--success-color);
+    }
+
+    .status-offline {
+        background-color: var(--text-secondary);
+    }
+
+    .chart-container {
+        height: 300px;
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% include "sidebar.html" %}
+<div class="admin-main-content">
+    <h1 class="dashboard-title">Admin Dashboard</h1>
+    
+    <!-- Metrics Section -->
+    <div class="dashboard-metrics">
+        <div class="dashboard-metric-card">
+            <div class="dashboard-metric-title">
+                <i class="bi bi-people-fill me-2"></i>Total Users
+            </div>
+            <div class="dashboard-metric-value" id="totalUsers">
+                <span class="spinner-border spinner-border-sm text-light" role="status"></span>
+            </div>
+        </div>
+        <div class="dashboard-metric-card">
+            <div class="dashboard-metric-title">
+                <i class="bi bi-person-check-fill me-2"></i>Active Sessions
+            </div>
+            <div class="dashboard-metric-value" id="activeSessions">
+                <span class="spinner-border spinner-border-sm text-light" role="status"></span>
+            </div>
+        </div>
+        <div class="dashboard-metric-card">
+            <div class="dashboard-metric-title">
+                <i class="bi bi-search me-2"></i>Total Searches
+            </div>
+            <div class="dashboard-metric-value" id="totalSearches">
+                <span class="spinner-border spinner-border-sm text-light" role="status"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Status Section -->
+    <div class="dashboard-section">
+        <div class="dashboard-section-title">
+            <i class="bi bi-speedometer2 me-2"></i>System Status
+        </div>
+        <div id="systemStatus" class="list-group mb-3"></div>
+        <div id="systemStatusChart" class="chart-container"></div>
+    </div>
+
+    <!-- Online Users Section -->
+    <div class="dashboard-section">
+        <div class="dashboard-section-title">
+            <i class="bi bi-person-fill-check me-2"></i>Online Users
+        </div>
+        <div id="onlineUsers" class="list-group"></div>
+    </div>
+
+    <!-- Recent Activity Section -->
+    <div class="dashboard-section">
+        <div class="dashboard-section-title">
+            <i class="bi bi-activity me-2"></i>Recent Activity
+        </div>
+        <div id="recentActivity" class="list-group"></div>
+    </div>
+
+    <!-- User Management Section -->
+    <div class="dashboard-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="dashboard-section-title mb-0">
+                <i class="bi bi-people me-2"></i>User Management
+            </div>
+            <button class="btn btn-primary" id="addUserBtn">
+                <i class="bi bi-person-plus me-2"></i>Add User
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover" id="usersTable">
+                <thead>
+                    <tr>
+                        <th>Profile</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Windows User Management Section -->
+    <div class="dashboard-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="dashboard-section-title mb-0">
+                <i class="bi bi-windows me-2"></i>Windows User Management
+            </div>
+            <button class="btn btn-primary" id="addWindowsUserBtn">
+                <i class="bi bi-person-plus me-2"></i>Add Windows User
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover" id="windowsUsersTable">
+                <thead>
+                    <tr>
+                        <th>Windows Username</th>
+                        <th>Display Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Linked Account</th>
+                        <th>Last Login</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Windows User Modal -->
+<div class="modal fade" id="addWindowsUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Windows User</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addWindowsUserForm">
+                    <div class="mb-3">
+                        <label class="form-label">Windows Username *</label>
+                        <input type="text" class="form-control" name="windows_username" required>
+                        <div class="form-text">The Windows domain username (e.g., john.doe)</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Display Name</label>
+                        <input type="text" class="form-control" name="display_name">
+                        <div class="form-text">Full name for display purposes</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Department</label>
+                        <input type="text" class="form-control" name="department">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select class="form-select" name="role" required>
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                            <option value="dev">Developer</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" name="notes" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="is_active" checked>
+                            <label class="form-check-label">Active</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveWindowsUserBtn">Save Windows User</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Windows User Modal -->
+<div class="modal fade" id="editWindowsUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Windows User</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editWindowsUserForm">
+                    <input type="hidden" name="windowsUserId">
+                    <div class="mb-3">
+                        <label class="form-label">Windows Username</label>
+                        <input type="text" class="form-control" name="windows_username" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Display Name</label>
+                        <input type="text" class="form-control" name="display_name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Department</label>
+                        <input type="text" class="form-control" name="department">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select class="form-select" name="role" required>
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                            <option value="dev">Developer</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" name="notes" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="is_active">
+                            <label class="form-check-label">Active</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="updateWindowsUserBtn">Update Windows User</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New User</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select class="form-select" name="role" required>
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                            <option value="dev">Developer</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveUserBtn">Save User</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit User</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editUserForm">
+                    <input type="hidden" name="userId">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select class="form-select" name="role" required>
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                            <option value="dev">Developer</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">New Password (leave blank to keep current)</label>
+                        <input type="password" class="form-control" name="password">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="updateUserBtn">Update User</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+// Initialize Socket.IO connection
+const socket = io({
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+    timeout: 20000,
+    transports: ['polling']
+});
+
+// Connection state tracking
+let isConnected = false;
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 5;
+const HEARTBEAT_INTERVAL = 15000;
+let heartbeatInterval;
+
+// Socket event handlers
+socket.on('connect', () => {
+    console.log('Connected to server');
+    isConnected = true;
+    reconnectAttempts = 0;
+    
+    if (heartbeatInterval) {
+        clearInterval(heartbeatInterval);
+    }
+    heartbeatInterval = setInterval(() => {
+        if (socket.connected) {
+            socket.emit('heartbeat');
+        }
+    }, HEARTBEAT_INTERVAL);
+    
+    socket.emit('heartbeat');
+    requestDashboardData();
+});
+
+socket.on('disconnect', (reason) => {
+    console.log('Disconnected from server:', reason);
+    isConnected = false;
+    
+    if (heartbeatInterval) {
+        clearInterval(heartbeatInterval);
+        heartbeatInterval = null;
+    }
+    
+    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+        reconnectAttempts++;
+        console.log(`Attempting to reconnect (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
+    } else {
+        showToast('Connection lost. Please refresh the page.', 'danger');
+    }
+});
+
+socket.on('admin_dashboard_data', (data) => {
+    updateDashboard(data);
+});
+
+// Dashboard update functions
+function updateDashboard(data) {
+    // Update metrics
+    document.getElementById('totalUsers').textContent = data.total_users || '0';
+    document.getElementById('activeSessions').textContent = data.active_sessions || '0';
+    document.getElementById('totalSearches').textContent = data.total_searches || '0';
+
+    // Update online users
+    const onlineUsersContainer = document.getElementById('onlineUsers');
+    if (data.online_users && data.online_users.length > 0) {
+        onlineUsersContainer.innerHTML = data.online_users.map(user => `
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <img src="/static/uploads/profile_pictures/${user.profile_picture || 'default.png'}" 
+                         alt="${user.name}" 
+                         class="user-avatar me-3">
+                    <div>
+                        <div class="fw-bold">${user.name}</div>
+                        <small class="text-muted">${user.email}</small>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-primary" onclick="editUser(${user.id})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-warning" onclick="resetPassword(${user.id})">
+                        <i class="bi bi-key"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(${user.id})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    } else {
+        onlineUsersContainer.innerHTML = '<div class="list-group-item">No users online</div>';
+    }
+
+    // Update system status
+    if (data.system_status) {
+        const statusList = document.getElementById('systemStatus');
+        statusList.innerHTML = Object.entries(data.system_status).map(([key, value]) => `
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <span>${key}</span>
+                <span class="badge ${value.includes('%') ? 'bg-primary' : 'bg-success'}">${value}</span>
+            </div>
+        `).join('');
+
+        // Update chart
+        updateSystemStatusChart(data.system_status);
+    }
+
+    // Update recent activity
+    if (data.recent_activity) {
+        const recentActivityList = document.getElementById('recentActivity');
+        if (data.recent_activity.length > 0) {
+            recentActivityList.innerHTML = data.recent_activity.map(activity => `
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-primary me-2">${activity.type}</span>
+                            ${activity.description}
+                        </div>
+                        <small class="text-muted">${activity.timestamp}</small>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            recentActivityList.innerHTML = '<div class="list-group-item">No recent activity</div>';
+        }
+    }
+}
+
+// System status chart
+let systemStatusChart = null;
+
+function initSystemStatusChart() {
+    const options = {
+        chart: {
+            type: 'line',
+            height: 300,
+            background: 'transparent',
+            toolbar: { show: false },
+            animations: { enabled: false }
+        },
+        series: [{
+            name: 'CPU Usage',
+            data: []
+        }, {
+            name: 'Memory Usage',
+            data: []
+        }],
+        xaxis: {
+            type: 'datetime',
+            labels: { style: { colors: '#fff' } }
+        },
+        yaxis: {
+            labels: { style: { colors: '#fff' } },
+            min: 0,
+            max: 100
+        },
+        colors: ['#17ead9', '#f02fc2'],
+        grid: { borderColor: '#40475D' },
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 3 },
+        tooltip: { theme: 'dark' },
+        legend: {
+            labels: { colors: '#fff' }
+        }
+    };
+
+    systemStatusChart = new ApexCharts(document.querySelector("#systemStatusChart"), options);
+    systemStatusChart.render();
+}
+
+function updateSystemStatusChart(status) {
+    if (!systemStatusChart) return;
+
+    const now = new Date().getTime();
+    const cpuValue = parseFloat(status['CPU Usage']);
+    const memoryValue = parseFloat(status['Memory Usage']);
+    
+    systemStatusChart.appendData([{
+        data: [{
+            x: now,
+            y: cpuValue
+        }]
+    }, {
+        data: [{
+            x: now,
+            y: memoryValue
+        }]
+    }]);
+    
+    // Keep only last 30 points
+    const series = systemStatusChart.getSeries();
+    if (series[0].data.length > 30) {
+        systemStatusChart.updateSeries([{
+            data: series[0].data.slice(-30)
+        }, {
+            data: series[1].data.slice(-30)
+        }]);
+    }
+}
+
+// User management functions
+function addUser() {
+    const modal = new bootstrap.Modal(document.getElementById('addUserModal'));
+    modal.show();
+}
+
+function editUser(userId) {
+    fetch(`/api/admin/users/${userId}`)
+        .then(res => res.json())
+        .then(user => {
+            const form = document.getElementById('editUserForm');
+            form.elements.userId.value = userId;
+            form.elements.username.value = user.username;
+            form.elements.email.value = user.email;
+            form.elements.role.value = user.role;
+            form.elements.password.value = '';
+            
+            const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error loading user:', error);
+            showToast('Error loading user details', 'danger');
+        });
+}
+
+function resetPassword(userId) {
+    if (confirm('Reset password for this user?')) {
+        fetch(`/api/admin/users/${userId}/reset-password`, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(`New password: ${data.new_password}`, 'success');
+                } else {
+                    showToast('Error resetting password', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error resetting password:', error);
+                showToast('Error resetting password', 'danger');
+            });
+    }
+}
+
+function deleteUser(userId) {
+    if (confirm('Are you sure you want to delete this user?')) {
+        fetch(`/api/admin/users/${userId}`, { method: 'DELETE' })
+            .then(() => {
+                loadUsers();
+                showToast('User deleted successfully', 'success');
+            })
+            .catch(error => {
+                console.error('Error deleting user:', error);
+                showToast('Error deleting user', 'danger');
+            });
+    }
+}
+
+// Load users for user management table
+function loadUsers() {
+    fetch('/api/admin/users')
+        .then(res => res.json())
+        .then(users => {
+            const tbody = document.querySelector('#usersTable tbody');
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>
+                        <img src="/static/uploads/profile_pictures/${user.profile_picture || 'default.png'}" 
+                             alt="${user.username}" 
+                             class="user-avatar">
+                    </td>
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td>
+                        <span class="badge ${user.role === 'admin' ? 'bg-danger' : user.role === 'dev' ? 'bg-warning' : 'bg-primary'}">
+                            ${user.role}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge ${user.is_online ? 'bg-success' : 'bg-secondary'}">
+                            ${user.is_online ? 'Online' : 'Offline'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editUser(${user.id})" title="Edit User">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="resetPassword(${user.id})" title="Reset Password">
+                                <i class="bi bi-key"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(${user.id})" title="Delete User" ${user.username === 'admin' ? 'disabled' : ''}>
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        })
+        .catch(error => {
+            console.error('Error loading users:', error);
+            showToast('Error loading users', 'danger');
+        });
+}
+
+// Utility functions
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+}
+
+function requestDashboardData() {
+    socket.emit('admin_dashboard_request');
+}
+
+// Event listeners
+document.getElementById('addUserBtn').onclick = addUser;
+
+document.getElementById('saveUserBtn').onclick = function() {
+    const form = document.getElementById('addUserForm');
+    const data = Object.fromEntries(new FormData(form).entries());
+    
+    fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            showToast(data.error, 'danger');
+            return;
+        }
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
+        if (modal) modal.hide();
+        form.reset();
+        loadUsers();
+        showToast('User created successfully', 'success');
+    })
+    .catch(error => {
+        console.error('Error creating user:', error);
+        showToast('Error creating user', 'danger');
+    });
+};
+
+document.getElementById('updateUserBtn').onclick = function() {
+    const form = document.getElementById('editUserForm');
+    const userId = form.elements.userId.value;
+    const data = Object.fromEntries(new FormData(form).entries());
+    
+    fetch(`/api/admin/users/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            showToast(data.error, 'danger');
+            return;
+        }
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+        if (modal) modal.hide();
+        loadUsers();
+        showToast('User updated successfully', 'success');
+    })
+    .catch(error => {
+        console.error('Error updating user:', error);
+        showToast('Error updating user', 'danger');
+    });
+};
+
+// Windows User Management Functions
+function addWindowsUser() {
+    const modal = new bootstrap.Modal(document.getElementById('addWindowsUserModal'));
+    modal.show();
+}
+
+function editWindowsUser(windowsUserId) {
+    fetch(`/api/admin/windows-users/${windowsUserId}`)
+        .then(res => res.json())
+        .then(windowsUser => {
+            const form = document.getElementById('editWindowsUserForm');
+            form.elements.windowsUserId.value = windowsUserId;
+            form.elements.windows_username.value = windowsUser.windows_username;
+            form.elements.display_name.value = windowsUser.display_name || '';
+            form.elements.email.value = windowsUser.email || '';
+            form.elements.department.value = windowsUser.department || '';
+            form.elements.role.value = windowsUser.role;
+            form.elements.notes.value = windowsUser.notes || '';
+            form.elements.is_active.checked = windowsUser.is_active;
+            
+            const modal = new bootstrap.Modal(document.getElementById('editWindowsUserModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error loading Windows user:', error);
+            showToast('Error loading Windows user details', 'danger');
+        });
+}
+
+function deleteWindowsUser(windowsUserId) {
+    if (confirm('Are you sure you want to delete this Windows user?')) {
+        fetch(`/api/admin/windows-users/${windowsUserId}`, { method: 'DELETE' })
+            .then(() => {
+                loadWindowsUsers();
+                showToast('Windows user deleted successfully', 'success');
+            })
+            .catch(error => {
+                console.error('Error deleting Windows user:', error);
+                showToast('Error deleting Windows user', 'danger');
+            });
+    }
+}
+
+function linkWindowsUser(windowsUserId) {
+    // Show a prompt to select a user account to link to
+    fetch('/api/admin/users')
+        .then(res => res.json())
+        .then(users => {
+            const userOptions = users.map(user => 
+                `<option value="${user.id}">${user.username} (${user.email})</option>`
+            ).join('');
+            
+            const selectHtml = `
+                <div class="mb-3">
+                    <label class="form-label">Select User Account to Link</label>
+                    <select class="form-select" id="linkUserSelect">
+                        <option value="">-- Select User --</option>
+                        ${userOptions}
+                    </select>
+                </div>
+            `;
+            
+            // Create a temporary modal for linking
+            const linkModal = document.createElement('div');
+            linkModal.className = 'modal fade';
+            linkModal.innerHTML = `
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Link Windows User to Account</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            ${selectHtml}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="confirmLinkBtn">Link User</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(linkModal);
+            const modal = new bootstrap.Modal(linkModal);
+            modal.show();
+            
+            document.getElementById('confirmLinkBtn').onclick = function() {
+                const userId = document.getElementById('linkUserSelect').value;
+                if (!userId) {
+                    showToast('Please select a user account', 'warning');
+                    return;
+                }
+                
+                fetch(`/api/admin/windows-users/${windowsUserId}/link-user`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: parseInt(userId) })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showToast(data.error, 'danger');
+                        return;
+                    }
+                    modal.hide();
+                    document.body.removeChild(linkModal);
+                    loadWindowsUsers();
+                    showToast('Windows user linked successfully', 'success');
+                })
+                .catch(error => {
+                    console.error('Error linking Windows user:', error);
+                    showToast('Error linking Windows user', 'danger');
+                });
+            };
+            
+            linkModal.addEventListener('hidden.bs.modal', () => {
+                document.body.removeChild(linkModal);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading users for linking:', error);
+            showToast('Error loading users', 'danger');
+        });
+}
+
+function unlinkWindowsUser(windowsUserId) {
+    if (confirm('Are you sure you want to unlink this Windows user from their account?')) {
+        fetch(`/api/admin/windows-users/${windowsUserId}/unlink-user`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showToast(data.error, 'danger');
+                    return;
+                }
+                loadWindowsUsers();
+                showToast('Windows user unlinked successfully', 'success');
+            })
+            .catch(error => {
+                console.error('Error unlinking Windows user:', error);
+                showToast('Error unlinking Windows user', 'danger');
+            });
+    }
+}
+
+// Load Windows users for management table
+function loadWindowsUsers() {
+    fetch('/api/admin/windows-users')
+        .then(res => res.json())
+        .then(windowsUsers => {
+            const tbody = document.querySelector('#windowsUsersTable tbody');
+            tbody.innerHTML = windowsUsers.map(windowsUser => `
+                <tr>
+                    <td><code>${windowsUser.windows_username}</code></td>
+                    <td>${windowsUser.display_name || '-'}</td>
+                    <td>${windowsUser.email || '-'}</td>
+                    <td>${windowsUser.department || '-'}</td>
+                    <td>
+                        <span class="badge ${windowsUser.role === 'admin' ? 'bg-danger' : windowsUser.role === 'dev' ? 'bg-warning' : 'bg-primary'}">
+                            ${windowsUser.role}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge ${windowsUser.is_active ? 'bg-success' : 'bg-secondary'}">
+                            ${windowsUser.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        ${windowsUser.linked_user ? 
+                            `<span class="badge bg-info">${windowsUser.linked_user.username}</span>` : 
+                            '<span class="text-muted">Not linked</span>'
+                        }
+                    </td>
+                    <td>
+                        ${windowsUser.last_login_attempt ? 
+                            new Date(windowsUser.last_login_attempt).toLocaleString() : 
+                            'Never'
+                        }
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editWindowsUser(${windowsUser.id})" title="Edit Windows User">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            ${windowsUser.linked_user ? 
+                                `<button class="btn btn-sm btn-outline-warning" onclick="unlinkWindowsUser(${windowsUser.id})" title="Unlink Account">
+                                    <i class="bi bi-link-break"></i>
+                                </button>` :
+                                `<button class="btn btn-sm btn-outline-info" onclick="linkWindowsUser(${windowsUser.id})" title="Link to Account">
+                                    <i class="bi bi-link"></i>
+                                </button>`
+                            }
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteWindowsUser(${windowsUser.id})" title="Delete Windows User">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        })
+        .catch(error => {
+            console.error('Error loading Windows users:', error);
+            showToast('Error loading Windows users', 'danger');
+        });
+}
+
+// Windows User Modal Event Listeners
+document.getElementById('addWindowsUserBtn').onclick = addWindowsUser;
+
+document.getElementById('saveWindowsUserBtn').onclick = function() {
+    const form = document.getElementById('addWindowsUserForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    data.is_active = formData.get('is_active') === 'on';
+    
+    fetch('/api/admin/windows-users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            showToast(data.error, 'danger');
+            return;
+        }
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addWindowsUserModal'));
+        if (modal) modal.hide();
+        form.reset();
+        loadWindowsUsers();
+        showToast('Windows user created successfully', 'success');
+    })
+    .catch(error => {
+        console.error('Error creating Windows user:', error);
+        showToast('Error creating Windows user', 'danger');
+    });
+};
+
+document.getElementById('updateWindowsUserBtn').onclick = function() {
+    const form = document.getElementById('editWindowsUserForm');
+    const windowsUserId = form.elements.windowsUserId.value;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    data.is_active = formData.get('is_active') === 'on';
+    
+    fetch(`/api/admin/windows-users/${windowsUserId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            showToast(data.error, 'danger');
+            return;
+        }
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editWindowsUserModal'));
+        if (modal) modal.hide();
+        loadWindowsUsers();
+        showToast('Windows user updated successfully', 'success');
+    })
+    .catch(error => {
+        console.error('Error updating Windows user:', error);
+        showToast('Error updating Windows user', 'danger');
+    });
+};
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    initSystemStatusChart();
+    loadUsers();
+    loadWindowsUsers();
+    requestDashboardData();
+    setInterval(requestDashboardData, 10000);
+});
+</script>
+{% endblock %} 

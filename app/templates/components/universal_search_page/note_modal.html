@@ -1,0 +1,30 @@
+<!-- Universal Search Page Note Modal Component -->
+<div class="note-modal" id="universalSearchNoteModal">
+    <div class="note-modal-header">
+        <h3 class="note-modal-title" id="universalSearchNoteModalTitle">Note</h3>
+        <div class="note-modal-actions">
+            <button
+                type="button"
+                class="btn btn-sm btn-primary"
+                id="universalSearchNoteEditBtn"
+                style="display: none;"
+            >
+                <i class="bi bi-pencil"></i> Edit
+            </button>
+            <button
+                type="button"
+                class="btn-close btn-close-white"
+                aria-label="Close"
+                onclick="
+                    document.getElementById('universalSearchNoteModal').classList.remove('active');
+                    document.getElementById('universalSearchNoteModalOverlay').classList.remove('active');
+                "
+            ></button>
+        </div>
+    </div>
+    
+    <div class="note-modal-content" id="universalSearchNoteModalContent">
+        <!-- Note content will be loaded here -->
+    </div>
+</div>
+<div class="note-modal-overlay" id="universalSearchNoteModalOverlay"></div> 

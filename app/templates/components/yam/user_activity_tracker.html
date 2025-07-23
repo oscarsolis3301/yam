@@ -1,0 +1,904 @@
+{% macro render_user_activity_tracker(current_user) %}
+<!-- YAM User Activity Tracker Component -->
+<div id="yamUserActivityTracker" class="yam-user-activity-tracker">
+    <div class="tracker-header">
+        <h4 class="tracker-title">
+            <i class="bi bi-activity"></i>
+            Activity Tracker
+        </h4>
+        <div class="tracker-controls">
+            <button class="tracker-control-btn" id="yamTrackerRefresh" title="Refresh Data">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <button class="tracker-control-btn" id="yamTrackerSettings" title="Settings">
+                <i class="bi bi-gear"></i>
+            </button>
+            <div class="tracker-status" id="yamTrackerStatus">
+                <i class="bi bi-circle-fill"></i>
+                <span>Active</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tracker-grid">
+        <!-- Current Activity -->
+        <div class="tracker-card current-activity-card">
+            <div class="card-header">
+                <h5>Current Activity</h5>
+                <span class="card-subtitle">Real-time user actions</span>
+            </div>
+            <div class="activity-stream" id="yamActivityStream">
+                <!-- Activity items will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Session Analytics -->
+        <div class="tracker-card session-analytics-card">
+            <div class="card-header">
+                <h5>Session Analytics</h5>
+                <span class="card-subtitle">Today's activity summary</span>
+            </div>
+            <div class="session-metrics">
+                <div class="metric-row">
+                    <div class="metric-item">
+                        <div class="metric-icon">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value" id="yamSessionTime">0h</div>
+                            <div class="metric-label">Session Time</div>
+                        </div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-icon">
+                            <i class="bi bi-mouse"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value" id="yamClicks">0</div>
+                            <div class="metric-label">Clicks</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-row">
+                    <div class="metric-item">
+                        <div class="metric-icon">
+                            <i class="bi bi-keyboard"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value" id="yamKeystrokes">0</div>
+                            <div class="metric-label">Keystrokes</div>
+                        </div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-icon">
+                            <i class="bi bi-window"></i>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-value" id="yamPages">0</div>
+                            <div class="metric-label">Pages</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Productivity Score -->
+        <div class="tracker-card productivity-card">
+            <div class="card-header">
+                <h5>Productivity Score</h5>
+                <span class="card-subtitle">Today's performance</span>
+            </div>
+            <div class="productivity-display">
+                <div class="score-circle" id="yamProductivityCircle">
+                    <div class="circle-progress">
+                        <svg viewBox="0 0 100 100">
+                            <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
+                            <circle class="circle-progress-bar" cx="50" cy="50" r="40" id="yamProductivityProgress"></circle>
+                        </svg>
+                        <div class="circle-text">
+                            <span class="circle-value" id="yamProductivityScore">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="productivity-breakdown">
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Focus Time:</span>
+                        <span class="breakdown-value" id="yamFocusTime">0%</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Task Completion:</span>
+                        <span class="breakdown-value" id="yamTaskCompletion">0%</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Efficiency:</span>
+                        <span class="breakdown-value" id="yamEfficiency">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Activity Timeline -->
+        <div class="tracker-card timeline-card">
+            <div class="card-header">
+                <h5>Activity Timeline</h5>
+                <span class="card-subtitle">Hourly activity pattern</span>
+            </div>
+            <div class="timeline-container">
+                <canvas id="yamActivityTimeline" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div class="modal fade" id="yamTrackerSettingsModal" tabindex="-1" aria-labelledby="yamTrackerSettingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="yamTrackerSettingsModalLabel">
+                        <i class="bi bi-gear"></i>
+                        Activity Tracker Settings
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-group">
+                        <h6>Tracking Options</h6>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="yamTrackClicks" checked>
+                                Track mouse clicks
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="yamTrackKeystrokes" checked>
+                                Track keystrokes
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="yamTrackPages" checked>
+                                Track page visits
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="yamTrackIdle" checked>
+                                Track idle time
+                            </label>
+                        </div>
+                    </div>
+                    <div class="settings-group">
+                        <h6>Privacy Settings</h6>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="yamShareData" checked>
+                                Share activity data with team
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="yamShowDetails" checked>
+                                Show detailed activity
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="yamSaveTrackerSettings">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.yam-user-activity-tracker {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.yam-user-activity-tracker::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #ff6b9d, #c44569, #ff6b9d);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.tracker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.tracker-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tracker-title i {
+    color: #ff6b9d;
+}
+
+.tracker-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.tracker-control-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+}
+
+.tracker-control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.tracker-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 0.25rem 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+.tracker-status i {
+    color: #4caf50;
+    font-size: 0.7rem;
+    animation: pulse 2s infinite;
+}
+
+.tracker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.tracker-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.tracker-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.activity-stream {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.activity-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px);
+}
+
+.activity-item.click {
+    border-left-color: #2196f3;
+}
+
+.activity-item.keystroke {
+    border-left-color: #4caf50;
+}
+
+.activity-item.page {
+    border-left-color: #ff9800;
+}
+
+.activity-item.idle {
+    border-left-color: #9e9e9e;
+}
+
+.activity-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.activity-icon.click {
+    background: linear-gradient(135deg, #2196f3, #03a9f4);
+}
+
+.activity-icon.keystroke {
+    background: linear-gradient(135deg, #4caf50, #8bc34a);
+}
+
+.activity-icon.page {
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+}
+
+.activity-icon.idle {
+    background: linear-gradient(135deg, #9e9e9e, #757575);
+}
+
+.activity-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.activity-description {
+    font-size: 0.9rem;
+    color: #fff;
+    margin-bottom: 0.25rem;
+}
+
+.activity-time {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.session-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.metric-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.metric-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.metric-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b9d, #c44569);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.metric-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.metric-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.productivity-display {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.score-circle {
+    flex-shrink: 0;
+}
+
+.circle-progress {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.circle-progress svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.circle-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 8;
+}
+
+.circle-progress-bar {
+    fill: none;
+    stroke: #ff6b9d;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 251.2;
+    stroke-dashoffset: 251.2;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+.circle-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.circle-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.productivity-breakdown {
+    flex: 1;
+    min-width: 0;
+}
+
+.breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+}
+
+.breakdown-label {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.breakdown-value {
+    color: #fff;
+    font-weight: 600;
+}
+
+.timeline-container {
+    height: 200px;
+    position: relative;
+}
+
+.timeline-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.settings-group {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.settings-group h6 {
+    color: #fff;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.setting-item {
+    margin-bottom: 0.75rem;
+}
+
+.setting-item label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.setting-item input[type="checkbox"] {
+    accent-color: #ff6b9d;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .yam-user-activity-tracker {
+        padding: 1rem;
+    }
+    
+    .tracker-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .tracker-controls {
+        align-self: flex-end;
+    }
+    
+    .tracker-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .metric-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .productivity-display {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .timeline-container {
+        height: 150px;
+    }
+}
+</style>
+
+<script>
+// YAM User Activity Tracker Component
+window.yamUserActivityTracker = {
+    data: {
+        sessionTime: 0,
+        clicks: 0,
+        keystrokes: 0,
+        pages: 0,
+        productivity: 0,
+        activities: []
+    },
+    settings: {
+        trackClicks: true,
+        trackKeystrokes: true,
+        trackPages: true,
+        trackIdle: true,
+        shareData: true,
+        showDetails: true
+    },
+    timers: {
+        session: null,
+        idle: null,
+        update: null
+    },
+    chart: null,
+    
+    init() {
+        this.loadSettings();
+        this.setupEventListeners();
+        this.setupActivityTracking();
+        this.startSessionTimer();
+        this.startUpdateTimer();
+        console.log('YAM User Activity Tracker: Component initialized');
+    },
+    
+    loadSettings() {
+        const saved = localStorage.getItem('yam_activity_settings');
+        if (saved) {
+            this.settings = { ...this.settings, ...JSON.parse(saved) };
+        }
+    },
+    
+    saveSettings() {
+        localStorage.setItem('yam_activity_settings', JSON.stringify(this.settings));
+    },
+    
+    setupEventListeners() {
+        // Refresh button
+        const refreshBtn = document.getElementById('yamTrackerRefresh');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => this.refreshData());
+        }
+        
+        // Settings button
+        const settingsBtn = document.getElementById('yamTrackerSettings');
+        if (settingsBtn) {
+            settingsBtn.addEventListener('click', () => this.showSettings());
+        }
+        
+        // Save settings button
+        const saveBtn = document.getElementById('yamSaveTrackerSettings');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => this.saveTrackerSettings());
+        }
+    },
+    
+    setupActivityTracking() {
+        if (this.settings.trackClicks) {
+            document.addEventListener('click', (e) => this.trackClick(e));
+        }
+        
+        if (this.settings.trackKeystrokes) {
+            document.addEventListener('keydown', (e) => this.trackKeystroke(e));
+        }
+        
+        if (this.settings.trackPages) {
+            this.trackPageVisit();
+        }
+        
+        if (this.settings.trackIdle) {
+            this.setupIdleTracking();
+        }
+    },
+    
+    trackClick(event) {
+        this.data.clicks++;
+        this.addActivity('click', `Clicked on ${event.target.tagName.toLowerCase()}`);
+        this.updateDisplays();
+    },
+    
+    trackKeystroke(event) {
+        // Ignore special keys
+        if (event.key.length === 1) {
+            this.data.keystrokes++;
+            this.addActivity('keystroke', `Typed: ${event.key}`);
+            this.updateDisplays();
+        }
+    },
+    
+    trackPageVisit() {
+        const page = window.location.pathname;
+        this.data.pages++;
+        this.addActivity('page', `Visited: ${page}`);
+        this.updateDisplays();
+    },
+    
+    setupIdleTracking() {
+        let idleTime = 0;
+        const idleThreshold = 60000; // 1 minute
+        
+        const resetIdle = () => {
+            if (idleTime > idleThreshold) {
+                this.addActivity('idle', `Returned from idle (${Math.round(idleTime/1000)}s)`);
+            }
+            idleTime = 0;
+        };
+        
+        const updateIdle = () => {
+            idleTime += 1000;
+            if (idleTime === idleThreshold) {
+                this.addActivity('idle', 'Became idle');
+            }
+        };
+        
+        ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
+            document.addEventListener(event, resetIdle, true);
+        });
+        
+        this.timers.idle = setInterval(updateIdle, 1000);
+    },
+    
+    addActivity(type, description) {
+        const activity = {
+            type: type,
+            description: description,
+            timestamp: new Date(),
+            time: new Date().toLocaleTimeString()
+        };
+        
+        this.data.activities.unshift(activity);
+        
+        // Keep only last 50 activities
+        if (this.data.activities.length > 50) {
+            this.data.activities = this.data.activities.slice(0, 50);
+        }
+        
+        this.updateActivityStream();
+        
+        // Share with Socket.IO if enabled
+        if (this.settings.shareData && window.yamDashboard && window.yamDashboard.socket) {
+            window.yamDashboard.socket.emit('user_activity', {
+                type: type,
+                description: description,
+                timestamp: activity.timestamp.toISOString()
+            });
+        }
+    },
+    
+    startSessionTimer() {
+        this.timers.session = setInterval(() => {
+            this.data.sessionTime += 1;
+            this.updateDisplays();
+        }, 1000);
+    },
+    
+    startUpdateTimer() {
+        this.timers.update = setInterval(() => {
+            this.calculateProductivity();
+            this.updateDisplays();
+        }, 30000); // Update every 30 seconds
+    },
+    
+    calculateProductivity() {
+        // Simple productivity calculation
+        const focusTime = Math.min(this.data.sessionTime / 3600, 8); // Max 8 hours
+        const taskCompletion = Math.min(this.data.clicks / 100, 1); // Normalize clicks
+        const efficiency = Math.min(this.data.keystrokes / 1000, 1); // Normalize keystrokes
+        
+        this.data.productivity = Math.round(
+            (focusTime * 0.4 + taskCompletion * 0.3 + efficiency * 0.3) * 100
+        );
+    },
+    
+    updateDisplays() {
+        this.updateMetrics();
+        this.updateProductivity();
+        this.updateActivityStream();
+    },
+    
+    updateMetrics() {
+        const hours = Math.floor(this.data.sessionTime / 3600);
+        const minutes = Math.floor((this.data.sessionTime % 3600) / 60);
+        
+        document.getElementById('yamSessionTime').textContent = `${hours}h ${minutes}m`;
+        document.getElementById('yamClicks').textContent = this.data.clicks;
+        document.getElementById('yamKeystrokes').textContent = this.data.keystrokes;
+        document.getElementById('yamPages').textContent = this.data.pages;
+    },
+    
+    updateProductivity() {
+        const progress = document.getElementById('yamProductivityProgress');
+        if (progress) {
+            const circumference = 2 * Math.PI * 40;
+            const offset = circumference - (this.data.productivity / 100) * circumference;
+            progress.style.strokeDashoffset = offset;
+        }
+        
+        document.getElementById('yamProductivityScore').textContent = `${this.data.productivity}%`;
+        
+        // Update breakdown
+        const focusTime = Math.min(this.data.sessionTime / 3600, 8) * 12.5; // Max 8 hours = 100%
+        const taskCompletion = Math.min(this.data.clicks / 100, 1) * 100;
+        const efficiency = Math.min(this.data.keystrokes / 1000, 1) * 100;
+        
+        document.getElementById('yamFocusTime').textContent = `${Math.round(focusTime)}%`;
+        document.getElementById('yamTaskCompletion').textContent = `${Math.round(taskCompletion)}%`;
+        document.getElementById('yamEfficiency').textContent = `${Math.round(efficiency)}%`;
+    },
+    
+    updateActivityStream() {
+        const container = document.getElementById('yamActivityStream');
+        if (!container || !this.settings.showDetails) return;
+        
+        container.innerHTML = this.data.activities.slice(0, 10).map(activity => `
+            <div class="activity-item ${activity.type}">
+                <div class="activity-icon ${activity.type}">
+                    <i class="bi bi-${this.getActivityIcon(activity.type)}"></i>
+                </div>
+                <div class="activity-info">
+                    <div class="activity-description">${activity.description}</div>
+                    <div class="activity-time">${activity.time}</div>
+                </div>
+            </div>
+        `).join('');
+    },
+    
+    getActivityIcon(type) {
+        const icons = {
+            click: 'mouse',
+            keystroke: 'keyboard',
+            page: 'window',
+            idle: 'pause-circle'
+        };
+        return icons[type] || 'circle';
+    },
+    
+    showSettings() {
+        // Populate current settings
+        document.getElementById('yamTrackClicks').checked = this.settings.trackClicks;
+        document.getElementById('yamTrackKeystrokes').checked = this.settings.trackKeystrokes;
+        document.getElementById('yamTrackPages').checked = this.settings.trackPages;
+        document.getElementById('yamTrackIdle').checked = this.settings.trackIdle;
+        document.getElementById('yamShareData').checked = this.settings.shareData;
+        document.getElementById('yamShowDetails').checked = this.settings.showDetails;
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('yamTrackerSettingsModal'));
+        modal.show();
+    },
+    
+    saveTrackerSettings() {
+        this.settings = {
+            trackClicks: document.getElementById('yamTrackClicks').checked,
+            trackKeystrokes: document.getElementById('yamTrackKeystrokes').checked,
+            trackPages: document.getElementById('yamTrackPages').checked,
+            trackIdle: document.getElementById('yamTrackIdle').checked,
+            shareData: document.getElementById('yamShareData').checked,
+            showDetails: document.getElementById('yamShowDetails').checked
+        };
+        
+        this.saveSettings();
+        
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('yamTrackerSettingsModal'));
+        modal.hide();
+        
+        // Update displays
+        this.updateActivityStream();
+    },
+    
+    refreshData() {
+        this.calculateProductivity();
+        this.updateDisplays();
+        this.updateActivityStream();
+    },
+    
+    destroy() {
+        // Clear timers
+        Object.values(this.timers).forEach(timer => {
+            if (timer) clearInterval(timer);
+        });
+        
+        console.log('YAM User Activity Tracker: Component destroyed');
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.yamUserActivityTracker) {
+        window.yamUserActivityTracker.init();
+    }
+});
+
+// Register with YAM Dashboard if available
+if (window.yamDashboard) {
+    window.yamDashboard.registerComponent('userActivityTracker', window.yamUserActivityTracker);
+}
+</script>
+{% endmacro %} 

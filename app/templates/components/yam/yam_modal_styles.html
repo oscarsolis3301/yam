@@ -1,0 +1,79 @@
+<!-- YAM Modal System Styles -->
+{% macro render_yam_modal_styles() %}
+<style>
+/* ENHANCED MODAL SYSTEM */
+.yam-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 1rem;
+}
+
+.yam-modal-container {
+    background: #2d2d2d;
+    border-radius: 16px !important; /* Increased radius */
+    border: 1px solid #404040;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6) !important; /* Enhanced shadow */
+    max-width: 90vw;
+    max-height: 90vh;
+    width: 750px !important; /* Increased width */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.yam-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem !important; /* Increased padding */
+    border-bottom: 1px solid #404040;
+    background: #363636;
+}
+
+.yam-modal-title {
+    font-size: 1.2rem !important; /* Increased font */
+    font-weight: 600;
+    color: #e0e0e0;
+    margin: 0;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+.yam-modal-close {
+    background: #404040;
+    border: 1px solid #505050;
+    color: #e0e0e0;
+    padding: 0.625rem !important; /* Increased padding */
+    border-radius: 6px !important; /* Increased radius */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px !important; /* Increased size */
+    height: 36px !important; /* Increased size */
+    flex-shrink: 0 !important;
+}
+
+.yam-modal-close:hover {
+    background: #505050;
+    color: #fff;
+}
+
+.yam-modal-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem !important; /* Increased padding */
+    max-height: calc(90vh - 80px) !important; /* Adjusted for larger header */
+}
+</style>
+{% endmacro %} 

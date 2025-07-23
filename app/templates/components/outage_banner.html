@@ -1,0 +1,279 @@
+<!-- Ultra-Modern Outage Banner Component -->
+<div id="outageBanner" class="outage-banner" tabindex="0" role="alert" aria-live="assertive" style="display: none;">
+    <div class="outage-banner-content">
+        <span class="outage-banner-icon" aria-hidden="true">&#9888;</span>
+        <span id="outageBannerText">Active Outage: Loading...</span>
+    </div>
+</div>
+
+<!-- Outage Details Modal -->
+<div class="modal fade outage-modal" id="outageDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <span id="modalOutageStatus" class="outage-status"></span>
+                    <span id="modalOutageTitle"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="outage-details">
+                    <p id="modalOutageDescription" class="mb-3"></p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Start Time:</strong><br><span id="modalOutageStart"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Expected Duration:</strong><br><span id="modalOutageDuration"></span></p>
+                        </div>
+                    </div>
+                    <p><strong>Affected Systems:</strong><br><span id="modalOutageSystems"></span></p>
+                    <p id="modalOutageTicket" class="mb-0"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* --- Outage Banner: Modern, Shiny, and Interactive --- */
+    .outage-banner {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        margin: 0 !important;
+        z-index: 900 !important;
+        border-radius: 0 0 20px 20px !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        max-height: 80px;
+        background: linear-gradient(90deg, #d32f2f 0%, #b71c1c 100%);
+        color: #fff;
+        text-align: center;
+        font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+        font-weight: 800;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 18px 0 rgba(211,47,47,0.18), 0 1px 4px 0 rgba(0,0,0,0.10);
+        border: none;
+        letter-spacing: 0.01em;
+        transition: box-shadow 0.2s, background 0.2s;
+        pointer-events: auto;
+        /* Remove margin-left to prevent sidebar interference */
+        filter: drop-shadow(0 1px 6px rgba(211,47,47,0.12));
+        overflow: hidden;
+        /* Shiny animation - removed rotation */
+    }
+    .outage-banner::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: 1;
+        pointer-events: none;
+        /* Subtle, smooth sheen - stationary */
+        background: linear-gradient(120deg,
+            transparent 0%,
+            rgba(255,255,255,0.07) 42%,
+            rgba(255,255,255,0.18) 48%,
+            rgba(255,255,255,0.22) 50%,
+            rgba(255,255,255,0.18) 52%,
+            rgba(255,255,255,0.07) 58%,
+            transparent 100%
+        );
+        background-size: 300% 100%;
+        background-position: 50% 0; /* Fixed position - no animation */
+        opacity: 0.7;
+        transition: opacity 0.3s;
+    }
+    .with-outage-banner {
+        padding-top: 56px !important;
+    }
+    @media (max-width: 768px) {
+        .outage-banner {
+            min-height: 38px !important;
+            font-size: 0.95rem !important;
+            margin-left: 0 !important;
+            border-radius: 0 0 12px 12px !important;
+        }
+        .with-outage-banner {
+            padding-top: 38px !important;
+        }
+    }
+    .outage-banner-content {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+        font-weight: 600;
+        font-size: 1.1rem;
+        line-height: 1.2;
+        position: relative;
+        z-index: 2;
+        color: #fff;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+        letter-spacing: 0.5px;
+        padding: 8px 18px;
+        background: rgba(0,0,0,0.08);
+        border-radius: 16px;
+        backdrop-filter: blur(3px);
+        border: 1px solid rgba(255,255,255,0.08);
+        box-shadow: 0 1px 6px rgba(211,47,47,0.08);
+        cursor: pointer;
+        transition: background 0.2s, box-shadow 0.2s;
+    }
+    .outage-banner-icon {
+        font-size: 1.5rem;
+        margin-right: 6px;
+        color: #ffe08a;
+        filter: none;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.10);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: iconPulse 1.5s ease-in-out infinite alternate; /* Removed rotation */
+        transition: filter 0.2s, color 0.2s;
+    }
+    @keyframes iconPulse {
+        from { transform: scale(1); opacity: 0.85; }
+        to { transform: scale(1.08); opacity: 1; }
+    }
+    /* Loading state for banner text */
+    .outage-banner.loading .outage-banner-content {
+        animation: textShimmer 2s ease-in-out infinite;
+    }
+    @keyframes textShimmer {
+        0%, 100% { opacity: 0.8; }
+        50% { opacity: 1; }
+    }
+    /* Hover and focus effects */
+    .outage-banner {
+        cursor: pointer;
+    }
+    .outage-banner:hover .outage-banner-content,
+    .outage-banner:focus .outage-banner-content {
+        background: rgba(0,0,0,0.16);
+        box-shadow: 0 2px 12px rgba(211,47,47,0.18);
+    }
+    .outage-banner:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.18), 0 3px 18px 0 rgba(211,47,47,0.18);
+    }
+    .outage-banner:active .outage-banner-content {
+        background: rgba(0,0,0,0.22);
+        box-shadow: 0 1px 4px rgba(211,47,47,0.18);
+        transform: scale(0.98);
+    }
+</style>
+
+<script>
+    // Enhanced outage banner positioning and dynamic page adjustment
+    (function() {
+        function positionOutageBanner() {
+            var outageBanner = document.getElementById('outageBanner');
+            
+            if (outageBanner) {
+                // CRITICAL: Check if we're on a YAM page - if so, don't interfere
+                const isYamPage = document.querySelector('.yam-page') !== null;
+                if (isYamPage) {
+                    console.log('Outage Banner: YAM page detected - skipping positioning logic');
+                    return; // Don't run any positioning logic on YAM pages
+                }
+                
+                // Check if outage banner is visible and has content
+                const isVisible = outageBanner.style.display !== 'none' && 
+                                 outageBanner.offsetHeight > 0 &&
+                                 outageBanner.textContent.trim() !== 'Active Outage: Loading...' &&
+                                 outageBanner.dataset.outageData &&
+                                 outageBanner.dataset.outageData !== '';
+                
+                // Debug logging
+                console.log('Outage Banner Debug:', {
+                    display: outageBanner.style.display,
+                    offsetHeight: outageBanner.offsetHeight,
+                    textContent: outageBanner.textContent.trim(),
+                    outageData: outageBanner.dataset.outageData,
+<<<<<<< HEAD
+isVisible: isVisible,
+                    isYamPage: isYamPage});
+=======
+                    isVisible: isVisible
+                });
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+                
+                // Handle different page layouts - prioritize YAM dashboard
+                const yamDashboard = document.querySelector('.yam-dashboard');
+                const mainContent = document.querySelector('.main-content') || 
+                                   document.querySelector('.admin-main-content') ||
+                                   document.querySelector('.yam-dashboard-minimal') ||
+                                   document.querySelector('.yam-dashboard-content');
+                
+                // For YAM dashboard, add padding to the yam-container
+                if (yamDashboard) {
+                    const yamContainer = yamDashboard.querySelector('.yam-container');
+                    if (yamContainer) {
+                        if (isVisible) {
+                            yamContainer.classList.add('with-outage-banner');
+                            console.log('YAM: Added with-outage-banner class - banner is visible');
+                        } else {
+                            yamContainer.classList.remove('with-outage-banner');
+                            console.log('YAM: Removed with-outage-banner class - banner is hidden');
+                        }
+                    }
+                }
+                // For other pages, use the original logic
+                else if (mainContent) {
+                    if (isVisible) {
+                        mainContent.classList.add('with-outage-banner');
+                        console.log('Other: Added with-outage-banner class - banner is visible');
+                    } else {
+                        mainContent.classList.remove('with-outage-banner');
+                        console.log('Other: Removed with-outage-banner class - banner is hidden');
+                    }
+                }
+                
+                // Ensure sidebar is never affected by outage banner
+                const sidebar = document.querySelector('.sidebar-fixed');
+                if (sidebar) {
+                    // Always keep sidebar at top: 0, never affected by banner
+                    sidebar.style.top = '0';
+                    sidebar.style.position = 'fixed';
+                    sidebar.style.zIndex = '9999999';
+                }
+            }
+        }
+        
+        // Run on various events to ensure proper positioning
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', positionOutageBanner);
+        } else {
+            positionOutageBanner();
+        }
+        
+        window.addEventListener('load', positionOutageBanner);
+        window.addEventListener('resize', positionOutageBanner);
+        
+        // Watch for dynamic changes to the outage banner
+        const observer = new MutationObserver(positionOutageBanner);
+        const outageBanner = document.getElementById('outageBanner');
+        if (outageBanner) {
+            observer.observe(outageBanner, {
+                attributes: true,
+                attributeFilter: ['style', 'class'],
+                childList: true,
+                subtree: true,
+                characterData: true
+            });
+        }
+        
+        // Periodic check for dynamic content changes
+        setInterval(positionOutageBanner, 2000);
+    })();
+</script> 

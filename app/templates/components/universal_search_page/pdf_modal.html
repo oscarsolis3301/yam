@@ -1,0 +1,20 @@
+<!-- Universal Search Page PDF Modal Component -->
+<div class="pdf-modal" id="universalSearchPdfModal">
+    <div class="pdf-modal-header">
+        <h3 class="pdf-modal-title" id="universalSearchPdfModalTitle">Document</h3>
+        <button
+            type="button"
+            class="btn-close btn-close-white"
+            aria-label="Close"
+            onclick="
+                document.getElementById('universalSearchPdfModal').classList.remove('active');
+                document.getElementById('universalSearchPdfModalOverlay').classList.remove('active');
+            "
+        ></button>
+    </div>
+    
+    <div class="pdf-modal-content" id="universalSearchPdfModalContent">
+        <!-- PDF content will be loaded here -->
+    </div>
+</div>
+<div class="pdf-modal-overlay" id="universalSearchPdfModalOverlay"></div> 

@@ -1,0 +1,260 @@
+{% macro render_yam_scripts() %}
+<script>
+// YAM Dashboard Layout Fixes and Initialization
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('YAM Dashboard initialization started');
+    
+    // Ensure sidebar is never affected by YAM layout
+    function ensureSidebarPosition() {
+        const sidebar = document.querySelector('.sidebar-fixed');
+        if (sidebar) {
+            sidebar.style.position = 'fixed';
+            sidebar.style.top = '0';
+            sidebar.style.left = '0';
+            sidebar.style.zIndex = '9999999';
+            sidebar.style.margin = '0';
+            sidebar.style.padding = '0';
+        }
+    }
+    
+    // Force all YAM elements to be properly sized and visible
+    function fixYamLayout() {
+        // Fix main dashboard container
+        const yamDashboard = document.querySelector('.yam-dashboard');
+        if (yamDashboard) {
+            yamDashboard.style.height = 'auto';
+            yamDashboard.style.minHeight = '100vh';
+            yamDashboard.style.overflowY = 'auto';
+            yamDashboard.style.overflowX = 'hidden';
+        }
+        
+        // Fix dashboard content
+        const yamDashboardContent = document.querySelector('.yam-dashboard-content');
+        if (yamDashboardContent) {
+            yamDashboardContent.style.height = 'auto';
+            yamDashboardContent.style.minHeight = '100vh';
+            yamDashboardContent.style.overflow = 'visible';
+        }
+        
+        // Fix main content area
+        const yamMainContent = document.querySelector('.yam-main-content');
+        if (yamMainContent) {
+            yamMainContent.style.height = 'auto';
+            yamMainContent.style.minHeight = 'calc(100vh - 200px)';
+            yamMainContent.style.overflow = 'visible';
+        }
+        
+        // Fix all full-width sections
+        const fullWidthSections = document.querySelectorAll('.yam-full-width-section');
+        fullWidthSections.forEach(section => {
+            section.style.height = 'auto';
+            section.style.minHeight = '400px';
+            section.style.overflow = 'visible';
+            section.style.maxHeight = 'none';
+        });
+        
+        // Fix all component grids
+        const componentGrids = document.querySelectorAll('.yam-component-grid');
+        componentGrids.forEach(grid => {
+            grid.style.height = 'auto';
+            grid.style.minHeight = '350px';
+            grid.style.overflow = 'visible';
+            grid.style.maxHeight = 'none';
+        });
+        
+        // Fix all component items
+        const componentItems = document.querySelectorAll('.yam-component-item');
+        componentItems.forEach(item => {
+            item.style.height = 'auto';
+            item.style.minHeight = '250px';
+            item.style.overflow = 'visible';
+            item.style.maxHeight = 'none';
+            item.style.display = 'flex';
+            item.style.flexDirection = 'column';
+        });
+        
+        // Fix all scrollable content areas
+        const scrollableContents = document.querySelectorAll('.yam-scrollable-content');
+        scrollableContents.forEach(content => {
+            content.style.height = 'auto';
+            content.style.minHeight = '300px';
+            content.style.overflowY = 'auto';
+            content.style.overflowX = 'visible';
+            content.style.maxHeight = 'none';
+        });
+        
+        // Fix all data content areas
+        const dataContents = document.querySelectorAll('.yam-data-content');
+        dataContents.forEach(content => {
+            content.style.height = 'auto';
+            content.style.minHeight = '200px';
+            content.style.overflow = 'visible';
+            content.style.maxHeight = 'none';
+            content.style.flex = '1';
+        });
+        
+        // Fix specific component containers
+        const containers = [
+            '.yam-user-presence-container',
+            '.yam-analytics-container',
+            '.yam-system-monitor-container',
+            '.yam-system-health-container',
+            '.yam-team-performance-container',
+            '.yam-team-collaboration-container',
+            '.yam-heatmap-container',
+            '.yam-status-container'
+        ];
+        
+        containers.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(element => {
+                element.style.height = 'auto';
+                element.style.minHeight = '200px';
+                element.style.overflow = 'visible';
+                element.style.maxHeight = 'none';
+                element.style.display = 'flex';
+                element.style.flexDirection = 'column';
+            });
+        });
+        
+        // Fix specific components
+        const components = [
+            '.yam-user-presence-map',
+            '.yam-system-monitor',
+            '.yam-system-health-monitor',
+            '.yam-team-performance-analytics',
+            '.yam-team-collaboration'
+        ];
+        
+        components.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(element => {
+                element.style.height = 'auto';
+                element.style.minHeight = '200px';
+                element.style.overflow = 'visible';
+                element.style.width = '100%';
+                element.style.display = 'block';
+            });
+        });
+        
+        console.log('YAM Layout fixes applied');
+    }
+    
+    // Apply fixes immediately
+    fixYamLayout();
+    ensureSidebarPosition();
+    
+    // Apply fixes after a short delay to ensure all components are loaded
+    setTimeout(() => {
+        fixYamLayout();
+        ensureSidebarPosition();
+    }, 100);
+    
+    // Apply fixes after a longer delay to catch any dynamically loaded content
+    setTimeout(() => {
+        fixYamLayout();
+        ensureSidebarPosition();
+    }, 1000);
+    
+    // Monitor for any dynamic content changes
+    const observer = new MutationObserver(function(mutations) {
+        let shouldRefix = false;
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                for (let node of mutation.addedNodes) {
+                    if (node.nodeType === 1 && (node.classList.contains('yam-component-item') || 
+                                                node.classList.contains('yam-full-width-section') ||
+                                                node.classList.contains('yam-scrollable-content'))) {
+                        shouldRefix = true;
+                        break;
+                    }
+                }
+            }
+        });
+        
+        if (shouldRefix) {
+            setTimeout(fixYamLayout, 100);
+        }
+    });
+    
+    // Start observing
+    const yamDashboard = document.querySelector('.yam-dashboard');
+    if (yamDashboard) {
+        observer.observe(yamDashboard, {
+            childList: true,
+            subtree: true
+        });
+    }
+    
+    // Ensure body and html allow scrolling
+    document.body.style.height = 'auto';
+    document.body.style.overflowX = 'hidden';
+    document.body.style.overflowY = 'auto';
+    
+    document.documentElement.style.height = 'auto';
+    document.documentElement.style.overflowX = 'hidden';
+    document.documentElement.style.overflowY = 'auto';
+    
+    // Fix any Bootstrap or other framework conflicts
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+        mainContent.style.height = 'auto';
+        mainContent.style.overflow = 'visible';
+        mainContent.style.minHeight = '100vh';
+    }
+    
+    console.log('YAM Dashboard initialization completed');
+});
+
+// Additional utility functions for YAM components
+window.YAMUtils = {
+    // Force refresh of layout
+    refreshLayout: function() {
+        const event = new Event('DOMContentLoaded');
+        document.dispatchEvent(event);
+    },
+    
+    // Toggle component visibility
+    toggleComponent: function(componentId) {
+        const component = document.getElementById(componentId);
+        if (component) {
+            if (component.style.display === 'none') {
+                component.style.display = 'flex';
+                component.style.flexDirection = 'column';
+                component.style.height = 'auto';
+                component.style.minHeight = '200px';
+                component.style.overflow = 'visible';
+            } else {
+                component.style.display = 'none';
+            }
+        }
+    },
+    
+    // Ensure component is visible
+    ensureVisible: function(componentId) {
+        const component = document.getElementById(componentId);
+        if (component) {
+            component.style.display = 'flex';
+            component.style.flexDirection = 'column';
+            component.style.height = 'auto';
+            component.style.minHeight = '200px';
+            component.style.overflow = 'visible';
+            component.style.maxHeight = 'none';
+        }
+    },
+    
+    // Scroll to component
+    scrollToComponent: function(componentId) {
+        const component = document.getElementById(componentId);
+        if (component) {
+            component.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+};
+
+// Export for use in other scripts
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = window.YAMUtils;
+}
+</script>
+{% endmacro %} 

@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block head %}
+<!-- Additional head content specific to tickets page -->
+<link href="../static/css/sidebars.css" rel="stylesheet">
+<style>
+    .ticket-card {
+        transition: transform 0.2s;
+    }
+    .ticket-card:hover {
+        transform: translateY(-2px);
+    }
+    .ticket-status {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+    }
+    .status-open { background-color: #28a745; }
+    .status-pending { background-color: #ffc107; }
+    .status-closed { background-color: #dc3545; }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="d-flex flex-nowrap">
+    {% include "sidebar.html" %}
+    
+    <div class="col-md-10 text-center mx-auto">
+        <h1 class="mt-2 text-light">Tickets</h1>
+        
+        <!-- Ticket Filters -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <select class="form-select" id="statusFilter">
+                    <option value="all">All Status</option>
+                    <option value="open">Open</option>
+                    <option value="pending">Pending</option>
+                    <option value="closed">Closed</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <input type="text" class="form-control" id="searchInput" placeholder="Search tickets...">
+            </div>
+            <div class="col-md-4">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newTicketModal">
+                    <i class="bi bi-plus-circle me-2"></i>New Ticket
+                </button>
+            </div>
+        </div>
+
+        <!-- Tickets List -->
+        <div class="row" id="ticketsList">
+            <!-- Tickets will be dynamically loaded here -->
+        </div>
+    </div>
+</main>
+
+<!-- New Ticket Modal -->
+<div class="modal fade" id="newTicketModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New Ticket</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newTicketForm">
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <input type="text" class="form-control" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Priority</label>
+                        <select class="form-select" name="priority" required>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="submitTicket">Create Ticket</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Tickets page specific scripts -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const socket = io();
+    
+    // Load tickets
+    function loadTickets() {
+        socket.emit('get_tickets');
+    }
+    
+    socket.on('tickets_list', tickets => {
+        const ticketsList = document.getElementById('ticketsList');
+        ticketsList.innerHTML = '';
+        
+        tickets.forEach(ticket => {
+            const card = createTicketCard(ticket);
+            ticketsList.appendChild(card);
+        });
+    });
+    
+    function createTicketCard(ticket) {
+        const div = document.createElement('div');
+        div.className = 'col-md-4 mb-4';
+        div.innerHTML = `
+            <div class="card ticket-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <span class="ticket-status status-${ticket.status}"></span>
+                        ${ticket.title}
+                    </h5>
+                    <p class="card-text">${ticket.description}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Priority: ${ticket.priority}</small>
+                        <button class="btn btn-sm btn-outline-primary" onclick="viewTicket(${ticket.id})">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        return div;
+    }
+    
+    // New ticket submission
+    document.getElementById('submitTicket').addEventListener('click', () => {
+        const form = document.getElementById('newTicketForm');
+        const formData = new FormData(form);
+        const ticketData = Object.fromEntries(formData.entries());
+        
+        socket.emit('create_ticket', ticketData);
+        form.reset();
+        bootstrap.Modal.getInstance(document.getElementById('newTicketModal')).hide();
+    });
+    
+    // Filter and search functionality
+    document.getElementById('statusFilter').addEventListener('change', filterTickets);
+    document.getElementById('searchInput').addEventListener('input', filterTickets);
+    
+    function filterTickets() {
+        const status = document.getElementById('statusFilter').value;
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        
+        socket.emit('filter_tickets', { status, search });
+    }
+    
+    // Initial load
+    loadTickets();
+});
+</script>
+{% endblock %} 

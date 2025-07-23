@@ -1,0 +1,549 @@
+{% macro render_user_functions() %}
+<script>
+// Enhanced function to ensure current user is marked as online
+function ensureCurrentUserOnline() {
+    if (socket && socket.connected) {
+        // Send heartbeat to mark user as online
+        socket.emit('heartbeat');
+        console.log('Ensuring current user is marked as online');
+        
+        // Also emit a specific presence event
+        socket.emit('user_presence', {
+            action: 'online',
+            timestamp: Date.now()
+        });
+    } else {
+        // If socket not connected, try again in a moment
+        setTimeout(ensureCurrentUserOnline, 1000);
+    }
+}
+
+// Enhanced user presence management
+function setupUserPresence() {
+    // Mark user as online when page becomes visible
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && socket && socket.connected) {
+            socket.emit('heartbeat');
+            socket.emit('user_presence', {
+                action: 'online',
+                timestamp: Date.now()
+            });
+        }
+    });
+    
+    // Mark user as online when window gains focus
+    window.addEventListener('focus', () => {
+        if (socket && socket.connected) {
+            socket.emit('heartbeat');
+            socket.emit('user_presence', {
+                action: 'online',
+                timestamp: Date.now()
+            });
+        }
+    });
+    
+    // Handle page unload to mark user as offline
+    window.addEventListener('beforeunload', () => {
+        if (socket && socket.connected) {
+            socket.emit('user_presence', {
+                action: 'offline',
+                timestamp: Date.now()
+            });
+        }
+    });
+}
+
+// Function to load initial data with retry mechanism
+function loadInitialDataWithRetry(retryCount = 0) {
+    const maxRetries = 3;
+    const retryDelay = 2000; // 2 seconds
+    
+    console.log(`Loading initial data (attempt ${retryCount + 1}/${maxRetries + 1})`);
+    
+    // Fetch initial dashboard data
+    fetch('/api/admin/dashboard')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Initial dashboard data:', data);
+            
+            // Update metrics
+            if (data.open_tickets !== undefined) {
+                document.getElementById('openTickets').textContent = data.open_tickets;
+            }
+            if (data.active_outages !== undefined) {
+                document.getElementById('activeOutages').textContent = data.active_outages;
+            }
+            
+            // Calculate unique online users count
+            if (data.online_users && Array.isArray(data.online_users)) {
+                const uniqueOnlineUsers = new Set(data.online_users
+                    .filter(user => user.is_online)
+                    .map(user => user.id || user.email));
+                document.getElementById('onlineUsersMetric').textContent = uniqueOnlineUsers.size;
+            }
+            
+            // Update online users list
+            const onlineUsersList = document.getElementById('onlineUsers');
+            if (data.online_users && Array.isArray(data.online_users)) {
+                // Sort users: online first, then by name
+                data.online_users.sort((a, b) => {
+                    if (a.is_online !== b.is_online) return b.is_online - a.is_online;
+                    return (a.username || a.name || '').localeCompare(b.username || b.name || '');
+                });
+
+                onlineUsersList.innerHTML = data.online_users.map(user => `
+                    <div class="list-group-item d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div class="position-relative me-3">
+                                <img src="/static/uploads/profile_pictures/${user.profile_picture || 'boy.png'}" 
+                                    alt="${user.username || user.name || 'User'}" 
+                                    class="rounded-circle user-icon"
+                                    width="48" 
+                                    height="48" 
+                                    style="object-fit:cover;object-position:center;opacity:${user.is_online ? '1' : '0.5'};"
+                                    onerror="this.onerror=null;this.src='/static/images/PFP/boy.png';">
+                                ${user.is_online ? `
+                                <span class="position-absolute bottom-0 end-0 p-1 border border-light rounded-circle glowing-green"
+                                      style="width: 14px; height: 14px; background: #00ff00; box-shadow: 0 0 8px 2px #00ff00, 0 0 0 2px rgba(255,255,255,0.2); animation: glow 1.2s infinite alternate;"></span>
+                                ` : ''}
+                            </div>
+                            <div>
+                                <div class="fw-bold d-flex align-items-center">
+                                    ${user.username || user.name || 'Unknown User'}
+                                    <span class="ms-2 rounded-circle d-inline-block" 
+                                          style="width: 12px; height: 12px; background-color: ${getRoleColor(user.role || 'user')};" 
+                                          title="${user.role || 'user'}"></span>
+                                </div>
+                                <small class="text-muted">${user.email || 'No email'}</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted">Last seen: <span class="last-seen" data-last-seen="${user.last_seen || ''}"></span></small>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Update last-seen timestamps
+                updateLastSeenWidgets();
+            } else {
+                onlineUsersList.innerHTML = '<div class="list-group-item">No users available</div>';
+            }
+            
+            // If we have users, stop retrying
+            if (data.online_users && data.online_users.length > 0) {
+                console.log('Successfully loaded users, stopping retry mechanism');
+                return;
+            }
+            
+            // If no users and we haven't exceeded retries, try again
+            if (retryCount < maxRetries) {
+                console.log(`No users found, retrying in ${retryDelay}ms...`);
+                setTimeout(() => {
+                    loadInitialDataWithRetry(retryCount + 1);
+                }, retryDelay);
+            } else {
+                console.log('Max retries reached, showing empty state');
+                onlineUsersList.innerHTML = '<div class="list-group-item">No users available - <button class="btn btn-sm btn-outline-primary" onclick="refreshUserList()">Refresh</button></div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading initial data:', error);
+            
+            // If we haven't exceeded retries, try again
+            if (retryCount < maxRetries) {
+                console.log(`Error occurred, retrying in ${retryDelay}ms...`);
+                setTimeout(() => {
+                    loadInitialDataWithRetry(retryCount + 1);
+                }, retryDelay);
+            } else {
+                console.error('Max retries reached, showing error state');
+                showToast('Error loading dashboard data', 'error');
+                // Set default values for metrics
+                document.getElementById('onlineUsersMetric').textContent = '0';
+                document.getElementById('activeOutages').textContent = '0';
+                document.getElementById('openTickets').textContent = '0';
+                document.getElementById('onlineUsers').innerHTML = '<div class="list-group-item">Error loading users - <button class="btn btn-sm btn-outline-primary" onclick="refreshUserList()">Refresh</button></div>';
+            }
+        });
+}
+
+// Function to request dashboard data
+function requestAdminDashboardData() {
+    // 1) Always reload the dashboard via REST
+    console.log('Loading dashboard via fetch…');
+    loadInitialDataWithRetry();
+  
+    // 2) If we have a socket connection, also ask for any socket‐specific updates
+    if (socket && socket.connected) {
+      console.log('Requesting dashboard data via socket…');
+      socket.emit('admin_dashboard_request');
+    }
+}
+
+// Function to manually refresh user list
+function refreshUserList() {
+    console.log('Manual refresh requested');
+    
+    // Show loading state
+    const onlineUsersList = document.getElementById('onlineUsers');
+    if (onlineUsersList) {
+        onlineUsersList.innerHTML = '<div class="list-group-item text-center"><i class="bi bi-arrow-clockwise spin"></i> Loading users...</div>';
+    }
+    
+    // Update button state
+    const refreshBtn = document.getElementById('reloadUsersBtn');
+    if (refreshBtn) {
+        refreshBtn.disabled = true;
+        refreshBtn.innerHTML = '<i class="bi bi-arrow-clockwise spin"></i>';
+    }
+    
+    if (socket && socket.connected) {
+        socket.emit('heartbeat');
+        socket.emit('get_online_users');
+        
+        // Also fetch via REST as backup
+        setTimeout(() => {
+            loadInitialDataWithRetry();
+            
+            // Re-enable button after a delay
+            setTimeout(() => {
+                if (refreshBtn) {
+                    refreshBtn.disabled = false;
+                    refreshBtn.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
+                }
+            }, 1000);
+        }, 500);
+    } else {
+        loadInitialDataWithRetry();
+        
+        // Re-enable button after a delay
+        setTimeout(() => {
+            if (refreshBtn) {
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
+            }
+        }, 1000);
+    }
+}
+
+// Global cache for last known users
+window.lastKnownUsers = [];
+window.hasEverLoadedUsers = false;
+
+function updateOnlineUsers(users) {
+    if (!users || !Array.isArray(users)) {
+        console.warn('Invalid users data received:', users);
+        // If we have a last known list, render it
+        if (window.lastKnownUsers.length > 0) {
+            renderUsers(window.lastKnownUsers);
+        }
+        return;
+    }
+
+    // If the new list is empty but we have a last known list, keep showing the last known list
+    if (users.length === 0 && window.lastKnownUsers.length > 0) {
+        renderUsers(window.lastKnownUsers);
+        return;
+    }
+
+    // If we get a non-empty list, update the cache and render
+    if (users.length > 0) {
+        window.lastKnownUsers = users;
+        window.hasEverLoadedUsers = true;
+        renderUsers(users);
+        return;
+    }
+
+    // If we have never loaded any users, show the empty state
+    if (!window.hasEverLoadedUsers) {
+        renderUsers([]);
+    }
+}
+
+function renderUsers(users) {
+    const onlineUsersContainer = document.getElementById('onlineUsers');
+    if (!onlineUsersContainer) return;
+
+    // Defensive copy
+    users = Array.isArray(users) ? [...users] : [];
+
+    // Get current user ID from a global variable set by backend (ensure this is set in your base.html)
+    const CURRENT_USER_ID = window.CURRENT_USER_ID || null;
+
+    // Only mark the logged-in user as online, never all users
+    let foundCurrentUser = false;
+    if (CURRENT_USER_ID) {
+        users.forEach(user => {
+            if (user.id == CURRENT_USER_ID || user.username === (window.CURRENT_USERNAME || '')) {
+                user.is_online = true;
+                foundCurrentUser = true;
+            }
+        });
+        // If not found, add the current user manually (shouldn't happen, but fallback)
+        if (!foundCurrentUser) {
+            users.push({
+                id: CURRENT_USER_ID,
+                username: window.CURRENT_USERNAME || 'You',
+                email: window.CURRENT_EMAIL || '',
+                is_online: true,
+                last_seen: new Date().toISOString(),
+                role: window.CURRENT_ROLE || 'user',
+                profile_picture: window.CURRENT_PROFILE_PICTURE || 'boy.png'
+            });
+        }
+    }
+
+    // If there are no users at all (should only happen if DB is empty and never loaded any users)
+    if (!users || users.length === 0) {
+        if (window.hasEverLoadedUsers) {
+            // If we ever loaded users, keep showing the last known list
+            if (window.lastKnownUsers && window.lastKnownUsers.length > 0) {
+                renderUsers(window.lastKnownUsers);
+                return;
+            }
+        }
+        onlineUsersContainer.innerHTML = '<div class="list-group-item">No users found in the system.</div>';
+        document.getElementById('onlineUsersMetric').textContent = '0';
+        return;
+    }
+
+    // Calculate unique online users count
+    const uniqueOnlineUsers = new Set(users
+        .filter(user => user.is_online)
+        .map(user => user.id || user.email));
+    document.getElementById('onlineUsersMetric').textContent = uniqueOnlineUsers.size;
+
+    // Sort users: online first, then by name
+    users.sort((a, b) => {
+        if (a.is_online !== b.is_online) return b.is_online - a.is_online;
+        return (a.username || a.name || '').localeCompare(b.username || b.name || '');
+    });
+
+    // Create new content (no inline refresh, always show all users)
+    const newContent = users.map(user => `
+        <div class="list-group-item d-flex align-items-center justify-content-between" 
+             data-user-id="${user.id || ''}" 
+             style="transition: opacity 0.3s ease-in-out;">
+            <div class="d-flex align-items-center">
+                <div class="position-relative me-3">
+                    <img src="/static/uploads/profile_pictures/${user.profile_picture || 'boy.png'}" 
+                        alt="${user.username || user.name || 'User'}" 
+                        class="rounded-circle user-icon"
+                        width="48" 
+                        height="48" 
+                        style="object-fit:cover;object-position:center;opacity:${user.is_online ? '1' : '0.5'};"
+                        onerror="this.onerror=null;this.src='/static/images/PFP/boy.png';">
+                    <span class="position-absolute bottom-0 end-0 p-1 border border-light rounded-circle ${user.is_online ? 'glowing-green' : ''}"
+                          style="width: 14px; height: 14px; background: ${user.is_online ? '#00ff00' : '#888'}; box-shadow: 0 0 8px 2px ${user.is_online ? '#00ff00' : '#888'}, 0 0 0 2px rgba(255,255,255,0.2); animation: ${user.is_online ? 'glow 1.2s infinite alternate' : 'none'};"></span>
+                </div>
+                <div>
+                    <div class="fw-bold d-flex align-items-center">
+                        ${user.username || user.name || 'Unknown User'}
+                        <span class="ms-2 rounded-circle d-inline-block" 
+                              style="width: 12px; height: 12px; background-color: ${getRoleColor(user.role || 'user')};" 
+                              title="${user.role || 'user'}"></span>
+                    </div>
+                    <small class="text-muted">${user.email || 'No email'}</small>
+                </div>
+            </div>
+            <div class="text-end">
+                <div class="small">
+                    <div class="mb-1">${user.is_online ? '<span style="color:#00ff00"><i class="bi bi-circle-fill"></i> Online</span>' : '<span style="color:#888"><i class="bi bi-circle"></i> Offline</span>'}</div>
+                    <div class="text-muted">Last seen: ${user.last_seen_human || '<span class="last-seen" data-last-seen="' + (user.last_seen || '') + '"></span>'}</div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    // Update with smooth transition
+    onlineUsersContainer.innerHTML = newContent;
+    updateLastSeenWidgets();
+}
+
+// Function to get role color
+function getRoleColor(role) {
+    switch(role) {
+        case 'admin':
+            return '#FF5733'; // Red for admin
+        case 'manager':
+            return '#33A1FF'; // Blue for manager
+        case 'dev':
+            return '#FFFF00'; // Yellow for developer
+        case 'user':
+            return '#33FF57'; // Green for user
+        default:
+            return '#C4C4C4'; // Grey for undefined roles
+    }
+}
+
+// Function to update all last-seen widgets
+function updateLastSeenWidgets() {
+    const now = new Date();
+    document.querySelectorAll('.last-seen').forEach(function(el) {
+        const lastSeen = el.getAttribute('data-last-seen');
+        if (!lastSeen) {
+            el.textContent = 'N/A';
+            return;
+        }
+        const lastSeenDate = new Date(lastSeen + 'Z');  // Add 'Z' to indicate UTC
+        const diffMs = now - lastSeenDate;
+        if (isNaN(diffMs)) {
+            el.textContent = 'N/A';
+            return;
+        }
+        const diffSec = Math.floor(diffMs / 1000);
+        if (diffSec < 60) {
+            el.textContent = 'just now';
+        } else if (diffSec < 3600) {
+            el.textContent = Math.floor(diffSec / 60) + ' min ago';
+        } else if (diffSec < 86400) {
+            el.textContent = Math.floor(diffSec / 3600) + ' hr ago';
+        } else {
+            el.textContent = lastSeenDate.toLocaleString();
+        }
+    });
+}
+
+// Update last-seen widgets every 10 seconds
+setInterval(updateLastSeenWidgets, 10000);
+
+// Enhanced presence-related functions
+let lastRefreshTime = new Date();
+let lastHeartbeatTime = new Date();
+
+function updateLastRefreshTime() {
+    lastRefreshTime = new Date();
+}
+
+function updateLastHeartbeatTime() {
+    lastHeartbeatTime = new Date();
+}
+
+function updatePresenceStats(stats) {
+    if (stats.active_users !== undefined) {
+        const metric = document.getElementById('onlineUsersMetric');
+        if (metric) {
+            metric.textContent = stats.active_users;
+        }
+    }
+    
+    // Update presence stats display if it exists
+    const statsContainer = document.getElementById('presenceStatsContainer');
+    if (statsContainer && stats) {
+        statsContainer.innerHTML = `
+            <div class="small text-muted">
+                <div>Active: ${stats.active_users || 0}</div>
+                <div>Total: ${stats.total_users || 0}</div>
+                <div>Last cleanup: ${stats.last_cleanup ? new Date(stats.last_cleanup).toLocaleTimeString() : 'Never'}</div>
+            </div>
+        `;
+    }
+}
+
+function displayPresenceStats(data) {
+    console.log('Displaying presence stats:', data);
+    
+    // Update metrics
+    if (data.active_users !== undefined) {
+        document.getElementById('onlineUsersMetric').textContent = data.active_users;
+    }
+    
+    // Show detailed stats if admin
+    if (data.average_session_duration !== undefined) {
+        showToast(`Presence Stats - Active: ${data.active_users}, Avg Session: ${Math.round(data.average_session_duration/60)}min`, 'info');
+    }
+}
+
+function refreshUserList() {
+    console.log('Manually refreshing user list');
+    
+    // Update refresh button state
+    const refreshBtn = document.getElementById('reloadUsersBtn');
+    if (refreshBtn) {
+        const originalHTML = refreshBtn.innerHTML;
+        refreshBtn.innerHTML = '<i class="bi bi-arrow-clockwise spin"></i>';
+        refreshBtn.disabled = true;
+        
+        setTimeout(() => {
+            refreshBtn.innerHTML = originalHTML;
+            refreshBtn.disabled = false;
+        }, 2000);
+    }
+    
+    // Send heartbeat to ensure current user is online
+    if (socket && socket.connected) {
+        socket.emit('heartbeat');
+        socket.emit('get_online_users');
+    }
+    
+    // Also fetch from API as fallback
+    fetch('/api/admin/active_users')
+        .then(response => response.json())
+        .then(data => {
+            if (data.users) {
+                updateOnlineUsers(data.users);
+                showToast('User list refreshed successfully', 'success');
+            }
+        })
+        .catch(error => {
+            console.error('Error refreshing user list:', error);
+            showToast('Error refreshing user list', 'error');
+        });
+}
+
+function triggerManualCleanup() {
+    if (!confirm('Trigger manual cleanup of stale users? This will mark inactive users as offline.')) {
+        return;
+    }
+    
+    if (socket && socket.connected) {
+        socket.emit('manual_presence_cleanup');
+    } else {
+        showToast('Not connected to server', 'error');
+    }
+}
+
+function getPresenceStats() {
+    if (socket && socket.connected) {
+        socket.emit('get_presence_stats');
+    } else {
+        showToast('Not connected to server', 'error');
+    }
+}
+
+// Set up refresh button click handler
+document.addEventListener('DOMContentLoaded', function() {
+    const refreshBtn = document.getElementById('reloadUsersBtn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', refreshUserList);
+    }
+});
+
+// Add missing updateConnectionStatus function
+function updateConnectionStatus(isConnected, message = '') {
+    // Update connection status indicator if it exists
+    const statusIndicator = document.getElementById('connectionStatus');
+    if (statusIndicator) {
+        statusIndicator.className = `connection-status ${isConnected ? 'connected' : 'disconnected'}`;
+        statusIndicator.textContent = isConnected ? 'Connected' : 'Disconnected';
+    }
+    
+    // Update connection text if it exists
+    const statusText = document.getElementById('connectionText');
+    if (statusText) {
+        statusText.textContent = message || (isConnected ? 'Connected to server' : 'Disconnected');
+    }
+    
+    // Log connection status for debugging
+    console.log(`Connection status: ${isConnected ? 'Connected' : 'Disconnected'}${message ? ' - ' + message : ''}`);
+}
+
+// Make updateConnectionStatus globally available
+window.updateConnectionStatus = updateConnectionStatus;
+</script>
+{% endmacro %} 

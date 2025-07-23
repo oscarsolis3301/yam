@@ -1,0 +1,68 @@
+﻿<!-- Patterson Dashboard Header Component -->
+<div class="dashboard-header">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+            <h1 class="dashboard-title">Patterson Technician Dispatch</h1>
+            <div class="status-indicator">
+                <div class="status-dot" id="connection-status"></div>
+                <span id="connection-text">Loading from file system...</span>
+            </div>
+        </div>
+        
+        <!-- Countdown Timer and File Upload for Non-User Roles -->
+        {% if current_user.role != 'user' %}
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 15px;">
+            <!-- Admin Controls - Left Side -->
+            {% if current_user.role == 'admin' %}
+            <div class="admin-controls" style="display: flex; gap: 12px;">
+                <button class="icon-btn icon-btn-warning" onclick="initializeDatabase()" 
+                        data-tooltip="Initialize Database - Import all historical tickets">
+                    <i class="bi bi-database-add"></i>
+                </button>
+                
+                <button class="icon-btn icon-btn-success" onclick="importDatedFiles()" 
+                        data-tooltip="Import Dated Files - Import all dated .txt files from Freshworks directory">
+                    <i class="bi bi-file-earmark-text"></i>
+                </button>
+                
+                <button class="icon-btn icon-btn-primary" onclick="manualApiPull()" 
+                        data-tooltip="Pull API Data - Manually pull data from Freshworks API">
+                    <i class="bi bi-cloud-download"></i>
+                </button>
+                
+                <!-- File Upload Button -->
+                <div class="file-upload-section">
+                    <input type="file" id="file-upload" accept=".txt,.csv,.json" style="display: none;" onchange="handleFileUpload(this)">
+                    <button class="icon-btn icon-btn-info" onclick="document.getElementById('file-upload').click()" 
+                            data-tooltip="Upload File - Upload .txt, .csv, or .json files">
+                        <i class="bi bi-paperclip"></i>
+                    </button>
+                </div>
+            </div>
+            {% else %}
+            <!-- Non-admin controls -->
+            <div class="admin-controls" style="display: flex; gap: 12px;">
+                <button class="icon-btn icon-btn-primary" onclick="manualApiPull()" 
+                        data-tooltip="Pull API Data - Manually pull data from Freshworks API">
+                    <i class="bi bi-cloud-download"></i>
+                </button>
+                
+                <div class="file-upload-section">
+                    <input type="file" id="file-upload" accept=".txt,.csv,.json" style="display: none;" onchange="handleFileUpload(this)">
+                    <button class="icon-btn icon-btn-info" onclick="document.getElementById('file-upload').click()" 
+                            data-tooltip="Upload File - Upload .txt, .csv, or .json files">
+                        <i class="bi bi-paperclip"></i>
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Countdown Timer - Right Side -->
+            <div class="countdown-timer">
+                <div class="countdown-label">Next Refresh:</div>
+                <div class="countdown-time" id="countdown-display">--:--:--</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div> 

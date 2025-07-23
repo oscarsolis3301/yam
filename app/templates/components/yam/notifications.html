@@ -1,0 +1,858 @@
+{% macro render_notifications(current_user) %}
+<!-- YAM Notifications Component -->
+<div id="yamNotifications" class="yam-notifications">
+    <div class="notifications-header">
+        <h4 class="notifications-title">
+            <i class="bi bi-bell"></i>
+            Live Notifications
+        </h4>
+        <div class="notifications-controls">
+            <button class="notification-control-btn" id="yamNotificationsToggle" title="Toggle Notifications">
+                <i class="bi bi-bell"></i>
+            </button>
+            <button class="notification-control-btn" id="yamNotificationsClear" title="Clear All">
+                <i class="bi bi-trash"></i>
+            </button>
+            <div class="notification-badge" id="yamNotificationCount">0</div>
+        </div>
+    </div>
+    
+    <div class="notifications-container">
+        <div id="yamNotificationsList" class="notifications-list">
+            <!-- Loading state -->
+            <div class="loading-state">
+                <i class="bi bi-bell"></i>
+                <div>Initializing notifications...</div>
+                <div class="loading-subtitle">Setting up real-time alerts</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notifications-settings">
+        <div class="settings-header">
+            <span>Notification Settings</span>
+            <button class="settings-toggle" id="yamSettingsToggle">
+                <i class="bi bi-gear"></i>
+            </button>
+        </div>
+        <div class="settings-panel" id="yamSettingsPanel">
+            <div class="setting-item">
+                <label class="setting-label">
+                    <input type="checkbox" id="yamSettingUserStatus" checked>
+                    <span>User Status Changes</span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <label class="setting-label">
+                    <input type="checkbox" id="yamSettingUserLogin" checked>
+                    <span>User Login/Logout</span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <label class="setting-label">
+                    <input type="checkbox" id="yamSettingSystemEvents" checked>
+                    <span>System Events</span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <label class="setting-label">
+                    <input type="checkbox" id="yamSettingConnectionEvents" checked>
+                    <span>Connection Events</span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.yam-notifications {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.yam-notifications::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #ff6b6b, #feca57, #ff6b6b);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.notifications-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.notifications-title i {
+    color: #ff6b6b;
+}
+
+.notifications-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+}
+
+.notification-control-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    position: relative;
+}
+
+.notification-control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.notification-control-btn:active {
+    transform: scale(0.95);
+}
+
+.notification-control-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff6b6b;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+.notifications-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.notifications-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notifications-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.notifications-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.notifications-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.notification-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.notification-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, #ff6b6b, #feca57);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.notification-item:hover::before {
+    opacity: 1;
+}
+
+.notification-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateX(4px);
+}
+
+.notification-item.unread {
+    background: rgba(255, 107, 107, 0.1);
+    border-color: rgba(255, 107, 107, 0.3);
+}
+
+.notification-item.unread::before {
+    opacity: 1;
+}
+
+.notification-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.notification-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.notification-icon.info {
+    background: linear-gradient(135deg, #2196f3, #03a9f4);
+}
+
+.notification-icon.success {
+    background: linear-gradient(135deg, #4caf50, #8bc34a);
+}
+
+.notification-icon.warning {
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+}
+
+.notification-icon.error {
+    background: linear-gradient(135deg, #f44336, #e91e63);
+}
+
+.notification-icon.user {
+    background: linear-gradient(135deg, #9c27b0, #673ab7);
+}
+
+.notification-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-title {
+    font-size: 0.9rem;
+    color: #fff;
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+.notification-message {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+}
+
+.notification-time {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+}
+
+.notification-time i {
+    font-size: 0.7rem;
+}
+
+.notification-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.notification-item:hover .notification-actions {
+    opacity: 1;
+}
+
+.notification-action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.75rem;
+}
+
+.notification-action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.notifications-settings {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1rem;
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+}
+
+.settings-toggle {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.settings-toggle:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.settings-panel {
+    display: none;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.settings-panel.show {
+    display: flex;
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+}
+
+.setting-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+    transition: color 0.3s ease;
+}
+
+.setting-label:hover {
+    color: #fff;
+}
+
+.setting-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #ff6b6b;
+}
+
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    gap: 1rem;
+}
+
+.loading-state i {
+    font-size: 2rem;
+    color: #ff6b6b;
+    animation: pulse 2s infinite;
+}
+
+.loading-subtitle {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: rgba(255, 255, 255, 0.5);
+    gap: 1rem;
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 2rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .yam-notifications {
+        padding: 1rem;
+    }
+    
+    .notifications-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .notifications-controls {
+        align-self: flex-end;
+    }
+    
+    .settings-panel {
+        padding: 0.75rem;
+    }
+}
+</style>
+
+<script>
+// YAM Notifications Component
+window.yamNotifications = {
+    notifications: [],
+    maxNotifications: 50,
+    enabled: true,
+    settings: {
+        userStatus: true,
+        userLogin: true,
+        systemEvents: true,
+        connectionEvents: true
+    },
+    unreadCount: 0,
+    
+    init() {
+        this.setupEventListeners();
+        this.setupSocketListeners();
+        this.loadSettings();
+        this.updateDisplay();
+        console.log('YAM Notifications: Component initialized');
+    },
+    
+    setupEventListeners() {
+        // Toggle notifications
+        const toggleBtn = document.getElementById('yamNotificationsToggle');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => this.toggleNotifications());
+        }
+        
+        // Clear notifications
+        const clearBtn = document.getElementById('yamNotificationsClear');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => this.clearNotifications());
+        }
+        
+        // Settings toggle
+        const settingsToggle = document.getElementById('yamSettingsToggle');
+        if (settingsToggle) {
+            settingsToggle.addEventListener('click', () => this.toggleSettings());
+        }
+        
+        // Settings checkboxes
+        document.querySelectorAll('.setting-label input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => this.updateSettings());
+        });
+    },
+    
+    setupSocketListeners() {
+        if (window.yamDashboard && window.yamDashboard.socket) {
+            const socket = window.yamDashboard.socket;
+            
+            socket.on('user_status_change', (data) => {
+                if (this.settings.userStatus) {
+                    this.addNotification('user', 'info', 'Status Change', `${data.username || data.name} changed status to ${data.status}`);
+                }
+            });
+            
+            socket.on('user_login', (data) => {
+                if (this.settings.userLogin) {
+                    this.addNotification('user', 'success', 'User Login', `${data.username || data.name} logged in`);
+                }
+            });
+            
+            socket.on('user_logout', (data) => {
+                if (this.settings.userLogin) {
+                    this.addNotification('user', 'warning', 'User Logout', `${data.username || data.name} logged out`);
+                }
+            });
+            
+            socket.on('online_users_update', (users) => {
+                // Track significant changes in online users
+                this.processUserUpdates(users);
+            });
+            
+            socket.on('connect', () => {
+                if (this.settings.connectionEvents) {
+                    this.addNotification('system', 'success', 'Connection', 'Real-time connection established');
+                }
+            });
+            
+            socket.on('disconnect', () => {
+                if (this.settings.connectionEvents) {
+                    this.addNotification('system', 'error', 'Connection Lost', 'Real-time connection lost');
+                }
+            });
+            
+            socket.on('error', (error) => {
+                if (this.settings.systemEvents) {
+                    this.addNotification('system', 'error', 'System Error', `Connection error: ${error.message || 'Unknown error'}`);
+                }
+            });
+        }
+    },
+    
+    addNotification(type, level, title, message) {
+        if (!this.enabled) return;
+        
+        const notification = {
+            id: Date.now() + Math.random(),
+            type: type,
+            level: level,
+            title: title,
+            message: message,
+            timestamp: Date.now(),
+            unread: true
+        };
+        
+        this.notifications.unshift(notification);
+        this.unreadCount++;
+        
+        // Limit the number of notifications
+        if (this.notifications.length > this.maxNotifications) {
+            this.notifications = this.notifications.slice(0, this.maxNotifications);
+        }
+        
+        this.updateDisplay();
+        this.addNotificationToDOM(notification);
+        this.showBrowserNotification(title, message);
+    },
+    
+    addNotificationToDOM(notification) {
+        const container = document.getElementById('yamNotificationsList');
+        if (!container) return;
+        
+        // Remove loading state if present
+        const loadingState = container.querySelector('.loading-state');
+        if (loadingState) {
+            loadingState.remove();
+        }
+        
+        const notificationElement = document.createElement('div');
+        notificationElement.className = `notification-item ${notification.unread ? 'unread' : ''}`;
+        notificationElement.dataset.notificationId = notification.id;
+        
+        notificationElement.innerHTML = `
+            <div class="notification-header">
+                <div class="notification-icon ${notification.level}">
+                    <i class="bi ${this.getNotificationIcon(notification.type, notification.level)}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">${notification.title}</div>
+                    <div class="notification-message">${notification.message}</div>
+                    <div class="notification-time">
+                        <i class="bi bi-clock"></i>
+                        <span>${this.formatTime(notification.timestamp)}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="notification-actions">
+                <button class="notification-action-btn" onclick="window.yamNotifications.markAsRead('${notification.id}')">
+                    Mark Read
+                </button>
+                <button class="notification-action-btn" onclick="window.yamNotifications.dismissNotification('${notification.id}')">
+                    Dismiss
+                </button>
+            </div>
+        `;
+        
+        // Add to the top of the list
+        container.insertBefore(notificationElement, container.firstChild);
+        
+        // Remove old notifications if we exceed the limit
+        const notifications = container.querySelectorAll('.notification-item');
+        if (notifications.length > this.maxNotifications) {
+            notifications[notifications.length - 1].remove();
+        }
+    },
+    
+    getNotificationIcon(type, level) {
+        const icons = {
+            'user': 'bi-person-circle',
+            'system': 'bi-gear',
+            'connection': 'bi-wifi',
+            'info': 'bi-info-circle',
+            'success': 'bi-check-circle',
+            'warning': 'bi-exclamation-triangle',
+            'error': 'bi-x-circle'
+        };
+        
+        if (type === 'user') return icons.user;
+        if (type === 'system') return icons.system;
+        return icons[level] || icons.info;
+    },
+    
+    formatTime(timestamp) {
+        const now = Date.now();
+        const diff = now - timestamp;
+        
+        if (diff < 60000) {
+            return 'Just now';
+        } else if (diff < 3600000) {
+            const minutes = Math.floor(diff / 60000);
+            return `${minutes}m ago`;
+        } else if (diff < 86400000) {
+            const hours = Math.floor(diff / 3600000);
+            return `${hours}h ago`;
+        } else {
+            const date = new Date(timestamp);
+            return date.toLocaleDateString();
+        }
+    },
+    
+    processUserUpdates(users) {
+        // Track significant changes in online users
+        if (!this.previousUserCount) {
+            this.previousUserCount = users.length;
+            return;
+        }
+        
+        const currentCount = users.length;
+        const change = currentCount - this.previousUserCount;
+        
+        if (change > 0 && this.settings.userLogin) {
+            this.addNotification('system', 'info', 'Users Online', `${change} new user${change > 1 ? 's' : ''} came online`);
+        } else if (change < 0 && this.settings.userLogin) {
+            this.addNotification('system', 'warning', 'Users Offline', `${Math.abs(change)} user${Math.abs(change) > 1 ? 's' : ''} went offline`);
+        }
+        
+        this.previousUserCount = currentCount;
+    },
+    
+    toggleNotifications() {
+        this.enabled = !this.enabled;
+        this.updateDisplay();
+        
+        const toggleBtn = document.getElementById('yamNotificationsToggle');
+        if (toggleBtn) {
+            if (this.enabled) {
+                toggleBtn.classList.remove('disabled');
+                toggleBtn.innerHTML = '<i class="bi bi-bell"></i>';
+                toggleBtn.title = 'Disable Notifications';
+            } else {
+                toggleBtn.classList.add('disabled');
+                toggleBtn.innerHTML = '<i class="bi bi-bell-slash"></i>';
+                toggleBtn.title = 'Enable Notifications';
+            }
+        }
+    },
+    
+    clearNotifications() {
+        this.notifications = [];
+        this.unreadCount = 0;
+        const container = document.getElementById('yamNotificationsList');
+        if (container) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-bell"></i>
+                    <div>No notifications</div>
+                    <div>Notifications will appear here when events occur</div>
+                </div>
+            `;
+        }
+        this.updateDisplay();
+    },
+    
+    toggleSettings() {
+        const panel = document.getElementById('yamSettingsPanel');
+        const toggle = document.getElementById('yamSettingsToggle');
+        
+        if (panel) {
+            panel.classList.toggle('show');
+        }
+        
+        if (toggle) {
+            toggle.innerHTML = panel.classList.contains('show') ? 
+                '<i class="bi bi-chevron-up"></i>' : 
+                '<i class="bi bi-gear"></i>';
+        }
+    },
+    
+    updateSettings() {
+        this.settings = {
+            userStatus: document.getElementById('yamSettingUserStatus').checked,
+            userLogin: document.getElementById('yamSettingUserLogin').checked,
+            systemEvents: document.getElementById('yamSettingSystemEvents').checked,
+            connectionEvents: document.getElementById('yamSettingConnectionEvents').checked
+        };
+        
+        this.saveSettings();
+    },
+    
+    loadSettings() {
+        const saved = localStorage.getItem('yam_notification_settings');
+        if (saved) {
+            this.settings = { ...this.settings, ...JSON.parse(saved) };
+        }
+        
+        // Update checkboxes
+        document.getElementById('yamSettingUserStatus').checked = this.settings.userStatus;
+        document.getElementById('yamSettingUserLogin').checked = this.settings.userLogin;
+        document.getElementById('yamSettingSystemEvents').checked = this.settings.systemEvents;
+        document.getElementById('yamSettingConnectionEvents').checked = this.settings.connectionEvents;
+    },
+    
+    saveSettings() {
+        localStorage.setItem('yam_notification_settings', JSON.stringify(this.settings));
+    },
+    
+    markAsRead(notificationId) {
+        const notification = this.notifications.find(n => n.id == notificationId);
+        if (notification) {
+            notification.unread = false;
+            this.unreadCount = Math.max(0, this.unreadCount - 1);
+            
+            const element = document.querySelector(`[data-notification-id="${notificationId}"]`);
+            if (element) {
+                element.classList.remove('unread');
+            }
+            
+            this.updateDisplay();
+        }
+    },
+    
+    dismissNotification(notificationId) {
+        this.notifications = this.notifications.filter(n => n.id != notificationId);
+        
+        const element = document.querySelector(`[data-notification-id="${notificationId}"]`);
+        if (element) {
+            element.remove();
+        }
+        
+        this.updateDisplay();
+    },
+    
+    updateDisplay() {
+        // Update notification count
+        const countElement = document.getElementById('yamNotificationCount');
+        if (countElement) {
+            countElement.textContent = this.unreadCount;
+            countElement.style.display = this.unreadCount > 0 ? 'flex' : 'none';
+        }
+    },
+    
+    showBrowserNotification(title, message) {
+        // Show browser notification if supported and permitted
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification(title, {
+                body: message,
+                icon: '/static/images/favicon.ico',
+                badge: '/static/images/favicon.ico'
+            });
+        }
+    },
+    
+    requestNotificationPermission() {
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    },
+    
+    destroy() {
+        console.log('YAM Notifications: Component destroyed');
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.yamNotifications) {
+        window.yamNotifications.init();
+        // Request notification permission
+        window.yamNotifications.requestNotificationPermission();
+    }
+});
+
+// Register with YAM Dashboard if available
+if (window.yamDashboard) {
+    window.yamDashboard.registerComponent('notifications', window.yamNotifications);
+}
+</script>
+{% endmacro %} 

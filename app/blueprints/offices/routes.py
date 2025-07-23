@@ -3,7 +3,7 @@ from flask import render_template, jsonify, request
 from flask_login import login_required, current_user
 from fuzzywuzzy import process, fuzz
 from . import bp
-from app.config import Config
+from app.extensions import Config
 
 # Load and prepare office data
 df = pd.read_csv(Config.BASE_DIR / "Offices" / "offices.csv")

@@ -1,0 +1,165 @@
+<!-- YAM Utility JavaScript Functions -->
+{% macro render_yam_utils_js() %}
+<script>
+// Utility Functions
+window.safeGetElementById = function(id) {
+    try {
+        return document.getElementById(id);
+    } catch (error) {
+        console.warn('Safe getElementById failed for:', id, error);
+        return null;
+    }
+};
+
+window.safeQuerySelector = function(selector, parent = document) {
+    try {
+        return parent.querySelector(selector);
+    } catch (error) {
+        console.warn('Safe querySelector failed for:', selector, error);
+        return null;
+    }
+};
+
+// Safe event listener wrapper
+window.safeAddEventListener = function(element, event, handler) {
+    try {
+        if (element && typeof element.addEventListener === 'function') {
+            element.addEventListener(event, handler);
+            return true;
+        } else {
+            console.warn('Element not found or addEventListener not available:', element);
+            return false;
+        }
+    } catch (error) {
+        console.error('Error adding event listener:', error);
+        return false;
+    }
+};
+
+// Safe component initialization wrapper
+window.safeInitComponent = function(componentName, initFunction) {
+    try {
+        if (typeof initFunction === 'function') {
+            initFunction();
+            console.log(`${componentName} component initialized`);
+        } else {
+            console.warn(`${componentName} init function not found`);
+        }
+    } catch (error) {
+        console.error(`Error initializing ${componentName}:`, error);
+    }
+};
+
+// Enhanced error handling for API calls
+window.safeApiCall = async function(url, options = {}) {
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            },
+            ...options
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error(`API call failed for ${url}:`, error);
+        return null;
+    }
+};
+
+// Enhanced data validation
+window.validateData = function(data, expectedType = 'object') {
+    if (!data) return false;
+    
+    switch (expectedType) {
+        case 'array':
+            return Array.isArray(data);
+        case 'object':
+            return typeof data === 'object' && !Array.isArray(data);
+        case 'string':
+            return typeof data === 'string';
+        case 'number':
+            return typeof data === 'number';
+        default:
+            return true;
+    }
+};
+
+// Enhanced chart data processing
+window.processChartData = function(data, fallbackData = []) {
+    try {
+        if (window.validateData(data, 'array')) {
+            return data;
+        } else if (window.validateData(data, 'object') && data.data && Array.isArray(data.data)) {
+            return data.data;
+        } else {
+            console.warn('Invalid chart data, using fallback');
+            return fallbackData;
+        }
+    } catch (error) {
+        console.error('Error processing chart data:', error);
+        return fallbackData;
+    }
+};
+
+// Enhanced analytics error handling
+window.handleAnalyticsError = function(error, context = 'analytics') {
+    console.error(`${context} error:`, error);
+    
+    // Send error to analytics if available
+    if (window.gtag) {
+        window.gtag('event', 'exception', {
+            description: `${context}: ${error.message || 'Unknown error'}`,
+            fatal: false
+        });
+    }
+    
+    // Show user-friendly error message if needed
+    const errorMessage = `Unable to load ${context} data. Please try again later.`;
+    console.warn(errorMessage);
+};
+
+// Enhanced component error recovery
+window.recoverComponent = function(componentName, fallbackFunction) {
+    try {
+        if (typeof fallbackFunction === 'function') {
+            fallbackFunction();
+            console.log(`${componentName} recovered with fallback`);
+        }
+    } catch (error) {
+        console.error(`Failed to recover ${componentName}:`, error);
+    }
+};
+
+// Socket connection utilities (if needed)
+window.getYamSocket = function() {
+    // Return socket if available
+    return null;
+};
+
+window.isYamSocketConnected = function() {
+    return false;
+};
+
+window.updateConnectionStatus = function(isConnected, message = '') {
+    console.log('Connection status updated:', isConnected, message);
+    // Update connection status indicators if needed
+};
+
+window.updateOnlineUsers = function(users) {
+    console.log('Updating online users:', users.length);
+    // Update online users if needed
+};
+
+window.updatePresenceStats = function(stats) {
+    console.log('Updating presence stats:', stats);
+    // Update presence stats if needed
+};
+</script>
+{% endmacro %} 

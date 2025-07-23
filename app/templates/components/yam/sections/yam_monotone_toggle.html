@@ -1,0 +1,230 @@
+{% macro render_monotone_toggle() %}
+<!-- YAM Monotone Toggle Component -->
+<div class="yam-monotone-toggle-container">
+    <button id="yamMonotoneToggle" class="yam-monotone-toggle" title="Toggle between monotone and colorful modes">
+        <i class="bi bi-palette"></i>
+        <span class="toggle-label">Monotone Mode</span>
+    </button>
+</div>
+
+<style>
+.yam-monotone-toggle-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.yam-monotone-toggle {
+    background: rgba(26, 26, 26, 0.9) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 2px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 25px !important;
+    padding: 0.75rem 1.25rem !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    min-width: 140px !important;
+    justify-content: center !important;
+}
+
+.yam-monotone-toggle:hover {
+    background: rgba(40, 40, 40, 0.9) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4) !important;
+}
+
+.yam-monotone-toggle:active {
+    transform: translateY(0) !important;
+}
+
+.yam-monotone-toggle i {
+    font-size: 1.1rem !important;
+    color: #ffffff !important;
+    transition: all 0.3s ease !important;
+}
+
+.yam-monotone-toggle:hover i {
+    color: #667eea !important;
+    transform: scale(1.1) !important;
+}
+
+.toggle-label {
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    color: #ffffff !important;
+    white-space: nowrap !important;
+}
+
+/* Colorful mode styles */
+.yam-monotone-toggle.colorful {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%) !important;
+    border-color: rgba(102, 126, 234, 0.3) !important;
+}
+
+.yam-monotone-toggle.colorful:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 1) 0%, rgba(118, 75, 162, 1) 100%) !important;
+    border-color: rgba(102, 126, 234, 0.5) !important;
+}
+
+.yam-monotone-toggle.colorful i {
+    color: #ffffff !important;
+}
+
+.yam-monotone-toggle.colorful:hover i {
+    color: #ffffff !important;
+    transform: rotate(180deg) scale(1.1) !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .yam-monotone-toggle-container {
+        top: 15px;
+        right: 15px;
+    }
+    
+    .yam-monotone-toggle {
+        padding: 0.625rem 1rem !important;
+        min-width: 120px !important;
+        font-size: 0.8rem !important;
+    }
+    
+    .toggle-label {
+        font-size: 0.75rem !important;
+    }
+    
+    .yam-monotone-toggle i {
+        font-size: 1rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .yam-monotone-toggle-container {
+        top: 10px;
+        right: 10px;
+    }
+    
+    .yam-monotone-toggle {
+        padding: 0.5rem 0.875rem !important;
+        min-width: 100px !important;
+        font-size: 0.75rem !important;
+    }
+    
+    .toggle-label {
+        display: none !important;
+    }
+    
+    .yam-monotone-toggle i {
+        font-size: 0.9rem !important;
+    }
+}
+
+/* Accessibility */
+.yam-monotone-toggle:focus {
+    outline: 2px solid #667eea !important;
+    outline-offset: 2px !important;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .yam-monotone-toggle,
+    .yam-monotone-toggle i {
+        transition: none !important;
+        animation: none !important;
+    }
+    
+    .yam-monotone-toggle:hover i {
+        transform: none !important;
+    }
+    
+    .yam-monotone-toggle.colorful:hover i {
+        transform: none !important;
+    }
+}
+</style>
+
+<script>
+// Monotone Toggle Functionality
+window.yamMonotoneToggle = {
+    init() {
+        this.setupToggle();
+        this.updateToggleState();
+        console.log('YAM Monotone toggle initialized');
+    },
+    
+    setupToggle() {
+        const toggle = document.getElementById('yamMonotoneToggle');
+        if (toggle) {
+            toggle.addEventListener('click', () => this.toggleMode());
+            toggle.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.toggleMode();
+                }
+            });
+        }
+    },
+    
+    toggleMode() {
+        if (window.yamMonotone) {
+            window.yamMonotone.toggleMonotone();
+            this.updateToggleState();
+        }
+    },
+    
+    updateToggleState() {
+        const toggle = document.getElementById('yamMonotoneToggle');
+        const label = toggle?.querySelector('.toggle-label');
+        const icon = toggle?.querySelector('i');
+        
+        if (toggle && label && icon) {
+            const isMonotone = window.yamMonotone?.config?.enableMonotone ?? true;
+            
+            if (isMonotone) {
+                toggle.classList.remove('colorful');
+                label.textContent = 'Monotone Mode';
+                icon.className = 'bi bi-palette';
+            } else {
+                toggle.classList.add('colorful');
+                label.textContent = 'Colorful Mode';
+                icon.className = 'bi bi-palette-fill';
+            }
+        }
+    }
+};
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.yamMonotoneToggle.init();
+    });
+} else {
+    window.yamMonotoneToggle.init();
+}
+
+// Listen for changes in monotone state
+document.addEventListener('DOMContentLoaded', () => {
+    // Update toggle state when monotone system changes
+    const observer = new MutationObserver(() => {
+        if (window.yamMonotoneToggle) {
+            window.yamMonotoneToggle.updateToggleState();
+        }
+    });
+    
+    observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class']
+    });
+});
+</script>
+{% endmacro %} 

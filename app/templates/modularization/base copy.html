@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/Y.ico') }}">
+    <meta http-equiv="pragma" content="no-cache">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --bs-body-bg: #23272f;
+            --bs-body-color: #fff;
+        }
+        body {
+            background: #23272f !important;
+            color: #fff !important;
+        }
+        /* Loading Bar Styles */
+        #globalLoadingBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 5000;
+            background: rgba(35,39,47,0.98);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .progress {
+            width: 500px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 100px;
+            align-items: center;
+            display: flex;
+            padding: 0 5px;
+        }
+        .progress-value {
+            background: #fff;
+            height: 30px;
+            width: 0;
+            border-radius: 100px;
+            box-shadow: 0 10px 40px -10px #fff;
+            animation: load 2.2s normal forwards;
+        }
+        @keyframes load {
+            0% { width: 0; }
+            100% { width: 68%; }
+        }
+        #outageBanner {
+            position: fixed;
+            top: 0;
+            left: 65px;
+            right: 0;
+            z-index: 2;
+            background-color: #d9001e;
+            color: white;
+            padding: 8px 0;
+            text-align: center;
+            overflow: hidden;
+            white-space: nowrap;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        
+        .marquee-container {
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+        
+        .marquee-text {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+            white-space: nowrap;
+            font-weight: bold;
+            padding-left: 100%;
+            font-size: 1.1rem;
+        }
+        
+        .marquee-text i {
+            margin-right: 8px;
+            animation: blink 1s infinite alternate;
+        }
+        
+        @keyframes blink {
+            from { opacity: 1; }
+            to { opacity: 0.4; }
+        }
+        
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        /* Outage Modal Styles */
+        .outage-modal .modal-content {
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+        
+        .outage-modal .modal-header {
+            border-bottom: 1px solid #333;
+        }
+        
+        .outage-modal .modal-footer {
+            border-top: 1px solid #333;
+        }
+        
+        .outage-details {
+            padding: 1rem;
+        }
+        
+        .outage-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status-active { background-color: #dc3545; }
+        .status-resolved { background-color: #28a745; }
+        .status-scheduled { background-color: #ffc107; }
+
+        /* Outage Banner Styles */
+        .outage-banner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 500;
+            right: 0;
+            background: linear-gradient(45deg, #ff0000, #ff4d4d);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            z-index: 99999999999;
+            animation: bannerSlide 0.5s ease-out;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .outage-banner-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: 'Noto Sans JP', sans-serif;
+            font-weight: bold;
+        }
+
+        .outage-banner-icon {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes bannerSlide {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Adjust main content to account for banner */
+        .main-content {
+            margin-top: 50px;
+        }
+    </style>
+    
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- {% if not request.endpoint == 'login' %}
+    <div id="globalLoadingBar">
+        <div class="progress">
+            <div class="progress-value"></div>
+        </div>
+        <button id="forceContinueBtn" style="display:none;margin-top:32px;padding:10px 24px;border-radius:8px;background:#23272f;color:#fff;border:1.5px solid #fff;font-size:1.1em;">Continue</button>
+    </div>
+    {% endif %} -->
+    {% include "sidebar.html" %}
+    <!-- Outage Banner -->
+    <div id="outageBanner" class="outage-banner" style="display: none;">
+        <div class="outage-banner-content">
+          <span class="outage-banner-icon">⚠️</span>
+          <span id="outageBannerText">Active Outage: Loading...</span>
+        </div>
+      </div>
+
+    <!-- Outage Details Modal -->
+    <div class="modal fade outage-modal" id="outageDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <span id="modalOutageStatus" class="outage-status"></span>
+                        <span id="modalOutageTitle"></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="outage-details">
+                        <p id="modalOutageDescription" class="mb-3"></p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Start Time:</strong><br><span id="modalOutageStart"></span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Expected Duration:</strong><br><span id="modalOutageDuration"></span></p>
+                            </div>
+                        </div>
+                        <p><strong>Affected Systems:</strong><br><span id="modalOutageSystems"></span></p>
+                        <p id="modalOutageTicket" class="mb-0"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    {% block content %}{% endblock %}
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Socket.IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    
+    <!-- Global Socket.IO Initialization -->
+    <script>
+        // Initialize a single Socket.IO instance with improved configuration
+        const socket = io({
+            reconnection: true,
+            reconnectionAttempts: Infinity,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            timeout: 20000,
+            transports: ['polling'],
+            autoConnect: true,
+            path: '/socket.io/',
+            forceNew: true
+        });
+
+        // Connection state tracking
+        let isConnected = false;
+        let reconnectAttempts = 0;
+        const MAX_RECONNECT_ATTEMPTS = 5;
+        const HEARTBEAT_INTERVAL = 15000; // 15 seconds
+        let heartbeatInterval;
+
+        // Global socket event handlers
+        socket.on('connect', () => {
+            console.log('Connected to server');
+            isConnected = true;
+            reconnectAttempts = 0;
+            
+            // Start heartbeat
+            if (heartbeatInterval) {
+                clearInterval(heartbeatInterval);
+            }
+            heartbeatInterval = setInterval(() => {
+                if (socket.connected) {
+                    socket.emit('heartbeat');
+                }
+            }, HEARTBEAT_INTERVAL);
+            
+            // Send initial heartbeat
+            socket.emit('heartbeat');
+
+            // Request current outages on connection
+            fetch('/api/admin/outages')
+                .then(res => res.json())
+                .then(outages => {
+                    if (outages && outages.length > 0) {
+                        const banner = document.getElementById('outageBanner');
+                        const bannerText = document.getElementById('outageBannerText');
+                        bannerText.textContent = `Active Outage: ${outages[0].title} - ${outages[0].description}`;
+                        banner.style.display = 'block';
+                        banner.dataset.outageData = JSON.stringify(outages[0]);
+                        banner.className = 'outage-banner alert alert-danger';
+                    }
+                })
+                .catch(err => console.error('Error fetching outages:', err));
+        });
+
+        // Outage event handlers
+        socket.on('new_outage_announcement', (data) => {
+            console.log('New outage announcement received:', data);
+            const banner = document.getElementById('outageBanner');
+            const bannerText = document.getElementById('outageBannerText');
+            
+            if (data) {
+                bannerText.textContent = `Active Outage: ${data.title} - ${data.description}`;
+                banner.style.display = 'block';
+                banner.dataset.outageData = JSON.stringify(data);
+                banner.className = 'outage-banner alert alert-danger';
+                
+                // Show toast notification for all users
+                showToast(`New outage alert: ${data.title}`, 'warning');
+            }
+        });
+
+        socket.on('outage_resolved', (data) => {
+            console.log('Outage resolved:', data);
+            const banner = document.getElementById('outageBanner');
+            const bannerText = document.getElementById('outageBannerText');
+            const currentOutage = banner.dataset.outageData ? JSON.parse(banner.dataset.outageData) : null;
+            
+            if (currentOutage && currentOutage.id === data.id) {
+                banner.className = 'outage-banner alert alert-success';
+                bannerText.textContent = `Resolved Outage: ${data.title} - ${data.description}`;
+                
+                // Show toast notification for all users
+                showToast(`Outage resolved: ${data.title}`, 'success');
+                
+                // Hide the banner after 5 seconds
+                setTimeout(() => {
+                    banner.style.display = 'none';
+                }, 5000);
+            }
+        });
+
+        socket.on('outage_modified', (data) => {
+            console.log('Outage modified:', data);
+            const banner = document.getElementById('outageBanner');
+            const bannerText = document.getElementById('outageBannerText');
+            const currentOutage = banner.dataset.outageData ? JSON.parse(banner.dataset.outageData) : null;
+            
+            if (currentOutage && currentOutage.id === data.id) {
+                bannerText.textContent = `Active Outage: ${data.title} - ${data.description}`;
+                banner.dataset.outageData = JSON.stringify(data);
+                banner.className = 'outage-banner alert alert-danger';
+                
+                // Show toast notification for all users
+                showToast(`Outage updated: ${data.title}`, 'info');
+            }
+        });
+
+        socket.on('outage_deleted', (data) => {
+            console.log('Outage deleted:', data);
+            const banner = document.getElementById('outageBanner');
+            const currentOutage = banner.dataset.outageData ? JSON.parse(banner.dataset.outageData) : null;
+            
+            if (currentOutage && currentOutage.id === data.id) {
+                banner.style.display = 'none';
+                
+                // Show toast notification for all users
+                showToast(`Outage deleted: ${currentOutage.title}`, 'info');
+            }
+        });
+
+        socket.on('disconnect', (reason) => {
+            console.log('Disconnected from server:', reason);
+            isConnected = false;
+            
+            // Clear heartbeat interval
+            if (heartbeatInterval) {
+                clearInterval(heartbeatInterval);
+                heartbeatInterval = null;
+            }
+            
+            // Handle reconnection
+            if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                reconnectAttempts++;
+                console.log(`Attempting to reconnect (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
+            } else {
+                console.error('Max reconnection attempts reached');
+                // Show user-friendly message
+                const toast = document.createElement('div');
+                toast.className = 'toast align-items-center text-white bg-danger border-0';
+                toast.setAttribute('role', 'alert');
+                toast.setAttribute('aria-live', 'assertive');
+                toast.setAttribute('aria-atomic', 'true');
+                toast.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            Connection lost. Please refresh the page.
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                `;
+                document.body.appendChild(toast);
+                const bsToast = new bootstrap.Toast(toast);
+                bsToast.show();
+            }
+        });
+
+        socket.on('connect_error', (error) => {
+            console.error('Connection error:', error);
+            if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+                socket.disconnect();
+            }
+        });
+
+        // Handle online users updates with debouncing
+        let updateTimeout;
+        socket.on('online_users_update', (users) => {
+            if (updateTimeout) {
+                clearTimeout(updateTimeout);
+            }
+            updateTimeout = setTimeout(() => {
+                if (typeof window.updateOnlineUsers === 'function') {
+                    window.updateOnlineUsers(users);
+                }
+            }, 100);
+        });
+
+        // Handle admin dashboard updates with debouncing
+        let dashboardUpdateTimeout;
+        socket.on('admin_dashboard_data', (data) => {
+            if (dashboardUpdateTimeout) {
+                clearTimeout(dashboardUpdateTimeout);
+            }
+            dashboardUpdateTimeout = setTimeout(() => {
+                if (typeof window.updateAdminDashboard === 'function') {
+                    window.updateAdminDashboard(data);
+                }
+            }, 100);
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (heartbeatInterval) {
+                clearInterval(heartbeatInterval);
+            }
+            if (socket.connected) {
+                socket.disconnect();
+            }
+        });
+    </script>
+
+<!-- put this in your base template (e.g. base.html), *after* Bootstrap's JS -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const banner   = document.getElementById('outageBanner');
+  const modalEl  = document.getElementById('outageDetailsModal');
+  if (!banner || !modalEl) return;
+
+  // initialize the Bootstrap modal once
+  const outageModal = new bootstrap.Modal(modalEl);
+
+  // cache all modal fields
+  const statusEl   = modalEl.querySelector('#modalOutageStatus');
+  const titleEl    = modalEl.querySelector('#modalOutageTitle');
+  const descEl     = modalEl.querySelector('#modalOutageDescription');
+  const startEl    = modalEl.querySelector('#modalOutageStart');
+  const durationEl = modalEl.querySelector('#modalOutageDuration');
+  const systemsEl  = modalEl.querySelector('#modalOutageSystems');
+  const ticketEl   = modalEl.querySelector('#modalOutageTicket');
+
+  banner.addEventListener('click', () => {
+    let data;
+    try {
+      data = JSON.parse(banner.dataset.outageData || '{}');
+    } catch (err) {
+      console.error('Invalid outage data JSON:', err);
+      return;
+    }
+
+    const {
+      title = '',
+      description = 'No description provided',
+      start_time,
+      end_time,
+      affected_systems,
+      ticket_id,
+      status = 'active'
+    } = data;
+
+    if (!title) return;
+
+    // populate the modal
+    statusEl.className = `outage-status status-${status}`;
+    titleEl.textContent = title;
+    descEl.textContent  = description;
+    startEl.textContent = start_time
+      ? new Date(start_time).toLocaleString()
+      : 'Unknown';
+    durationEl.textContent = end_time
+      ? `${((new Date(end_time) - new Date(start_time)) / 60000).toFixed(0)} min`
+      : 'Ongoing';
+    systemsEl.textContent = affected_systems || 'All systems';
+    ticketEl.textContent  = ticket_id
+      ? `Ticket ID: ${ticket_id}`
+      : '';
+
+    outageModal.show();
+  });
+});
+</script>
+  
+    <!-- Robust global loading bar logic -->
+    <script>
+        // Robust global loading bar logic
+        (function() {
+            const loadingBar = document.getElementById('globalLoadingBar');
+            if (!loadingBar) return;
+            let loaded = false;
+            function hideLoading() {
+                if (loaded) return;
+                loaded = true;
+                loadingBar.style.display = 'none';
+            }
+            // Hide loading bar after page is fully loaded
+            window.addEventListener('load', () => {
+                setTimeout(hideLoading, 300);
+            });
+            // Fallback: hide after 4s no matter what
+            setTimeout(hideLoading, 4000);
+            // Show force continue button after 5s if still visible
+            setTimeout(() => {
+                if (!loaded && loadingBar.style.display !== 'none') {
+                    const btn = document.getElementById('forceContinueBtn');
+                    btn.style.display = 'block';
+                    btn.onclick = hideLoading;
+                }
+            }, 5000);
+        })();
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html> 

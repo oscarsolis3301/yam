@@ -1,0 +1,273 @@
+<!-- YAM Grid Styles - Layout Grid System -->
+<style>
+/* Grid Layout System */
+.yam-grid {
+    display: grid;
+    gap: 1rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: visible !important; /* Changed from hidden to visible to prevent clipping */
+    /* Add padding to prevent clipping during hover animations */
+    padding: 4px !important;
+}
+
+.yam-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.yam-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.yam-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.yam-grid-auto {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* ENHANCED ACTIONS GRID - IMPROVED LAYOUT */
+.yam-actions-grid-full {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+    gap: 1rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    margin-bottom: 2rem !important;
+    padding-bottom: 1rem !important;
+    /* Add padding to prevent clipping during hover animations */
+    padding: 4px !important;
+    overflow: visible !important; /* Changed from hidden to visible */
+}
+
+.yam-actions-grid-full .yam-action-group {
+    height: fit-content !important;
+    min-height: auto !important;
+    max-height: none !important;
+}
+
+/* Responsive Grid Breakpoints */
+@media (max-width: 768px) {
+    .yam-grid-2,
+    .yam-grid-3,
+    .yam-grid-4 {
+        grid-template-columns: 1fr;
+    }
+    
+    .yam-grid-auto {
+        grid-template-columns: 1fr;
+    }
+    
+    .yam-actions-grid-full {
+        grid-template-columns: 1fr !important;
+        gap: 0.875rem !important;
+        padding: 2px !important; /* Reduced padding for mobile */
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .yam-grid-3,
+    .yam-grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .yam-actions-grid-full {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+        gap: 0.875rem !important;
+        padding: 3px !important;
+    }
+}
+
+@media (min-width: 1025px) and (max-width: 1400px) {
+    .yam-actions-grid-full {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+        gap: 1rem !important;
+        padding: 4px !important;
+    }
+}
+
+@media (min-width: 1401px) {
+    .yam-actions-grid-full {
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)) !important;
+        gap: 1.25rem !important;
+        padding: 4px !important;
+    }
+}
+
+/* Grid Item Enhancements */
+.yam-grid-item {
+    min-height: 180px;
+    height: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    /* Add margin to prevent clipping during hover */
+    margin: 2px !important;
+}
+
+.yam-grid-item-full {
+    grid-column: 1 / -1;
+}
+
+.yam-grid-item-span-2 {
+    grid-column: span 2;
+}
+
+.yam-grid-item-span-3 {
+    grid-column: span 3;
+}
+
+/* Grid Item Responsive */
+@media (max-width: 768px) {
+    .yam-grid-item-span-2,
+    .yam-grid-item-span-3 {
+        grid-column: 1 / -1;
+    }
+    
+    .yam-grid-item {
+        min-height: 160px;
+        margin: 1px !important; /* Reduced margin for mobile */
+    }
+}
+
+/* Flexbox Fallback */
+.yam-flex {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: visible !important; /* Changed from hidden to visible */
+    /* Add padding to prevent clipping during hover animations */
+    padding: 4px !important;
+}
+
+.yam-flex-column {
+    flex-direction: column;
+}
+
+.yam-flex-row {
+    flex-direction: row;
+}
+
+.yam-flex-wrap {
+    flex-wrap: wrap;
+}
+
+.yam-flex-item {
+    flex: 1;
+    min-width: 0;
+    /* Add margin to prevent clipping during hover */
+    margin: 2px !important;
+}
+
+.yam-flex-item-fixed {
+    flex: 0 0 auto;
+}
+
+/* Flexbox Responsive */
+@media (max-width: 768px) {
+    .yam-flex-row {
+        flex-direction: column;
+    }
+    
+    .yam-flex {
+        padding: 2px !important; /* Reduced padding for mobile */
+    }
+    
+    .yam-flex-item {
+        margin: 1px !important; /* Reduced margin for mobile */
+    }
+}
+
+/* ENHANCED SCROLLING SUPPORT */
+.yam-scrollable-container {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    max-height: 100vh !important;
+    padding-bottom: 2rem !important;
+    /* Add padding to prevent clipping during hover animations */
+    padding: 4px !important;
+}
+
+.yam-scrollable-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.yam-scrollable-container::-webkit-scrollbar-track {
+    background: rgba(88, 101, 242, 0.1);
+    border-radius: 4px;
+}
+
+.yam-scrollable-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #5865f2, #7289da);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.yam-scrollable-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #7289da, #5865f2);
+}
+
+/* ENHANCED SPACING FOR BETTER READABILITY */
+.yam-section-spacing {
+    margin-bottom: 1.5rem !important;
+    padding-bottom: 0.5rem !important;
+    /* Add padding to prevent clipping during hover animations */
+    padding: 4px !important;
+}
+
+.yam-section-spacing:last-child {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* ENHANCED PERFORMANCE */
+.yam-grid,
+.yam-actions-grid-full,
+.yam-flex {
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+}
+
+/* ENHANCED HOVER CONTAINER SUPPORT */
+.yam-hover-container {
+    /* Container that supports hover animations without clipping */
+    overflow: visible !important;
+    padding: 4px !important;
+    position: relative;
+}
+
+.yam-hover-container > * {
+    /* Ensure all direct children have proper spacing */
+    margin: 2px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.yam-hover-container > *:hover {
+    /* Ensure hover states work properly */
+    z-index: 10 !important;
+    position: relative;
+}
+
+/* MOBILE OPTIMIZATIONS */
+@media (max-width: 640px) {
+    .yam-grid,
+    .yam-actions-grid-full,
+    .yam-flex,
+    .yam-scrollable-container,
+    .yam-section-spacing {
+        padding: 2px !important; /* Reduced padding for very small screens */
+    }
+    
+    .yam-grid-item,
+    .yam-flex-item,
+    .yam-hover-container > * {
+        margin: 1px !important; /* Reduced margin for very small screens */
+    }
+}
+</style> 

@@ -1,0 +1,1487 @@
+<!-- YAM Modal Scripts - ENHANCED FULL SCREEN MODAL SYSTEM -->
+<script>
+<<<<<<< HEAD
+// YAM Enhanced Modal System - FIXED Z-INDEX AND VISIBILITYwindow.yamModals = {
+=======
+// YAM Enhanced Modal System
+window.yamModals = {
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    // Modal state management
+    currentModal: null,
+    modalHistory: [],
+    modalCache: new Map(),
+    loadingStates: new Set(),
+    
+    // Modal configuration
+    config: {
+        animationDuration: 400,
+        cacheTimeout: 300000, // 5 minutes
+        maxCacheSize: 20,
+        enableKeyboard: true,
+        enableHistory: true,
+        enableCaching: true,
+        enableToast: true,
+<<<<<<< HEAD
+fallbackContent: true, // Enable fallback content when API fails
+        zIndex: 99999999 // CRITICAL: Highest z-index},
+    
+    // Initialize modal system
+    init() {
+// CRITICAL: Ensure modal is hidden on initialization
+        this.ensureModalHidden();
+        
+        this.setupEventListeners();
+        this.setupKeyboardShortcuts();
+        this.setupToastSystem();
+        this.fixZIndexIssues();
+        this.setupModalDebugging();
+        console.log('YAM Modal system initialized with enhanced z-index handling');
+    },
+    
+    // CRITICAL: Ensure modal is hidden on initialization
+    ensureModalHidden() {
+        const overlay = document.getElementById('yamModalOverlay');
+        if (overlay) {
+            // Force modal to be hidden
+            overlay.classList.remove('yam-modal-active');
+            overlay.style.display = 'none';
+            overlay.style.visibility = 'hidden';
+            overlay.style.opacity = '0';
+            overlay.setAttribute('aria-hidden', 'true');
+            overlay.style.pointerEvents = 'none';
+            
+            console.log('[YAM DEBUG] Modal forced to be hidden on initialization');
+        }
+    },
+    
+    // DEBUG: Setup modal debugging to track direct style changes
+    setupModalDebugging() {
+        const overlay = document.getElementById('yamModalOverlay');
+        if (overlay) {
+            // Monitor for direct style changes to the modal overlay
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                        const display = overlay.style.display;
+                        if (display === 'flex' || display === 'block') {
+                            console.log('[YAM DEBUG] Modal overlay display changed to:', display);
+                            console.trace('[YAM DEBUG] Stack trace for direct style change:');
+                        }
+                    }
+                });
+            });
+            
+            observer.observe(overlay, {
+                attributes: true,
+                attributeFilter: ['style']
+            });
+            
+            // Override the style.display setter to catch direct assignments
+            const originalDisplayDescriptor = Object.getOwnPropertyDescriptor(overlay.style, 'display');
+            Object.defineProperty(overlay.style, 'display', {
+                set: function(value) {
+                    if (value === 'flex' || value === 'block') {
+                        console.log('[YAM DEBUG] Modal overlay display set to:', value);
+                        console.trace('[YAM DEBUG] Stack trace for display setter:');
+                    }
+                    originalDisplayDescriptor.set.call(this, value);
+                },
+                get: function() {
+                    return originalDisplayDescriptor.get.call(this);
+                }
+            });
+            
+            // Check if modal is already open on initialization
+            setTimeout(() => {
+                if (overlay.style.display === 'flex' || overlay.style.display === 'block') {
+                    console.log('[YAM DEBUG] Modal was already open on initialization!');
+                    console.log('[YAM DEBUG] Current display style:', overlay.style.display);
+                    console.trace('[YAM DEBUG] Stack trace for initialization check:');
+                }
+            }, 100);
+            
+            // Monitor for any clicks that might trigger modal opening
+            document.addEventListener('click', (e) => {
+                if (e.target.matches('[onclick*="openModal"], [onclick*="yamModals.openModal"]')) {
+                    console.log('[YAM DEBUG] Click detected on element with openModal onclick:', e.target);
+                    console.trace('[YAM DEBUG] Stack trace for modal button click:');
+                }
+            });
+            
+            // Monitor for any programmatic button clicks
+            const originalClick = HTMLElement.prototype.click;
+            HTMLElement.prototype.click = function() {
+                if (this.matches('[onclick*="openModal"], [onclick*="yamModals.openModal"]')) {
+                    console.log('[YAM DEBUG] Programmatic click detected on element with openModal onclick:', this);
+                    console.trace('[YAM DEBUG] Stack trace for programmatic modal button click:');
+                }
+                return originalClick.call(this);
+            };
+            
+            console.log('[YAM DEBUG] Modal debugging setup complete');
+        }
+    },
+    
+    // CRITICAL: Fix z-index issues
+    fixZIndexIssues() {
+        // Ensure YAM modal overlay has highest z-index
+        const overlay = document.getElementById('yamModalOverlay');
+        if (overlay) {
+            overlay.style.zIndex = this.config.zIndex;
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.right = '0';
+            overlay.style.bottom = '0';
+            overlay.style.pointerEvents = 'auto';
+        }
+        
+        // Ensure YAM modal container has proper z-index
+        const container = document.getElementById('yamModalContainer');
+        if (container) {
+            container.style.zIndex = this.config.zIndex;
+            container.style.position = 'relative';
+            container.style.pointerEvents = 'auto';
+        }
+        
+        // Ensure YAM modal content has proper z-index
+        const content = document.getElementById('yamModalContent');
+        if (content) {
+            content.style.zIndex = this.config.zIndex;
+            content.style.position = 'relative';
+            content.style.pointerEvents = 'auto';
+        }
+        
+        // Fix Bootstrap modal conflicts
+        this.fixBootstrapModalConflicts();
+    },
+    
+    // CRITICAL: Fix Bootstrap modal conflicts
+    fixBootstrapModalConflicts() {
+        // Set Bootstrap modal z-index to be lower than YAM modals
+        const style = document.createElement('style');
+        style.textContent = `
+            .modal-backdrop { z-index: 1040 !important; }
+            .modal { z-index: 1050 !important; }
+            .modal.show { z-index: 1050 !important; }
+            .modal.show .modal-dialog { z-index: 1050 !important; }
+            .modal.show .modal-content { z-index: 1050 !important; }
+            
+            /* CRITICAL: Ensure YAM modals are always on top */
+            .yam-modal-overlay { z-index: ${this.config.zIndex} !important; }
+            .yam-modal-overlay .yam-modal-container { z-index: ${this.config.zIndex} !important; }
+            .yam-modal-overlay .yam-modal-content { z-index: ${this.config.zIndex} !important; }
+            
+            /* CRITICAL: Force all interactive elements to be clickable */
+            .yam-modal-overlay * { pointer-events: auto !important; }
+            .modal * { pointer-events: auto !important; }
+        `;
+        document.head.appendChild(style);},
+    
+=======
+        fallbackContent: true // Enable fallback content when API fails
+    },
+    
+    // Initialize modal system
+    init() {
+        this.setupEventListeners();
+        this.setupKeyboardShortcuts();
+        this.setupToastSystem();
+        console.log('YAM Modal system initialized');
+    },
+    
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    // Setup event listeners
+    setupEventListeners() {
+        // Close modal on overlay click
+        document.addEventListener('click', (event) => {
+            if (event.target.classList.contains('yam-modal-overlay')) {
+                this.closeModal();
+            }
+        });
+        
+        // Handle escape key
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && this.currentModal) {
+                this.closeModal();
+            }
+        });
+        
+        // Handle browser back button
+        window.addEventListener('popstate', (event) => {
+            if (event.state && event.state.modal) {
+                this.openModal(event.state.modal.type, event.state.modal.data);
+            } else {
+                this.closeModal();
+            }
+        });
+<<<<<<< HEAD
+// CRITICAL: Ensure modals are properly initialized when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                this.fixZIndexIssues();
+            });
+        } else {
+            this.fixZIndexIssues();
+        }},
+    
+    // Setup keyboard shortcuts
+    setupKeyboardShortcuts() {
+document.addEventListener('keydown', (event) => {
+            if (!this.currentModal) return;
+            
+            switch(event.key) {
+                case 'Escape':
+                    event.preventDefault();
+                    this.closeModal();
+                    break;
+                case 'F5':
+                    event.preventDefault();
+                    this.refreshModal();
+                    break;
+                case 'r':
+                    if (event.ctrlKey) {
+                        event.preventDefault();
+                        this.refreshModal();
+                    }
+                    break;}
+=======
+    },
+    
+    // Setup keyboard shortcuts
+    setupKeyboardShortcuts() {
+        if (!this.config.enableKeyboard) return;
+        
+        document.addEventListener('keydown', (event) => {
+            if (!this.currentModal) return;
+            
+            // Ctrl/Cmd + W to close modal
+            if ((event.ctrlKey || event.metaKey) && event.key === 'w') {
+                event.preventDefault();
+                this.closeModal();
+            }
+            
+            // Ctrl/Cmd + R to refresh modal content
+            if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
+                event.preventDefault();
+                this.refreshModal();
+            }
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+        });
+    },
+    
+    // Setup toast system
+    setupToastSystem() {
+        if (!this.config.enableToast) return;
+        
+        // Create toast container if it doesn't exist
+        if (!document.getElementById('yamToastContainer')) {
+            const toastContainer = document.createElement('div');
+            toastContainer.id = 'yamToastContainer';
+            toastContainer.className = 'yam-toast-container';
+<<<<<<< HEAD
+toastContainer.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: ${this.config.zIndex + 1};
+                pointer-events: none;
+            `;document.body.appendChild(toastContainer);
+=======
+            document.body.appendChild(toastContainer);
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+        }
+    },
+    
+    // Show toast notification
+    showToast(message, type = 'info', duration = 3000) {
+        if (!this.config.enableToast) return;
+        
+        const toastContainer = document.getElementById('yamToastContainer');
+        if (!toastContainer) return;
+        
+        const toast = document.createElement('div');
+        toast.className = `yam-toast yam-toast-${type}`;
+<<<<<<< HEAD
+toast.style.cssText = `
+            background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#3b82f6'};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            pointer-events: auto;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: ${this.config.zIndex + 1};
+        `;
+        toast.textContent = message;toastContainer.appendChild(toast);
+        
+        // Auto remove after duration
+        setTimeout(() => {
+if (toast.parentNode) {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }
+        }, duration);
+        
+        // Click to dismiss
+        toast.addEventListener('click', () => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        });
+    },
+    
+    // Open modal with enhanced z-index handling
+    async openModal(type, data = {}, options = {}) {
+        // DEBUG: Track what is opening the modal
+        console.log('[YAM DEBUG] openModal called with:', { type, data, options });
+        console.trace('[YAM DEBUG] Stack trace for modal open:');try {
+=======
+        toast.innerHTML = `
+            <div class="yam-toast-content">
+                <i class="bi bi-${this.getToastIcon(type)}"></i>
+                <span>${message}</span>
+            </div>
+            <button class="yam-toast-close" onclick="this.parentElement.remove()">
+                <i class="bi bi-x"></i>
+            </button>
+        `;
+        
+        toastContainer.appendChild(toast);
+        
+        // Auto remove after duration
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.remove();
+            }
+        }, duration);
+    },
+    
+    // Get toast icon based on type
+    getToastIcon(type) {
+        const icons = {
+            success: 'check-circle',
+            error: 'exclamation-triangle',
+            warning: 'exclamation-triangle',
+            info: 'info-circle'
+        };
+        return icons[type] || 'info-circle';
+    },
+    
+    // Open modal with enhanced error handling
+    async openModal(type, data = {}, options = {}) {
+        try {
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+            // Close current modal if open
+            if (this.currentModal) {
+                await this.closeModal();
+            }
+            
+            // Show loading state
+            this.showModalLoading();
+            
+<<<<<<< HEAD
+// CRITICAL: Ensure proper z-index before showing modal
+            this.fixZIndexIssues();// Get modal content with fallback
+=======
+            // Get modal content with fallback
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+            const content = await this.getModalContent(type, data, options);
+            
+            // Update modal
+            this.updateModal(type, content, data);
+            
+<<<<<<< HEAD
+// Show modal with enhanced z-indexthis.showModal();
+=======
+            // Show modal
+            this.showModal();
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+            
+            // Add to history
+            if (this.config.enableHistory) {
+                this.addToHistory(type, data);
+            }
+            
+            // Show success toast
+            this.showToast(`Opened ${this.getModalTitle(type)}`, 'success', 2000);
+            
+<<<<<<< HEAD
+console.log(`YAM Modal: Opened ${type} modal with z-index ${this.config.zIndex}`);} catch (error) {
+=======
+            console.log(`YAM Modal: Opened ${type} modal`);
+            
+        } catch (error) {
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+            console.error('YAM Modal Error:', error);
+            
+            // Show fallback content if enabled
+            if (this.config.fallbackContent) {
+                const fallbackContent = this.getFallbackContent(type);
+                this.updateModal(type, fallbackContent, data);
+                this.showModal();
+                this.showToast(`Opened ${this.getModalTitle(type)} (offline mode)`, 'warning', 3000);
+            } else {
+                this.showModalError(error.message);
+                this.showToast(`Failed to open ${type} modal`, 'error', 3000);
+            }
+        }
+    },
+    
+    // Get modal content with caching and fallback
+    async getModalContent(type, data, options) {
+        // Check cache first
+        if (this.config.enableCaching) {
+            const cached = this.getCachedContent(type, data);
+            if (cached) {
+<<<<<<< HEAD
+console.log(`YAM Modal: Using cached content for ${type}`);return cached;
+=======
+                return cached;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+            }
+        }
+        
+        try {
+            // Try to load from API
+            const content = await this.loadModalContent(type, data, options);
+            
+            // Cache the content
+            if (this.config.enableCaching) {
+                this.cacheContent(type, data, content);
+            }
+            
+            return content;
+<<<<<<< HEAD
+} catch (error) {
+=======
+        } catch (error) {
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+            console.warn(`Failed to load modal content from API: ${error.message}`);
+            
+            // Return fallback content
+            return this.getFallbackContent(type);
+        }
+    },
+    
+    // Load modal content from API
+    async loadModalContent(type, data, options) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), options.timeout || 10000);
+        
+        try {
+            const response = await fetch(`/api/modals/${type}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ data, options }),
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const result = await response.json();
+            
+            if (result.error) {
+                throw new Error(result.error);
+            }
+            
+            return result.content || result;
+            
+        } catch (error) {
+            clearTimeout(timeoutId);
+            
+            if (error.name === 'AbortError') {
+                throw new Error('Request timeout');
+            }
+            
+            throw error;
+        }
+    },
+    
+    // Get fallback content for when API fails
+    getFallbackContent(type) {
+<<<<<<< HEAD
+const fallbackContent = {
+            'userPresenceModal': `
+                <div class="yam-modal-full-content">
+                    <div class="yam-presence-grid">
+                        <div class="yam-presence-card">
+                            <div class="yam-presence-avatar">
+                                <i class="bi bi-person"></i>
+                            </div>
+                            <div class="yam-presence-info">
+                                <h5>User Presence Map</h5>
+                                <span class="yam-status online">Online</span>
+                            </div>
+                        </div></div>
+=======
+        const fallbackTemplates = {
+            'userPresenceModal': `
+                <div class="yam-modal-full-content">
+                    <div class="yam-user-presence-map">
+                        <h4><i class="bi bi-people-fill"></i> User Presence Map</h4>
+                        <div class="yam-presence-grid">
+                            <div class="yam-presence-card">
+                                <div class="yam-presence-avatar">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                                <div class="yam-presence-info">
+                                    <h5>Current User</h5>
+                                    <span class="yam-status online">Online</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="yam-fallback-message">
+                            <i class="bi bi-wifi-off"></i>
+                            <p>Showing offline data. Connect to network for real-time updates.</p>
+                        </div>
+                    </div>
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+                </div>
+            `,
+            'userAnalyticsModal': `
+                <div class="yam-modal-full-content">
+<<<<<<< HEAD
+<div class="yam-analytics-grid">
+                        <div class="yam-analytics-card">
+                            <h4><i class="bi bi-graph-up"></i> User Analytics</h4>
+                            <div class="yam-metrics-list">
+                                <div class="yam-metric">
+                                    <span>Active Users</span>
+                                    <span>25</span>
+                                </div>
+                                <div class="yam-metric">
+                                    <span>Total Sessions</span>
+                                    <span>150</span>
+                                </div>
+                            </div>
+                        </div></div>
+=======
+                    <div class="yam-user-analytics">
+                        <h4><i class="bi bi-graph-up"></i> User Analytics</h4>
+                        <div class="yam-analytics-grid">
+                            <div class="yam-analytics-card">
+                                <h5>Activity Overview</h5>
+                                <div class="yam-chart-container">
+                                    <div class="yam-fallback-chart">
+                                        <i class="bi bi-bar-chart"></i>
+                                        <p>Chart data unavailable offline</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="yam-fallback-message">
+                            <i class="bi bi-wifi-off"></i>
+                            <p>Showing offline data. Connect to network for real-time analytics.</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            'activityHeatmapModal': `
+                <div class="yam-modal-full-content">
+                    <div class="yam-activity-heatmap">
+                        <h4><i class="bi bi-calendar-heart"></i> Activity Heatmap</h4>
+                        <div class="yam-heatmap-container">
+                            <div class="yam-fallback-heatmap">
+                                <i class="bi bi-calendar3"></i>
+                                <p>Heatmap data unavailable offline</p>
+                            </div>
+                        </div>
+                        <div class="yam-fallback-message">
+                            <i class="bi bi-wifi-off"></i>
+                            <p>Showing offline data. Connect to network for activity data.</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            'advancedStatusModal': `
+                <div class="yam-modal-full-content">
+                    <div class="yam-advanced-status">
+                        <h4><i class="bi bi-gear-wide-connected"></i> Advanced User Status</h4>
+                        <div class="yam-status-grid">
+                            <div class="yam-status-card">
+                                <h5>System Status</h5>
+                                <div class="yam-status-indicators">
+                                    <div class="yam-status-item warning">
+                                        <i class="bi bi-circle-fill"></i>
+                                        <span>Offline Mode</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="yam-fallback-message">
+                            <i class="bi bi-wifi-off"></i>
+                            <p>Showing offline data. Connect to network for system status.</p>
+                        </div>
+                    </div>
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+                </div>
+            `,
+            'systemMonitorModal': `
+                <div class="yam-modal-full-content">
+<<<<<<< HEAD
+<div class="yam-monitor-grid">
+                        <div class="yam-monitor-card">
+                            <h4><i class="bi bi-cpu"></i> System Monitor</h4>
+                            <div class="yam-status-indicators">
+                                <div class="yam-status-item online">
+                                    <i class="bi bi-check-circle"></i>
+                                    <span>System Online</span>
+                                </div>
+                            </div>
+                        </div></div>
+=======
+                    <div class="yam-system-monitor">
+                        <h4><i class="bi bi-cpu"></i> System Monitor</h4>
+                        <div class="yam-monitor-grid">
+                            <div class="yam-monitor-card">
+                                <h5>System Status</h5>
+                                <div class="yam-fallback-monitor">
+                                    <i class="bi bi-cpu"></i>
+                                    <p>System data unavailable offline</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="yam-fallback-message">
+                            <i class="bi bi-wifi-off"></i>
+                            <p>Showing offline data. Connect to network for system monitoring.</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            'systemHealthModal': `
+                <div class="yam-modal-full-content">
+                    <div class="yam-system-health">
+                        <h4><i class="bi bi-heart-pulse"></i> System Health Monitor</h4>
+                        <div class="yam-health-grid">
+                            <div class="yam-health-card">
+                                <h5>Health Status</h5>
+                                <div class="yam-fallback-health">
+                                    <i class="bi bi-heart-pulse"></i>
+                                    <p>Health data unavailable offline</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="yam-fallback-message">
+                            <i class="bi bi-wifi-off"></i>
+                            <p>Showing offline data. Connect to network for health monitoring.</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            'teamPerformanceModal': `
+                <div class="yam-modal-full-content">
+                    <div class="yam-team-performance">
+                        <h4><i class="bi bi-trophy"></i> Team Performance Analytics</h4>
+                        <div class="yam-performance-grid">
+                            <div class="yam-performance-card">
+                                <h5>Team Metrics</h5>
+                                <div class="yam-fallback-performance">
+                                    <i class="bi bi-trophy"></i>
+                                    <p>Performance data unavailable offline</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="yam-fallback-message">
+                            <i class="bi bi-wifi-off"></i>
+                            <p>Showing offline data. Connect to network for team analytics.</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            'teamCollaborationModal': `
+                <div class="yam-modal-full-content">
+                    <div class="yam-team-collaboration">
+                        <h4><i class="bi bi-people"></i> Team Collaboration</h4>
+                        <div class="yam-collaboration-grid">
+                            <div class="yam-collaboration-card">
+                                <h5>Team Status</h5>
+                                <div class="yam-fallback-collaboration">
+                                    <i class="bi bi-people"></i>
+                                    <p>Team data unavailable offline</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="yam-fallback-message">
+                            <i class="bi bi-wifi-off"></i>
+                            <p>Showing offline data. Connect to network for team collaboration.</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            'recentActivityModal': `
+                <div class="yam-modal-full-content">
+                    <div class="yam-recent-activity">
+                        <h4><i class="bi bi-clock-history"></i> Recent Activity</h4>
+                        <div class="yam-activity-list">
+                            <div class="yam-activity-item">
+                                <div class="yam-activity-icon">
+                                    <i class="bi bi-info-circle"></i>
+                                </div>
+                                <div class="yam-activity-content">
+                                    <span class="yam-activity-text">Offline Mode Active</span>
+                                    <span class="yam-activity-time">Just now</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="yam-fallback-message">
+                            <i class="bi bi-wifi-off"></i>
+                            <p>Showing offline data. Connect to network for recent activity.</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            'activityTrackerModal': `
+                <div class="yam-modal-full-content">
+                    <div class="yam-activity-tracker">
+                        <h4><i class="bi bi-activity"></i> User Activity Tracker</h4>
+                        <div class="yam-tracker-grid">
+                            <div class="yam-tracker-card">
+                                <h5>Activity Status</h5>
+                                <div class="yam-fallback-tracker">
+                                    <i class="bi bi-activity"></i>
+                                    <p>Activity data unavailable offline</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="yam-fallback-message">
+                            <i class="bi bi-wifi-off"></i>
+                            <p>Showing offline data. Connect to network for activity tracking.</p>
+                        </div>
+                    </div>
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+                </div>
+            `,
+            'notificationsModal': `
+                <div class="yam-modal-full-content">
+<<<<<<< HEAD
+<div class="yam-notifications-list">
+                        <div class="yam-notification">
+                            <div class="yam-notification-icon">
+                                <i class="bi bi-bell"></i>
+                            </div>
+                            <div class="yam-notification-content">
+                                <span class="yam-notification-title">System Notification</span>
+                                <span class="yam-notification-message">All systems operational</span>
+                                <span class="yam-notification-time">2 minutes ago</span>
+                            </div></div>
+=======
+                    <div class="yam-notifications">
+                        <h4><i class="bi bi-bell"></i> Notifications</h4>
+                        <div class="yam-notifications-list">
+                            <div class="yam-notification">
+                                <div class="yam-notification-icon">
+                                    <i class="bi bi-info-circle"></i>
+                                </div>
+                                <div class="yam-notification-content">
+                                    <span class="yam-notification-title">Offline Mode</span>
+                                    <span class="yam-notification-message">Notifications unavailable offline</span>
+                                    <span class="yam-notification-time">Just now</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="yam-fallback-message">
+                            <i class="bi bi-wifi-off"></i>
+                            <p>Showing offline data. Connect to network for notifications.</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            'teamChatModal': `
+                <div class="yam-modal-full-content">
+                    <div class="yam-team-chat">
+                        <h4><i class="bi bi-chat-dots"></i> Team Chat</h4>
+                        <div class="yam-chat-container">
+                            <div class="yam-chat-messages">
+                                <div class="yam-message">
+                                    <div class="yam-message-avatar">
+                                        <i class="bi bi-person-circle"></i>
+                                    </div>
+                                    <div class="yam-message-content">
+                                        <span class="yam-message-author">System</span>
+                                        <span class="yam-message-text">Chat unavailable in offline mode</span>
+                                        <span class="yam-message-time">Just now</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="yam-chat-input">
+                                <input type="text" placeholder="Chat disabled offline..." class="yam-chat-textbox" disabled>
+                                <button class="yam-chat-send" disabled>
+                                    <i class="bi bi-send"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="yam-fallback-message">
+                            <i class="bi bi-wifi-off"></i>
+                            <p>Showing offline data. Connect to network for team chat.</p>
+                        </div>
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+                    </div>
+                </div>
+            `
+        };
+        
+<<<<<<< HEAD
+return fallbackContent[type] || `
+            <div class="yam-modal-full-content">
+                <div style="text-align: center; padding: 2rem;">
+                    <i class="bi bi-info-circle" style="font-size: 3rem; color: #5865f2;"></i>
+                    <h4>Modal Content</h4>
+                    <p>Content for ${type} modal</p></div>
+=======
+        return fallbackTemplates[type] || `
+            <div class="yam-modal-full-content">
+                <div class="yam-fallback-content">
+                    <h4><i class="bi bi-exclamation-triangle"></i> Modal Content</h4>
+                    <div class="yam-fallback-message">
+                        <i class="bi bi-wifi-off"></i>
+                        <p>Content unavailable offline. Connect to network for full functionality.</p>
+                    </div>
+                </div>
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+            </div>
+        `;
+    },
+    
+    // Update modal content
+    updateModal(type, content, data) {
+<<<<<<< HEAD
+const title = document.getElementById('yamModalTitle');
+        const modalContent = document.getElementById('yamModalContent');
+        
+        if (title) {
+            title.textContent = this.getModalTitle(type);
+        }if (modalContent) {
+            modalContent.innerHTML = content;
+        }
+        
+// Store current modal info
+        this.currentModal = { type, data };
+        
+        // CRITICAL: Ensure proper z-index after content update
+        setTimeout(() => {
+            this.fixZIndexIssues();
+        }, 100);},
+=======
+        const modalContent = document.getElementById('yamModalContent');
+        const modalTitle = document.getElementById('yamModalTitle');
+        
+        if (modalContent) {
+            modalContent.innerHTML = content;
+        }
+        
+        if (modalTitle) {
+            modalTitle.textContent = this.getModalTitle(type);
+        }
+        
+        // Store modal data for potential use
+        this.currentModal = { type, data, content };
+    },
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    
+    // Get modal title
+    getModalTitle(type) {
+        const titles = {
+<<<<<<< HEAD
+'profileSettingsModal': 'Profile Settings','userPresenceModal': 'User Presence Map',
+=======
+            'userPresenceModal': 'User Presence Map',
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+            'userAnalyticsModal': 'User Analytics',
+            'activityHeatmapModal': 'Activity Heatmap',
+            'advancedStatusModal': 'Advanced User Status',
+            'systemMonitorModal': 'System Monitor',
+            'systemHealthModal': 'System Health Monitor',
+            'teamPerformanceModal': 'Team Performance Analytics',
+            'teamCollaborationModal': 'Team Collaboration',
+            'recentActivityModal': 'Recent Activity',
+            'activityTrackerModal': 'User Activity Tracker',
+            'notificationsModal': 'Notifications',
+            'teamChatModal': 'Team Chat'
+        };
+        
+        return titles[type] || 'Modal';
+    },
+    
+<<<<<<< HEAD
+// Show modal with enhanced z-index
+    showModal() {
+        // DEBUG: Track when modal is being shown
+        console.log('[YAM DEBUG] showModal called');
+        console.trace('[YAM DEBUG] Stack trace for showModal:');
+        
+        const overlay = document.getElementById('yamModalOverlay');
+        if (overlay) {
+            // CRITICAL: Use class-based approach to show modal
+            overlay.classList.add('yam-modal-active');
+            overlay.style.zIndex = this.config.zIndex;
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.right = '0';
+            overlay.style.bottom = '0';
+            overlay.style.pointerEvents = 'auto';overlay.setAttribute('aria-hidden', 'false');
+=======
+    // Show modal
+    showModal() {
+        const overlay = document.getElementById('yamModalOverlay');
+        if (overlay) {
+            overlay.style.display = 'flex';
+            overlay.setAttribute('aria-hidden', 'false');
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+            
+            // Focus management
+            setTimeout(() => {
+                const closeBtn = overlay.querySelector('.yam-modal-close');
+                if (closeBtn) closeBtn.focus();
+            }, 100);
+            
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+<<<<<<< HEAD
+// CRITICAL: Ensure all interactive elements are clickable
+            setTimeout(() => {
+                this.ensureInteractiveElements();
+            }, 200);
+        }
+    },
+    
+    // CRITICAL: Ensure all interactive elements are clickable
+    ensureInteractiveElements() {
+        const overlay = document.getElementById('yamModalOverlay');
+        if (!overlay) return;
+        
+        // Force all elements to be interactive
+        const allElements = overlay.querySelectorAll('*');
+        allElements.forEach(element => {
+            element.style.pointerEvents = 'auto';
+            element.style.position = 'relative';
+            element.style.zIndex = 'auto';
+        });
+        
+        // Specifically ensure form elements are interactive
+        const formElements = overlay.querySelectorAll('input, textarea, select, button, a');
+        formElements.forEach(element => {
+            element.style.pointerEvents = 'auto';
+            element.style.position = 'relative';
+            element.style.zIndex = 'auto';
+        });
+    },// Show modal loading state
+=======
+        }
+    },
+    
+    // Show modal loading state
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    showModalLoading() {
+        const modalContent = document.getElementById('yamModalContent');
+        if (modalContent) {
+            modalContent.innerHTML = `
+                <div class="yam-modal-loading">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    Loading modal content...
+                </div>
+            `;
+        }
+    },
+    
+    // Show modal error state
+    showModalError(message) {
+        const modalContent = document.getElementById('yamModalContent');
+        if (modalContent) {
+            modalContent.innerHTML = `
+                <div class="yam-modal-error">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <h4>Error Loading Modal</h4>
+                    <p>${message}</p>
+                    <button onclick="yamModals.closeModal()" class="yam-modal-btn yam-modal-btn-primary">
+                        Close Modal
+                    </button>
+                </div>
+            `;
+        }
+    },
+    
+<<<<<<< HEAD
+// Close modal with proper cleanup
+    closeModal() {
+        const overlay = document.getElementById('yamModalOverlay');
+        if (overlay) {
+            // CRITICAL: Use class-based approach to hide modal
+            overlay.classList.remove('yam-modal-active');
+            overlay.style.zIndex = 'auto'; // Reset z-index
+            overlay.style.position = 'static'; // Reset position
+            overlay.style.top = 'auto';
+            overlay.style.left = 'auto';
+            overlay.style.right = 'auto';
+            overlay.style.bottom = 'auto';
+            overlay.style.pointerEvents = 'auto';overlay.setAttribute('aria-hidden', 'true');
+=======
+    // Close modal
+    closeModal() {
+        const overlay = document.getElementById('yamModalOverlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+            overlay.setAttribute('aria-hidden', 'true');
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+            
+            // Restore body scroll
+            document.body.style.overflow = '';
+            
+            // Clear current modal
+            this.currentModal = null;
+            
+            // Remove from history
+            if (this.config.enableHistory) {
+                this.removeFromHistory();
+            }
+<<<<<<< HEAD
+// CRITICAL: Clean up any lingering modal backdrops
+            setTimeout(() => {
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                backdrops.forEach(backdrop => {
+                    if (backdrop.style.zIndex < this.config.zIndex) {
+                        backdrop.remove();
+                    }
+                });
+            }, 100);}
+=======
+        }
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    },
+    
+    // Refresh modal content
+    async refreshModal() {
+        if (!this.currentModal) return;
+        
+        const { type, data } = this.currentModal;
+        
+        // Clear cache for this modal
+        if (this.config.enableCaching) {
+            this.clearCache(type);
+        }
+        
+        // Reload content
+        await this.openModal(type, data);
+    },
+    
+    // Cache management
+    cacheContent(type, data, content) {
+        const key = `${type}_${JSON.stringify(data)}`;
+        this.modalCache.set(key, {
+            content,
+            timestamp: Date.now()
+        });
+        
+        // Clean old cache entries
+        this.cleanCache();
+    },
+    
+    getCachedContent(type, data) {
+        const key = `${type}_${JSON.stringify(data)}`;
+        const cached = this.modalCache.get(key);
+        
+        if (cached && Date.now() - cached.timestamp < this.config.cacheTimeout) {
+            return cached.content;
+        }
+        
+        // Remove expired cache entry
+        if (cached) {
+            this.modalCache.delete(key);
+        }
+        
+        return null;
+    },
+    
+    clearCache(type = null) {
+        if (type) {
+            // Clear specific type
+            for (const [key] of this.modalCache) {
+                if (key.startsWith(type + '_')) {
+                    this.modalCache.delete(key);
+                }
+            }
+        } else {
+            // Clear all cache
+            this.modalCache.clear();
+        }
+    },
+    
+    cleanCache() {
+        const now = Date.now();
+        const maxSize = this.config.maxCacheSize;
+        
+        // Remove expired entries
+        for (const [key, value] of this.modalCache) {
+            if (now - value.timestamp > this.config.cacheTimeout) {
+                this.modalCache.delete(key);
+            }
+        }
+        
+        // Limit cache size
+        if (this.modalCache.size > maxSize) {
+            const entries = Array.from(this.modalCache.entries());
+            entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
+            
+            const toRemove = entries.slice(0, entries.length - maxSize);
+            for (const [key] of toRemove) {
+                this.modalCache.delete(key);
+            }
+        }
+    },
+    
+    // History management
+    addToHistory(type, data) {
+        this.modalHistory.push({ type, data });
+        
+        // Update browser history
+        const state = { modal: { type, data } };
+        const url = `#modal-${type}`;
+<<<<<<< HEAD
+window.history.pushState(state, '', url);
+    },
+    
+    removeFromHistory() {
+        if (this.modalHistory.length > 0) {
+            this.modalHistory.pop();
+            
+            // Update browser history
+            if (this.modalHistory.length > 0) {
+                const lastModal = this.modalHistory[this.modalHistory.length - 1];
+                const state = { modal: lastModal };
+                const url = `#modal-${lastModal.type}`;
+                window.history.replaceState(state, '', url);
+            } else {
+                window.history.back();
+            }
+        }
+    },
+    
+    // Go back in modal history
+    goBack() {
+        if (this.modalHistory.length > 1) {
+            this.modalHistory.pop(); // Remove current
+            const previousModal = this.modalHistory[this.modalHistory.length - 1];
+            this.openModal(previousModal.type, previousModal.data);
+        } else {
+            this.closeModal();
+        }
+    },
+    
+    // Get modal statistics
+    getStats() {
+        return {
+            currentModal: this.currentModal,
+            historyLength: this.modalHistory.length,
+            cacheSize: this.modalCache.size,
+            loadingStates: Array.from(this.loadingStates)};
+    }
+};
+
+// Initialize modal system when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('[YAM DEBUG] DOMContentLoaded - Initializing modal system');
+        window.yamModals.init();
+        
+        // CRITICAL: Double-check that modal is hidden after initialization
+        setTimeout(() => {
+            const overlay = document.getElementById('yamModalOverlay');
+            if (overlay) {
+                // Force modal to be hidden if it somehow got opened
+                if (overlay.classList.contains('yam-modal-active') || 
+                    overlay.style.display === 'flex' || 
+                    overlay.style.display === 'block') {
+                    console.log('[YAM DEBUG] Modal was open after initialization - forcing it closed');
+                    overlay.classList.remove('yam-modal-active');
+                    overlay.style.display = 'none';
+                    overlay.style.visibility = 'hidden';
+                    overlay.style.opacity = '0';
+                    overlay.setAttribute('aria-hidden', 'true');
+                    overlay.style.pointerEvents = 'none';
+                }
+            }
+        }, 100);
+    });
+} else {
+    console.log('[YAM DEBUG] DOM already loaded - Initializing modal system');
+    window.yamModals.init();
+    
+    // CRITICAL: Double-check that modal is hidden after initialization
+    setTimeout(() => {
+        const overlay = document.getElementById('yamModalOverlay');
+        if (overlay) {
+            // Force modal to be hidden if it somehow got opened
+            if (overlay.classList.contains('yam-modal-active') || 
+                overlay.style.display === 'flex' || 
+                overlay.style.display === 'block') {
+                console.log('[YAM DEBUG] Modal was open after initialization - forcing it closed');
+                overlay.classList.remove('yam-modal-active');
+                overlay.style.display = 'none';
+                overlay.style.visibility = 'hidden';
+                overlay.style.opacity = '0';
+                overlay.setAttribute('aria-hidden', 'true');
+                overlay.style.pointerEvents = 'none';
+            }
+        }
+    }, 100);
+}
+
+// CRITICAL: Ensure modals work with Bootstrap modals
+document.addEventListener('DOMContentLoaded', () => {
+    // Fix any Bootstrap modal conflicts
+    const fixBootstrapModals = () => {
+        const bootstrapModals = document.querySelectorAll('.modal');
+        bootstrapModals.forEach(modal => {
+            // Ensure Bootstrap modals have proper z-index
+            if (modal.style.zIndex < window.yamModals.config.zIndex) {
+                modal.style.zIndex = '1050';
+            }
+            
+            // Ensure modal content is interactive
+            const modalContent = modal.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.style.pointerEvents = 'auto';
+                modalContent.style.position = 'relative';
+            }
+        });
+    };
+    
+    // Run fix immediately
+    fixBootstrapModals();
+    
+    // Run fix periodically to catch dynamically added modals
+    setInterval(fixBootstrapModals, 1000);
+    
+    console.log('YAM Modal System: Bootstrap modal compatibility initialized');});
+=======
+        history.pushState(state, '', url);
+    },
+    
+    removeFromHistory() {
+        this.modalHistory.pop();
+        
+        // Update browser history without navigation
+        if (this.modalHistory.length > 0) {
+            const lastModal = this.modalHistory[this.modalHistory.length - 1];
+            const state = { modal: lastModal };
+            const url = `#modal-${lastModal.type}`;
+            history.replaceState(state, '', url);
+        } else {
+            // Don't call history.back() - just update the URL to remove the modal hash
+            // This prevents unwanted navigation when closing modals
+            const currentUrl = window.location.href.split('#')[0];
+            history.replaceState(null, '', currentUrl);
+        }
+    },
+    
+    // Get cache statistics
+    getCacheStats() {
+        return {
+            size: this.modalCache.size,
+            maxSize: this.config.maxCacheSize,
+            timeout: this.config.cacheTimeout
+        };
+    },
+    
+    // Get modal statistics
+    getModalStats() {
+        return {
+            currentModal: this.currentModal?.type,
+            historyLength: this.modalHistory.length,
+            cacheStats: this.getCacheStats()
+        };
+    }
+};
+
+// Initialize modal system when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.yamModals.init();
+});
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+
+// Add fallback styles for offline mode
+const fallbackStyles = `
+<style>
+.yam-fallback-message {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.yam-fallback-message i {
+    font-size: 2rem;
+    color: #ffc107;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.yam-fallback-message p {
+    color: #b9bbbe;
+    margin: 0;
+}
+
+.yam-fallback-chart,
+.yam-fallback-heatmap,
+.yam-fallback-monitor,
+.yam-fallback-health,
+.yam-fallback-performance,
+.yam-fallback-collaboration,
+.yam-fallback-tracker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    color: #b9bbbe;
+}
+
+.yam-fallback-chart i,
+.yam-fallback-heatmap i,
+.yam-fallback-monitor i,
+.yam-fallback-health i,
+.yam-fallback-performance i,
+.yam-fallback-collaboration i,
+.yam-fallback-tracker i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #72767d;
+}
+
+.yam-toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.yam-toast {
+    background: #2f3136;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    color: #dcddde;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 300px;
+    animation: toastSlideIn 0.3s ease;
+}
+
+.yam-toast-success {
+    border-left: 4px solid #43b581;
+}
+
+.yam-toast-error {
+    border-left: 4px solid #f04747;
+}
+
+.yam-toast-warning {
+    border-left: 4px solid #ffc107;
+}
+
+.yam-toast-info {
+    border-left: 4px solid #5865f2;
+}
+
+.yam-toast-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.yam-toast-close {
+    background: none;
+    border: none;
+    color: #b9bbbe;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.yam-toast-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.yam-modal-error {
+    text-align: center;
+    padding: 3rem;
+    color: #dcddde;
+}
+
+.yam-modal-error i {
+    font-size: 3rem;
+    color: #f04747;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.yam-modal-error h4 {
+    color: #ffffff;
+    margin-bottom: 1rem;
+}
+
+.yam-modal-error p {
+    color: #b9bbbe;
+    margin-bottom: 2rem;
+}
+
+.yam-modal-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.yam-modal-btn-primary {
+    background: #5865f2;
+    color: white;
+}
+
+.yam-modal-btn-primary:hover {
+    background: #4752c4;
+}
+</style>
+`;
+
+// Inject fallback styles
+document.head.insertAdjacentHTML('beforeend', fallbackStyles);
+</script> 

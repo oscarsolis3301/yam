@@ -26,16 +26,19 @@ def serve_profile_picture_or_default(filename: str):
     if not uploads_dir.is_absolute():
         uploads_dir = Path(current_app.root_path).parent / uploads_dir
 
+    # For profile pictures, we need to look in the profile_pictures subdirectory
+    profile_pictures_dir = uploads_dir / 'profile_pictures'
+    
     # Guarantee the directory exists so we never raise an *ENOENT* at runtime
-    uploads_dir.mkdir(parents=True, exist_ok=True)
+    profile_pictures_dir.mkdir(parents=True, exist_ok=True)
 
-    requested_path = uploads_dir / filename
+    requested_path = profile_pictures_dir / filename
 
     if requested_path.exists():
         return send_file(str(requested_path))
 
-    # Fallback – first try the generic default avatar placed inside the uploads directory
-    default_avatar = uploads_dir / 'default.png'
+    # Fallback – first try the generic default avatar placed inside the profile_pictures directory
+    default_avatar = profile_pictures_dir / 'default.png'
 
     # If that file is missing as well, fall back to the legacy placeholder that ships
     # with the repository so we *always* return a valid image instead of a 500 error.

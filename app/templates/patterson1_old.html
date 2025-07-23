@@ -1,0 +1,3784 @@
+﻿{% extends "base.html" %}
+
+{% block head %}
+<title>Patterson Technician Dispatch - PDSI</title>
+<style>
+    /* Production-Ready Patterson Dispatch Styles */
+    .patterson-container {
+        padding: 20px;
+        margin-left: 65px;
+        margin-top: 25px; /* Add space for outage banner */
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    }
+    
+    .dashboard-header {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 30px;
+        color: white;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .dashboard-title {
+        font-size: 2.8rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+        background: linear-gradient(45deg, #fff, #e3f2fd);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .dashboard-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        font-weight: 300;
+    }
+    
+    .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 20px;
+        font-size: 0.9rem;
+        margin-top: 15px;
+    }
+    
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    .status-dot.online { background: #4CAF50; }
+    .status-dot.offline { background: #f44336; }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.1); }
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(15px);
+        border-radius: 16px;
+        padding: 30px;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,0.2);
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        transition: left 0.5s;
+    }
+    
+    .stat-card:hover::before {
+        left: 100%;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        border-color: rgba(255,255,255,0.4);
+    }
+    
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+        color: #fff;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .stat-label {
+        font-size: 1rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 500;
+    }
+    
+    .main-content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 30px;
+        height: 82vh; /* Increased for more space */
+        min-height: 700px;
+        align-items: stretch;
+    }
+    
+    .calendar-section, .tickets-section {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        background: rgba(42, 46, 54, 0.9);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.1);
+        padding: 25px;
+    }
+    
+    .calendar-section {
+        justify-content: flex-start;
+    }
+    
+    .tickets-section {
+        justify-content: flex-start;
+        padding-bottom: 0;
+    }
+    
+    .calendar-grid {
+        min-height: 540px;
+        height: 100%;
+        flex: 1 1 auto;
+    }
+    
+    .tickets-list {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        width: 100%;
+        padding-bottom: 0;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,0.3) transparent;
+        max-width: 100%;
+    }
+    
+    .tickets-list::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .tickets-list::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    .tickets-list::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.3);
+        border-radius: 3px;
+    }
+    
+    .tickets-list::-webkit-scrollbar-thumb:hover {
+        background: rgba(255,255,255,0.5);
+    }
+    
+    .calendar-section {
+        background: rgba(42, 46, 54, 0.9);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid rgba(255,255,255,0.1);
+    }
+    
+    .section-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #fff;
+        flex: 1;
+    }
+    
+    .btn-primary-patterson {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 12px 24px;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin-left: auto;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-primary-patterson:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+    
+    .btn-refresh {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 8px;
+        padding: 8px 16px;
+        color: white;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        margin-left: 10px;
+    }
+    
+    .btn-refresh:hover {
+        background: rgba(255,255,255,0.2);
+        transform: rotate(180deg);
+    }
+    
+    /* Enhanced Calendar Styles */
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .calendar-nav {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+    
+    .calendar-nav-btn {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 8px;
+        padding: 10px 14px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .calendar-nav-btn:hover {
+        background: rgba(255,255,255,0.2);
+        transform: scale(1.05);
+    }
+    
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        grid-template-rows: repeat(6, 1fr); /* Always 6 rows for full month */
+        gap: 3px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 12px;
+        overflow: hidden;
+        padding: 3px;
+        min-height: 540px; /* Ensures 6 rows are visible */
+        height: 100%;
+    }
+    
+    .calendar-day-header {
+        background: rgba(255,255,255,0.1);
+        padding: 15px 8px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .calendar-day {
+        background: rgba(255,255,255,0.05);
+        min-height: 90px;
+        padding: 10px 4px 4px 4px;
+        border: 1px solid rgba(255,255,255,0.1);
+        position: relative;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        overflow: hidden;
+        height: 100%;
+    }
+    
+    .calendar-day:hover {
+        background: rgba(255,255,255,0.1);
+        transform: scale(1.02);
+    }
+    
+    .calendar-day.today {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .calendar-day.has-events {
+        background: rgba(102, 126, 234, 0.15);
+        border: 2px solid #667eea;
+    }
+    
+    .day-number {
+        font-weight: 700;
+        margin-bottom: 8px;
+        font-size: 1.1rem;
+    }
+    
+    .calendar-events-container {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        max-height: 70px;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        scrollbar-width: thin;
+        scrollbar-color: #667eea #23243a;
+    }
+    
+    .calendar-events-container::-webkit-scrollbar {
+        width: 5px;
+    }
+    
+    .calendar-events-container::-webkit-scrollbar-thumb {
+        background: #667eea;
+        border-radius: 3px;
+    }
+    
+    .calendar-event {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 2px 6px;
+        border-radius: 6px;
+        font-size: 0.72rem;
+        margin-bottom: 2px;
+        cursor: pointer;
+        font-weight: 500;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+        word-break: break-word;
+        white-space: normal;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-height: 18px;
+        max-height: 32px;
+        line-height: 1.2;
+    }
+    
+    .calendar-event:last-child {
+        margin-bottom: 0;
+    }
+    
+    /* Enhanced Ticket Card Styles */
+    .ticket-card {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(15px);
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 20px;
+        border-left: 5px solid #667eea;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid rgba(255,255,255,0.2);
+        max-width: 100%;
+        word-break: break-word;
+    }
+    
+    .ticket-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 5px;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        transition: width 0.3s ease;
+    }
+    
+    .ticket-card:hover::before {
+        width: 8px;
+    }
+    
+    .ticket-card:hover {
+        transform: translateX(8px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        border-color: rgba(255,255,255,0.4);
+    }
+    
+    .ticket-card.clickable {
+        cursor: pointer;
+    }
+    
+    .ticket-card.clickable:hover {
+        background: rgba(255,255,255,0.15);
+    }
+    
+    .ticket-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .ticket-number {
+        font-weight: 800;
+        color: #667eea;
+        font-size: 1.3rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .ticket-priority {
+        padding: 6px 16px;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        white-space: nowrap;
+        letter-spacing: 1px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .priority-high { background: linear-gradient(135deg, #ff4757, #ff3742); color: white; }
+    .priority-medium { background: linear-gradient(135deg, #ffa502, #ff9500); color: #000; }
+    .priority-low { background: linear-gradient(135deg, #2ed573, #1e90ff); color: white; }
+    
+    .ticket-details {
+        margin-bottom: 20px;
+    }
+    
+    .ticket-office {
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 8px;
+        word-wrap: break-word;
+        font-size: 1.1rem;
+    }
+    
+    .ticket-technician {
+        color: rgba(255,255,255,0.8);
+        font-size: 1rem;
+        margin-bottom: 8px;
+        word-wrap: break-word;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .ticket-technician .badge {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.2);
+    }
+    
+    .ticket-description {
+        color: rgba(255,255,255,0.9);
+        font-size: 1rem;
+        line-height: 1.6;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: pre-line;
+        max-width: 100%;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .ticket-schedule {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+        padding: 15px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.1);
+        text-align: center;
+    }
+    
+    .schedule-info {
+        text-align: center;
+    }
+    
+    .schedule-label {
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.7);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+    
+    .schedule-value {
+        font-weight: 700;
+        color: #fff;
+        word-wrap: break-word;
+        font-size: 1.1rem;
+    }
+    
+    /* Enhanced Stage Progress Bar */
+    .stage-progress {
+        margin-bottom: 20px;
+    }
+    
+    .stage-bar {
+        display: flex;
+        background: rgba(255,255,255,0.1);
+        border-radius: 25px;
+        overflow: hidden;
+        height: 12px;
+        position: relative;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .stage-segment {
+        flex: 1;
+        height: 100%;
+        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        transform-origin: center;
+    }
+    
+    .stage-segment.active {
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        animation: stagePulse 3s infinite ease-in-out;
+        box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+        transform: scaleY(1.1);
+    }
+    
+    .stage-segment.completed {
+        background: linear-gradient(90deg, #2ed573, #1e90ff);
+        animation: stageComplete 0.6s ease-out;
+    }
+    
+    .stage-segment.pending {
+        background: rgba(255,255,255,0.2);
+        transition: all 0.4s ease;
+    }
+    
+    @keyframes stagePulse {
+        0%, 100% { 
+            opacity: 1; 
+            transform: scaleY(1.1);
+        }
+        50% { 
+            opacity: 0.8; 
+            transform: scaleY(1.2);
+        }
+    }
+    
+    @keyframes stageComplete {
+        0% { 
+            transform: scaleY(1);
+            opacity: 0.7;
+        }
+        50% { 
+            transform: scaleY(1.3);
+            opacity: 1;
+        }
+        100% { 
+            transform: scaleY(1.1);
+            opacity: 1;
+        }
+    }
+    
+    .stage-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 12px;
+        font-size: 0.85rem;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .stage-label {
+        color: rgba(255,255,255,0.7);
+        text-align: center;
+        flex: 1;
+        min-width: 0;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateY(0);
+    }
+    
+    .stage-label.active {
+        color: #667eea;
+        font-weight: 700;
+        text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+        transform: translateY(-2px);
+        animation: labelPulse 2s infinite ease-in-out;
+    }
+    
+    .stage-label.completed {
+        color: #2ed573;
+        transform: translateY(-1px);
+    }
+    
+    @keyframes labelPulse {
+        0%, 100% { 
+            transform: translateY(-2px);
+            opacity: 1;
+        }
+        50% { 
+            transform: translateY(-3px);
+            opacity: 0.9;
+        }
+    }
+    
+    /* Enhanced Action Buttons */
+    .ticket-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+    
+    .btn-stage {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .btn-stage:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    
+    .btn-stage.scheduled { background: linear-gradient(135deg, #6c757d, #495057); color: white; }
+    .btn-stage.in_progress { background: linear-gradient(135deg, #ffc107, #ff9500); color: #000; }
+    .btn-stage.completed { background: linear-gradient(135deg, #28a745, #20c997); color: white; }
+    
+    /* Urgency selector styles */
+    .urgency-selector {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 15px;
+        padding: 10px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .urgency-label {
+        font-size: 0.9rem;
+        color: rgba(255,255,255,0.8);
+        font-weight: 500;
+    }
+    
+    .urgency-select {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .urgency-select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    }
+    
+    .urgency-select option {
+        background: #2a2e36;
+        color: white;
+    }
+    
+    /* Enhanced Modal Styles */
+    .modal-content {
+        background: linear-gradient(135deg, #2a2e36 0%, #3a3f47 100%);
+        color: white;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    }
+    
+    .modal-header {
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding: 25px 30px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 20px 20px 0 0;
+    }
+    
+    .modal-body {
+        padding: 30px;
+    }
+    
+    .modal-footer {
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding: 25px 30px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 0 0 20px 20px;
+    }
+    
+    .form-control {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
+        border-radius: 12px;
+        padding: 12px 16px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        background: rgba(255,255,255,0.15);
+        border-color: #667eea;
+        color: white;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        outline: none;
+    }
+    
+    .form-control::placeholder {
+        color: rgba(255,255,255,0.6);
+    }
+    
+    .form-label {
+        color: rgba(255,255,255,0.9);
+        font-weight: 600;
+        margin-bottom: 10px;
+        font-size: 1rem;
+    }
+    
+    /* Enhanced Loading Animation */
+    .loading-spinner {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* Real-time update indicators */
+    .update-indicator {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(46, 213, 115, 0.9);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        font-weight: 600;
+        z-index: 9999;
+        transform: translateX(400px);
+        transition: transform 0.5s ease;
+        box-shadow: 0 4px 15px rgba(46, 213, 115, 0.3);
+    }
+    
+    .update-indicator.show {
+        transform: translateX(0);
+    }
+    
+    .update-indicator.error {
+        background: rgba(255, 71, 87, 0.9);
+        box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+        .main-content-grid {
+            grid-template-columns: 1fr;
+            height: auto;
+        }
+        
+        .calendar-section, .tickets-section {
+            height: auto;
+            min-height: 500px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .patterson-container {
+            margin-left: 0;
+            padding: 15px;
+        }
+        
+        .dashboard-title {
+            font-size: 2rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .stat-card {
+            padding: 20px;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+        }
+        
+        .calendar-grid {
+            font-size: 0.8rem;
+        }
+        
+        .calendar-day {
+            min-height: 70px;
+            padding: 8px;
+        }
+        
+        .ticket-schedule {
+            grid-template-columns: 1fr;
+        }
+        
+        .ticket-actions {
+            justify-content: center;
+        }
+        
+        .stage-labels {
+            font-size: 0.7rem;
+        }
+        
+        .ticket-card {
+            padding: 20px;
+        }
+    }
+    
+    /* Dark mode enhancements */
+    @media (prefers-color-scheme: dark) {
+        .patterson-container {
+            background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+        }
+    }
+    
+    /* Accessibility improvements */
+    .btn-stage:focus,
+    .calendar-nav-btn:focus,
+    .btn-primary-patterson:focus {
+        outline: 2px solid #667eea;
+        outline-offset: 2px;
+    }
+    
+    /* Print styles */
+    @media print {
+        .patterson-container {
+            background: white;
+            color: black;
+        }
+        
+        .ticket-card {
+            background: white;
+            border: 1px solid #ccc;
+            color: black;
+        }
+    }
+    
+    /* Countdown Timer Styles */
+    .countdown-timer {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 12px 20px;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,0.2);
+        min-width: 150px;
+    }
+    
+    .countdown-label {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        margin-bottom: 4px;
+    }
+    
+    .countdown-time {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #fff;
+    }
+    
+    .countdown-time.warning {
+        color: #ffa502;
+        animation: pulse-warning 2s infinite;
+    }
+    
+    .countdown-time.critical {
+        color: #ff4757;
+        animation: pulse-critical 1s infinite;
+    }
+    
+    @keyframes pulse-warning {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+    
+    @keyframes pulse-critical {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.05); }
+    }
+    
+    /* File Upload Styles */
+    .file-upload-section {
+        display: flex;
+        align-items: center;
+    }
+    
+    .btn-upload {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 12px 20px;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        font-size: 0.9rem;
+    }
+    
+    .btn-upload:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+    
+    .btn-upload i {
+        font-size: 1.1rem;
+    }
+    
+    .btn-upload.uploading {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .btn-upload.uploading i {
+        animation: spin 1s linear infinite;
+    }
+    
+    .admin-controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .admin-controls .btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .admin-controls .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
+    .admin-controls .btn-warning {
+        background: linear-gradient(135deg, #ff9800, #f57c00);
+        color: white;
+    }
+    
+    .admin-controls .btn-success {
+        background: linear-gradient(135deg, #4caf50, #388e3c);
+        color: white;
+    }
+    
+    .admin-controls .btn-info {
+        background: linear-gradient(135deg, #2196f3, #1976d2);
+        color: white;
+    }
+    
+    .file-upload-section {
+        position: relative;
+    }
+    
+    .file-upload-section input[type="file"] {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="patterson-container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h1 class="dashboard-title">Patterson Technician Dispatch</h1>
+                <div class="status-indicator">
+                    <div class="status-dot" id="connection-status"></div>
+                    <span id="connection-text">Loading from file system...</span>
+                </div>
+            </div>
+            
+            <!-- Countdown Timer and File Upload for Non-User Roles -->
+            {% if current_user.role != 'user' %}
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 15px;">
+                <!-- Admin Controls - Left Side -->
+                {% if current_user.role == 'admin' %}
+                <div class="admin-controls" style="display: flex; gap: 10px;">
+                    <button class="btn btn-warning" onclick="initializeDatabase()" title="Import all historical tickets">
+                        <i class="bi bi-database-add"></i>
+                        <span>Initialize DB</span>
+                    </button>
+                    
+                    <button class="btn btn-success" onclick="importDatedFiles()" title="Import all dated .txt files from Freshworks directory">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>Import Dated Files</span>
+                    </button>
+                    
+                    <button class="btn btn-primary" onclick="manualApiPull()" title="Manually pull data from Freshworks API">
+                        <i class="bi bi-cloud-download"></i>
+                        <span>Pull API Data</span>
+                    </button>
+                    
+                    <!-- File Upload Button -->
+                    <div class="file-upload-section">
+                        <input type="file" id="file-upload" accept=".txt,.csv,.json" style="display: none;" onchange="handleFileUpload(this)">
+                        <button class="btn btn-info" onclick="document.getElementById('file-upload').click()" title="Upload File">
+                            <i class="bi bi-paperclip"></i>
+                            <span>Upload File</span>
+                        </button>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Non-admin controls -->
+                <div class="admin-controls" style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" onclick="manualApiPull()" title="Manually pull data from Freshworks API">
+                        <i class="bi bi-cloud-download"></i>
+                        <span>Pull API Data</span>
+                    </button>
+                    
+                    <div class="file-upload-section">
+                        <input type="file" id="file-upload" accept=".txt,.csv,.json" style="display: none;" onchange="handleFileUpload(this)">
+                        <button class="btn-upload" onclick="document.getElementById('file-upload').click()" title="Upload File">
+                            <i class="bi bi-paperclip"></i>
+                            <span>Upload File</span>
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Countdown Timer - Right Side -->
+                <div class="countdown-timer">
+                    <div class="countdown-label">Next Refresh:</div>
+                    <div class="countdown-time" id="countdown-display">--:--:--</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number" id="total-tickets">0</div>
+            <div class="stat-label">Total Tickets</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="scheduled-tickets">0</div>
+            <div class="stat-label">In Progress</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="in-progress-tickets">0</div>
+            <div class="stat-label">Scheduled</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="completed-tickets">0</div>
+            <div class="stat-label">Completed</div>
+        </div>
+    </div>
+    
+    <!-- Main Content Grid -->
+    <div class="main-content-grid">
+        <!-- Calendar Section -->
+        <div class="calendar-section">
+            <div class="section-header">
+                <h2 class="section-title">Schedule Calendar</h2>
+                <div>
+                    <button class="btn btn-refresh" onclick="refreshData()" title="Sync with Freshworks">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                    <button class="btn btn-primary-patterson" onclick="openNewTicketModal()">
+                        <i class="bi bi-plus-circle"></i> New Ticket
+                    </button>
+                </div>
+            </div>
+            
+            <div class="calendar-header">
+                <div class="calendar-nav">
+                    <button class="calendar-nav-btn" onclick="previousMonth()">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <h3 id="current-month">January 2024</h3>
+                    <button class="calendar-nav-btn" onclick="nextMonth()">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="calendar-grid" id="calendar-grid">
+                <!-- Calendar will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Tickets Section -->
+        <div class="tickets-section">
+            <div class="section-header">
+                <h2 class="section-title">Active Tickets</h2>
+                <div>
+                    <button class="btn btn-primary-patterson" onclick="openUserMappingModal()" title="Manage User Mappings">
+                        <i class="bi bi-people"></i> User Mappings
+                    </button>
+                    <select class="form-select" id="filter-status" onchange="filterTickets()">
+                        <option value="">All Status</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="scheduled">Scheduled</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="tickets-list" id="tickets-list">
+                <!-- Tickets will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Real-time Update Indicator -->
+<div class="update-indicator" id="update-indicator">
+    <i class="bi bi-check-circle"></i>
+    <span id="update-message">Data updated successfully</span>
+</div>
+
+<!-- New Ticket Modal -->
+<div class="modal fade" id="newTicketModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New Patterson Dispatch Ticket</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newTicketForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Office</label>
+                                <select class="form-control" id="office-select" required>
+                                    <option value="">Select Office</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Technician</label>
+                                <select class="form-control" id="technician-select" required>
+                                    <option value="">Select Technician</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Scheduled Date</label>
+                                <input type="date" class="form-control" id="scheduled-date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Scheduled Time</label>
+                                <input type="time" class="form-control" id="scheduled-time" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Priority</label>
+                                <select class="form-control" id="priority-select">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium" selected>Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Urgent">Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Estimated Duration</label>
+                                <select class="form-control" id="duration-select">
+                                    <option value="1 hour">1 hour</option>
+                                    <option value="1.5 hours" selected>1.5 hours</option>
+                                    <option value="2 hours">2 hours</option>
+                                    <option value="3 hours">3 hours</option>
+                                    <option value="4 hours">4 hours</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="description" rows="4" placeholder="Describe the work to be performed..." required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary-patterson" onclick="createTicket()">
+                    <span id="create-btn-text">Create Ticket</span>
+                    <span id="create-btn-spinner" class="loading-spinner" style="display: none;"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Ticket Modal -->
+<div class="modal fade" id="editTicketModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Patterson Dispatch Ticket</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editTicketForm">
+                    <input type="hidden" id="edit-ticket-id">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Office</label>
+                                <select class="form-control" id="edit-office-select" required>
+                                    <option value="">Select Office</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Technician</label>
+                                <select class="form-control" id="edit-technician-select" required>
+                                    <option value="">Select Technician</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Scheduled Date</label>
+                                <input type="date" class="form-control" id="edit-scheduled-date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Scheduled Time</label>
+                                <input type="time" class="form-control" id="edit-scheduled-time" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Priority</label>
+                                <select class="form-control" id="edit-priority-select">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Urgent">Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Estimated Duration</label>
+                                <select class="form-control" id="edit-duration-select">
+                                    <option value="1 hour">1 hour</option>
+                                    <option value="1.5 hours">1.5 hours</option>
+                                    <option value="2 hours">2 hours</option>
+                                    <option value="3 hours">3 hours</option>
+                                    <option value="4 hours">4 hours</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="edit-description" rows="4" placeholder="Describe the work to be performed..." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Stage</label>
+                        <select class="form-control" id="edit-stage-select">
+                            <option value="in_progress">In Progress</option>
+                            <option value="scheduled">Scheduled</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" onclick="deleteTicket()" id="delete-ticket-btn">
+                    <i class="bi bi-trash"></i> Delete Ticket
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary-patterson" onclick="updateTicket()">
+                    <span id="update-btn-text">Update Ticket</span>
+                    <span id="update-btn-spinner" class="loading-spinner" style="display: none;"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Admin Ticket Modal -->
+<div class="modal fade" id="adminTicketModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Admin Ticket Management</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="adminTicketForm">
+                    <input type="hidden" id="admin-ticket-id">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Ticket Number</label>
+                                <input type="text" class="form-control" id="admin-ticket-number" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Freshworks ID</label>
+                                <input type="text" class="form-control" id="admin-freshworks-id" placeholder="Freshworks ticket ID">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Title</label>
+                                <input type="text" class="form-control" id="admin-ticket-title" placeholder="Ticket title">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Office</label>
+                                <select class="form-control" id="admin-office-select" required>
+                                    <option value="">Select Office</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Technician</label>
+                                <select class="form-control" id="admin-technician-select" required>
+                                    <option value="">Select Technician</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Category</label>
+                                <select class="form-control" id="admin-category-select">
+                                    <option value="IT">IT</option>
+                                    <option value="Hardware">Hardware</option>
+                                    <option value="Software">Software</option>
+                                    <option value="Network">Network</option>
+                                    <option value="Maintenance">Maintenance</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Scheduled Date</label>
+                                <input type="date" class="form-control" id="admin-scheduled-date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Scheduled Time</label>
+                                <input type="time" class="form-control" id="admin-scheduled-time" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Priority</label>
+                                <select class="form-control" id="admin-priority-select">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Urgent">Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Urgency</label>
+                                <select class="form-control" id="admin-urgency-select">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Urgent">Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Stage</label>
+                                <select class="form-control" id="admin-stage-select">
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="scheduled">Scheduled</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Estimated Duration</label>
+                                <select class="form-control" id="admin-duration-select">
+                                    <option value="30 minutes">30 minutes</option>
+                                    <option value="1 hour">1 hour</option>
+                                    <option value="1.5 hours">1.5 hours</option>
+                                    <option value="2 hours">2 hours</option>
+                                    <option value="3 hours">3 hours</option>
+                                    <option value="4 hours">4 hours</option>
+                                    <option value="Full day">Full day</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Source</label>
+                                <select class="form-control" id="admin-source-select">
+                                    <option value="database">Database</option>
+                                    <option value="Freshworks">Freshworks</option>
+                                    <option value="Manual">Manual</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="admin-description" rows="4" placeholder="Describe the work to be performed..." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes (JSON format)</label>
+                        <textarea class="form-control" id="admin-notes" rows="3" placeholder='["Note 1", "Note 2"]'></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" onclick="deleteTicket()" id="admin-delete-ticket-btn">
+                    <i class="bi bi-trash"></i> Delete Ticket
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary-patterson" onclick="adminUpdateTicket()">
+                    <span id="admin-update-btn-text">Update Ticket</span>
+                    <span id="admin-update-btn-spinner" class="loading-spinner" style="display: none;"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ticket Details Modal -->
+<div class="modal fade" id="ticketDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ticket Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="ticket-details-content">
+                <!-- Ticket details will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Mapping Modal -->
+<div class="modal fade" id="userMappingModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User Mappings Management</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 style="color: #667eea; font-weight: 700; margin-bottom: 15px;">Add New Mapping</h6>
+                        <form id="userMappingForm">
+                            <div class="mb-3">
+                                <label class="form-label">Freshworks User ID</label>
+                                <select class="form-control" id="unmapped-user-select" required>
+                                    <option value="">Select Unmapped User ID</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Name</label>
+                                <input type="text" class="form-control" id="user-name" placeholder="Enter technician name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email (Optional)</label>
+                                <input type="email" class="form-control" id="user-email" placeholder="Enter email address">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Role</label>
+                                <select class="form-control" id="user-role">
+                                    <option value="technician">Technician</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="manager">Manager</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary-patterson">
+                                <span id="add-mapping-btn-text">Add Mapping</span>
+                                <span id="add-mapping-btn-spinner" class="loading-spinner" style="display: none;"></span>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 style="color: #667eea; font-weight: 700; margin-bottom: 15px;">Existing Mappings</h6>
+                        <div id="mappings-table-container">
+                            <div class="table-responsive">
+                                <table class="table table-dark table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Role</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="mappings-table-body">
+                                        <!-- Mappings will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Calendar Event Modal -->
+<div class="modal fade" id="calendarEventModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Calendar Event</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="calendarEventForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Event Title</label>
+                                <input type="text" class="form-control" id="event-title" placeholder="Enter event title" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Date</label>
+                                <input type="date" class="form-control" id="event-date" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Time</label>
+                                <input type="time" class="form-control" id="event-time" value="09:00" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Duration</label>
+                                <select class="form-control" id="event-duration">
+                                    <option value="30 minutes">30 minutes</option>
+                                    <option value="1 hour" selected>1 hour</option>
+                                    <option value="1.5 hours">1.5 hours</option>
+                                    <option value="2 hours">2 hours</option>
+                                    <option value="3 hours">3 hours</option>
+                                    <option value="4 hours">4 hours</option>
+                                    <option value="Full day">Full day</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Office</label>
+                                <select class="form-control" id="event-office">
+                                    <option value="General">General</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Technician</label>
+                                <select class="form-control" id="event-technician">
+                                    <option value="">Unassigned</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Priority</label>
+                                <select class="form-control" id="event-priority">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium" selected>Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Urgent">Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Urgency</label>
+                                <select class="form-control" id="event-urgency">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium" selected>Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Urgent">Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="event-description" rows="4" placeholder="Describe the event..." required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary-patterson" onclick="createCalendarEvent()">
+                    <span id="create-event-btn-text">Create Event</span>
+                    <span id="create-event-btn-spinner" class="loading-spinner" style="display: none;"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Calendar Event Modal for Admin Editing -->
+<div class="modal fade" id="editCalendarEventModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Calendar Event</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCalendarEventForm">
+                    <input type="hidden" id="edit-event-id">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Event Title</label>
+                                <input type="text" class="form-control" id="edit-event-title" placeholder="Enter event title" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Date</label>
+                                <input type="date" class="form-control" id="edit-event-date" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Time</label>
+                                <input type="time" class="form-control" id="edit-event-time" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Duration</label>
+                                <select class="form-control" id="edit-event-duration">
+                                    <option value="30 minutes">30 minutes</option>
+                                    <option value="1 hour">1 hour</option>
+                                    <option value="1.5 hours">1.5 hours</option>
+                                    <option value="2 hours">2 hours</option>
+                                    <option value="3 hours">3 hours</option>
+                                    <option value="4 hours">4 hours</option>
+                                    <option value="Full day">Full day</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Office</label>
+                                <select class="form-control" id="edit-event-office">
+                                    <option value="General">General</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Technician</label>
+                                <select class="form-control" id="edit-event-technician">
+                                    <option value="">Unassigned</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Priority</label>
+                                <select class="form-control" id="edit-event-priority">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Urgent">Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Urgency</label>
+                                <select class="form-control" id="edit-event-urgency">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Urgent">Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="edit-event-description" rows="4" placeholder="Describe the event..." required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" onclick="deleteCalendarEvent()" id="delete-event-btn">
+                    <i class="bi bi-trash"></i> Delete Event
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary-patterson" onclick="updateCalendarEvent()">
+                    <span id="update-event-btn-text">Update Event</span>
+                    <span id="update-event-btn-spinner" class="loading-spinner" style="display: none;"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Global variables
+let currentDate = new Date();
+let tickets = [];
+let calendarEvents = [];
+let userRole = '{{ current_user.role }}';
+let refreshInterval;
+let lastUpdateTime = null;
+let countdownInterval = null;
+let selectedCalendarDate = null;
+
+// Initialize the dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    initializeDashboard();
+    
+    // Add event listeners
+    const userMappingForm = document.getElementById('userMappingForm');
+    if (userMappingForm) {
+        userMappingForm.addEventListener('submit', addUserMapping);
+    }
+    
+    // Initialize countdown timer for non-user roles
+    if (userRole !== 'user') {
+        initializeCountdownTimer();
+    }
+    
+    // Remove automatic real-time updates - only manual refresh
+    // startRealTimeUpdates();
+});
+
+// Initialize dashboard
+async function initializeDashboard() {
+    try {
+        // Load data instantly from files
+        await Promise.all([
+            loadTickets(),
+            loadCalendarData(),
+            loadOffices(),
+            loadTechnicians()
+        ]);
+        
+        // Check if we have any tickets, if not, try to import dated files automatically
+        if (tickets.length === 0 && userRole !== 'user') {
+            console.log('No tickets found, attempting to import dated files automatically...');
+            await importDatedFiles();
+        }
+        
+        updateStats();
+        updateConnectionStatus(true, 'Connected to file system');
+        
+        // Set default date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('scheduled-date').value = today;
+        document.getElementById('edit-scheduled-date').value = today;
+        
+    } catch (error) {
+        console.error('Error initializing dashboard:', error);
+        updateConnectionStatus(false, 'Error loading data');
+        showUpdateIndicator('Failed to initialize dashboard', 'error');
+    }
+}
+
+// Initialize countdown timer for non-user roles
+async function initializeCountdownTimer() {
+    try {
+        const response = await fetch('/patterson/api/next-refresh');
+        const data = await response.json();
+        
+        if (data.success) {
+            startCountdownTimer(data.time_until_refresh);
+        } else {
+            console.error('Failed to get refresh time:', data.error);
+        }
+    } catch (error) {
+        console.error('Error initializing countdown timer:', error);
+    }
+}
+
+// Start countdown timer
+function startCountdownTimer(initialSeconds) {
+    let secondsLeft = Math.max(0, Math.floor(initialSeconds)); // Ensure integer seconds
+    
+    function updateCountdown() {
+        const hours = Math.floor(secondsLeft / 3600);
+        const minutes = Math.floor((secondsLeft % 3600) / 60);
+        const seconds = Math.floor(secondsLeft % 60); // Ensure integer seconds
+        
+        const display = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        const countdownDisplay = document.getElementById('countdown-display');
+        if (countdownDisplay) {
+            countdownDisplay.textContent = display;
+            
+            // Add warning/critical classes based on time remaining
+            countdownDisplay.classList.remove('warning', 'critical');
+            if (secondsLeft <= 1800) { // 30 minutes
+                countdownDisplay.classList.add('critical');
+            } else if (secondsLeft <= 3600) { // 1 hour
+                countdownDisplay.classList.add('warning');
+            }
+        }
+        
+        if (secondsLeft <= 0) {
+            // Timer expired, refresh data
+            refreshData();
+            // Restart timer for next 3-hour cycle
+            startCountdownTimer(3 * 60 * 60);
+        } else {
+            secondsLeft--;
+        }
+    }
+    
+    // Update immediately
+    updateCountdown();
+    
+    // Clear existing interval if any
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+    }
+    
+    // Set new interval
+    countdownInterval = setInterval(updateCountdown, 1000);
+}
+
+// Load tickets from file system (instant)
+async function loadTickets() {
+    try {
+        const response = await fetch('/patterson/api/tickets');
+        const data = await response.json();
+        
+        if (data.success) {
+            tickets = data.tickets;
+            renderTickets();
+            updateStats();
+            
+            // Refresh calendar data to show tickets with scheduled dates
+            await loadCalendarData();
+            
+            if (data.source === 'database') {
+                updateConnectionStatus(true, `Connected - ${tickets.length} tickets from database`);
+                showUpdateIndicator(`Loaded ${tickets.length} tickets from database`);
+            } else if (data.source === 'file') {
+                updateConnectionStatus(true, `Connected - ${tickets.length} tickets from file`);
+                showUpdateIndicator(`Loaded ${tickets.length} tickets from file system`);
+            } else if (data.source === 'freshworks') {
+                updateConnectionStatus(true, `Connected - ${tickets.length} tickets from Freshworks`);
+                showUpdateIndicator(`Loaded ${tickets.length} tickets from Freshworks`);
+            } else {
+                updateConnectionStatus(false, 'Using sample data');
+                showUpdateIndicator('Using sample data - no file data available', 'warning');
+            }
+            
+            lastUpdateTime = new Date();
+        } else {
+            console.error('Failed to load tickets:', data.error);
+            updateConnectionStatus(false, 'Failed to load tickets');
+            showUpdateIndicator('Failed to load tickets: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error loading tickets:', error);
+        updateConnectionStatus(false, 'Connection error');
+        showUpdateIndicator('Connection error - using sample data', 'error');
+        
+        // Fallback to sample data
+        tickets = [
+            {
+                id: 1,
+                ticket_number: 'INC-2024-001',
+                office_name: '6 - IRV',
+                technician: 'John Smith',
+                technician_id: 1,
+                description: 'Network connectivity issues - Router needs replacement',
+                priority: 'High',
+                status: 'Scheduled',
+                scheduled_date: '2024-01-15',
+                scheduled_time: '09:00',
+                estimated_duration: '2 hours',
+                stage: 'scheduled',
+                created_at: '2024-01-10T10:30:00',
+                updated_at: '2024-01-10T14:45:00'
+            }
+        ];
+        renderTickets();
+        updateStats();
+    }
+}
+
+// Refresh data manually (only when user clicks refresh)
+async function refreshData() {
+    try {
+        showUpdateIndicator('Refreshing data from Freshworks...', 'info');
+        
+        const response = await fetch('/patterson/api/refresh');
+        const data = await response.json();
+        
+        if (data.success) {
+            tickets = data.tickets;
+            renderTickets();
+            updateStats();
+            
+            // Refresh calendar data to show tickets with scheduled dates
+            await loadCalendarData();
+            
+            if (data.source === 'freshworks') {
+                updateConnectionStatus(true, `Refreshed - ${tickets.length} tickets from Freshworks`);
+                showUpdateIndicator(data.message);
+            } else {
+                updateConnectionStatus(false, 'Using sample data');
+                showUpdateIndicator(data.message, 'warning');
+            }
+            
+            lastUpdateTime = new Date();
+        } else {
+            console.error('Failed to refresh:', data.error);
+            showUpdateIndicator('Failed to refresh data: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error refreshing data:', error);
+        showUpdateIndicator('Error refreshing data - check connection', 'error');
+    }
+}
+
+// Initialize database with all historical ticket data
+async function initializeDatabase() {
+    try {
+        showUpdateIndicator('Initializing database with historical data...', 'info');
+        
+        const response = await fetch('/patterson/api/initialize-database', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showUpdateIndicator(`Database initialized successfully! Removed ${data.test_tickets_removed} test tickets, imported ${data.tickets_imported} tickets. Total: ${data.total_tickets_in_db} tickets.`, 'success');
+            
+            // Reload tickets to show the new data
+            await loadTickets();
+            
+            // Refresh calendar data to show tickets with scheduled dates
+            await loadCalendarData();
+        } else {
+            console.error('Failed to initialize database:', data.error);
+            showUpdateIndicator('Failed to initialize database: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error initializing database:', error);
+        showUpdateIndicator('Error initializing database - check connection', 'error');
+    }
+}
+
+// Import all dated .txt files from Freshworks directory
+async function importDatedFiles() {
+    try {
+        showUpdateIndicator('Importing all dated .txt files from Freshworks directory...', 'info');
+        
+        const response = await fetch('/patterson/api/import-dated-files', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showUpdateIndicator(`Successfully imported ${data.total_imported} tickets from dated files! Total tickets in database: ${data.total_tickets_in_db}`, 'success');
+            
+            // Reload tickets to show the new data
+            await loadTickets();
+            
+            // Refresh calendar data to show tickets with scheduled dates
+            await loadCalendarData();
+            
+            // Update statistics
+            updateStats();
+        } else {
+            console.error('Failed to import dated files:', data.error);
+            showUpdateIndicator('Failed to import dated files: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error importing dated files:', error);
+        showUpdateIndicator('Error importing dated files - check connection', 'error');
+    }
+}
+
+// Load calendar data from file system
+async function loadCalendarData() {
+    try {
+        const response = await fetch('/patterson/api/calendar');
+        const data = await response.json();
+        
+        if (data.success) {
+            calendarEvents = data.events;
+            document.getElementById('current-month').textContent = data.current_month;
+            renderCalendar();
+        } else {
+            console.error('Failed to load calendar data:', data.error);
+            // Use sample calendar data
+            calendarEvents = [
+                {
+                    id: 1,
+                    title: 'INC-2024-001 - 6 - IRV',
+                    date: '2024-01-15',
+                    time: '09:00',
+                    priority: 'High',
+                    stage: 'scheduled'
+                }
+            ];
+            document.getElementById('current-month').textContent = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            renderCalendar();
+        }
+    } catch (error) {
+        console.error('Error loading calendar data:', error);
+        // Use sample calendar data on error
+        calendarEvents = [
+            {
+                id: 1,
+                title: 'INC-2024-001 - 6 - IRV',
+                date: '2024-01-15',
+                time: '09:00',
+                priority: 'High',
+                stage: 'scheduled'
+            }
+        ];
+        document.getElementById('current-month').textContent = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        renderCalendar();
+    }
+}
+
+// Load offices
+async function loadOffices() {
+    try {
+        const response = await fetch('/patterson/api/offices');
+        const data = await response.json();
+        
+        if (data.success) {
+            const officeSelect = document.getElementById('office-select');
+            const editOfficeSelect = document.getElementById('edit-office-select');
+            
+            const officeOptions = '<option value="">Select Office</option>' + 
+                data.offices.map(office => `<option value="${office}">${office}</option>`).join('');
+            
+            officeSelect.innerHTML = officeOptions;
+            editOfficeSelect.innerHTML = officeOptions;
+        }
+    } catch (error) {
+        console.error('Error loading offices:', error);
+    }
+}
+
+// Load technicians
+async function loadTechnicians() {
+    try {
+        const response = await fetch('/patterson/api/technicians');
+        const data = await response.json();
+        
+        if (data.success) {
+            const technicianSelect = document.getElementById('technician-select');
+            const editTechnicianSelect = document.getElementById('edit-technician-select');
+            
+            const technicianOptions = '<option value="">Select Technician</option>' + 
+                data.technicians.map(technician => 
+                    `<option value="${technician.id}" 
+                             data-email="${technician.email}" 
+                             data-role="${technician.role}">
+                        ${technician.name}
+                    </option>`
+                ).join('');
+            
+            technicianSelect.innerHTML = technicianOptions;
+            editTechnicianSelect.innerHTML = technicianOptions;
+        }
+    } catch (error) {
+        console.error('Error loading technicians:', error);
+    }
+}
+
+// Render tickets list with enhanced styling
+function renderTickets() {
+    const ticketsList = document.getElementById('tickets-list');
+    const filterStatus = document.getElementById('filter-status').value;
+    
+    let filteredTickets = tickets;
+    if (filterStatus) {
+        filteredTickets = tickets.filter(ticket => ticket.stage === filterStatus);
+    }
+    
+    ticketsList.innerHTML = '';
+    
+    if (filteredTickets.length === 0) {
+        ticketsList.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.7);">
+                <i class="bi bi-inbox" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                <h4>No tickets found</h4>
+                <p>${filterStatus ? `No tickets with status "${filterStatus}"` : 'No tickets available'}</p>
+            </div>
+        `;
+        return;
+    }
+    
+    filteredTickets.forEach(ticket => {
+        const ticketCard = createTicketCard(ticket);
+        ticketsList.appendChild(ticketCard);
+    });
+}
+
+// Create enhanced ticket card element
+function createTicketCard(ticket) {
+    const card = document.createElement('div');
+    card.className = 'ticket-card';
+    card.id = `ticket-${ticket.id}`;
+    
+    // Make all tickets clickable to show details or edit
+    card.classList.add('clickable');
+    if (userRole !== 'user') {
+        // For non-user roles, clicking opens edit modal
+        card.onclick = () => openEditTicketModal(ticket);
+    } else {
+        // For user role, clicking shows details only
+        card.onclick = () => showTicketDetails(ticket);
+    }
+    
+    // Flip stage order: in_progress -> scheduled -> completed
+    const stages = ['in_progress', 'scheduled', 'completed'];
+    const stageLabels = ['In Progress', 'Scheduled', 'Completed'];
+    const currentStageIndex = stages.indexOf(ticket.stage);
+    
+    // Format dates for display
+    const createdDate = new Date(ticket.created_at).toLocaleDateString();
+    const updatedDate = new Date(ticket.updated_at).toLocaleDateString();
+    
+    // Handle scheduled date display
+    let scheduledDateDisplay = 'Not scheduled yet';
+    if (ticket.scheduled_date) {
+        scheduledDateDisplay = formatDate(ticket.scheduled_date);
+    }
+    
+    // Build primary/secondary headings intelligently
+    const isUnknown = !ticket.office_name || ticket.office_name === 'Unknown Office';
+    const headingHtml = `<div class="ticket-office">${isUnknown ? (ticket.subject || 'No Subject') : ticket.office_name}</div>`;
+    // We no longer render a separate subject line to prevent duplicates
+    const subjectHtml = '';
+    const descHtml = ticket.description ? `<div class=\"ticket-description\">${ticket.description}</div>` : '';
+
+    card.innerHTML = `
+        <div class="ticket-header">
+            <div class="ticket-number">${ticket.ticket_number}</div>
+            <div class="ticket-priority priority-${ticket.priority.toLowerCase()}">${ticket.priority}</div>
+        </div>
+        <div class="ticket-details">
+            ${headingHtml}
+            ${subjectHtml}
+            <div class="ticket-technician">
+                <i class="bi bi-person-circle me-1"></i>
+                ${ticket.technician}
+                <span class="badge">${ticket.freshworks_id ? 'Freshworks' : 'Local'}</span>
+            </div>
+            ${descHtml}
+        </div>
+        
+        <div class="ticket-schedule">
+            <div class="schedule-info">
+                <div class="schedule-label">Scheduled Date</div>
+                <div class="schedule-value">${scheduledDateDisplay}</div>
+            </div>
+        </div>
+        
+        <div class="stage-progress">
+            <div class="stage-bar">
+                ${stages.map((stage, index) => `
+                    <div class="stage-segment ${index < currentStageIndex ? 'completed' : index === currentStageIndex ? 'active' : 'pending'}"></div>
+                `).join('')}
+            </div>
+            <div class="stage-labels">
+                ${stageLabels.map((label, index) => `
+                    <div class="stage-label ${index < currentStageIndex ? 'completed' : index === currentStageIndex ? 'active' : ''}">${label}</div>
+                `).join('')}
+            </div>
+        </div>
+        
+        <div class="ticket-actions">
+            ${stages.map((stage, index) => `
+                <button class="btn-stage${index === currentStageIndex ? ' ' + stage : ''}"
+                        style="${index === currentStageIndex ? '' : 'background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);'}"
+                        onclick="event.stopPropagation(); updateTicketStage(${ticket.id}, '${stage}')" 
+                        ${index <= currentStageIndex ? '' : 'disabled'}>
+                    ${stageLabels[index]}
+                </button>
+            `).join('')}
+        </div>
+    `;
+    
+    return card;
+}
+
+// Enhanced calendar rendering
+function renderCalendar() {
+    const calendarGrid = document.getElementById('calendar-grid');
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    // Group events by date for quick lookup
+    const eventsByDate = {};
+    calendarEvents.forEach(event => {
+        if (!eventsByDate[event.date]) eventsByDate[event.date] = [];
+        eventsByDate[event.date].push(event);
+    });
+    
+    // Clear calendar
+    calendarGrid.innerHTML = '';
+    
+    // Add day headers
+    const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    dayHeaders.forEach(day => {
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'calendar-day-header';
+        dayHeader.textContent = day;
+        calendarGrid.appendChild(dayHeader);
+    });
+    
+    // Get first day of month and number of days
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDay = firstDay.getDay();
+    
+    // Always render 6 rows (42 days)
+    let dayCounter = 1 - startingDay;
+    for (let i = 0; i < 42; i++) {
+        const dayDate = new Date(year, month, dayCounter);
+        const dayCell = document.createElement('div');
+        dayCell.className = 'calendar-day';
+        if (
+            dayDate.getMonth() !== month
+        ) {
+            dayCell.style.opacity = '0.3';
+        }
+        if (
+            dayDate.getDate() === new Date().getDate() &&
+            dayDate.getMonth() === new Date().getMonth() &&
+            dayDate.getFullYear() === new Date().getFullYear()
+        ) {
+            dayCell.classList.add('today');
+        }
+        
+        // Add click handler for non-user roles
+        if (userRole !== 'user') {
+            dayCell.style.cursor = 'pointer';
+            dayCell.onclick = () => openCalendarEventModal(dayDate);
+        }
+        
+        // Day number
+        const dayNumber = document.createElement('div');
+        dayNumber.className = 'day-number';
+        dayNumber.textContent = dayDate.getDate();
+        dayCell.appendChild(dayNumber);
+        
+        // Events
+        const dateStr = dayDate.toISOString().slice(0, 10);
+        const dayEvents = eventsByDate[dateStr] || [];
+        if (dayEvents.length > 0) {
+            dayCell.classList.add('has-events');
+        }
+        
+        // Container for events with max height and scroll
+        const eventsContainer = document.createElement('div');
+        eventsContainer.className = 'calendar-events-container';
+        dayEvents.forEach(event => {
+            const eventElement = document.createElement('div');
+            eventElement.className = 'calendar-event';
+            eventElement.textContent = `${event.title}`;
+            eventElement.onclick = (e) => {
+                e.stopPropagation();
+                // Find the ticket and show details
+                const ticket = tickets.find(t => t.id === event.id);
+                if (ticket) {
+                    showTicketDetails(ticket);
+                }
+            };
+            eventsContainer.appendChild(eventElement);
+        });
+        dayCell.appendChild(eventsContainer);
+        calendarGrid.appendChild(dayCell);
+        dayCounter++;
+    }
+}
+
+// Open calendar event modal
+function openCalendarEventModal(date) {
+    if (userRole === 'user') return;
+    
+    selectedCalendarDate = date;
+    
+    // Set the date in the modal
+    document.getElementById('event-date').value = date.toISOString().split('T')[0];
+    
+    // Populate office and technician dropdowns
+    populateEventDropdowns();
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('calendarEventModal'));
+    modal.show();
+}
+
+// Populate event dropdowns
+async function populateEventDropdowns() {
+    try {
+        // Load offices
+        const officesResponse = await fetch('/patterson/api/offices');
+        const officesData = await officesResponse.json();
+        
+        if (officesData.success) {
+            const officeSelect = document.getElementById('event-office');
+            officeSelect.innerHTML = '<option value="General">General</option>';
+            officesData.offices.forEach(office => {
+                const option = document.createElement('option');
+                option.value = office;
+                option.textContent = office;
+                officeSelect.appendChild(option);
+            });
+        }
+        
+        // Load technicians
+        const techniciansResponse = await fetch('/patterson/api/technicians');
+        const techniciansData = await techniciansResponse.json();
+        
+        if (techniciansData.success) {
+            const technicianSelect = document.getElementById('event-technician');
+            technicianSelect.innerHTML = '<option value="">Unassigned</option>';
+            techniciansData.technicians.forEach(technician => {
+                const option = document.createElement('option');
+                option.value = technician.id;
+                option.textContent = technician.name;
+                technicianSelect.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error populating event dropdowns:', error);
+    }
+}
+
+// Create calendar event
+async function createCalendarEvent() {
+    const title = document.getElementById('event-title').value;
+    const date = document.getElementById('event-date').value;
+    const time = document.getElementById('event-time').value;
+    const duration = document.getElementById('event-duration').value;
+    const office = document.getElementById('event-office').value;
+    const technician = document.getElementById('event-technician').value;
+    const priority = document.getElementById('event-priority').value;
+    const urgency = document.getElementById('event-urgency').value;
+    const description = document.getElementById('event-description').value;
+    
+    if (!title || !date || !description) {
+        showUpdateIndicator('Please fill in all required fields', 'error');
+        return;
+    }
+    
+    // Show loading state
+    const createBtn = document.querySelector('#calendarEventModal .btn-primary-patterson');
+    const btnText = document.getElementById('create-event-btn-text');
+    const btnSpinner = document.getElementById('create-event-btn-spinner');
+    
+    btnText.style.display = 'none';
+    btnSpinner.style.display = 'inline-block';
+    createBtn.disabled = true;
+    
+    try {
+        const response = await fetch('/patterson/api/calendar/events', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: title,
+                date: date,
+                time: time,
+                duration: duration,
+                office: office,
+                technician_id: technician ? parseInt(technician) : null,
+                priority: priority,
+                urgency: urgency,
+                description: description
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Add new event to calendar
+            calendarEvents.push(data.event);
+            
+            // Close modal and refresh
+            const modal = bootstrap.Modal.getInstance(document.getElementById('calendarEventModal'));
+            modal.hide();
+            
+            // Reset form
+            document.getElementById('calendarEventForm').reset();
+            document.getElementById('event-time').value = '09:00';
+            document.getElementById('event-duration').value = '1 hour';
+            document.getElementById('event-priority').value = 'Medium';
+            document.getElementById('event-urgency').value = 'Medium';
+            
+            // Refresh calendar display
+            renderCalendar();
+            
+            showUpdateIndicator('Calendar event created successfully');
+        } else {
+            showUpdateIndicator('Failed to create event: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error creating calendar event:', error);
+        showUpdateIndicator('Error creating event. Please try again.', 'error');
+    } finally {
+        // Reset button state
+        btnText.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+        createBtn.disabled = false;
+    }
+}
+
+// Update ticket stage with enhanced feedback
+async function updateTicketStage(ticketId, newStage) {
+    try {
+        const response = await fetch(`/patterson/api/tickets/${ticketId}/stage`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ stage: newStage })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update local ticket data
+            const ticketIndex = tickets.findIndex(t => t.id === ticketId);
+            if (ticketIndex !== -1) {
+                tickets[ticketIndex] = data.ticket;
+            }
+            
+            // Animate the ticket card
+            const ticketCard = document.getElementById(`ticket-${ticketId}`);
+            ticketCard.classList.add('stage-update');
+            
+            setTimeout(() => {
+                ticketCard.classList.remove('stage-update');
+                renderTickets();
+                updateStats();
+            }, 600);
+            
+            showUpdateIndicator(`Ticket stage updated to ${newStage.replace('_', ' ')}`);
+            
+        } else {
+            console.error('Failed to update ticket stage:', data.error);
+            showUpdateIndicator('Failed to update ticket stage', 'error');
+        }
+    } catch (error) {
+        console.error('Error updating ticket stage:', error);
+        showUpdateIndicator('Error updating ticket stage', 'error');
+    }
+}
+
+// Open edit ticket modal (enhanced for non-user roles)
+function openEditTicketModal(ticket) {
+    if (userRole === 'user') {
+        // For users, just show details
+        showTicketDetails(ticket);
+        return;
+    }
+    
+    // For non-user roles, show enhanced edit modal
+    // Populate form fields
+    document.getElementById('edit-ticket-id').value = ticket.id;
+    document.getElementById('edit-office-select').value = ticket.office_name;
+    document.getElementById('edit-technician-select').value = ticket.technician_id || '';
+    document.getElementById('edit-scheduled-date').value = ticket.scheduled_date;
+    document.getElementById('edit-scheduled-time').value = ticket.scheduled_time;
+    document.getElementById('edit-priority-select').value = ticket.priority;
+    document.getElementById('edit-duration-select').value = ticket.estimated_duration;
+    document.getElementById('edit-description').value = ticket.description;
+    document.getElementById('edit-stage-select').value = ticket.stage;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('editTicketModal'));
+    modal.show();
+}
+
+// Update ticket with enhanced validation
+async function updateTicket() {
+    const ticketId = document.getElementById('edit-ticket-id').value;
+    
+    const ticketData = {
+        office_name: document.getElementById('edit-office-select').value,
+        technician_id: parseInt(document.getElementById('edit-technician-select').value),
+        description: document.getElementById('edit-description').value,
+        scheduled_date: document.getElementById('edit-scheduled-date').value,
+        scheduled_time: document.getElementById('edit-scheduled-time').value,
+        priority: document.getElementById('edit-priority-select').value,
+        estimated_duration: document.getElementById('edit-duration-select').value,
+        stage: document.getElementById('edit-stage-select').value
+    };
+    
+    // Validate required fields
+    const requiredFields = ['office_name', 'technician_id', 'description', 'scheduled_date', 'scheduled_time'];
+    for (const field of requiredFields) {
+        if (!ticketData[field]) {
+            showUpdateIndicator(`Please fill in the ${field.replace('_', ' ')} field.`, 'error');
+            return;
+        }
+    }
+    
+    // Show loading state
+    const updateBtn = document.querySelector('#editTicketModal .btn-primary-patterson');
+    const btnText = document.getElementById('update-btn-text');
+    const btnSpinner = document.getElementById('update-btn-spinner');
+    
+    btnText.style.display = 'none';
+    btnSpinner.style.display = 'inline-block';
+    updateBtn.disabled = true;
+    
+    try {
+        const response = await fetch(`/patterson/api/tickets/${ticketId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(ticketData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update local ticket data
+            const ticketIndex = tickets.findIndex(t => t.id === parseInt(ticketId));
+            if (ticketIndex !== -1) {
+                tickets[ticketIndex] = data.ticket;
+            }
+            
+            // Close modal and refresh
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editTicketModal'));
+            modal.hide();
+            
+            // Refresh displays
+            renderTickets();
+            loadCalendarData();
+            updateStats();
+            
+            showUpdateIndicator('Ticket updated successfully');
+        } else {
+            showUpdateIndicator('Failed to update ticket: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error updating ticket:', error);
+        showUpdateIndicator('Error updating ticket. Please try again.', 'error');
+    } finally {
+        // Reset button state
+        btnText.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+        updateBtn.disabled = false;
+    }
+}
+
+// Create new ticket with enhanced validation
+async function createTicket() {
+    const form = document.getElementById('newTicketForm');
+    const formData = new FormData(form);
+    
+    const ticketData = {
+        office_name: document.getElementById('office-select').value,
+        technician_id: parseInt(document.getElementById('technician-select').value),
+        description: document.getElementById('description').value,
+        scheduled_date: document.getElementById('scheduled-date').value,
+        scheduled_time: document.getElementById('scheduled-time').value,
+        priority: document.getElementById('priority-select').value,
+        estimated_duration: document.getElementById('duration-select').value
+    };
+    
+    // Validate required fields
+    const requiredFields = ['office_name', 'technician_id', 'description', 'scheduled_date', 'scheduled_time'];
+    for (const field of requiredFields) {
+        if (!ticketData[field]) {
+            showUpdateIndicator(`Please fill in the ${field.replace('_', ' ')} field.`, 'error');
+            return;
+        }
+    }
+    
+    // Show loading state
+    const createBtn = document.querySelector('#newTicketModal .btn-primary-patterson');
+    const btnText = document.getElementById('create-btn-text');
+    const btnSpinner = document.getElementById('create-btn-spinner');
+    
+    btnText.style.display = 'none';
+    btnSpinner.style.display = 'inline-block';
+    createBtn.disabled = true;
+    
+    try {
+        const response = await fetch('/patterson/api/tickets', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(ticketData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Add new ticket to local data
+            tickets.push(data.ticket);
+            
+            // Close modal and refresh
+            const modal = bootstrap.Modal.getInstance(document.getElementById('newTicketModal'));
+            modal.hide();
+            
+            // Reset form
+            form.reset();
+            
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('scheduled-date').value = today;
+            
+            // Refresh displays
+            renderTickets();
+            loadCalendarData();
+            updateStats();
+            
+            showUpdateIndicator('Ticket created successfully');
+        } else {
+            showUpdateIndicator('Failed to create ticket: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error creating ticket:', error);
+        showUpdateIndicator('Error creating ticket. Please try again.', 'error');
+    } finally {
+        // Reset button state
+        btnText.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+        createBtn.disabled = false;
+    }
+}
+
+// Show ticket details with enhanced information
+function showTicketDetails(ticket) {
+    // Get technician info from the technician select options
+    const technicianSelect = document.getElementById('technician-select');
+    const technicianOption = technicianSelect.querySelector(`option[value="${ticket.technician_id}"]`);
+    const technicianEmail = technicianOption ? technicianOption.getAttribute('data-email') : '';
+    const technicianRole = technicianOption ? technicianOption.getAttribute('data-role') : '';
+    
+    const modal = new bootstrap.Modal(document.getElementById('ticketDetailsModal'));
+    const content = document.getElementById('ticket-details-content');
+    
+    // Format notes for display
+    let notesHtml = '';
+    if (ticket.notes && ticket.notes.length > 0) {
+        notesHtml = `
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h6 style="color: #667eea; font-weight: 700; margin-bottom: 15px;">Notes (${ticket.notes.length})</h6>
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        ${ticket.notes.map((note, index) => `
+                            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border-left: 4px solid #667eea; margin-bottom: 10px;">
+                                <div style="font-weight: 600; color: #667eea; margin-bottom: 8px;">Note ${index + 1}</div>
+                                <div style="white-space: pre-wrap; line-height: 1.5; color: rgba(255,255,255,0.9);">${note}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    } else {
+        notesHtml = `
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h6 style="color: #667eea; font-weight: 700; margin-bottom: 15px;">Notes</h6>
+                    <p style="color: rgba(255,255,255,0.6); font-style: italic;">No notes available for this ticket.</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Add urgency selector for non-user roles
+    let urgencySelector = '';
+    if (userRole !== 'user') {
+        urgencySelector = `
+            <div class="urgency-selector">
+                <span class="urgency-label">Urgency:</span>
+                <select class="urgency-select" onchange="updateTicketUrgency(${ticket.id}, this.value)">
+                    <option value="Low" ${ticket.urgency === 'Low' ? 'selected' : ''}>Low</option>
+                    <option value="Medium" ${ticket.urgency === 'Medium' ? 'selected' : ''}>Medium</option>
+                    <option value="High" ${ticket.urgency === 'High' ? 'selected' : ''}>High</option>
+                    <option value="Urgent" ${ticket.urgency === 'Urgent' ? 'selected' : ''}>Urgent</option>
+                </select>
+            </div>
+        `;
+    }
+    
+    content.innerHTML = `
+        ${urgencySelector}
+        <div class="row">
+            <div class="col-md-6">
+                <h6 style="color: #667eea; font-weight: 700; margin-bottom: 15px;">Ticket Information</h6>
+                <p><strong>Number:</strong> ${ticket.ticket_number}</p>
+                <p><strong>Office:</strong> ${ticket.office_name}</p>
+                <p><strong>Technician:</strong> 
+                    <i class="bi bi-person-circle me-1"></i>
+                    ${ticket.technician}
+                </p>
+                <p><strong>Email:</strong> ${technicianEmail || 'N/A'}</p>
+                <p><strong>Role:</strong> ${technicianRole || 'N/A'}</p>
+                <p><strong>Priority:</strong> <span class="ticket-priority priority-${ticket.priority.toLowerCase()}">${ticket.priority}</span></p>
+                <p><strong>Urgency:</strong> <span class="ticket-priority priority-${(ticket.urgency || 'Medium').toLowerCase()}">${ticket.urgency || 'Medium'}</span></p>
+                <p><strong>Source:</strong> ${ticket.freshworks_id ? 'Freshworks' : 'Local System'}</p>
+            </div>
+            <div class="col-md-6">
+                <h6 style="color: #667eea; font-weight: 700; margin-bottom: 15px;">Schedule</h6>
+                <p><strong>Date:</strong> ${ticket.scheduled_date ? formatDate(ticket.scheduled_date) : 'Not scheduled yet'}</p>
+                <p><strong>Status:</strong> ${ticket.status}</p>
+                <p><strong>Stage:</strong> ${ticket.stage.replace('_', ' ').toUpperCase()}</p>
+                <p><strong>Category:</strong> ${ticket.category || 'N/A'}</p>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-12">
+                <h6 style="color: #667eea; font-weight: 700; margin-bottom: 15px;">Description</h6>
+                <p style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border-left: 4px solid #667eea; white-space: pre-wrap; line-height: 1.5;">${ticket.description}</p>
+            </div>
+        </div>
+        ${notesHtml}
+        <div class="row mt-4">
+            <div class="col-12">
+                <h6 style="color: #667eea; font-weight: 700; margin-bottom: 15px;">Timestamps</h6>
+                <p><strong>Created:</strong> ${new Date(ticket.created_at).toLocaleString()}</p>
+                <p><strong>Last Updated:</strong> ${new Date(ticket.updated_at).toLocaleString()}</p>
+                ${ticket.freshworks_id ? `<p><strong>Freshworks ID:</strong> ${ticket.freshworks_id}</p>` : ''}
+            </div>
+        </div>
+    `;
+    
+    modal.show();
+}
+
+// Update statistics with enhanced display
+function updateStats() {
+    const total = tickets.length;
+    const inProgress = tickets.filter(t => t.stage === 'in_progress').length;
+    const scheduled = tickets.filter(t => t.stage === 'scheduled').length;
+    const completed = tickets.filter(t => t.stage === 'completed').length;
+    
+    // Animate number changes
+    animateNumber('total-tickets', total);
+    animateNumber('scheduled-tickets', inProgress);
+    animateNumber('in-progress-tickets', scheduled);
+    animateNumber('completed-tickets', completed);
+}
+
+// Animate number changes
+function animateNumber(elementId, targetValue) {
+    const element = document.getElementById(elementId);
+    const currentValue = parseInt(element.textContent) || 0;
+    const increment = (targetValue - currentValue) / 20;
+    let current = currentValue;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        if ((increment > 0 && current >= targetValue) || (increment < 0 && current <= targetValue)) {
+            element.textContent = targetValue;
+            clearInterval(timer);
+        } else {
+            element.textContent = Math.floor(current);
+        }
+    }, 50);
+}
+
+// Filter tickets
+function filterTickets() {
+    renderTickets();
+}
+
+// Calendar navigation
+function previousMonth() {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    loadCalendarData();
+}
+
+function nextMonth() {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    loadCalendarData();
+}
+
+// Open new ticket modal
+function openNewTicketModal() {
+    const modal = new bootstrap.Modal(document.getElementById('newTicketModal'));
+    modal.show();
+}
+
+// Open user mapping modal
+function openUserMappingModal() {
+    loadUnmappedUsers();
+    loadUserMappings();
+    const modal = new bootstrap.Modal(document.getElementById('userMappingModal'));
+    modal.show();
+}
+
+// Load unmapped users
+async function loadUnmappedUsers() {
+    try {
+        const response = await fetch('/patterson/api/unmapped-users');
+        const data = await response.json();
+        
+        if (data.success) {
+            const select = document.getElementById('unmapped-user-select');
+            select.innerHTML = '<option value="">Select Unmapped User ID</option>';
+            
+            data.unmapped_users.forEach(userId => {
+                const option = document.createElement('option');
+                option.value = userId;
+                option.textContent = `User ID: ${userId}`;
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading unmapped users:', error);
+    }
+}
+
+// Load user mappings
+async function loadUserMappings() {
+    try {
+        const response = await fetch('/patterson/api/user-mappings');
+        const data = await response.json();
+        
+        if (data.success) {
+            const tbody = document.getElementById('mappings-table-body');
+            tbody.innerHTML = '';
+            
+            data.mappings.forEach(mapping => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${mapping.freshworks_id}</td>
+                    <td>${mapping.name}</td>
+                    <td><span class="badge bg-primary">${mapping.role}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="deleteUserMapping(${mapping.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading user mappings:', error);
+    }
+}
+
+// Add user mapping
+async function addUserMapping(event) {
+    event.preventDefault();
+    
+    const freshworksId = document.getElementById('unmapped-user-select').value;
+    const name = document.getElementById('user-name').value;
+    const email = document.getElementById('user-email').value;
+    const role = document.getElementById('user-role').value;
+    
+    if (!freshworksId || !name) {
+        showUpdateIndicator('Please fill in all required fields', 'error');
+        return;
+    }
+    
+    // Show loading state
+    const btn = document.querySelector('#userMappingForm .btn-primary-patterson');
+    const btnText = document.getElementById('add-mapping-btn-text');
+    const btnSpinner = document.getElementById('add-mapping-btn-spinner');
+    
+    btnText.style.display = 'none';
+    btnSpinner.style.display = 'inline-block';
+    btn.disabled = true;
+    
+    try {
+        const response = await fetch('/patterson/api/user-mappings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                freshworks_id: freshworksId,
+                name: name,
+                email: email,
+                role: role
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Reset form
+            document.getElementById('userMappingForm').reset();
+            
+            // Reload data
+            loadUnmappedUsers();
+            loadUserMappings();
+            
+            // Refresh tickets to show updated names
+            loadTickets();
+            
+            showUpdateIndicator(data.message);
+        } else {
+            showUpdateIndicator('Failed to add mapping: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error adding user mapping:', error);
+        showUpdateIndicator('Error adding mapping. Please try again.', 'error');
+    } finally {
+        // Reset button state
+        btnText.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+        btn.disabled = false;
+    }
+}
+
+// Delete user mapping
+async function deleteUserMapping(mappingId) {
+    if (!confirm('Are you sure you want to delete this user mapping?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/patterson/api/user-mappings/${mappingId}`, {
+            method: 'DELETE'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            loadUserMappings();
+            loadTickets(); // Refresh tickets to show updated names
+            showUpdateIndicator(data.message);
+        } else {
+            showUpdateIndicator('Failed to delete mapping: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting user mapping:', error);
+        showUpdateIndicator('Error deleting mapping. Please try again.', 'error');
+    }
+}
+
+// Update ticket urgency with enhanced feedback
+async function updateTicketUrgency(ticketId, newUrgency) {
+    try {
+        const response = await fetch(`/patterson/api/tickets/${ticketId}/urgency`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ urgency: newUrgency })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update local ticket data
+            const ticketIndex = tickets.findIndex(t => t.id === ticketId);
+            if (ticketIndex !== -1) {
+                tickets[ticketIndex].urgency = newUrgency;
+            }
+            
+            showUpdateIndicator(`Ticket urgency updated to ${newUrgency}`);
+            
+        } else {
+            console.error('Failed to update ticket urgency:', data.error);
+            showUpdateIndicator('Failed to update ticket urgency', 'error');
+        }
+    } catch (error) {
+        console.error('Error updating ticket urgency:', error);
+        showUpdateIndicator('Error updating ticket urgency', 'error');
+    }
+}
+
+// Utility functions
+function formatDate(dateString) {
+    if (!dateString) return 'Not scheduled yet';
+    
+    // Parse the date string as local time to avoid timezone issues
+    // For dates in YYYY-MM-DD format, create a local date
+    if (typeof dateString === 'string' && dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [year, month, day] = dateString.split('-').map(Number);
+        const date = new Date(year, month - 1, day); // month is 0-indexed
+        return formatDateWithOrdinal(date);
+    } else {
+        // Fallback for other date formats
+        const date = new Date(dateString);
+        return formatDateWithOrdinal(date);
+    }
+}
+
+// Helper function to format date with ordinal suffix and full day name
+function formatDateWithOrdinal(date) {
+    const month = date.toLocaleDateString('en-US', { month: 'long' });
+    const day = date.getDate();
+    const year = date.getFullYear();
+    const weekday = date.toLocaleDateString('en-US', { weekday: 'long' });
+    
+    // Add ordinal suffix to day
+    const ordinalSuffix = getOrdinalSuffix(day);
+    
+    return `${month} ${day}${ordinalSuffix}, ${year} [${weekday}]`;
+}
+
+// Helper function to get ordinal suffix (1st, 2nd, 3rd, etc.)
+function getOrdinalSuffix(day) {
+    if (day >= 11 && day <= 13) {
+        return 'th';
+    }
+    switch (day % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+    }
+}
+
+function formatDateForCalendar(date) {
+    return date.toISOString().split('T')[0];
+}
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+    }
+});
+
+// Update connection status
+function updateConnectionStatus(connected, message = '') {
+    const statusDot = document.querySelector('.status-dot');
+    const statusText = document.querySelector('.status-indicator span');
+    
+    if (connected) {
+        statusDot.className = 'status-dot online';
+        statusText.textContent = message || 'Connected to file system';
+    } else {
+        statusDot.className = 'status-dot offline';
+        statusText.textContent = message || 'File system unavailable';
+    }
+}
+
+// Show update indicator
+function showUpdateIndicator(message, type = 'success') {
+    const indicator = document.getElementById('update-indicator');
+    const messageEl = document.getElementById('update-message');
+    
+    messageEl.textContent = message;
+    indicator.className = `update-indicator ${type}`;
+    indicator.classList.add('show');
+    
+    setTimeout(() => {
+        indicator.classList.remove('show');
+    }, 3000);
+}
+
+// Manual API pull function
+async function manualApiPull() {
+    try {
+        showUpdateIndicator('Pulling data from Freshworks API...', 'info');
+        
+        const response = await fetch('/patterson/api/manual-api-pull', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showUpdateIndicator(data.message, 'success');
+            
+            // Reload tickets to show the new data
+            await loadTickets();
+            
+            // Refresh calendar data to show tickets with scheduled dates
+            await loadCalendarData();
+            
+            // Update statistics
+            updateStats();
+        } else {
+            console.error('Failed to pull API data:', data.error);
+            showUpdateIndicator('Failed to pull API data: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error pulling API data:', error);
+        showUpdateIndicator('Error pulling API data - check connection', 'error');
+    }
+}
+
+// Enhanced calendar event handling for admins
+function openCalendarEventModal(date, event = null) {
+    if (userRole === 'user') return;
+    
+    selectedCalendarDate = date;
+    
+    if (event) {
+        // Editing existing event - show edit modal
+        openEditCalendarEventModal(event);
+    } else {
+        // Creating new event - show create modal
+        // Set the date in the modal
+        document.getElementById('event-date').value = date.toISOString().split('T')[0];
+        
+        // Populate office and technician dropdowns
+        populateEventDropdowns();
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('calendarEventModal'));
+        modal.show();
+    }
+}
+
+// Open edit calendar event modal
+function openEditCalendarEventModal(event) {
+    if (userRole === 'user') return;
+    
+    // Populate form fields
+    document.getElementById('edit-event-id').value = event.id;
+    document.getElementById('edit-event-title').value = event.title;
+    document.getElementById('edit-event-date').value = event.date;
+    document.getElementById('edit-event-time').value = event.time;
+    document.getElementById('edit-event-duration').value = event.duration || '1 hour';
+    document.getElementById('edit-event-office').value = event.office || 'General';
+    document.getElementById('edit-event-technician').value = event.technician_id || '';
+    document.getElementById('edit-event-priority').value = event.priority || 'Medium';
+    document.getElementById('edit-event-urgency').value = event.urgency || 'Medium';
+    document.getElementById('edit-event-description').value = event.description || '';
+    
+    // Populate dropdowns
+    populateEventDropdowns();
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('editCalendarEventModal'));
+    modal.show();
+}
+
+// Update calendar event
+async function updateCalendarEvent() {
+    const eventId = document.getElementById('edit-event-id').value;
+    
+    const eventData = {
+        title: document.getElementById('edit-event-title').value,
+        date: document.getElementById('edit-event-date').value,
+        time: document.getElementById('edit-event-time').value,
+        duration: document.getElementById('edit-event-duration').value,
+        office: document.getElementById('edit-event-office').value,
+        technician_id: document.getElementById('edit-event-technician').value ? parseInt(document.getElementById('edit-event-technician').value) : null,
+        priority: document.getElementById('edit-event-priority').value,
+        urgency: document.getElementById('edit-event-urgency').value,
+        description: document.getElementById('edit-event-description').value
+    };
+    
+    // Validate required fields
+    const requiredFields = ['title', 'date', 'description'];
+    for (const field of requiredFields) {
+        if (!eventData[field]) {
+            showUpdateIndicator(`Please fill in the ${field.replace('_', ' ')} field.`, 'error');
+            return;
+        }
+    }
+    
+    // Show loading state
+    const updateBtn = document.querySelector('#editCalendarEventModal .btn-primary-patterson');
+    const btnText = document.getElementById('update-event-btn-text');
+    const btnSpinner = document.getElementById('update-event-btn-spinner');
+    
+    btnText.style.display = 'none';
+    btnSpinner.style.display = 'inline-block';
+    updateBtn.disabled = true;
+    
+    try {
+        const response = await fetch(`/patterson/api/calendar/events/${eventId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(eventData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update local event data
+            const eventIndex = calendarEvents.findIndex(e => e.id === parseInt(eventId));
+            if (eventIndex !== -1) {
+                calendarEvents[eventIndex] = data.event;
+            }
+            
+            // Close modal and refresh
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editCalendarEventModal'));
+            modal.hide();
+            
+            // Refresh calendar display
+            renderCalendar();
+            
+            showUpdateIndicator('Calendar event updated successfully');
+        } else {
+            showUpdateIndicator('Failed to update event: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error updating calendar event:', error);
+        showUpdateIndicator('Error updating event. Please try again.', 'error');
+    } finally {
+        // Reset button state
+        btnText.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+        updateBtn.disabled = false;
+    }
+}
+
+// Delete calendar event
+async function deleteCalendarEvent() {
+    const eventId = document.getElementById('edit-event-id').value;
+    
+    if (!confirm('Are you sure you want to delete this calendar event? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/patterson/api/calendar/events/${eventId}`, {
+            method: 'DELETE'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Remove from local events
+            calendarEvents = calendarEvents.filter(e => e.id !== parseInt(eventId));
+            
+            // Close modal and refresh
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editCalendarEventModal'));
+            modal.hide();
+            
+            // Refresh calendar display
+            renderCalendar();
+            
+            showUpdateIndicator('Calendar event deleted successfully');
+        } else {
+            showUpdateIndicator('Failed to delete event: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting calendar event:', error);
+        showUpdateIndicator('Error deleting event. Please try again.', 'error');
+    }
+}
+
+// Enhanced ticket editing for admins
+function openEditTicketModal(ticket) {
+    if (userRole === 'user') {
+        // For users, just show details
+        showTicketDetails(ticket);
+        return;
+    }
+    
+    if (userRole === 'admin') {
+        // For admins, show enhanced admin modal
+        openAdminTicketModal(ticket);
+        return;
+    }
+    
+    // For non-admin non-user roles, show regular edit modal
+    // Populate form fields
+    document.getElementById('edit-ticket-id').value = ticket.id;
+    document.getElementById('edit-office-select').value = ticket.office_name;
+    document.getElementById('edit-technician-select').value = ticket.technician_id || '';
+    document.getElementById('edit-scheduled-date').value = ticket.scheduled_date;
+    document.getElementById('edit-scheduled-time').value = ticket.scheduled_time;
+    document.getElementById('edit-priority-select').value = ticket.priority;
+    document.getElementById('edit-duration-select').value = ticket.estimated_duration;
+    document.getElementById('edit-description').value = ticket.description;
+    document.getElementById('edit-stage-select').value = ticket.stage;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('editTicketModal'));
+    modal.show();
+}
+
+// Open admin ticket modal
+function openAdminTicketModal(ticket) {
+    // Populate form fields
+    document.getElementById('admin-ticket-id').value = ticket.id;
+    document.getElementById('admin-ticket-number').value = ticket.ticket_number;
+    document.getElementById('admin-freshworks-id').value = ticket.freshworks_id || '';
+    document.getElementById('admin-ticket-title').value = ticket.title || '';
+    document.getElementById('admin-office-select').value = ticket.office_name;
+    document.getElementById('admin-technician-select').value = ticket.technician_id || '';
+    document.getElementById('admin-category-select').value = ticket.category || 'IT';
+    document.getElementById('admin-scheduled-date').value = ticket.scheduled_date;
+    document.getElementById('admin-scheduled-time').value = ticket.scheduled_time;
+    document.getElementById('admin-priority-select').value = ticket.priority;
+    document.getElementById('admin-urgency-select').value = ticket.urgency || 'Medium';
+    document.getElementById('admin-stage-select').value = ticket.stage;
+    document.getElementById('admin-duration-select').value = ticket.estimated_duration;
+    document.getElementById('admin-source-select').value = ticket.source || 'database';
+    document.getElementById('admin-description').value = ticket.description;
+    
+    // Handle notes (convert array to JSON string)
+    let notesText = '';
+    if (ticket.notes && Array.isArray(ticket.notes)) {
+        notesText = JSON.stringify(ticket.notes, null, 2);
+    }
+    document.getElementById('admin-notes').value = notesText;
+    
+    // Populate dropdowns
+    populateAdminDropdowns();
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('adminTicketModal'));
+    modal.show();
+}
+
+// Populate admin dropdowns
+async function populateAdminDropdowns() {
+    try {
+        // Load offices
+        const officesResponse = await fetch('/patterson/api/offices');
+        const officesData = await officesResponse.json();
+        
+        if (officesData.success) {
+            const officeSelect = document.getElementById('admin-office-select');
+            officeSelect.innerHTML = '<option value="">Select Office</option>';
+            officesData.offices.forEach(office => {
+                const option = document.createElement('option');
+                option.value = office;
+                option.textContent = office;
+                officeSelect.appendChild(option);
+            });
+        }
+        
+        // Load technicians
+        const techniciansResponse = await fetch('/patterson/api/technicians');
+        const techniciansData = await techniciansResponse.json();
+        
+        if (techniciansData.success) {
+            const technicianSelect = document.getElementById('admin-technician-select');
+            technicianSelect.innerHTML = '<option value="">Select Technician</option>';
+            techniciansData.technicians.forEach(technician => {
+                const option = document.createElement('option');
+                option.value = technician.id;
+                option.textContent = technician.name;
+                technicianSelect.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error populating admin dropdowns:', error);
+    }
+}
+
+// Admin update ticket
+async function adminUpdateTicket() {
+    const ticketId = document.getElementById('admin-ticket-id').value;
+    
+    // Parse notes from JSON
+    let notes = [];
+    const notesText = document.getElementById('admin-notes').value.trim();
+    if (notesText) {
+        try {
+            notes = JSON.parse(notesText);
+        } catch (e) {
+            showUpdateIndicator('Invalid JSON format in notes field', 'error');
+            return;
+        }
+    }
+    
+    const ticketData = {
+        freshworks_id: document.getElementById('admin-freshworks-id').value || null,
+        title: document.getElementById('admin-ticket-title').value,
+        office_name: document.getElementById('admin-office-select').value,
+        technician_id: parseInt(document.getElementById('admin-technician-select').value),
+        category: document.getElementById('admin-category-select').value,
+        description: document.getElementById('admin-description').value,
+        scheduled_date: document.getElementById('admin-scheduled-date').value,
+        scheduled_time: document.getElementById('admin-scheduled-time').value,
+        priority: document.getElementById('admin-priority-select').value,
+        urgency: document.getElementById('admin-urgency-select').value,
+        stage: document.getElementById('admin-stage-select').value,
+        estimated_duration: document.getElementById('admin-duration-select').value,
+        source: document.getElementById('admin-source-select').value,
+        notes: notes
+    };
+    
+    // Validate required fields
+    const requiredFields = ['office_name', 'technician_id', 'description', 'scheduled_date', 'scheduled_time'];
+    for (const field of requiredFields) {
+        if (!ticketData[field]) {
+            showUpdateIndicator(`Please fill in the ${field.replace('_', ' ')} field.`, 'error');
+            return;
+        }
+    }
+    
+    // Show loading state
+    const updateBtn = document.querySelector('#adminTicketModal .btn-primary-patterson');
+    const btnText = document.getElementById('admin-update-btn-text');
+    const btnSpinner = document.getElementById('admin-update-btn-spinner');
+    
+    btnText.style.display = 'none';
+    btnSpinner.style.display = 'inline-block';
+    updateBtn.disabled = true;
+    
+    try {
+        const response = await fetch(`/patterson/api/tickets/${ticketId}/admin-update`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(ticketData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update local ticket data
+            const ticketIndex = tickets.findIndex(t => t.id === parseInt(ticketId));
+            if (ticketIndex !== -1) {
+                tickets[ticketIndex] = data.ticket;
+            }
+            
+            // Close modal and refresh
+            const modal = bootstrap.Modal.getInstance(document.getElementById('adminTicketModal'));
+            modal.hide();
+            
+            // Refresh displays
+            renderTickets();
+            loadCalendarData();
+            updateStats();
+            
+            showUpdateIndicator('Ticket updated successfully with admin privileges');
+        } else {
+            showUpdateIndicator('Failed to update ticket: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error updating ticket:', error);
+        showUpdateIndicator('Error updating ticket. Please try again.', 'error');
+    } finally {
+        // Reset button state
+        btnText.style.display = 'inline';
+        btnSpinner.style.display = 'none';
+        updateBtn.disabled = false;
+    }
+}
+
+// Delete ticket function
+async function deleteTicket() {
+    let ticketId;
+    
+    // Check which modal is open to get the ticket ID
+    if (document.getElementById('edit-ticket-id').value) {
+        ticketId = document.getElementById('edit-ticket-id').value;
+    } else if (document.getElementById('admin-ticket-id').value) {
+        ticketId = document.getElementById('admin-ticket-id').value;
+    } else {
+        showUpdateIndicator('No ticket selected for deletion', 'error');
+        return;
+    }
+    
+    if (!confirm('Are you sure you want to delete this ticket? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/patterson/api/tickets/${ticketId}`, {
+            method: 'DELETE'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Remove from local tickets
+            tickets = tickets.filter(t => t.id !== parseInt(ticketId));
+            
+            // Close any open modals
+            const editModal = bootstrap.Modal.getInstance(document.getElementById('editTicketModal'));
+            if (editModal) editModal.hide();
+            
+            const adminModal = bootstrap.Modal.getInstance(document.getElementById('adminTicketModal'));
+            if (adminModal) adminModal.hide();
+            
+            // Refresh displays
+            renderTickets();
+            loadCalendarData();
+            updateStats();
+            
+            showUpdateIndicator('Ticket deleted successfully');
+        } else {
+            showUpdateIndicator('Failed to delete ticket: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting ticket:', error);
+        showUpdateIndicator('Error deleting ticket. Please try again.', 'error');
+    }
+}
+
+// Enhanced calendar rendering with admin capabilities
+function renderCalendar() {
+    const calendarGrid = document.getElementById('calendar-grid');
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    // Group events by date for quick lookup
+    const eventsByDate = {};
+    calendarEvents.forEach(event => {
+        if (!eventsByDate[event.date]) eventsByDate[event.date] = [];
+        eventsByDate[event.date].push(event);
+    });
+    
+    // Clear calendar
+    calendarGrid.innerHTML = '';
+    
+    // Add day headers
+    const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    dayHeaders.forEach(day => {
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'calendar-day-header';
+        dayHeader.textContent = day;
+        calendarGrid.appendChild(dayHeader);
+    });
+    
+    // Get first day of month and number of days
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDay = firstDay.getDay();
+    
+    // Always render 6 rows (42 days)
+    let dayCounter = 1 - startingDay;
+    for (let i = 0; i < 42; i++) {
+        const dayDate = new Date(year, month, dayCounter);
+        const dayCell = document.createElement('div');
+        dayCell.className = 'calendar-day';
+        if (
+            dayDate.getMonth() !== month
+        ) {
+            dayCell.style.opacity = '0.3';
+        }
+        if (
+            dayDate.getDate() === new Date().getDate() &&
+            dayDate.getMonth() === new Date().getMonth() &&
+            dayDate.getFullYear() === new Date().getFullYear()
+        ) {
+            dayCell.classList.add('today');
+        }
+        
+        // Add click handler for non-user roles
+        if (userRole !== 'user') {
+            dayCell.style.cursor = 'pointer';
+            dayCell.onclick = () => openCalendarEventModal(dayDate);
+        }
+        
+        // Day number
+        const dayNumber = document.createElement('div');
+        dayNumber.className = 'day-number';
+        dayNumber.textContent = dayDate.getDate();
+        dayCell.appendChild(dayNumber);
+        
+        // Events
+        const dateStr = dayDate.toISOString().slice(0, 10);
+        const dayEvents = eventsByDate[dateStr] || [];
+        if (dayEvents.length > 0) {
+            dayCell.classList.add('has-events');
+        }
+        
+        // Container for events with max height and scroll
+        const eventsContainer = document.createElement('div');
+        eventsContainer.className = 'calendar-events-container';
+        dayEvents.forEach(event => {
+            const eventElement = document.createElement('div');
+            eventElement.className = 'calendar-event';
+            eventElement.textContent = `${event.title}`;
+            eventElement.onclick = (e) => {
+                e.stopPropagation();
+                if (userRole !== 'user') {
+                    // For non-user roles, open edit modal
+                    openCalendarEventModal(dayDate, event);
+                } else {
+                    // For user role, find the ticket and show details
+                    const ticket = tickets.find(t => t.id === event.id);
+                    if (ticket) {
+                        showTicketDetails(ticket);
+                    }
+                }
+            };
+            eventsContainer.appendChild(eventElement);
+        });
+        dayCell.appendChild(eventsContainer);
+        calendarGrid.appendChild(dayCell);
+        dayCounter++;
+    }
+}
+
+// Handle file upload
+async function handleFileUpload(input) {
+    const file = input.files[0];
+    if (!file) {
+        showUpdateIndicator('No file selected', 'error');
+        return;
+    }
+    
+    // Check file extension
+    const allowedExtensions = ['txt', 'csv', 'json'];
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+    if (!allowedExtensions.includes(fileExtension)) {
+        showUpdateIndicator('Invalid file type. Only .txt, .csv, and .json files are allowed.', 'error');
+        return;
+    }
+    
+    // Create FormData
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+        showUpdateIndicator('Uploading file...', 'info');
+        
+        const response = await fetch('/patterson/api/upload-file', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showUpdateIndicator(`File uploaded successfully! Processed ${data.tickets_processed} tickets.`, 'success');
+            
+            // Reload tickets to show the new data
+            await loadTickets();
+            
+            // Refresh calendar data to show tickets with scheduled dates
+            await loadCalendarData();
+            
+            // Update statistics
+            updateStats();
+        } else {
+            showUpdateIndicator('Failed to upload file: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        showUpdateIndicator('Error uploading file. Please try again.', 'error');
+    } finally {
+        // Reset file input
+        input.value = '';
+    }
+}
+</script>
+{% endblock %} 

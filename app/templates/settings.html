@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - ServiceDesk AI{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card bg-dark text-light mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Settings</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="#appearance" class="list-group-item list-group-item-action bg-dark text-light active" data-bs-toggle="list">
+                        <i class="bi bi-palette me-2"></i>Appearance
+                    </a>
+                    <a href="#notifications" class="list-group-item list-group-item-action bg-dark text-light" data-bs-toggle="list">
+                        <i class="bi bi-bell me-2"></i>Notifications
+                    </a>
+                    <a href="#privacy" class="list-group-item list-group-item-action bg-dark text-light" data-bs-toggle="list">
+                        <i class="bi bi-shield-lock me-2"></i>Privacy
+                    </a>
+                    <a href="#data" class="list-group-item list-group-item-action bg-dark text-light" data-bs-toggle="list">
+                        <i class="bi bi-database me-2"></i>Data Management
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="tab-content">
+                <!-- Appearance Settings -->
+                <div class="tab-pane fade show active" id="appearance">
+                    <div class="card bg-dark text-light">
+                        <div class="card-header">
+                            <h5 class="mb-0">Appearance Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="appearance-form">
+                                <div class="mb-3">
+                                    <label class="form-label">Theme</label>
+                                    <select class="form-select bg-dark text-light" name="theme">
+                                        <option value="dark">Dark</option>
+                                        <option value="light">Light</option>
+                                        <option value="system">System Default</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Accent Color</label>
+                                    <input type="color" class="form-control form-control-color bg-dark text-light" name="accent_color" value="#007bff">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Font Size</label>
+                                    <select class="form-select bg-dark text-light" name="font_size">
+                                        <option value="small">Small</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="large">Large</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notification Settings -->
+                <div class="tab-pane fade" id="notifications">
+                    <div class="card bg-dark text-light">
+                        <div class="card-header">
+                            <h5 class="mb-0">Notification Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="notifications-form">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="email_notifications" id="email_notifications" checked>
+                                        <label class="form-check-label" for="email_notifications">Email Notifications</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="browser_notifications" id="browser_notifications" checked>
+                                        <label class="form-check-label" for="browser_notifications">Browser Notifications</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Notification Frequency</label>
+                                    <select class="form-select bg-dark text-light" name="notification_frequency">
+                                        <option value="realtime">Real-time</option>
+                                        <option value="daily">Daily Digest</option>
+                                        <option value="weekly">Weekly Summary</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Privacy Settings -->
+                <div class="tab-pane fade" id="privacy">
+                    <div class="card bg-dark text-light">
+                        <div class="card-header">
+                            <h5 class="mb-0">Privacy Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="privacy-form">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="search_history" id="search_history" checked>
+                                        <label class="form-check-label" for="search_history">Save Search History</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="activity_tracking" id="activity_tracking" checked>
+                                        <label class="form-check-label" for="activity_tracking">Track Activity</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="data_collection" id="data_collection" checked>
+                                        <label class="form-check-label" for="data_collection">Allow Data Collection</label>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Data Management -->
+                <div class="tab-pane fade" id="data">
+                    <div class="card bg-dark text-light">
+                        <div class="card-header">
+                            <h5 class="mb-0">Data Management</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <h6>Export Data</h6>
+                                <p class="text-muted">Download all your data in a portable format.</p>
+                                <button class="btn btn-outline-primary" id="export-data">
+                                    <i class="bi bi-download me-2"></i>Export Data
+                                </button>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <h6>Clear Data</h6>
+                                <p class="text-muted">Delete specific types of data from your account.</p>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-danger" id="clear-search-history">
+                                        <i class="bi bi-trash me-2"></i>Clear Search History
+                                    </button>
+                                    <button class="btn btn-outline-danger" id="clear-activity">
+                                        <i class="bi bi-trash me-2"></i>Clear Activity Log
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h6>Delete Account</h6>
+                                <p class="text-muted">Permanently delete your account and all associated data.</p>
+                                <button class="btn btn-danger" id="delete-account">
+                                    <i class="bi bi-trash me-2"></i>Delete Account
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Save settings
+async function saveSettings(formId, endpoint) {
+    const form = document.getElementById(formId);
+    const formData = new FormData(form);
+    const settings = Object.fromEntries(formData.entries());
+    
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(settings)
+        });
+        
+        if (response.ok) {
+            alert('Settings saved successfully!');
+        } else {
+            throw new Error('Failed to save settings');
+        }
+    } catch (error) {
+        console.error('Error saving settings:', error);
+        alert('Failed to save settings. Please try again.');
+    }
+}
+
+// Event listeners for forms
+document.getElementById('appearance-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    saveSettings('appearance-form', '/api/settings/appearance');
+});
+
+document.getElementById('notifications-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    saveSettings('notifications-form', '/api/settings/notifications');
+});
+
+document.getElementById('privacy-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    saveSettings('privacy-form', '/api/settings/privacy');
+});
+
+// Data management actions
+document.getElementById('export-data').addEventListener('click', async () => {
+    try {
+        const response = await fetch('/api/settings/export-data');
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'user-data.json';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    } catch (error) {
+        console.error('Error exporting data:', error);
+        alert('Failed to export data. Please try again.');
+    }
+});
+
+document.getElementById('clear-search-history').addEventListener('click', async () => {
+    if (confirm('Are you sure you want to clear your search history? This action cannot be undone.')) {
+        try {
+            const response = await fetch('/api/settings/clear-search-history', { method: 'POST' });
+            if (response.ok) {
+                alert('Search history cleared successfully!');
+            } else {
+                throw new Error('Failed to clear search history');
+            }
+        } catch (error) {
+            console.error('Error clearing search history:', error);
+            alert('Failed to clear search history. Please try again.');
+        }
+    }
+});
+
+document.getElementById('clear-activity').addEventListener('click', async () => {
+    if (confirm('Are you sure you want to clear your activity log? This action cannot be undone.')) {
+        try {
+            const response = await fetch('/api/settings/clear-activity', { method: 'POST' });
+            if (response.ok) {
+                alert('Activity log cleared successfully!');
+            } else {
+                throw new Error('Failed to clear activity log');
+            }
+        } catch (error) {
+            console.error('Error clearing activity log:', error);
+            alert('Failed to clear activity log. Please try again.');
+        }
+    }
+});
+
+document.getElementById('delete-account').addEventListener('click', async () => {
+    if (confirm('Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently deleted.')) {
+        const password = prompt('Please enter your password to confirm:');
+        if (password) {
+            try {
+                const response = await fetch('/api/settings/delete-account', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                
+                if (response.ok) {
+                    alert('Account deleted successfully. You will be redirected to the login page.');
+                    window.location.href = '/login';
+                } else {
+                    throw new Error('Failed to delete account');
+                }
+            } catch (error) {
+                console.error('Error deleting account:', error);
+                alert('Failed to delete account. Please try again.');
+            }
+        }
+    }
+});
+</script>
+{% endblock %} 

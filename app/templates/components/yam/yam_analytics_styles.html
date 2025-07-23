@@ -1,0 +1,109 @@
+<!-- YAM Analytics Component Styles -->
+{% macro render_yam_analytics_styles() %}
+<style>
+/* ENHANCED ANALYTICS COMPONENT STYLES - BETTER CONTAINMENT */
+.daily-analytics-component {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px !important; /* Increased radius */
+    padding: 1.25rem !important; /* Increased padding */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important; /* Prevent overflow */
+    min-height: 300px !important; /* Minimum height */
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem !important; /* Increased gap */
+    margin-top: 1rem !important; /* Increased margin */
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important; /* Prevent overflow */
+}
+
+.chart-container {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px !important; /* Increased radius */
+    padding: 1rem !important; /* Increased padding */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important; /* Prevent overflow */
+    min-height: 200px !important; /* Minimum height */
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.chart-container:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px) !important; /* Enhanced hover */
+}
+
+.chart-container h6 {
+    color: #e0e0e0;
+    font-size: 0.95rem !important; /* Increased font */
+    font-weight: 600;
+    margin-bottom: 1rem !important; /* Increased margin */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem !important; /* Increased gap */
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+.chart-container h6 i {
+    color: #5865f2;
+    font-size: 1rem !important; /* Increased size */
+    flex-shrink: 0 !important; /* Prevent icon shrinking */
+}
+
+.chart-container canvas {
+    flex: 1 !important;
+    max-height: 180px !important; /* Increased max height */
+    width: 100% !important;
+    height: auto !important;
+    object-fit: contain !important;
+}
+
+.chart-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem !important; /* Increased margin */
+    padding-top: 1rem !important; /* Increased padding */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0 !important; /* Prevent shrinking */
+}
+
+.stat {
+    text-align: center;
+    flex: 1 !important;
+    overflow: hidden !important;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.2rem !important; /* Increased font */
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.stat-label {
+    font-size: 0.8rem !important; /* Increased font */
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 0.25rem !important; /* Increased margin */
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+</style>
+{% endmacro %} 

@@ -1,0 +1,537 @@
+<!-- Initialization Progress Monitor Component -->
+<div id="initialization-monitor" class="initialization-monitor" style="display: none;">
+    <div class="monitor-header">
+        <h4>🚀 Application Initialization</h4>
+        <div class="system-info">
+            <span id="system-specs">Detecting system specifications...</span>
+        </div>
+    </div>
+    
+    <div class="progress-overview">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="overall-progress">
+                <div class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div class="progress-text">
+                <span id="progress-percentage">0%</span> - 
+                <span id="progress-status">Starting...</span>
+                <span id="progress-timing"></span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="components-list" id="components-list">
+        <!-- Component status items will be populated dynamically -->
+    </div>
+    
+    <div class="performance-metrics">
+        <div class="metric-item">
+            <span class="metric-label">Memory Usage:</span>
+            <span id="memory-usage" class="metric-value">-- MB</span>
+        </div>
+        <div class="metric-item">
+            <span class="metric-label">Performance Score:</span>
+            <span id="performance-score" class="metric-value">--</span>
+        </div>
+        <div class="metric-item">
+            <span class="metric-label">Elapsed Time:</span>
+            <span id="elapsed-time" class="metric-value">--s</span>
+        </div>
+    </div>
+    
+    <div class="monitor-controls">
+        <button id="toggle-details" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-chevron-down"></i> Show Details
+        </button>
+        <button id="refresh-status" class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+    </div>
+</div>
+
+<style>
+.initialization-monitor {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px;
+    color: white;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    max-width: 600px;
+    position: relative;
+}
+
+.monitor-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.monitor-header h4 {
+    margin: 0 0 8px 0;
+    color: #3498db;
+    font-weight: 600;
+}
+
+.system-info {
+    font-size: 12px;
+    color: #bdc3c7;
+    font-weight: 400;
+}
+
+.progress-overview {
+    margin-bottom: 20px;
+}
+
+.progress-bar-container {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 3px;
+    margin-bottom: 8px;
+}
+
+.progress-bar {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    height: 25px;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, #3498db 0%, #2ecc71 100%);
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    animation: shine 2s infinite;
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #ecf0f1;
+    margin-top: 5px;
+}
+
+.components-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.component-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    margin: 3px 0;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.component-name {
+    font-weight: 500;
+    flex: 1;
+}
+
+.component-status {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.component-timing {
+    font-size: 10px;
+    color: #bdc3c7;
+    margin-left: 8px;
+}
+
+.status-starting {
+    background: #f39c12;
+    color: white;
+}
+
+.status-complete, .status-success {
+    background: #27ae60;
+    color: white;
+}
+
+.status-error {
+    background: #e74c3c;
+    color: white;
+}
+
+.status-skipped {
+    background: #95a5a6;
+    color: white;
+}
+
+.performance-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 15px;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.metric-item {
+    text-align: center;
+}
+
+.metric-label {
+    display: block;
+    font-size: 11px;
+    color: #bdc3c7;
+    margin-bottom: 4px;
+}
+
+.metric-value {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #3498db;
+}
+
+.monitor-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.monitor-controls .btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-secondary {
+    border: 1px solid #6c757d;
+    color: #6c757d;
+    background: transparent;
+}
+
+.btn-outline-secondary:hover {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-outline-primary {
+    border: 1px solid #3498db;
+    color: #3498db;
+    background: transparent;
+}
+
+.btn-outline-primary:hover {
+    background: #3498db;
+    color: white;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .initialization-monitor {
+        margin: 10px;
+        padding: 15px;
+    }
+    
+    .performance-metrics {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .monitor-controls {
+        flex-direction: column;
+    }
+}
+
+/* Animation for showing/hiding */
+.initialization-monitor.fade-in {
+    animation: fadeInUp 0.5s ease;
+}
+
+.initialization-monitor.fade-out {
+    animation: fadeOutDown 0.3s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOutDown {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+</style>
+
+<script>
+class InitializationMonitor {
+    constructor() {
+        this.monitor = document.getElementById('initialization-monitor');
+        this.updateInterval = null;
+        this.isDetailsVisible = false;
+        this.lastUpdateTime = 0;
+        
+        this.bindEvents();
+        this.startMonitoring();
+    }
+    
+    bindEvents() {
+        // Toggle details button
+        const toggleBtn = document.getElementById('toggle-details');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => this.toggleDetails());
+        }
+        
+        // Refresh status button
+        const refreshBtn = document.getElementById('refresh-status');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => this.refreshStatus());
+        }
+    }
+    
+    async startMonitoring() {
+        try {
+            // Initial fetch
+            await this.updateStatus();
+            
+            // Set up periodic updates
+            this.updateInterval = setInterval(() => {
+                this.updateStatus();
+            }, 2000); // Update every 2 seconds
+            
+            // Show the monitor
+            this.show();
+            
+        } catch (error) {
+            console.error('Failed to start initialization monitoring:', error);
+        }
+    }
+    
+    async updateStatus() {
+        try {
+            const response = await fetch('/api/initialization/status');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const status = await response.json();
+            this.renderStatus(status);
+            
+            // Stop monitoring if initialization is complete
+            if (status.status === 'full_complete' || status.status === 'error') {
+                setTimeout(() => {
+                    this.stopMonitoring();
+                }, 5000); // Hide after 5 seconds
+            }
+            
+        } catch (error) {
+            console.error('Failed to fetch initialization status:', error);
+            this.renderError(error);
+        }
+    }
+    
+    renderStatus(status) {
+        // Update progress bar
+        const progressFill = this.monitor.querySelector('.progress-fill');
+        const progressPercentage = this.monitor.querySelector('#progress-percentage');
+        const progressStatus = this.monitor.querySelector('#progress-status');
+        const progressTiming = this.monitor.querySelector('#progress-timing');
+        
+        if (status.progress) {
+            const percentage = Math.round(status.progress.percentage);
+            progressFill.style.width = `${percentage}%`;
+            progressPercentage.textContent = `${percentage}%`;
+            progressStatus.textContent = `${status.progress.completed}/${status.progress.total} components`;
+        }
+        
+        // Update timing
+        if (status.elapsed_time) {
+            progressTiming.textContent = `(${status.elapsed_time.toFixed(1)}s)`;
+        }
+        
+        // Update system info
+        const systemSpecs = this.monitor.querySelector('#system-specs');
+        if (status.performance_metrics?.system_info) {
+            const sys = status.performance_metrics.system_info;
+            systemSpecs.textContent = `${sys.cpu_count} CPUs, ${sys.memory_total_gb?.toFixed(1)}GB RAM`;
+        }
+        
+        // Update components list
+        this.renderComponents(status.components || {});
+        
+        // Update performance metrics
+        this.renderPerformanceMetrics(status);
+    }
+    
+    renderComponents(components) {
+        const componentsList = this.monitor.querySelector('#components-list');
+        
+        if (!this.isDetailsVisible) {
+            componentsList.style.display = 'none';
+            return;
+        }
+        
+        componentsList.style.display = 'block';
+        
+        const html = Object.entries(components).map(([name, component]) => {
+            const statusClass = `status-${component.status}`;
+            const timing = component.duration ? `${component.duration.toFixed(2)}s` : '';
+            const displayName = name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            
+            return `
+                <div class="component-item">
+                    <span class="component-name">${displayName}</span>
+                    <div>
+                        <span class="component-status ${statusClass}">${component.status}</span>
+                        ${timing ? `<span class="component-timing">${timing}</span>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        componentsList.innerHTML = html;
+    }
+    
+    renderPerformanceMetrics(status) {
+        // Memory usage
+        const memoryUsage = this.monitor.querySelector('#memory-usage');
+        if (status.current_metrics?.process?.memory_mb) {
+            memoryUsage.textContent = `${Math.round(status.current_metrics.process.memory_mb)}MB`;
+        }
+        
+        // Performance score (calculated from system info)
+        const performanceScore = this.monitor.querySelector('#performance-score');
+        if (status.performance_metrics?.system_info) {
+            const sys = status.performance_metrics.system_info;
+            const score = Math.min(10, (sys.cpu_count / 4) * (sys.memory_total_gb / 8) * 10);
+            performanceScore.textContent = `${score.toFixed(1)}/10`;
+        }
+        
+        // Elapsed time
+        const elapsedTime = this.monitor.querySelector('#elapsed-time');
+        if (status.elapsed_time) {
+            elapsedTime.textContent = `${status.elapsed_time.toFixed(1)}s`;
+        }
+    }
+    
+    renderError(error) {
+        const progressStatus = this.monitor.querySelector('#progress-status');
+        progressStatus.textContent = `Error: ${error.message}`;
+        progressStatus.style.color = '#e74c3c';
+    }
+    
+    toggleDetails() {
+        this.isDetailsVisible = !this.isDetailsVisible;
+        const toggleBtn = document.getElementById('toggle-details');
+        const icon = toggleBtn.querySelector('i');
+        
+        if (this.isDetailsVisible) {
+            icon.className = 'fas fa-chevron-up';
+            toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide Details';
+        } else {
+            icon.className = 'fas fa-chevron-down';
+            toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i> Show Details';
+        }
+        
+        // Re-render components with new visibility
+        this.updateStatus();
+    }
+    
+    async refreshStatus() {
+        const refreshBtn = document.getElementById('refresh-status');
+        const originalContent = refreshBtn.innerHTML;
+        
+        refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+        refreshBtn.disabled = true;
+        
+        try {
+            await this.updateStatus();
+        } finally {
+            setTimeout(() => {
+                refreshBtn.innerHTML = originalContent;
+                refreshBtn.disabled = false;
+            }, 500);
+        }
+    }
+    
+    show() {
+        this.monitor.style.display = 'block';
+        this.monitor.classList.add('fade-in');
+    }
+    
+    hide() {
+        this.monitor.classList.add('fade-out');
+        setTimeout(() => {
+            this.monitor.style.display = 'none';
+            this.monitor.classList.remove('fade-in', 'fade-out');
+        }, 300);
+    }
+    
+    stopMonitoring() {
+        if (this.updateInterval) {
+            clearInterval(this.updateInterval);
+            this.updateInterval = null;
+        }
+        
+        setTimeout(() => {
+            this.hide();
+        }, 2000);
+    }
+}
+
+// Auto-initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    // Only initialize if we're in an appropriate context (splash screen, admin panel, etc.)
+    if (document.getElementById('initialization-monitor')) {
+        window.initMonitor = new InitializationMonitor();
+    }
+});
+
+// Export for manual initialization
+window.InitializationMonitor = InitializationMonitor;
+</script> 

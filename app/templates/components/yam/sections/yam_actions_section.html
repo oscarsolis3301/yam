@@ -1,0 +1,270 @@
+<!-- YAM Actions Section - Action Buttons Grid -->
+<div class="yam-actions-grid-full yam-grid-hover-safe">
+    <!-- Team & Analytics -->
+    <div class="yam-action-group yam-hover-lift">
+        <h3>
+            <i class="bi bi-people-fill" aria-hidden="true"></i>
+            Team & Analytics
+        </h3>
+        <div class="yam-action-buttons">
+            <button class="yam-action-btn yam-focus-visible yam-btn-hover" 
+                    onclick="yamModals.openModal('userPresenceModal')"
+                    aria-label="Open User Presence Map">
+                <i class="bi bi-map" aria-hidden="true"></i>
+                <span>User Presence Map</span>
+            </button>
+            <button class="yam-action-btn yam-focus-visible yam-btn-hover" 
+                    onclick="yamModals.openModal('userAnalyticsModal')"
+                    aria-label="Open User Analytics">
+                <i class="bi bi-graph-up" aria-hidden="true"></i>
+                <span>User Analytics</span>
+            </button>
+            <button class="yam-action-btn yam-focus-visible yam-btn-hover" 
+                    onclick="yamModals.openModal('activityHeatmapModal')"
+                    aria-label="Open Activity Heatmap">
+                <i class="bi bi-calendar-heatmap" aria-hidden="true"></i>
+                <span>Activity Heatmap</span>
+            </button>
+            <button class="yam-action-btn yam-focus-visible yam-btn-hover" 
+                    onclick="yamModals.openModal('advancedStatusModal')"
+                    aria-label="Open Advanced Status">
+                <i class="bi bi-person-badge" aria-hidden="true"></i>
+                <span>Advanced Status</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- System & Monitoring -->
+    <div class="yam-action-group yam-hover-lift">
+        <h3>
+            <i class="bi bi-gear-fill" aria-hidden="true"></i>
+            System & Monitoring
+        </h3>
+        <div class="yam-action-buttons">
+            <button class="yam-action-btn yam-focus-visible yam-btn-hover" 
+                    onclick="yamModals.openModal('systemMonitorModal')"
+                    aria-label="Open System Monitor">
+                <i class="bi bi-cpu" aria-hidden="true"></i>
+                <span>System Monitor</span>
+            </button>
+            <button class="yam-action-btn yam-focus-visible yam-btn-hover" 
+                    onclick="yamModals.openModal('systemHealthModal')"
+                    aria-label="Open System Health">
+                <i class="bi bi-heart-pulse" aria-hidden="true"></i>
+                <span>System Health</span>
+            </button>
+            <button class="yam-action-btn yam-focus-visible yam-btn-hover" 
+                    onclick="yamModals.openModal('teamPerformanceModal')"
+                    aria-label="Open Team Performance">
+                <i class="bi bi-trophy" aria-hidden="true"></i>
+                <span>Team Performance</span>
+            </button>
+            <button class="yam-action-btn yam-focus-visible yam-btn-hover" 
+                    onclick="yamModals.openModal('teamCollaborationModal')"
+                    aria-label="Open Team Collaboration">
+                <i class="bi bi-people" aria-hidden="true"></i>
+                <span>Team Collaboration</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Activity & Communication -->
+    <div class="yam-action-group yam-hover-lift">
+        <h3>
+            <i class="bi bi-activity" aria-hidden="true"></i>
+            Activity & Communication
+        </h3>
+        <div class="yam-action-buttons">
+            <button class="yam-action-btn yam-focus-visible yam-btn-hover" 
+                    onclick="yamModals.openModal('recentActivityModal')"
+                    aria-label="Open Recent Activity">
+                <i class="bi bi-clock-history" aria-hidden="true"></i>
+                <span>Recent Activity</span>
+            </button>
+            <button class="yam-action-btn yam-focus-visible yam-btn-hover" 
+                    onclick="yamModals.openModal('activityTrackerModal')"
+                    aria-label="Open Activity Tracker">
+                <i class="bi bi-activity" aria-hidden="true"></i>
+                <span>Activity Tracker</span>
+            </button>
+            <button class="yam-action-btn yam-focus-visible yam-btn-hover" 
+                    onclick="yamModals.openModal('notificationsModal')"
+                    aria-label="Open Notifications">
+                <i class="bi bi-bell" aria-hidden="true"></i>
+                <span>Notifications</span>
+            </button>
+            <button class="yam-action-btn yam-focus-visible yam-btn-hover" 
+                    onclick="yamModals.openModal('teamChatModal')"
+                    aria-label="Open Team Chat">
+                <i class="bi bi-chat-dots" aria-hidden="true"></i>
+                <span>Team Chat</span>
+            </button>
+        </div>
+    </div>
+<<<<<<< HEAD
+</div>
+
+<!-- CRITICAL: YAM Actions Handler for Create Outage -->
+<script>
+// YAM Actions Handler
+window.yamActions = {
+    // Show create outage modal
+    showCreateOutageModal() {
+        // Check if we have the dailyAnalytics object (from daily_analytics.html)
+        if (window.dailyAnalytics && typeof window.dailyAnalytics.showCreateOutageModal === 'function') {
+            window.dailyAnalytics.showCreateOutageModal();
+            return;
+        }
+        
+        // Check if we have the outage tracker object (from outage_tracker.html)
+        if (window.outageTracker && typeof window.outageTracker.showCreateOutageModal === 'function') {
+            window.outageTracker.showCreateOutageModal();
+            return;
+        }
+        
+        // Fallback: Try to find and show any create outage modal
+        const createOutageModal = document.getElementById('createOutageModal') || 
+                                 document.getElementById('yamCreateOutageModal') ||
+                                 document.getElementById('outageModal');
+        
+        if (createOutageModal) {
+            // Use Bootstrap modal if available
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const modal = new bootstrap.Modal(createOutageModal);
+                modal.show();
+            } else {
+                // Fallback to direct show
+                createOutageModal.style.display = 'block';
+                createOutageModal.classList.add('show');
+                document.body.classList.add('modal-open');
+            }
+            
+            // CRITICAL: Ensure modal is properly positioned and interactive
+            setTimeout(() => {
+                this.ensureModalVisibility(createOutageModal);
+            }, 100);
+        } else {
+            // Show error message
+            console.error('Create outage modal not found');
+            if (window.yamModals && window.yamModals.showToast) {
+                window.yamModals.showToast('Create outage modal not available', 'error');
+            } else {
+                alert('Create outage modal not available');
+            }
+        }
+    },
+    
+    // CRITICAL: Ensure modal is properly visible and interactive
+    ensureModalVisibility(modalElement) {
+        if (!modalElement) return;
+        
+        // Set proper z-index
+        modalElement.style.zIndex = '99999999';
+        
+        // Ensure modal dialog is properly positioned
+        const modalDialog = modalElement.querySelector('.modal-dialog');
+        if (modalDialog) {
+            modalDialog.style.zIndex = '99999999';
+            modalDialog.style.position = 'relative';
+        }
+        
+        // Ensure modal content is interactive
+        const modalContent = modalElement.querySelector('.modal-content');
+        if (modalContent) {
+            modalContent.style.zIndex = '99999999';
+            modalContent.style.position = 'relative';
+            modalContent.style.pointerEvents = 'auto';
+        }
+        
+        // Ensure all form elements are interactive
+        const formElements = modalElement.querySelectorAll('input, textarea, select, button');
+        formElements.forEach(element => {
+            element.style.pointerEvents = 'auto';
+            element.style.position = 'relative';
+            element.style.zIndex = 'auto';
+        });
+        
+        // Add backdrop if needed
+        if (!document.querySelector('.modal-backdrop')) {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.style.zIndex = '99999998';
+            document.body.appendChild(backdrop);
+        }
+        
+        console.log('YAM Actions: Create outage modal visibility ensured');
+    }
+};
+
+// Initialize YAM Actions when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('YAM Actions: Initialized');
+    });
+} else {
+    console.log('YAM Actions: Initialized');
+}
+</script>
+
+<!-- CRITICAL: Enhanced styles for outage button -->
+<style>
+/* Enhanced styles for Create Outage button */
+.yam-action-btn-outage {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.8) 0%, rgba(220, 38, 38, 0.8) 100%) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+.yam-action-btn-outage:hover {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(220, 38, 38, 0.9) 100%) !important;
+    border-color: rgba(239, 68, 68, 0.5) !important;
+    box-shadow: 0 12px 32px rgba(239, 68, 68, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+.yam-action-btn-outage i {
+    color: #ffffff !important;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+/* CRITICAL: Ensure Bootstrap modals work properly */
+.modal.show {
+    z-index: 99999999 !important;
+}
+
+.modal.show .modal-dialog {
+    z-index: 99999999 !important;
+}
+
+.modal.show .modal-content {
+    z-index: 99999999 !important;
+    pointer-events: auto !important;
+}
+
+.modal-backdrop.show {
+    z-index: 99999998 !important;
+}
+
+/* CRITICAL: Force all modal elements to be interactive */
+.modal * {
+    pointer-events: auto !important;
+}
+
+.modal input,
+.modal textarea,
+.modal select,
+.modal button {
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: auto !important;
+}
+</style>
+=======
+</div> 
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909

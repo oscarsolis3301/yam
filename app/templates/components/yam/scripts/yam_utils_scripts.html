@@ -1,0 +1,379 @@
+<!-- YAM Utils Scripts - Utility Functions and Helper Methods -->
+<script>
+// Enhanced analytics component styles
+window.yamAnalyticsStyles = {
+    // Enhanced analytics component to fill space
+    dailyAnalyticsComponent: {
+        minHeight: '400px',
+        height: 'auto',
+        flex: '1'
+    },
+    
+    // Enhanced chart container styles
+    chartContainer: {
+        minHeight: '500px',
+        height: 'auto',
+        flex: '1'
+    },
+    
+    // Enhanced chart canvas styles
+    chartCanvas: {
+        maxHeight: '400px',
+        minHeight: '350px'
+    }
+};
+
+// Enhanced analytics component styles - better containment and filling
+window.yamAnalyticsEnhancements = {
+    // Apply enhanced styles to analytics components
+    enhanceAnalyticsComponents: function() {
+        const analyticsComponents = document.querySelectorAll('.daily-analytics-component');
+        analyticsComponents.forEach(component => {
+            Object.assign(component.style, window.yamAnalyticsStyles.dailyAnalyticsComponent);
+        });
+        
+        const chartContainers = document.querySelectorAll('.chart-container');
+        chartContainers.forEach(container => {
+            Object.assign(container.style, window.yamAnalyticsStyles.chartContainer);
+        });
+        
+        const chartCanvases = document.querySelectorAll('.chart-container canvas');
+        chartCanvases.forEach(canvas => {
+            Object.assign(canvas.style, window.yamAnalyticsStyles.chartCanvas);
+        });
+    },
+    
+    // Initialize analytics enhancements
+    init: function() {
+        this.enhanceAnalyticsComponents();
+        console.log('YAM Analytics enhancements applied');
+    }
+};
+
+// Enhanced chart data processing utilities
+window.yamChartUtils = {
+    // Process chart data with fallback
+    processChartData: function(data, fallbackData = []) {
+        try {
+            if (window.validateData(data, 'array')) {
+                return data;
+            } else if (window.validateData(data, 'object') && data.data && Array.isArray(data.data)) {
+                return data.data;
+            } else {
+                console.warn('Invalid chart data, using fallback');
+                return fallbackData;
+            }
+        } catch (error) {
+            console.error('Error processing chart data:', error);
+            return fallbackData;
+        }
+    },
+    
+    // Create chart configuration
+    createChartConfig: function(type, data, options = {}) {
+        const baseConfig = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#e0e0e0'
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: '#e0e0e0'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: '#e0e0e0'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                }
+            }
+        };
+        
+        return {
+            type: type,
+            data: data,
+            options: { ...baseConfig, ...options }
+        };
+    },
+    
+    // Update chart with new data
+    updateChart: function(chart, newData) {
+        if (chart && chart.data) {
+            chart.data = newData;
+            chart.update('active');
+        }
+    }
+};
+
+// Enhanced component utilities
+window.yamComponentUtils = {
+    // Safe component initialization
+    safeInitComponent: function(componentName, initFunction) {
+        try {
+            if (typeof initFunction === 'function') {
+                initFunction();
+                console.log(`${componentName} component initialized`);
+            } else {
+                console.warn(`${componentName} init function not found`);
+            }
+        } catch (error) {
+            console.error(`Error initializing ${componentName}:`, error);
+        }
+    },
+    
+    // Component error recovery
+    recoverComponent: function(componentName, fallbackFunction) {
+        try {
+            if (typeof fallbackFunction === 'function') {
+                fallbackFunction();
+                console.log(`${componentName} recovered with fallback`);
+            }
+        } catch (error) {
+            console.error(`Failed to recover ${componentName}:`, error);
+        }
+    },
+    
+    // Component registration
+    registerComponent: function(name, component) {
+        if (window.yamDashboard) {
+            return window.yamDashboard.registerComponent(name, component);
+        }
+        return false;
+    }
+};
+
+// Enhanced event utilities
+window.yamEventUtils = {
+    // Safe event listener wrapper
+    safeAddEventListener: function(element, event, handler) {
+        try {
+            if (element && typeof element.addEventListener === 'function') {
+                element.addEventListener(event, handler);
+                return true;
+            } else {
+                console.warn('Element not found or addEventListener not available:', element);
+                return false;
+            }
+        } catch (error) {
+            console.error('Error adding event listener:', error);
+            return false;
+        }
+    },
+    
+    // Debounce function
+    debounce: function(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    },
+    
+    // Throttle function
+    throttle: function(func, limit) {
+        let inThrottle;
+        return function() {
+            const args = arguments;
+            const context = this;
+            if (!inThrottle) {
+                func.apply(context, args);
+                inThrottle = true;
+                setTimeout(() => inThrottle = false, limit);
+            }
+        };
+    }
+};
+
+// Enhanced DOM utilities
+window.yamDomUtils = {
+    // Safe element selection
+    safeGetElementById: function(id) {
+        try {
+            return document.getElementById(id);
+        } catch (error) {
+            console.warn('Safe getElementById failed for:', id, error);
+            return null;
+        }
+    },
+    
+    safeQuerySelector: function(selector, parent = document) {
+        try {
+            return parent.querySelector(selector);
+        } catch (error) {
+            console.warn('Safe querySelector failed for:', selector, error);
+            return null;
+        }
+    },
+    
+    // Element visibility utilities
+    isElementVisible: function(element) {
+        if (!element) return false;
+        
+        const rect = element.getBoundingClientRect();
+        const style = window.getComputedStyle(element);
+        
+        return rect.width > 0 && 
+               rect.height > 0 && 
+               style.visibility !== 'hidden' && 
+               style.display !== 'none';
+    },
+    
+    // Scroll element into view
+    scrollIntoView: function(element, options = {}) {
+        if (element && typeof element.scrollIntoView === 'function') {
+            element.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'nearest',
+                ...options
+            });
+        }
+    }
+};
+
+// Enhanced storage utilities
+window.yamStorageUtils = {
+    // Local storage with error handling
+    setLocalStorage: function(key, value) {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+            return true;
+        } catch (error) {
+            console.error('Error setting localStorage:', error);
+            return false;
+        }
+    },
+    
+    getLocalStorage: function(key, defaultValue = null) {
+        try {
+            const item = localStorage.getItem(key);
+            return item ? JSON.parse(item) : defaultValue;
+        } catch (error) {
+            console.error('Error getting localStorage:', error);
+            return defaultValue;
+        }
+    },
+    
+    removeLocalStorage: function(key) {
+        try {
+            localStorage.removeItem(key);
+            return true;
+        } catch (error) {
+            console.error('Error removing localStorage:', error);
+            return false;
+        }
+    },
+    
+    // Session storage with error handling
+    setSessionStorage: function(key, value) {
+        try {
+            sessionStorage.setItem(key, JSON.stringify(value));
+            return true;
+        } catch (error) {
+            console.error('Error setting sessionStorage:', error);
+            return false;
+        }
+    },
+    
+    getSessionStorage: function(key, defaultValue = null) {
+        try {
+            const item = sessionStorage.getItem(key);
+            return item ? JSON.parse(item) : defaultValue;
+        } catch (error) {
+            console.error('Error getting sessionStorage:', error);
+            return defaultValue;
+        }
+    }
+};
+
+// Enhanced formatting utilities
+window.yamFormatUtils = {
+    // Format numbers
+    formatNumber: function(num, decimals = 0) {
+        if (isNaN(num)) return '0';
+        return Number(num).toLocaleString('en-US', {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        });
+    },
+    
+    // Format percentages
+    formatPercentage: function(num, decimals = 1) {
+        if (isNaN(num)) return '0%';
+        return Number(num).toLocaleString('en-US', {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        }) + '%';
+    },
+    
+    // Format dates
+    formatDate: function(date, format = 'short') {
+        if (!date) return '';
+        
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return '';
+        
+        switch (format) {
+            case 'short':
+                return d.toLocaleDateString();
+            case 'long':
+                return d.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            case 'time':
+                return d.toLocaleTimeString();
+            case 'datetime':
+                return d.toLocaleString();
+            default:
+                return d.toLocaleDateString();
+        }
+    },
+    
+    // Format file sizes
+    formatFileSize: function(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+};
+
+// Initialize utilities when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize analytics enhancements
+    if (window.yamAnalyticsEnhancements) {
+        window.yamAnalyticsEnhancements.init();
+    }
+    
+    // Clear expired cache items periodically
+    if (window.yamDataCache) {
+        setInterval(() => {
+            window.yamDataCache.clearExpired();
+        }, 60000); // Every minute
+    }
+    
+    console.log('YAM Utils initialized');
+});
+</script> 

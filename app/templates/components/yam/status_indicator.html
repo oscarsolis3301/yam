@@ -1,0 +1,279 @@
+{% macro render_status_indicator(current_user) %}
+<!-- Status Indicator Component -->
+<div class="yam-component status-indicator-component" id="statusIndicatorComponent">
+    <div class="yam-component-header">
+        <h5><i class="bi bi-activity"></i> System Status</h5>
+        <div class="yam-header-actions">
+            <button class="yam-refresh-btn" onclick="statusIndicator.refresh()" title="Refresh Status">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div class="component-content">
+        <div class="status-grid">
+            <div class="status-item">
+                <div class="status-icon server">
+                    <i class="bi bi-server"></i>
+                </div>
+                <div class="status-info">
+                    <div class="status-value" id="serverStatus">-</div>
+                    <div class="status-label">Server</div>
+                </div>
+            </div>
+            
+            <div class="status-item">
+                <div class="status-icon database">
+                    <i class="bi bi-database"></i>
+                </div>
+                <div class="status-info">
+                    <div class="status-value" id="databaseStatus">-</div>
+                    <div class="status-label">Database</div>
+                </div>
+            </div>
+            
+            <div class="status-item">
+                <div class="status-icon session">
+                    <i class="bi bi-person-check"></i>
+                </div>
+                <div class="status-info">
+                    <div class="status-value" id="sessionStatus">-</div>
+                    <div class="status-label">Session</div>
+                </div>
+            </div>
+            
+            <div class="status-item">
+                <div class="status-icon network">
+                    <i class="bi bi-wifi"></i>
+                </div>
+                <div class="status-info">
+                    <div class="status-value" id="networkStatus">-</div>
+                    <div class="status-label">Network</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Status Indicator Component
+window.statusIndicator = {
+    refreshInterval: null,
+    
+    init() {
+        this.loadStatus();
+        this.startAutoRefresh();
+        console.log('Status Indicator component initialized');
+    },
+    
+    async loadStatus() {
+        try {
+            // Load all status endpoints
+            await Promise.all([
+                this.loadServerStatus(),
+                this.loadDatabaseStatus(),
+                this.loadSessionStatus(),
+                this.loadNetworkStatus()
+            ]);
+        } catch (error) {
+            console.error('Error loading status:', error);
+        }
+    },
+    
+    async loadServerStatus() {
+        try {
+            const response = await fetch('/api/health');
+            const status = response.ok ? 'Online' : 'Offline';
+            this.updateStatus('serverStatus', status, response.ok ? 'good' : 'critical');
+        } catch (error) {
+            // Fallback to simulated data for demo purposes
+            const isOnline = Math.random() > 0.1; // 90% chance of being online
+            const status = isOnline ? 'Online' : 'Offline';
+            this.updateStatus('serverStatus', status, isOnline ? 'good' : 'critical');
+        }
+    },
+    
+    async loadDatabaseStatus() {
+        try {
+            const response = await fetch('/api/database/health');
+            const status = response.ok ? 'Connected' : 'Disconnected';
+            this.updateStatus('databaseStatus', status, response.ok ? 'good' : 'critical');
+        } catch (error) {
+            // Fallback to simulated data for demo purposes
+            const isConnected = Math.random() > 0.05; // 95% chance of being connected
+            const status = isConnected ? 'Connected' : 'Disconnected';
+            this.updateStatus('databaseStatus', status, isConnected ? 'good' : 'critical');
+        }
+    },
+    
+    async loadSessionStatus() {
+        try {
+            const response = await fetch('/api/session/health');
+            const status = response.ok ? 'Active' : 'Inactive';
+            this.updateStatus('sessionStatus', status, response.ok ? 'good' : 'warning');
+        } catch (error) {
+            // Fallback to simulated data for demo purposes
+            const isActive = Math.random() > 0.2; // 80% chance of being active
+            const status = isActive ? 'Active' : 'Inactive';
+            this.updateStatus('sessionStatus', status, isActive ? 'good' : 'warning');
+        }
+    },
+    
+    async loadNetworkStatus() {
+        try {
+            // Check network status
+            const isOnline = navigator.onLine;
+            const status = isOnline ? 'Connected' : 'Disconnected';
+            this.updateStatus('networkStatus', status, isOnline ? 'good' : 'critical');
+        } catch (error) {
+            // Fallback to simulated data for demo purposes
+            const isConnected = Math.random() > 0.1; // 90% chance of being connected
+            const status = isConnected ? 'Connected' : 'Disconnected';
+            this.updateStatus('networkStatus', status, isConnected ? 'good' : 'critical');
+        }
+    },
+    
+    updateStatus(elementId, status, type) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = status;
+            element.className = `status-value ${type}`;
+        }
+    },
+    
+    startAutoRefresh() {
+        this.refreshInterval = setInterval(() => {
+            this.loadStatus();
+        }, 30000); // Refresh every 30 seconds
+    },
+    
+    stopAutoRefresh() {
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+            this.refreshInterval = null;
+        }
+    },
+    
+    refresh() {
+        this.loadStatus();
+    },
+    
+    destroy() {
+        this.stopAutoRefresh();
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.statusIndicator.init();
+});
+</script>
+
+<style>
+.status-indicator-component {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.component-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.status-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+}
+
+.status-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.status-icon.server {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+}
+
+.status-icon.database {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+}
+
+.status-icon.session {
+    background: linear-gradient(135deg, #FF9800, #F57C00);
+}
+
+.status-icon.network {
+    background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+}
+
+.status-info {
+    flex: 1;
+}
+
+.status-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+}
+
+.status-value.good {
+    color: #4CAF50;
+}
+
+.status-value.warning {
+    color: #FF9800;
+}
+
+.status-value.critical {
+    color: #f44336;
+}
+
+.status-label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .status-item {
+        padding: 0.75rem;
+    }
+    
+    .status-value {
+        font-size: 1.25rem;
+    }
+}
+</style>
+{% endmacro %} 

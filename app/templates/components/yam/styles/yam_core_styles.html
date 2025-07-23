@@ -1,0 +1,412 @@
+<!-- YAM Core Styles - OPTIMIZED FOR INSTANT LOADING -->
+<style>
+/* CRITICAL: Hide title bar and remove ALL top spacing for YAM pages */
+.yam-page #yam-title-bar {
+    display: none !important;
+}
+
+.yam-page .window-controls {
+    display: none !important;
+}
+
+.yam-page .main-content {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+.yam-page .main-content.with-outage-banner {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Ensure no extra spacing anywhere */
+.yam-page {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+}
+
+.yam-page body,
+.yam-page html {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+}
+
+/* Force full width on ALL containers */
+.yam-page .container,
+.yam-page .container-fluid,
+.yam-page .row,
+.yam-page .col,
+.yam-page .col-* {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Ensure YAM dashboard takes full width */
+.yam-dashboard-full {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+}
+
+/* OPTIMIZED Full-Width Container - IMPROVED SPACING AND FIT */
+.yam-container-full {
+    width: calc(100vw - 3.5rem) !important;
+    max-width: calc(100vw - 3.5rem) !important;
+    margin-left: 3.5rem !important;
+    margin-top: 0 !important;
+    margin-right: 0 !important;
+<<<<<<< HEAD
+padding: 0 1rem 1rem 1rem !important; /* Remove top padding to prevent 5px spacing */display: flex !important;
+=======
+    padding: 1rem !important;
+    display: flex !important;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    flex-direction: column !important;
+    gap: 1rem !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+/* When sidebar is collapsed */
+.yam-container-full.sidebar-collapsed {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin-left: 0 !important;
+    overflow-x: hidden !important;
+}
+
+/* OPTIMIZED SECTION LAYOUTS - IMPROVED SPACING AND FIT */
+.yam-welcome-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+}
+
+.yam-main-content-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 2fr !important;
+    gap: 1rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+}
+
+.yam-user-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    min-height: 0 !important;
+}
+
+.yam-analytics-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    min-height: 0 !important;
+}
+
+.yam-quick-stats-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+}
+
+.yam-actions-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+}
+
+/* RESPONSIVE GRID ADJUSTMENTS - IMPROVED FIT */
+@media (max-width: 1400px) {
+    .yam-main-content-grid {
+        grid-template-columns: 1fr 1.8fr !important;
+        gap: 1rem !important;
+    }
+    
+    .yam-container-full {
+        padding: 1.25rem !important;
+        gap: 1.25rem !important;
+    }
+}
+
+@media (max-width: 1200px) {
+    .yam-main-content-grid {
+        grid-template-columns: 1fr 1.5fr !important;
+        gap: 1rem !important;
+    }
+    
+    .yam-container-full {
+        width: calc(100vw - 3rem) !important;
+        max-width: calc(100vw - 3rem) !important;
+        margin-left: 3rem !important;
+<<<<<<< HEAD
+padding: 0 1rem 1rem 1rem !important; /* Remove top padding to prevent spacing */gap: 1rem !important;
+=======
+        padding: 1rem !important;
+        gap: 1rem !important;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    }
+}
+
+@media (max-width: 768px) {
+    .yam-container-full {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        margin-left: 0 !important;
+<<<<<<< HEAD
+padding: 0 0.75rem 0.75rem 0.75rem !important; /* Remove top padding to prevent spacing */gap: 0.75rem !important;
+=======
+        padding: 0.75rem !important;
+        gap: 0.75rem !important;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    }
+    
+    .yam-main-content-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
+}
+
+/* ENHANCED SPACING FOR TEXT AND EMOJIS */
+.yam-text-emoji-spacing {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+.yam-text-emoji-spacing .emoji {
+    margin-left: 1rem !important;
+    margin-right: 0.5rem !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    flex-shrink: 0 !important;
+}
+
+.yam-text-emoji-spacing .text {
+    flex: 1 !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+/* ENHANCED CONTAINER SMOOTHING */
+.yam-smooth-container {
+    border-radius: 32px !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    overflow: hidden !important;
+}
+
+.yam-smooth-container:hover {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+<<<<<<< HEAD
+=======
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4) !important;
+    transform: translateY(-4px) !important;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+}
+
+/* LOADING STATES - OPTIMIZED */
+.yam-loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.yam-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* ACCESSIBILITY */
+.yam-focus-visible:focus-visible {
+    outline: 2px solid #5865f2;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* ENHANCED COMPONENT STYLES - IMPROVED SPACING */
+.yam-component {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
+/* ENHANCED VIEWPORT FITTING */
+.yam-viewport-fit {
+    max-height: calc(100vh - 2rem) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+.yam-viewport-fit::-webkit-scrollbar {
+    width: 8px;
+}
+
+.yam-viewport-fit::-webkit-scrollbar-track {
+<<<<<<< HEAD
+background: rgba(74, 144, 226, 0.1);border-radius: 4px;
+}
+
+.yam-viewport-fit::-webkit-scrollbar-thumb {
+background: rgba(74, 144, 226, 0.3);border-radius: 4px;
+=======
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.yam-viewport-fit::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    transition: background 0.3s ease;
+}
+
+.yam-viewport-fit::-webkit-scrollbar-thumb:hover {
+<<<<<<< HEAD
+background: rgba(74, 144, 226, 0.5);}
+=======
+    background: rgba(255, 255, 255, 0.3);
+}
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+
+/* ENHANCED RESPONSIVE FITTING */
+@media (max-height: 900px) {
+    .yam-container-full {
+        padding: 1rem !important;
+        gap: 1rem !important;
+    }
+    
+    .yam-welcome-banner {
+        padding: 3rem 2.5rem !important;
+        min-height: 200px !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .yam-card-enhanced {
+        padding: 2rem !important;
+        min-height: 240px !important;
+    }
+    
+    .yam-action-group {
+        padding: 2rem !important;
+        min-height: 320px !important;
+    }
+}
+
+@media (max-height: 700px) {
+    .yam-container-full {
+        padding: 0.75rem !important;
+        gap: 0.75rem !important;
+    }
+    
+    .yam-welcome-banner {
+        padding: 2rem 2rem !important;
+        min-height: 160px !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    .yam-card-enhanced {
+        padding: 1.5rem !important;
+        min-height: 200px !important;
+    }
+    
+    .yam-action-group {
+        padding: 1.5rem !important;
+        min-height: 280px !important;
+    }
+}
+
+@media (max-height: 600px) {
+    .yam-container-full {
+        padding: 0.5rem !important;
+        gap: 0.5rem !important;
+    }
+    
+    .yam-welcome-banner {
+        padding: 1.5rem 1.5rem !important;
+        min-height: 120px !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .yam-card-enhanced {
+        padding: 1rem !important;
+        min-height: 160px !important;
+    }
+    
+    .yam-action-group {
+        padding: 1rem !important;
+        min-height: 240px !important;
+    }
+}
+</style> 

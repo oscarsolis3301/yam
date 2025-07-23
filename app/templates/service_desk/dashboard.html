@@ -1,0 +1,716 @@
+{% extends "base.html" %}
+
+{% block title %}Service Desk Dashboard - Cyberpunk{% endblock %}
+
+{% block head %}
+<style>
+/* Cyberpunk Theme Variables */
+:root {
+    --neon-blue: #00d4ff;
+    --neon-pink: #ff0080;
+    --neon-green: #00ff41;
+    --neon-purple: #8a2be2;
+    --neon-orange: #ff6b35;
+    --dark-bg: #0a0a0a;
+    --darker-bg: #050505;
+    --card-bg: rgba(20, 20, 20, 0.9);
+    --glass-bg: rgba(30, 30, 30, 0.8);
+    --border-glow: rgba(0, 212, 255, 0.3);
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --text-accent: #00d4ff;
+}
+
+/* Global Cyberpunk Styles */
+body {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+    color: var(--text-primary);
+    font-family: 'Orbitron', 'Courier New', monospace;
+    overflow-x: hidden;
+}
+
+/* Animated Background */
+.cyberpunk-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 0, 128, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(138, 43, 226, 0.05) 0%, transparent 50%);
+    animation: cyberpunkPulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes cyberpunkPulse {
+    0% { opacity: 0.3; }
+    100% { opacity: 0.7; }
+}
+
+/* Grid Lines Effect */
+.grid-lines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-image: 
+        linear-gradient(rgba(0, 212, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+/* Main Container */
+.cyberpunk-container {
+    min-height: 100vh;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* Header */
+.cyberpunk-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.cyberpunk-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink), var(--neon-purple));
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 3s ease-in-out infinite;
+    text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+    margin-bottom: 1rem;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.cyberpunk-subtitle {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    animation: glowText 2s ease-in-out infinite alternate;
+}
+
+@keyframes glowText {
+    0% { text-shadow: 0 0 5px var(--neon-blue); }
+    100% { text-shadow: 0 0 20px var(--neon-blue), 0 0 30px var(--neon-blue); }
+}
+
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.cyberpunk-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border-glow);
+    border-radius: 15px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+}
+
+.cyberpunk-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.cyberpunk-card:hover::before {
+    left: 100%;
+}
+
+.cyberpunk-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 50px rgba(0, 212, 255, 0.4);
+    border-color: var(--neon-blue);
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--neon-blue);
+    text-shadow: 0 0 20px var(--neon-blue);
+    margin-bottom: 0.5rem;
+    animation: numberGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes numberGlow {
+    0% { text-shadow: 0 0 20px var(--neon-blue); }
+    100% { text-shadow: 0 0 30px var(--neon-blue), 0 0 40px var(--neon-blue); }
+}
+
+.stat-label {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 1rem;
+}
+
+.stat-change {
+    font-size: 0.9rem;
+    color: var(--neon-green);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stat-change.negative {
+    color: var(--neon-orange);
+}
+
+/* Charts Section */
+.charts-section {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.chart-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border-glow);
+    border-radius: 15px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+}
+
+.chart-title {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 2px solid var(--neon-blue);
+    padding-bottom: 1rem;
+}
+
+/* Recent Tickets */
+.tickets-section {
+    background: var(--card-bg);
+    border: 2px solid var(--border-glow);
+    border-radius: 15px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+}
+
+.ticket-item {
+    background: var(--glass-bg);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.ticket-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--neon-blue);
+    transition: all 0.3s ease;
+}
+
+.ticket-item:hover {
+    transform: translateX(5px);
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+.ticket-item:hover::before {
+    background: var(--neon-pink);
+    box-shadow: 0 0 10px var(--neon-pink);
+}
+
+.ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.ticket-id {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--neon-blue);
+    text-shadow: 0 0 10px var(--neon-blue);
+}
+
+.ticket-status {
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.status-open { background: rgba(255, 107, 53, 0.2); color: var(--neon-orange); border: 1px solid var(--neon-orange); }
+.status-pending { background: rgba(255, 193, 7, 0.2); color: #ffc107; border: 1px solid #ffc107; }
+.status-in_progress { background: rgba(0, 212, 255, 0.2); color: var(--neon-blue); border: 1px solid var(--neon-blue); }
+.status-resolved { background: rgba(0, 255, 65, 0.2); color: var(--neon-green); border: 1px solid var(--neon-green); }
+
+.ticket-subject {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.ticket-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.ticket-assignee {
+    color: var(--neon-purple);
+    font-weight: 500;
+}
+
+.ticket-time {
+    color: var(--text-secondary);
+}
+
+/* Priority Indicators */
+.priority-high { border-left-color: var(--neon-orange); }
+.priority-medium { border-left-color: var(--neon-blue); }
+.priority-low { border-left-color: var(--neon-green); }
+.priority-urgent { border-left-color: var(--neon-pink); }
+
+/* Loading Animation */
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid var(--glass-bg);
+    border-top: 3px solid var(--neon-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 2rem auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .cyberpunk-container {
+        padding: 1rem;
+    }
+    
+    .cyberpunk-title {
+        font-size: 2.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .charts-section {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .ticket-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--darker-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--neon-blue);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--neon-pink);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Animated Background -->
+<div class="cyberpunk-bg"></div>
+<div class="grid-lines"></div>
+
+<div class="cyberpunk-container">
+    <!-- Header -->
+    <div class="cyberpunk-header">
+        <h1 class="cyberpunk-title">SERVICE DESK</h1>
+        <p class="cyberpunk-subtitle">Real-time Operations Center</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid" id="statsGrid">
+        <div class="cyberpunk-card">
+            <div class="stat-number" id="totalTickets">--</div>
+            <div class="stat-label">Total Tickets</div>
+            <div class="stat-change">
+                <i class="bi bi-arrow-up"></i>
+                <span id="ticketsChange">+12%</span>
+            </div>
+        </div>
+        
+        <div class="cyberpunk-card">
+            <div class="stat-number" id="openTickets">--</div>
+            <div class="stat-label">Open Tickets</div>
+            <div class="stat-change">
+                <i class="bi bi-clock"></i>
+                <span id="openChange">Active</span>
+            </div>
+        </div>
+        
+        <div class="cyberpunk-card">
+            <div class="stat-number" id="resolvedToday">--</div>
+            <div class="stat-label">Resolved Today</div>
+            <div class="stat-change positive">
+                <i class="bi bi-check-circle"></i>
+                <span id="resolvedChange">+8</span>
+            </div>
+        </div>
+        
+        <div class="cyberpunk-card">
+            <div class="stat-number" id="avgResponse">--</div>
+            <div class="stat-label">Avg Response (hrs)</div>
+            <div class="stat-change">
+                <i class="bi bi-speedometer2"></i>
+                <span id="responseChange">Target: 4h</span>
+            </div>
+        </div>
+        
+        <div class="cyberpunk-card">
+            <div class="stat-number" id="satisfaction">--</div>
+            <div class="stat-label">Satisfaction Score</div>
+            <div class="stat-change positive">
+                <i class="bi bi-star"></i>
+                <span id="satisfactionChange">Excellent</span>
+            </div>
+        </div>
+        
+        <div class="cyberpunk-card">
+            <div class="stat-number" id="agentsOnline">--</div>
+            <div class="stat-label">Agents Online</div>
+            <div class="stat-change">
+                <i class="bi bi-person-check"></i>
+                <span id="agentsChange">Available</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+        <div class="chart-card">
+            <h3 class="chart-title">Ticket Performance</h3>
+            <canvas id="performanceChart" width="400" height="200"></canvas>
+        </div>
+        
+        <div class="chart-card">
+            <h3 class="chart-title">Category Distribution</h3>
+            <canvas id="categoryChart" width="300" height="300"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Tickets -->
+    <div class="tickets-section">
+        <h3 class="chart-title">Recent Tickets</h3>
+        <div id="recentTickets">
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Initialize dashboard data
+let performanceChart, categoryChart;
+
+// Load dashboard data
+async function loadDashboardData() {
+    try {
+        // Load stats
+        const statsResponse = await fetch('/service-desk/api/stats');
+        const statsData = await statsResponse.json();
+        
+        if (statsData.success) {
+            updateStats(statsData.stats);
+        }
+        
+        // Load recent tickets
+        const ticketsResponse = await fetch('/service-desk/api/recent-tickets');
+        const ticketsData = await ticketsResponse.json();
+        
+        if (ticketsData.success) {
+            updateRecentTickets(ticketsData.tickets);
+        }
+        
+        // Load performance metrics
+        const metricsResponse = await fetch('/service-desk/api/performance-metrics');
+        const metricsData = await metricsResponse.json();
+        
+        if (metricsData.success) {
+            updateCharts(metricsData.metrics);
+        }
+        
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+    }
+}
+
+// Update statistics
+function updateStats(stats) {
+    document.getElementById('totalTickets').textContent = stats.total_tickets;
+    document.getElementById('openTickets').textContent = stats.open_tickets;
+    document.getElementById('resolvedToday').textContent = stats.resolved_today;
+    document.getElementById('avgResponse').textContent = stats.avg_response_time;
+    document.getElementById('satisfaction').textContent = stats.satisfaction_score;
+    document.getElementById('agentsOnline').textContent = stats.agents_online;
+}
+
+// Update recent tickets
+function updateRecentTickets(tickets) {
+    const container = document.getElementById('recentTickets');
+    
+    if (tickets.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No recent tickets</p>';
+        return;
+    }
+    
+    container.innerHTML = tickets.map(ticket => `
+        <div class="ticket-item priority-${ticket.priority}">
+            <div class="ticket-header">
+                <span class="ticket-id">${ticket.id}</span>
+                <span class="ticket-status status-${ticket.status}">${ticket.status.replace('_', ' ')}</span>
+            </div>
+            <div class="ticket-subject">${ticket.subject}</div>
+            <div class="ticket-meta">
+                <span class="ticket-assignee">👤 ${ticket.assignee}</span>
+                <span class="ticket-time">🕒 ${formatTime(ticket.created_at)}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Update charts
+function updateCharts(metrics) {
+    // Performance Chart
+    const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+    
+    if (performanceChart) {
+        performanceChart.destroy();
+    }
+    
+    performanceChart = new Chart(performanceCtx, {
+        type: 'line',
+        data: {
+            labels: metrics.dates,
+            datasets: [
+                {
+                    label: 'Tickets Created',
+                    data: metrics.tickets_created,
+                    borderColor: '#00d4ff',
+                    backgroundColor: 'rgba(0, 212, 255, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Tickets Resolved',
+                    data: metrics.tickets_resolved,
+                    borderColor: '#00ff41',
+                    backgroundColor: 'rgba(0, 255, 65, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#ffffff',
+                        font: {
+                            family: 'Orbitron, monospace'
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: '#b0b0b0',
+                        font: {
+                            family: 'Orbitron, monospace'
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 212, 255, 0.1)'
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: '#b0b0b0',
+                        font: {
+                            family: 'Orbitron, monospace'
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 212, 255, 0.1)'
+                    }
+                }
+            }
+        }
+    });
+    
+    // Category Chart
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    
+    if (categoryChart) {
+        categoryChart.destroy();
+    }
+    
+    const categoryData = {
+        'Network': 35,
+        'Software': 25,
+        'Hardware': 20,
+        'Email': 15,
+        'Other': 5
+    };
+    
+    categoryChart = new Chart(categoryCtx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(categoryData),
+            datasets: [{
+                data: Object.values(categoryData),
+                backgroundColor: [
+                    '#00d4ff',
+                    '#ff0080',
+                    '#00ff41',
+                    '#8a2be2',
+                    '#ff6b35'
+                ],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#ffffff',
+                        font: {
+                            family: 'Orbitron, monospace',
+                            size: 12
+                        },
+                        padding: 20
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Format time
+function formatTime(isoString) {
+    const date = new Date(isoString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    
+    if (diffHours < 1) {
+        return 'Just now';
+    } else if (diffHours < 24) {
+        return `${diffHours}h ago`;
+    } else {
+        const diffDays = Math.floor(diffHours / 24);
+        return `${diffDays}d ago`;
+    }
+}
+
+// Auto-refresh data every 30 seconds
+setInterval(loadDashboardData, 30000);
+
+// Initial load
+document.addEventListener('DOMContentLoaded', () => {
+    loadDashboardData();
+});
+
+// Add some cyberpunk sound effects (optional)
+function playCyberpunkSound() {
+    // This would integrate with Web Audio API for sound effects
+    console.log('🔊 Cyberpunk sound effect triggered');
+}
+
+// Add hover effects to cards
+document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.cyberpunk-card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            playCyberpunkSound();
+        });
+    });
+});
+</script>
+{% endblock %} 

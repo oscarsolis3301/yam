@@ -1,0 +1,647 @@
+{% macro render_activity_feed(current_user) %}
+<!-- YAM Activity Feed Component -->
+<div id="yamActivityFeed" class="yam-activity-feed">
+    <div class="feed-header">
+        <h4 class="feed-title">
+            <i class="bi bi-activity"></i>
+            Live Activity Feed
+        </h4>
+        <div class="feed-controls">
+            <button class="feed-control-btn" id="yamPauseFeedBtn" title="Pause Feed">
+                <i class="bi bi-pause-circle"></i>
+            </button>
+            <button class="feed-control-btn" id="yamClearFeedBtn" title="Clear Feed">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div class="feed-container">
+        <div id="yamActivityList" class="activity-list">
+            <!-- Loading state -->
+            <div class="loading-state">
+                <i class="bi bi-activity"></i>
+                <div>Initializing activity feed...</div>
+                <div class="loading-subtitle">Connecting to real-time updates</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="feed-status">
+        <div class="status-item">
+            <i class="bi bi-circle-fill"></i>
+            <span id="yamFeedStatus">Live</span>
+        </div>
+        <div class="status-item">
+            <i class="bi bi-clock"></i>
+            <span id="yamLastActivityTime">Just now</span>
+        </div>
+    </div>
+</div>
+
+<style>
+.yam-activity-feed {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.yam-activity-feed::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.feed-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.feed-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.feed-title i {
+    color: #667eea;
+}
+
+.feed-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.feed-control-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+}
+
+.feed-control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.feed-control-btn:active {
+    transform: scale(0.95);
+}
+
+.feed-control-btn.paused {
+    background: rgba(255, 152, 0, 0.3);
+    border-color: #ff9800;
+    color: #ff9800;
+}
+
+.feed-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.feed-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.feed-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.feed-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.feed-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.activity-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.activity-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, #667eea, #764ba2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.activity-item:hover::before {
+    opacity: 1;
+}
+
+.activity-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateX(4px);
+}
+
+.activity-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.activity-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.activity-icon.online {
+    background: linear-gradient(135deg, #4caf50, #8bc34a);
+}
+
+.activity-icon.offline {
+    background: linear-gradient(135deg, #f44336, #e91e63);
+}
+
+.activity-icon.away {
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+}
+
+.activity-icon.busy {
+    background: linear-gradient(135deg, #9c27b0, #673ab7);
+}
+
+.activity-icon.message {
+    background: linear-gradient(135deg, #2196f3, #03a9f4);
+}
+
+.activity-icon.login {
+    background: linear-gradient(135deg, #4caf50, #8bc34a);
+}
+
+.activity-icon.logout {
+    background: linear-gradient(135deg, #f44336, #e91e63);
+}
+
+.activity-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.activity-text {
+    font-size: 0.9rem;
+    color: #fff;
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
+}
+
+.activity-user {
+    font-weight: 600;
+    color: #667eea;
+}
+
+.activity-time {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.activity-time i {
+    font-size: 0.7rem;
+}
+
+.feed-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.status-item i {
+    font-size: 0.7rem;
+}
+
+.status-item.live i {
+    color: #4caf50;
+    animation: pulse 2s infinite;
+}
+
+.status-item.paused i {
+    color: #ff9800;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    gap: 1rem;
+}
+
+.loading-state i {
+    font-size: 2rem;
+    color: #667eea;
+    animation: pulse 2s infinite;
+}
+
+.loading-subtitle {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: rgba(255, 255, 255, 0.5);
+    gap: 1rem;
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 2rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .yam-activity-feed {
+        padding: 1rem;
+    }
+    
+    .feed-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .feed-controls {
+        align-self: flex-end;
+    }
+    
+    .feed-status {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+</style>
+
+<script>
+// YAM Activity Feed Component
+window.yamActivityFeed = {
+    activities: [],
+    maxActivities: 50,
+    isPaused: false,
+    lastActivityTime: null,
+    
+    init() {
+        this.setupEventListeners();
+        this.setupSocketListeners();
+        this.updateDisplay();
+        console.log('YAM Activity Feed: Component initialized');
+    },
+    
+    setupEventListeners() {
+        const pauseBtn = document.getElementById('yamPauseFeedBtn');
+        const clearBtn = document.getElementById('yamClearFeedBtn');
+        
+        if (pauseBtn) {
+            pauseBtn.addEventListener('click', () => this.togglePause());
+        }
+        
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => this.clearFeed());
+        }
+    },
+    
+    setupSocketListeners() {
+        if (window.yamDashboard && window.yamDashboard.socket) {
+            const socket = window.yamDashboard.socket;
+            
+            socket.on('user_status_change', (data) => {
+                this.addActivity('status', data);
+            });
+            
+            socket.on('user_login', (data) => {
+                this.addActivity('login', data);
+            });
+            
+            socket.on('user_logout', (data) => {
+                this.addActivity('logout', data);
+            });
+            
+            socket.on('user_message', (data) => {
+                this.addActivity('message', data);
+            });
+            
+            socket.on('online_users_update', (users) => {
+                // Track status changes from user list updates
+                this.processUserUpdates(users);
+            });
+        }
+    },
+    
+    addActivity(type, data) {
+        if (this.isPaused) return;
+        
+        const activity = {
+            id: Date.now() + Math.random(),
+            type: type,
+            data: data,
+            timestamp: Date.now(),
+            text: this.generateActivityText(type, data)
+        };
+        
+        this.activities.unshift(activity);
+        
+        // Limit the number of activities
+        if (this.activities.length > this.maxActivities) {
+            this.activities = this.activities.slice(0, this.maxActivities);
+        }
+        
+        this.lastActivityTime = Date.now();
+        this.updateDisplay();
+        this.addActivityToDOM(activity);
+    },
+    
+    generateActivityText(type, data) {
+        const username = data.username || data.name || 'Unknown User';
+        
+        switch (type) {
+            case 'online':
+                return `${username} came online`;
+            case 'offline':
+                return `${username} went offline`;
+            case 'away':
+                return `${username} is now away`;
+            case 'busy':
+                return `${username} is now busy`;
+            case 'login':
+                return `${username} logged in`;
+            case 'logout':
+                return `${username} logged out`;
+            case 'message':
+                return `${username} sent a message`;
+            case 'status':
+                return `${username} changed status to ${data.status}`;
+            default:
+                return `${username} performed an action`;
+        }
+    },
+    
+    processUserUpdates(users) {
+        // Compare with previous user list to detect status changes
+        if (!this.previousUsers) {
+            this.previousUsers = users;
+            return;
+        }
+        
+        const currentUserIds = new Set(users.map(u => u.id));
+        const previousUserIds = new Set(this.previousUsers.map(u => u.id));
+        
+        // Find new online users
+        users.forEach(user => {
+            if (!previousUserIds.has(user.id) && user.is_online) {
+                this.addActivity('online', user);
+            }
+        });
+        
+        // Find users who went offline
+        this.previousUsers.forEach(user => {
+            if (!currentUserIds.has(user.id) || !user.is_online) {
+                this.addActivity('offline', user);
+            }
+        });
+        
+        this.previousUsers = users;
+    },
+    
+    addActivityToDOM(activity) {
+        const container = document.getElementById('yamActivityList');
+        if (!container) return;
+        
+        // Remove loading state if present
+        const loadingState = container.querySelector('.loading-state');
+        if (loadingState) {
+            loadingState.remove();
+        }
+        
+        const activityElement = document.createElement('div');
+        activityElement.className = 'activity-item';
+        activityElement.dataset.activityId = activity.id;
+        
+        activityElement.innerHTML = `
+            <div class="activity-header">
+                <div class="activity-icon ${activity.type}">
+                    <i class="bi ${this.getActivityIcon(activity.type)}"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-text">${activity.text}</div>
+                    <div class="activity-time">
+                        <i class="bi bi-clock"></i>
+                        <span>${this.formatTime(activity.timestamp)}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Add to the top of the list
+        container.insertBefore(activityElement, container.firstChild);
+        
+        // Remove old activities if we exceed the limit
+        const activities = container.querySelectorAll('.activity-item');
+        if (activities.length > this.maxActivities) {
+            activities[activities.length - 1].remove();
+        }
+    },
+    
+    getActivityIcon(type) {
+        const icons = {
+            'online': 'bi-circle-fill',
+            'offline': 'bi-circle',
+            'away': 'bi-moon',
+            'busy': 'bi-slash-circle',
+            'login': 'bi-box-arrow-in-right',
+            'logout': 'bi-box-arrow-left',
+            'message': 'bi-chat',
+            'status': 'bi-person-circle'
+        };
+        return icons[type] || 'bi-activity';
+    },
+    
+    formatTime(timestamp) {
+        const now = Date.now();
+        const diff = now - timestamp;
+        
+        if (diff < 60000) {
+            return 'Just now';
+        } else if (diff < 3600000) {
+            const minutes = Math.floor(diff / 60000);
+            return `${minutes}m ago`;
+        } else if (diff < 86400000) {
+            const hours = Math.floor(diff / 3600000);
+            return `${hours}h ago`;
+        } else {
+            const date = new Date(timestamp);
+            return date.toLocaleDateString();
+        }
+    },
+    
+    togglePause() {
+        this.isPaused = !this.isPaused;
+        this.updateDisplay();
+        
+        const pauseBtn = document.getElementById('yamPauseFeedBtn');
+        if (pauseBtn) {
+            if (this.isPaused) {
+                pauseBtn.classList.add('paused');
+                pauseBtn.innerHTML = '<i class="bi bi-play-circle"></i>';
+                pauseBtn.title = 'Resume Feed';
+            } else {
+                pauseBtn.classList.remove('paused');
+                pauseBtn.innerHTML = '<i class="bi bi-pause-circle"></i>';
+                pauseBtn.title = 'Pause Feed';
+            }
+        }
+    },
+    
+    clearFeed() {
+        this.activities = [];
+        const container = document.getElementById('yamActivityList');
+        if (container) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-activity"></i>
+                    <div>No activities yet</div>
+                    <div>Activity feed will show real-time updates here</div>
+                </div>
+            `;
+        }
+    },
+    
+    updateDisplay() {
+        // Update last activity time
+        const lastActivityElement = document.getElementById('yamLastActivityTime');
+        if (lastActivityElement && this.lastActivityTime) {
+            lastActivityElement.textContent = this.formatTime(this.lastActivityTime);
+        }
+        
+        // Update feed status
+        const statusElement = document.getElementById('yamFeedStatus');
+        if (statusElement) {
+            if (this.isPaused) {
+                statusElement.textContent = 'Paused';
+                statusElement.parentElement.classList.remove('live');
+                statusElement.parentElement.classList.add('paused');
+            } else {
+                statusElement.textContent = 'Live';
+                statusElement.parentElement.classList.remove('paused');
+                statusElement.parentElement.classList.add('live');
+            }
+        }
+    },
+    
+    destroy() {
+        console.log('YAM Activity Feed: Component destroyed');
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.yamActivityFeed) {
+        window.yamActivityFeed.init();
+    }
+});
+
+// Register with YAM Dashboard if available
+if (window.yamDashboard) {
+    window.yamDashboard.registerComponent('activityFeed', window.yamActivityFeed);
+}
+</script>
+{% endmacro %} 

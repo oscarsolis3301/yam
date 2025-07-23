@@ -18,7 +18,7 @@ from . import bp  # Blueprint defined in __init__.py
 # again.
 from app.blueprints.offices.routes import df  # type: ignore  # pylint: disable=import-error
 
-from app.config import Config
+from app.extensions import Config
 from app.utils.device import load_devices_cache
 
 import logging

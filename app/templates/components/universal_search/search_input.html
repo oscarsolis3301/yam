@@ -1,0 +1,50 @@
+<!-- Search Input Component -->
+<div id="universalSearchContainer" class="universal-search-container" style="display: none;">
+    <div class="search-bar-wrapper">
+        <div class="search-input-group">
+            <div class="search-icon">
+                <i class="bi bi-search"></i>
+            </div>
+            <input 
+                type="text" 
+                id="universalSearchInput" 
+                class="search-input" 
+                placeholder="Search everything... (Ctrl+K)"
+                autocomplete="off"
+                spellcheck="false"
+            >
+            <button id="searchClearBtn" class="search-clear-btn" style="display: none;">
+                <i class="bi bi-x"></i>
+            </button>
+            <div id="searchLoading" class="search-loading" style="display: none;">
+                <!-- Custom SVG Water Loader -->
+                <svg id="waterLoader" width="28" height="28" viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="18" stroke="#007bff" stroke-width="3" fill="none"/>
+                  <path id="waterPath" fill="#007bff" fill-opacity="0.5">
+                    <animate attributeName="d" dur="1.2s" repeatCount="indefinite"
+                      values="M2,20 Q20,10 38,20 Q20,30 2,20 Z;M2,22 Q20,12 38,22 Q20,32 2,22 Z;M2,20 Q20,10 38,20 Q20,30 2,20 Z"/>
+                  </path>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Search Filters Placeholder - Will be filled by the filter component -->
+        {% include 'components/universal_search/search_filters.html' %}
+    </div>
+    
+    <!-- Search Results Placeholder - Will be filled by the results component -->
+    {% include 'components/universal_search/search_results.html' %}
+    
+    <!-- Search Suggestions Placeholder - Will be filled by the suggestions component -->
+    {% include 'components/universal_search/search_suggestions.html' %}
+</div>
+
+<!-- Background Blur Overlay -->
+<div id="searchBlurOverlay" class="search-blur-overlay"></div>
+
+<!-- Universal Search Detail Modal -->
+<div id="universalSearchDetailModal" class="universal-search-detail-modal" style="display: none;">
+    <div id="universalSearchDetailContent" class="universal-search-detail-content" role="dialog" aria-modal="true">
+        <!-- Modal content will be dynamically filled -->
+    </div>
+</div> 

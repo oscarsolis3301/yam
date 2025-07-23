@@ -1,0 +1,900 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"/>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='assets/styles.css') }}" />
+<style>
+    :root {
+        --primary-bg: #1a1d24;
+        --secondary-bg: #23272f;
+        --card-bg: #262D47;
+        --text-primary: #ffffff;
+        --text-secondary: #8b95a5;
+        --accent-color: #0d6efd;
+        --success-color: #198754;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+    }
+
+    html, body {
+        background: var(--primary-bg) !important;
+        color: var(--text-primary) !important;
+        font-family: 'Montserrat', sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+    }
+
+    .container-fluid {
+        background: var(--primary-bg) !important;
+        min-height: 100vh;
+        padding-top: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Add styles for the banner */
+    .banner {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: var(--danger-color);
+        color: white;
+        padding: 0.5rem;
+        text-align: center;
+    }
+
+    /* Adjust main content to account for banner */
+    .main-content {
+        margin-top: 3rem;
+    }
+
+    .card {
+        background: var(--card-bg) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+        background: transparent !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-primary);
+    }
+
+    .card-body {
+        color: var(--text-primary);
+    }
+
+    .table {
+        color: var(--text-primary) !important;
+        background: transparent !important;
+    }
+
+    .table th {
+        border-top: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        font-weight: 600;
+        color: var(--text-secondary);
+        background: transparent !important;
+    }
+
+    .table td {
+        vertical-align: middle;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        background: transparent !important;
+    }
+
+    .table-hover tbody tr:hover {
+        background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .modal-content {
+        background: var(--card-bg) !important;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-footer {
+        border-top-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .form-control, .form-select {
+        background: var(--secondary-bg) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        color: var(--text-primary) !important;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--accent-color) !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+        background: var(--secondary-bg) !important;
+        color: var(--text-primary) !important;
+    }
+
+    .progress {
+        background-color: rgba(255, 255, 255, 0.1);
+        height: 8px;
+    }
+
+    .progress-bar {
+        background: linear-gradient(90deg, var(--success-color), var(--warning-color));
+    }
+
+    .list-group-item {
+        background: transparent !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        color: var(--text-primary) !important;
+        padding: 1rem;
+    }
+
+    .list-group-item:hover {
+        background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid transparent;
+        border-top: 2px solid currentColor;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Banner for outages -->
+<div class="banner" id="outageBanner" style="display: none;">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <span id="outageMessage"></span>
+</div>
+
+<div class="container-fluid py-4 main-content">
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <!-- Dashboard Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Admin Dashboard</h2>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary" id="refreshBtn">
+                <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+            </button>
+            <button class="btn btn-primary" id="addUserBtn">
+                <i class="bi bi-person-plus me-2"></i>Add User
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0">Total Users</h6>
+                            <h2 class="mt-2 mb-0" id="totalUsers">
+                                <span class="loading-spinner"></span>
+                            </h2>
+                        </div>
+                        <i class="bi bi-people fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0">Online Users</h6>
+                            <h2 class="mt-2 mb-0" id="onlineUsers">
+                                <span class="loading-spinner"></span>
+                            </h2>
+                        </div>
+                        <i class="bi bi-person-check fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0">Active Sessions</h6>
+                            <h2 class="mt-2 mb-0" id="activeSessions">
+                                <span class="loading-spinner"></span>
+                            </h2>
+                        </div>
+                        <i class="bi bi-window-desktop fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0">System Status</h6>
+                            <h2 class="mt-2 mb-0" id="systemStatus">
+                                <span class="loading-spinner"></span>
+                            </h2>
+                        </div>
+                        <i class="bi bi-hdd-stack fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row g-4">
+        <!-- User Management -->
+        <div class="col-md-8">
+            <div class="card h-100">
+                <div class="card-header bg-transparent">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">User Management</h5>
+                        <div class="input-group" style="width: 300px;">
+                            <input type="text" class="form-control" id="userSearch" placeholder="Search users...">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="usersTable">
+                            <thead>
+                                <tr>
+                                    <th>Profile</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Last Login</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="7" class="text-center">
+                                        <span class="loading-spinner me-2"></span>Loading users...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status & Recent Activity -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">System Status</h5>
+                </div>
+                <div class="card-body">
+                    <div id="systemMetrics">
+                        <div class="text-center">
+                            <span class="loading-spinner me-2"></span>Loading system metrics...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div id="recentActivity" class="list-group list-group-flush">
+                        <div class="list-group-item text-center">
+                            <span class="loading-spinner me-2"></span>Loading activity...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select class="form-select" name="role" required>
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveUserBtn">Save User</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editUserForm">
+                    <input type="hidden" name="userId">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select class="form-select" name="role" required>
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" name="is_active" required>
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">New Password (leave blank to keep current)</label>
+                        <input type="password" class="form-control" name="password">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="updateUserBtn">Update User</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+<script>
+// Initialize Socket.IO connection
+let socket;
+
+// Dashboard refresh interval (in milliseconds)
+const REFRESH_INTERVAL = 30000;
+
+// Initialize tooltips and socket connection
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Initialize socket connection
+    socket = io();
+    
+    // Set up socket event handlers
+    socket.on('connect', () => {
+        console.log('Connected to server');
+        showToast('Connected to server', 'success');
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Disconnected from server');
+        showToast('Disconnected from server', 'warning');
+    });
+
+    socket.on('user_status_update', (data) => {
+        loadDashboardData();
+    });
+
+    socket.on('system_status_update', (data) => {
+        if (data && typeof data === 'object') {
+            updateSystemStatus(data);
+        }
+    });
+    
+    // Load initial data
+    loadDashboardData();
+    
+    // Set up auto-refresh
+    setInterval(loadDashboardData, REFRESH_INTERVAL);
+});
+
+// Utility function to show toast notifications
+function showToast(message, type = 'info') {
+    const toastContainer = document.querySelector('.toast-container');
+    const toastId = 'toast-' + Date.now();
+    
+    const toastHtml = `
+        <div class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true" id="${toastId}">
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    `;
+    
+    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
+    toast.show();
+    
+    // Remove toast element after it's hidden
+    toastElement.addEventListener('hidden.bs.toast', () => {
+        toastElement.remove();
+    });
+}
+
+// Load dashboard data with error handling
+function loadDashboardData() {
+    // Show loading state
+    document.getElementById('totalUsers').innerHTML = '<span class="loading-spinner"></span>';
+    document.getElementById('onlineUsers').innerHTML = '<span class="loading-spinner"></span>';
+    document.getElementById('activeSessions').innerHTML = '<span class="loading-spinner"></span>';
+    document.getElementById('systemStatus').innerHTML = '<span class="loading-spinner"></span>';
+
+    fetch('/api/admin/dashboard')
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            updateDashboardStats(data);
+            updateUserTable(data.users || []);
+            updateSystemStatus(data.system_status || {});
+            updateRecentActivity(data.recent_activity || []);
+        })
+        .catch(error => {
+            console.error('Error loading dashboard data:', error);
+            showToast('Error loading dashboard data: ' + error.message, 'danger');
+            
+            // Show N/A for all metrics
+            updateDashboardStats({});
+            updateUserTable([]);
+            updateSystemStatus({});
+            updateRecentActivity([]);
+        });
+}
+
+// Update dashboard statistics
+function updateDashboardStats(data) {
+    // Update total users
+    const totalUsersEl = document.getElementById('totalUsers');
+    if (totalUsersEl) {
+        totalUsersEl.textContent = data.total_users !== undefined ? data.total_users : 'N/A';
+    }
+
+    // Fallback: if data.users is missing or empty, but data.online_users exists, use that
+    let usersArr = [];
+    if (Array.isArray(data.users) && data.users.length > 0) {
+        usersArr = data.users;
+    } else if (Array.isArray(data.online_users) && data.online_users.length > 0) {
+        // Map online_users to the expected user object structure if needed
+        usersArr = data.online_users.map(u => ({
+            ...u,
+            is_online: true,
+            username: u.username || u.name || '',
+            email: u.email || '',
+            role: u.role || 'user',
+            profile_picture: u.profile_picture || 'default.png',
+            last_login: u.last_login || null,
+            is_active: true
+        }));
+    }
+
+    // Update online users - count users with is_online=true
+    const onlineUsersEl = document.getElementById('onlineUsers');
+    if (onlineUsersEl) {
+        const onlineCount = usersArr.filter(user => user.is_online).length;
+        onlineUsersEl.textContent = onlineCount;
+    }
+
+    // Update active sessions
+    const activeSessionsEl = document.getElementById('activeSessions');
+    if (activeSessionsEl) {
+        activeSessionsEl.textContent = data.active_sessions !== undefined ? data.active_sessions : 'N/A';
+    }
+
+    // Update system status
+    const systemStatusEl = document.getElementById('systemStatus');
+    if (systemStatusEl) {
+        systemStatusEl.textContent = data.system_status?.status || 'N/A';
+    }
+
+    // Always update the user table with the best available array
+    updateUserTable(usersArr);
+}
+
+// Update user table
+function updateUserTable(users) {
+    const tbody = document.querySelector('#usersTable tbody');
+    
+    if (!users || users.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center text-danger">No users available</td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = users.map(user => `
+        <tr>
+            <td>
+                <img src="/static/uploads/profile_pictures/${user.profile_picture || 'default.png'}" 
+                     alt="${user.username}" 
+                     class="rounded-circle"
+                     style="width: 32px; height: 32px; object-fit: cover;"
+                     onerror="this.src='/static/uploads/profile_pictures/default.png'">
+            </td>
+            <td>${escapeHtml(user.username || 'N/A')}</td>
+            <td>${escapeHtml(user.email || 'N/A')}</td>
+            <td>
+                <span class="badge ${user.role === 'admin' ? 'bg-danger' : 'bg-primary'}">
+                    ${escapeHtml(user.role || 'user')}
+                </span>
+            </td>
+            <td>
+                <span class="badge ${user.is_online ? 'bg-success' : 'bg-secondary'}">
+                    ${user.is_online ? 'Online' : 'Offline'}
+                </span>
+            </td>
+            <td>${user.last_login ? new Date(user.last_login).toLocaleString() : 'Never'}</td>
+            <td>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-primary" onclick="editUser(${user.id})" title="Edit User">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-warning" onclick="resetPassword(${user.id})" title="Reset Password">
+                        <i class="bi bi-key"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(${user.id})" title="Delete User" ${user.username === 'admin' ? 'disabled' : ''}>
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Update system status
+function updateSystemStatus(status) {
+    const metricsDiv = document.getElementById('systemMetrics');
+    
+    if (!status || Object.keys(status).length === 0) {
+        metricsDiv.innerHTML = '<div class="text-center text-danger">System metrics not available</div>';
+        return;
+    }
+    
+    const cpuUsage = status.cpu_usage || 0;
+    const memoryUsage = status.memory_usage || 0;
+    const diskUsage = status.disk_usage || 0;
+    
+    metricsDiv.innerHTML = `
+        <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+                <span>CPU Usage</span>
+                <span>${cpuUsage.toFixed(1)}%</span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar ${cpuUsage > 80 ? 'bg-danger' : cpuUsage > 60 ? 'bg-warning' : 'bg-success'}" 
+                     role="progressbar" style="width: ${cpuUsage}%" 
+                     aria-valuenow="${cpuUsage}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+                <span>Memory Usage</span>
+                <span>${memoryUsage.toFixed(1)}%</span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar ${memoryUsage > 80 ? 'bg-danger' : memoryUsage > 60 ? 'bg-warning' : 'bg-success'}" 
+                     role="progressbar" style="width: ${memoryUsage}%" 
+                     aria-valuenow="${memoryUsage}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+                <span>Disk Usage</span>
+                <span>${diskUsage.toFixed(1)}%</span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar ${diskUsage > 80 ? 'bg-danger' : diskUsage > 60 ? 'bg-warning' : 'bg-success'}" 
+                     role="progressbar" style="width: ${diskUsage}%" 
+                     aria-valuenow="${diskUsage}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+    `;
+}
+
+// Update recent activity
+function updateRecentActivity(activities) {
+    const activityDiv = document.getElementById('recentActivity');
+    
+    if (!activities || activities.length === 0) {
+        activityDiv.innerHTML = '<div class="list-group-item text-center text-danger">No recent activity</div>';
+        return;
+    }
+    
+    activityDiv.innerHTML = activities.map(activity => `
+        <div class="list-group-item">
+            <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">${escapeHtml(activity.action || 'Unknown Action')}</h6>
+                <small class="text-muted">${activity.timestamp ? new Date(activity.timestamp + 'Z').toLocaleString() : 'Unknown Time'}</small>
+            </div>
+            <p class="mb-1">${escapeHtml(activity.details || 'No details available')}</p>
+            <small class="text-muted">By ${escapeHtml(activity.user || 'Unknown User')}</small>
+        </div>
+    `).join('');
+}
+
+// Utility function to escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// User management functions
+function addUser() {
+    const modal = new bootstrap.Modal(document.getElementById('addUserModal'));
+    modal.show();
+}
+
+function editUser(userId) {
+    fetch(`/api/admin/users/${userId}`)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+            }
+            return res.json();
+        })
+        .then(user => {
+            if (user.error) {
+                throw new Error(user.error);
+            }
+            
+            const form = document.getElementById('editUserForm');
+            form.elements.userId.value = userId;
+            form.elements.username.value = user.username || '';
+            form.elements.email.value = user.email || '';
+            form.elements.role.value = user.role || 'user';
+            form.elements.is_active.value = user.is_active !== undefined ? user.is_active.toString() : 'true';
+            form.elements.password.value = '';
+            
+            const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error loading user:', error);
+            showToast('Error loading user details: ' + error.message, 'danger');
+        });
+}
+
+function resetPassword(userId) {
+    if (confirm('Reset password for this user?')) {
+        fetch(`/api/admin/users/${userId}/reset-password`, { method: 'POST' })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                if (data.success) {
+                    showToast(`New password: ${data.new_password}`, 'success');
+                } else {
+                    showToast('Error resetting password', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error resetting password:', error);
+                showToast('Error resetting password: ' + error.message, 'danger');
+            });
+    }
+}
+
+function deleteUser(userId) {
+    if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+        fetch(`/api/admin/users/${userId}`, { method: 'DELETE' })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                loadDashboardData();
+                showToast('User deleted successfully', 'success');
+            })
+            .catch(error => {
+                console.error('Error deleting user:', error);
+                showToast('Error deleting user: ' + error.message, 'danger');
+            });
+    }
+}
+
+// Event listeners
+document.getElementById('addUserBtn')?.addEventListener('click', addUser);
+document.getElementById('refreshBtn')?.addEventListener('click', loadDashboardData);
+document.getElementById('userSearch')?.addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#usersTable tbody tr');
+    
+    rows.forEach(row => {
+        if (row.cells.length < 3) return; // Skip header/loading rows
+        const username = row.cells[1].textContent.toLowerCase();
+        const email = row.cells[2].textContent.toLowerCase();
+        row.style.display = username.includes(searchTerm) || email.includes(searchTerm) ? '' : 'none';
+    });
+});
+
+document.getElementById('saveUserBtn').onclick = function() {
+    const form = document.getElementById('addUserForm');
+    const data = Object.fromEntries(new FormData(form).entries());
+    
+    // Validate form
+    if (!data.username || !data.email || !data.password) {
+        showToast('Please fill in all required fields', 'warning');
+        return;
+    }
+    
+    fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.error) {
+            showToast(data.error, 'danger');
+            return;
+        }
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
+        if (modal) modal.hide();
+        form.reset();
+        loadDashboardData();
+        showToast('User created successfully', 'success');
+    })
+    .catch(error => {
+        console.error('Error creating user:', error);
+        showToast('Error creating user: ' + error.message, 'danger');
+    });
+};
+
+document.getElementById('updateUserBtn').onclick = function() {
+    const form = document.getElementById('editUserForm');
+    const userId = form.elements.userId.value;
+    const data = Object.fromEntries(new FormData(form).entries());
+    
+    // Validate form
+    if (!data.username || !data.email) {
+        showToast('Please fill in all required fields', 'warning');
+        return;
+    }
+    
+    fetch(`/api/admin/users/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.error) {
+            showToast(data.error, 'danger');
+            return;
+        }
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+        if (modal) modal.hide();
+        loadDashboardData();
+        showToast('User updated successfully', 'success');
+    })
+    .catch(error => {
+        console.error('Error updating user:', error);
+        showToast('Error updating user: ' + error.message, 'danger');
+    });
+};
+</script>
+{% endblock %} 

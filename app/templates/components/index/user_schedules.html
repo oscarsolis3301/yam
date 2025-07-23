@@ -1,0 +1,622 @@
+{% macro render_user_schedules(current_user) %}
+<div class="user-schedules-section">
+    <div class="management-card fade-in" style="animation-delay: 0.6s;">
+        <div class="card-header">
+            <div class="card-title">
+                <i class="bi bi-clock-fill text-warning"></i>
+                Currently On Shift
+            </div>
+            <div class="card-actions">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-sm btn-outline-light active" data-filter="all">All</button>
+                    <button type="button" class="btn btn-sm btn-outline-light" data-filter="dsc">DSC</button>
+                    <button type="button" class="btn btn-sm btn-outline-light" data-filter="isc">ISC</button>
+                </div>
+            </div>
+        </div>
+        <div class="card-content">
+            <div class="schedules-container">
+                <div id="onShiftUsers" class="on-shift-container"></div>
+                <div class="schedule-divider">
+                    <div class="divider-line"></div>
+                    <div class="divider-text">Not On Shift</div>
+                    <div class="divider-line"></div>
+                </div>
+                <div id="offShiftUsers" class="off-shift-container"></div>
+            </div>
+        </div>
+        <div class="card-background"></div>
+    </div>
+</div>
+
+<!-- Hidden CSV data for schedules -->
+<div id="scheduleData" style="display: none;">
+    DSC,Anthony Risker,4:00 AM,9:00 AM,11:00 AM,1:00 PM,1:00 PM,Mon - Fri,,
+    DSC,Ralph Rosalin,4:00 AM,6:00 AM,8:00 AM,11:15 AM,1:00 PM,Mon - Fri,,
+    ISC,AJ Mercado,5:00 AM,7:00 AM,9:00 AM,12:00 PM,2:00 PM,Mon - Fri,,
+    DSC,Nick Gutierrez,5:00 AM,8:15 AM,11:00 AM,12:15 PM,2:00 PM,Mon - Fri,,
+    DSC,Jarrod Woodson,5:00 AM,7:30 AM,9:00 AM,12:30 PM,2:00 PM,Mon - Fri,,
+    DSC,Rhonda Robinson,6:00 AM,8:00 AM,10:30 AM,11:30 AM,3:00 PM,Mon - Fri,,
+    DSC,Christopher Bush,6:00 AM,9:00 AM,1:00 PM,4:00 PM,3:00 PM,Mon - Fri,,
+    DSC,Mayra Lopez,6:00 AM,7:15 AM,9:30 AM,12:15 PM,3:00 PM,"Tues - Sat, off Sun & Mon",Monday,
+    Remote,Staci Valko,6:00 AM,,,,3:00 PM,Mon - Fri,,
+    ISC,Doug Spohn,6:30 AM,8:30 AM,10:00 AM,1:30 PM,3:30 PM,"Tues - Sat, off Sun & Mon",Monday,
+    DSC,Jayson Barker,7:00 AM,9:15 AM,12:00 PM,2:15 PM,4:00 PM,Mon - Fri,,
+    ISC,Nathan Bui,7:00 AM,9:15 AM,12:00 PM,2:15 PM,4:00 PM,Mon - Fri,,
+    ISC,Jabin Dejesa,8:00 AM,,,,5:00 PM,Mon - Fri,,
+    ISC,Samuel Nightingale,8:00 AM,10:15 AM,12:30 PM,3:15 PM,5:00 PM,Mon - Fri,,
+    ISC,Oscar Solis,8:00 AM,10:15 AM,12:30 PM,3:15 PM,5:00 PM,Mon - Fri,"Fridays, 7:30 am - 4:30 pm","Fridays, 7:30 am - 4:30 pm"
+    ISC,Jonathan Nguyen,8:00 AM,,,,5:00 PM,Mon - Fri,,
+    ISC,JZ Miranda,8:30 AM,10:30 AM,12:30 PM,3:30 PM,5:30 PM,Mon - Fri,,
+    ISC,Richard Nguyen,9:00 AM,11:30 AM,1:30 PM,4:30 PM,6:00 PM,Mon - Fri,,
+    ISC,Pietro Vue,11:00 AM,1:00 PM,3:00 PM,6:00 PM,8:00 PM,,,"Fridays, 10 am - 7 pm"
+</div>
+
+<style>
+.user-schedules-section {
+    margin-bottom: 2.5rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.schedules-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.on-shift-container, .off-shift-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: flex-start;
+    align-items: stretch;
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.on-shift-container::-webkit-scrollbar, .off-shift-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.on-shift-container::-webkit-scrollbar-track, .off-shift-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.on-shift-container::-webkit-scrollbar-thumb, .off-shift-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.on-shift-container::-webkit-scrollbar-thumb:hover, .off-shift-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.schedule-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+.divider-text {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    padding: 0 1rem;
+}
+
+.on-shift-card, .off-shift-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    min-width: 300px;
+    flex: 1;
+    max-width: 400px;
+}
+
+.on-shift-card::before, .off-shift-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #ffc107, #ff9800);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.on-shift-card:hover::before {
+    opacity: 1;
+}
+
+.off-shift-card::before {
+    background: linear-gradient(180deg, #6c757d, #495057);
+}
+
+.off-shift-card:hover::before {
+    opacity: 1;
+}
+
+.on-shift-card:hover, .off-shift-card:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.shift-user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.shift-user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffc107, #ff9800);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.off-shift-card .shift-user-avatar {
+    background: linear-gradient(135deg, #6c757d, #495057);
+}
+
+.shift-user-avatar.online::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background: #4caf50;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    animation: pulseDot 2s infinite ease-in-out;
+}
+
+.shift-user-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.shift-user-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.25rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.shift-user-department {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.shift-time-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.shift-time-badge {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    padding: 0.5rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.shift-timer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.shift-timer-svg {
+    width: 32px;
+    height: 32px;
+}
+
+.shift-timer-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #e0e0e0;
+    min-width: 80px;
+    text-align: right;
+}
+
+/* Animation keyframes */
+@keyframes pulseDot {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Empty state styling */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.empty-state i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state div {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state small {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .on-shift-card, .off-shift-card {
+        min-width: 100%;
+        max-width: 100%;
+    }
+    
+    .shift-user-info {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: center;
+    }
+    
+    .shift-user-avatar {
+        align-self: center;
+    }
+    
+    .shift-time-info {
+        align-items: center;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .on-shift-container, .off-shift-container {
+        padding: 0.75rem;
+    }
+    
+    .on-shift-card, .off-shift-card {
+        padding: 1rem;
+    }
+}
+</style>
+
+<script>
+// User Schedules Manager
+class UserSchedulesManager {
+    constructor() {
+        this.scheduleData = [];
+        this.currentFilter = 'all';
+        this.init().catch(error => {
+            console.error('Error initializing UserSchedulesManager:', error);
+        });
+    }
+    
+    async init() {
+        await this.loadScheduleData();
+        this.setupEventHandlers();
+        this.startRealtimeUpdates();
+    }
+    
+    async loadScheduleData() {
+        try {
+            // Try to fetch from CSV file first
+            const response = await fetch('/static/uploads/files/SD-Schedules.csv');
+            if (response.ok) {
+                const csvText = await response.text();
+                this.scheduleData = this.parseCSV(csvText);
+            } else {
+                // Fallback to hidden CSV data
+                const scheduleDataElement = document.getElementById('scheduleData');
+                if (scheduleDataElement) {
+                    const csvText = scheduleDataElement.textContent.trim();
+                    this.scheduleData = this.parseCSV(csvText);
+                }
+            }
+        } catch (error) {
+            console.error('Error loading schedule data:', error);
+            // Fallback to hidden CSV data
+            const scheduleDataElement = document.getElementById('scheduleData');
+            if (scheduleDataElement) {
+                const csvText = scheduleDataElement.textContent.trim();
+                this.scheduleData = this.parseCSV(csvText);
+            }
+        }
+    }
+    
+    parseCSV(text) {
+        const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+        const data = [];
+        
+        for (let i = 1; i < lines.length; i++) { // Skip header row
+            const row = lines[i].split(',');
+            if (row.length < 7 || !row[1] || !row[2] || !row[6]) continue;
+            
+            // Skip empty rows or rows that don't have a name
+            if (!row[1] || row[1].trim() === '') continue;
+            
+            data.push({
+                department: row[0] || '',
+                name: row[1].trim(),
+                start: row[2].trim(),
+                end: row[6].trim(),
+                workDays: row[7] || '',
+                notes: row[8] || ''
+            });
+        }
+        
+        return data;
+    }
+    
+    setupEventHandlers() {
+        const filterButtons = document.querySelectorAll('[data-filter]');
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                this.currentFilter = button.dataset.filter;
+                this.updateDisplay();
+            });
+        });
+    }
+    
+    startRealtimeUpdates() {
+        // Update every second
+        setInterval(() => {
+            this.updateDisplay();
+        }, 1000);
+    }
+    
+    updateDisplay() {
+        const onShiftUsers = this.getOnShiftUsers();
+        const offShiftUsers = this.getOffShiftUsers();
+        
+        this.renderOnShiftUsers(onShiftUsers);
+        this.renderOffShiftUsers(offShiftUsers);
+        this.updateCountdowns(onShiftUsers);
+    }
+    
+    getOnShiftUsers() {
+        const now = new Date();
+        let filtered = this.currentFilter === 'all' 
+            ? this.scheduleData 
+            : this.scheduleData.filter(u => u.department && u.department.toLowerCase() === this.currentFilter);
+        
+        return filtered.filter(user => {
+            if (!this.isTodayWorkday(user.workDays)) return false;
+            const start = this.parseTimeToDate(user.start);
+            const end = this.parseTimeToDate(user.end);
+            return now >= start && now < end;
+        });
+    }
+    
+    getOffShiftUsers() {
+        const onShiftUsers = this.getOnShiftUsers();
+        const onShiftNames = new Set(onShiftUsers.map(u => u.name));
+        
+        let filtered = this.currentFilter === 'all' 
+            ? this.scheduleData 
+            : this.scheduleData.filter(u => u.department && u.department.toLowerCase() === this.currentFilter);
+        
+        return filtered.filter(u => !onShiftNames.has(u.name) && this.isTodayWorkday(u.workDays));
+    }
+    
+    isTodayWorkday(workDays) {
+        if (!workDays) return false;
+        const today = new Date();
+        const weekday = today.toLocaleDateString('en-US', { weekday: 'short' });
+        
+        if (workDays.includes('Mon - Fri')) return ['Mon','Tue','Wed','Thu','Fri'].includes(weekday);
+        if (workDays.includes('Tues - Sat')) return ['Tue','Wed','Thu','Fri','Sat'].includes(weekday);
+        if (workDays.includes('Sun - Thurs')) return ['Sun','Mon','Tue','Wed','Thu'].includes(weekday);
+        if (workDays.includes('Sun - Thurs, off Fri & Sat')) return ['Sun','Mon','Tue','Wed','Thu'].includes(weekday);
+        if (workDays.includes('Tues - Sat, off Sun & Mon')) return ['Tue','Wed','Thu','Fri','Sat'].includes(weekday);
+        
+        return workDays.includes(weekday);
+    }
+    
+    parseTimeToDate(timeStr) {
+        const [hm, ampm] = timeStr.trim().split(' ');
+        let [h, m] = hm.split(':').map(Number);
+        if (ampm.toUpperCase() === 'PM' && h !== 12) h += 12;
+        if (ampm.toUpperCase() === 'AM' && h === 12) h = 0;
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
+    }
+    
+    getShiftPercent(start, end) {
+        const now = new Date();
+        const s = this.parseTimeToDate(start);
+        const e = this.parseTimeToDate(end);
+        if (now < s) return 0;
+        if (now > e) return 1;
+        return (now - s) / (e - s);
+    }
+    
+    getTimeLeft(end) {
+        const now = new Date();
+        const endDate = this.parseTimeToDate(end);
+        let diff = Math.max(0, endDate - now);
+        const hours = Math.floor(diff / 3600000);
+        diff -= hours * 3600000;
+        const mins = Math.floor(diff / 60000);
+        diff -= mins * 60000;
+        const secs = Math.floor(diff / 1000);
+        return { hours, mins, secs };
+    }
+    
+    renderOnShiftUsers(users) {
+        const container = document.getElementById('onShiftUsers');
+        if (!container) return;
+        
+        if (users.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-clock"></i>
+                    <div>No one is currently on shift</div>
+                    <small>Check back later for updates</small>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = users.map((user, idx) => {
+            const percent = this.getShiftPercent(user.start, user.end);
+            const timeLeft = this.getTimeLeft(user.end);
+            const pastel = '#ffc107';
+            
+            return `
+                <div class="on-shift-card" data-user-id="${idx}">
+                    <div class="shift-user-info">
+                        <div class="shift-user-avatar online">
+                            ${user.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="shift-user-details">
+                            <div class="shift-user-name">${user.name}</div>
+                            <div class="shift-user-department">${user.department}</div>
+                        </div>
+                    </div>
+                    <div class="shift-time-info">
+                        <div class="shift-time-badge">${user.start} - ${user.end}</div>
+                        <div class="shift-timer">
+                            <svg class="shift-timer-svg" viewBox="0 0 56 56">
+                                <circle cx="28" cy="28" r="24" stroke="#333" stroke-width="6" fill="none"/>
+                                <circle cx="28" cy="28" r="24" stroke="${pastel}" stroke-width="6" fill="none" 
+                                        stroke-dasharray="${2 * Math.PI * 24}" 
+                                        stroke-dashoffset="${(1 - percent) * 2 * Math.PI * 24}" 
+                                        style="transition: stroke-dashoffset 1s linear;"/>
+                            </svg>
+                            <span class="shift-timer-text" id="timer-${idx}">
+                                ${timeLeft.hours.toString().padStart(2, '0')}:${timeLeft.mins.toString().padStart(2, '0')}:${timeLeft.secs.toString().padStart(2, '0')}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    renderOffShiftUsers(users) {
+        const container = document.getElementById('offShiftUsers');
+        if (!container) return;
+        
+        if (users.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-people"></i>
+                    <div>Everyone scheduled is on shift now</div>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = users.map(user => `
+            <div class="off-shift-card">
+                <div class="shift-user-info">
+                    <div class="shift-user-avatar">
+                        ${user.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div class="shift-user-details">
+                        <div class="shift-user-name">${user.name}</div>
+                        <div class="shift-user-department">${user.department}</div>
+                    </div>
+                </div>
+                <div class="shift-time-info">
+                    <div class="shift-time-badge">${user.start} - ${user.end}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    updateCountdowns(users) {
+        users.forEach((user, idx) => {
+            const timerElement = document.getElementById(`timer-${idx}`);
+            if (timerElement) {
+                const timeLeft = this.getTimeLeft(user.end);
+                timerElement.textContent = `${timeLeft.hours.toString().padStart(2, '0')}:${timeLeft.mins.toString().padStart(2, '0')}:${timeLeft.secs.toString().padStart(2, '0')}`;
+            }
+        });
+    }
+}
+
+// Initialize when DOM is loaded
+let userSchedulesManager;
+document.addEventListener('DOMContentLoaded', () => {
+    userSchedulesManager = new UserSchedulesManager();
+});
+
+// Export for global access
+window.userSchedulesManager = userSchedulesManager;
+</script>
+{% endmacro %} 

@@ -1,0 +1,357 @@
+{% macro render_outage_banner() %}
+<!-- Outage Banner -->
+<div id="outageBanner" class="outage-banner" style="display: none;">
+    <div class="outage-content">
+        <div class="outage-icon">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+        <div class="outage-text">
+            <span class="outage-title">Active Outage:</span>
+            <span class="outage-description" id="outageDescription"></span>
+        </div>
+        <div class="outage-actions">
+            <button class="outage-close-btn" onclick="hideOutageBanner()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.outage-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+    z-index: 9999;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 2px 10px rgba(220, 53, 69, 0.3);
+    animation: slideDown 0.3s ease-out;
+}
+
+.outage-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 1rem;
+}
+
+.outage-icon {
+    font-size: 1.25rem;
+    animation: pulse 2s infinite;
+}
+
+.outage-text {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.outage-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.outage-description {
+    font-size: 0.9rem;
+}
+
+.outage-actions {
+    display: flex;
+    align-items: center;
+}
+
+.outage-close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+.outage-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+@media (max-width: 768px) {
+    .outage-content {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .outage-text {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}
+</style>
+
+<script>
+// Outage Banner Management with Enhanced Error Handling
+class OutageBanner {
+    constructor() {
+        this.errors = [];
+        this.warnings = [];
+        this.banner = null;
+        this.description = null;
+        this.isVisible = false;
+        this.init();
+    }
+    
+    init() {
+        try {
+            this.banner = document.getElementById('outageBanner');
+            this.description = document.getElementById('outageDescription');
+            
+            if (!this.banner) {
+                this.logError('Outage banner element not found', 'Element with id "outageBanner" missing');
+                return;
+            }
+            
+            if (!this.description) {
+                this.logError('Outage description element not found', 'Element with id "outageDescription" missing');
+                return;
+            }
+            
+            this.checkForActiveOutages();
+            this.setupSocketListeners();
+            this.logInfo('OutageBanner initialized successfully');
+            
+        } catch (error) {
+            this.logError('OutageBanner initialization failed', error.message);
+        }
+    }
+    
+    async checkForActiveOutages() {
+        try {
+            const response = await fetch('/api/outages/active');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const outages = await response.json();
+            
+            if (outages && outages.length > 0) {
+                this.showOutage(outages[0]);
+                this.logInfo('Active outage found', outages[0].title);
+            } else {
+                this.logInfo('No active outages found');
+            }
+            
+        } catch (error) {
+            this.logError('Failed to check for active outages', error.message);
+            
+            // Show a fallback outage for testing in development
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                this.logWarning('Showing test outage for development');
+                this.showOutage({
+                    title: 'Test Outage',
+                    description: 'This is a test outage for development purposes'
+                });
+            }
+        }
+    }
+    
+    showOutage(outage) {
+        try {
+            if (!outage || !outage.title) {
+                this.logError('Invalid outage data', 'Outage object is missing or invalid');
+                return;
+            }
+            
+            if (this.description) {
+                const description = outage.description ? ` - ${outage.description}` : '';
+                this.description.textContent = `${outage.title}${description}`;
+            }
+            
+            if (this.banner) {
+                this.banner.style.display = 'block';
+                this.isVisible = true;
+                this.adjustMainContent();
+                this.logInfo('Outage banner displayed', outage.title);
+            }
+            
+        } catch (error) {
+            this.logError('Failed to show outage', error.message);
+        }
+    }
+    
+    hide() {
+        try {
+            if (this.banner) {
+                this.banner.style.display = 'none';
+                this.isVisible = false;
+                this.adjustMainContent();
+                this.logInfo('Outage banner hidden');
+            }
+        } catch (error) {
+            this.logError('Failed to hide outage banner', error.message);
+        }
+    }
+    
+    adjustMainContent() {
+        try {
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                if (this.isVisible) {
+                    mainContent.style.paddingTop = '60px';
+                } else {
+                    mainContent.style.paddingTop = '0';
+                }
+            } else {
+                this.logWarning('Main content element not found for adjustment');
+            }
+        } catch (error) {
+            this.logError('Failed to adjust main content', error.message);
+        }
+    }
+    
+    setupSocketListeners() {
+        try {
+            if (window.socketState && window.socketState.socket) {
+                window.socketState.socket.on('outage_created', (outage) => {
+                    this.logInfo('Outage created via WebSocket', outage.title);
+                    this.showOutage(outage);
+                });
+                
+                window.socketState.socket.on('outage_resolved', () => {
+                    this.logInfo('Outage resolved via WebSocket');
+                    this.hide();
+                });
+                
+                this.logInfo('WebSocket listeners setup complete');
+            } else {
+                this.logWarning('WebSocket not available for outage notifications');
+            }
+        } catch (error) {
+            this.logError('Failed to setup WebSocket listeners', error.message);
+        }
+    }
+    
+    // Logging methods
+    logError(message, details) {
+        this.errors.push({
+            message,
+            details,
+            timestamp: new Date().toISOString()
+        });
+        
+        if (window.index2Debugger) {
+            window.index2Debugger.logError(`[OutageBanner] ${message}`, details);
+        }
+        
+        console.error(`[OutageBanner] ${message}:`, details);
+    }
+    
+    logWarning(message, details) {
+        this.warnings.push({
+            message,
+            details,
+            timestamp: new Date().toISOString()
+        });
+        
+        if (window.index2Debugger) {
+            window.index2Debugger.logWarning(`[OutageBanner] ${message}`, details);
+        }
+        
+        console.warn(`[OutageBanner] ${message}:`, details);
+    }
+    
+    logInfo(message, details = '') {
+        this.info = this.info || [];
+        this.info.push({
+            message,
+            details,
+            timestamp: new Date().toISOString()
+        });
+        
+        if (window.index2Debugger) {
+            window.index2Debugger.logInfo(`[OutageBanner] ${message}`, details);
+        }
+        
+        console.log(`[OutageBanner] ${message}`, details);
+    }
+    
+    // Get debug information
+    getDebugInfo() {
+        return {
+            errors: this.errors,
+            warnings: this.warnings,
+            info: this.info || [],
+            isVisible: this.isVisible,
+            bannerExists: !!this.banner,
+            descriptionExists: !!this.description
+        };
+    }
+}
+
+// Global functions with error handling
+window.showOutageBanner = function(title, description) {
+    try {
+        if (window.outageBanner) {
+            window.outageBanner.showOutage({ title, description });
+        } else {
+            console.error('OutageBanner not initialized');
+        }
+    } catch (error) {
+        console.error('Failed to show outage banner:', error);
+    }
+};
+
+window.hideOutageBanner = function() {
+    try {
+        if (window.outageBanner) {
+            window.outageBanner.hide();
+        } else {
+            console.error('OutageBanner not initialized');
+        }
+    } catch (error) {
+        console.error('Failed to hide outage banner:', error);
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        window.outageBanner = new OutageBanner();
+        console.log('[Index2] OutageBanner initialized successfully');
+    } catch (error) {
+        console.error('[Index2] Failed to initialize OutageBanner:', error);
+    }
+});
+</script>
+{% endmacro %} 

@@ -1,0 +1,841 @@
+{% macro render_dashboard_initialization() %}
+<script>
+// Dashboard Initialization and Data Management
+class DashboardManager {
+    constructor() {
+        this.data = {
+            metrics: {},
+            users: [],
+            outages: [],
+            activity: [],
+            charts: {}
+        };
+        this.refreshIntervals = {};
+        this.isInitialized = false;
+        this.socket = null;
+        this.previousMetrics = {};
+        
+        this.init();
+    }
+    
+    async init() {
+        try {
+            console.log('Initializing Dashboard Manager...');
+            
+            // Load initial data
+            await this.loadInitialData();
+            
+            // Initialize real-time updates
+            this.initializeRealTimeUpdates();
+            
+            // Set up auto-refresh intervals
+            this.setupAutoRefresh();
+            
+            // Initialize charts
+            this.initializeCharts();
+            
+            // Set up event listeners
+            this.setupEventListeners();
+            
+            this.isInitialized = true;
+            console.log('Dashboard Manager initialized successfully');
+            
+        } catch (error) {
+            console.error('Error initializing Dashboard Manager:', error);
+            this.showToast('Error initializing dashboard', 'error');
+        }
+    }
+    
+    async loadInitialData() {
+        try {
+            console.log('Loading initial dashboard data...');
+            
+            // Load dashboard metrics
+            const dashboardResponse = await fetch('/api/admin/dashboard');
+            const dashboardData = await dashboardResponse.json();
+            
+            if (dashboardData.error) {
+                throw new Error(dashboardData.error);
+            }
+            
+            this.data.metrics = dashboardData;
+            this.previousMetrics = { ...dashboardData };
+            this.updateMetrics();
+            this.updateUsersList(dashboardData.online_users || []);
+            
+            // Load outages
+            await this.loadOutages();
+            
+            // Load activity
+            await this.loadActivity();
+            
+            console.log('Initial data loaded successfully');
+            
+        } catch (error) {
+            console.error('Error loading initial data:', error);
+            this.showToast('Error loading dashboard data', 'error');
+            
+            // Set fallback values
+            this.setFallbackData();
+        }
+    }
+    
+    updateMetrics() {
+        const metrics = this.data.metrics;
+        
+        // Update metric cards with animation
+        const openTicketsEl = document.getElementById('openTickets');
+        const activeOutagesEl = document.getElementById('activeOutages');
+        const onlineUsersEl = document.getElementById('onlineUsersMetric');
+        const systemHealthEl = document.getElementById('systemHealth');
+        
+        if (openTicketsEl) {
+            const newValue = metrics.open_tickets !== undefined ? metrics.open_tickets : '0';
+            const oldValue = this.previousMetrics.open_tickets || 0;
+            this.updateMetricWithAnimation(openTicketsEl, newValue, 'ticketsTrend', oldValue, newValue);
+        }
+        
+        if (activeOutagesEl) {
+            const newValue = metrics.active_outages !== undefined ? metrics.active_outages : '0';
+            const oldValue = this.previousMetrics.active_outages || 0;
+            this.updateMetricWithAnimation(activeOutagesEl, newValue, 'outagesTrend', oldValue, newValue);
+        }
+        
+        if (onlineUsersEl) {
+            const onlineCount = metrics.online_users ? 
+                new Set(metrics.online_users.filter(user => user.is_online).map(user => user.id || user.email)).size : 0;
+            const oldValue = this.previousMetrics.online_users_count || 0;
+            this.updateMetricWithAnimation(onlineUsersEl, onlineCount, 'usersTrend', oldValue, onlineCount);
+            
+            // Update the Team Members manager if it exists
+            if (window.teamMembersManager && window.teamMembersManager.teamMembers) {
+                const currentCount = window.teamMembersManager.teamMembers.filter(user => user.is_online).length;
+                if (currentCount !== onlineCount) {
+                    // Trigger a refresh of the team members list
+                    window.teamMembersManager.loadTeamMembers();
+                }
+            }
+        }
+        
+        if (systemHealthEl) {
+            const health = this.calculateSystemHealth(metrics);
+            const oldValue = parseInt(this.previousMetrics.system_health || '98');
+            this.updateMetricWithAnimation(systemHealthEl, `${health}%`, 'healthTrend', oldValue, health);
+        }
+        
+        // Update previous metrics
+        this.previousMetrics = { ...metrics };
+    }
+    
+    updateMetricWithAnimation(element, newValue, trendElementId, oldValue, newValueNum) {
+        if (!element) return;
+        
+        // Add updating animation
+        element.classList.add('updating');
+        
+        // Update value after a short delay
+        setTimeout(() => {
+            element.textContent = newValue;
+            element.classList.remove('updating');
+        }, 300);
+        
+        // Update trend if provided
+        if (trendElementId && typeof oldValue === 'number' && typeof newValueNum === 'number') {
+            const trendElement = document.getElementById(trendElementId);
+            if (trendElement) {
+                const trend = this.calculateTrend(oldValue, newValueNum);
+                trendElement.textContent = trend;
+                
+                // Update trend class
+                const trendContainer = trendElement.closest('.metric-trend');
+                if (trendContainer) {
+                    trendContainer.className = 'metric-trend';
+                    if (trend.includes('+')) {
+                        trendContainer.classList.add('positive');
+                    } else if (trend.includes('-')) {
+                        trendContainer.classList.add('negative');
+                    } else {
+                        trendContainer.classList.add('neutral');
+                    }
+                }
+            }
+        }
+    }
+    
+    calculateTrend(oldValue, newValue) {
+        if (oldValue === 0) return newValue > 0 ? '+100%' : '0%';
+        const change = ((newValue - oldValue) / oldValue) * 100;
+        const sign = change >= 0 ? '+' : '';
+        return `${sign}${Math.round(change)}%`;
+    }
+    
+    calculateSystemHealth(metrics) {
+        let health = 100;
+        
+        // Reduce health based on active outages
+        if (metrics.active_outages > 0) {
+            health -= (metrics.active_outages * 10);
+        }
+        
+        // Reduce health based on low online users (if expected)
+        if (metrics.online_users && metrics.online_users.length < 2) {
+            health -= 5;
+        }
+        
+        return Math.max(health, 85); // Minimum 85% health
+    }
+    
+    updateUsersList(users) {
+        // This method is now handled by TeamMembersManager to prevent conflicts
+        // Only update the metric count, not the actual user list
+        if (users && users.length > 0) {
+            const onlineCount = users.filter(user => user.is_online).length;
+            const onlineUsersEl = document.getElementById('onlineUsersMetric');
+            if (onlineUsersEl) {
+                onlineUsersEl.textContent = onlineCount;
+            }
+        }
+    }
+    
+    async loadOutages() {
+        try {
+            const response = await fetch('/api/admin/outages');
+            const outages = await response.json();
+            this.data.outages = outages || [];
+            this.updateOutagesList();
+        } catch (error) {
+            console.error('Error loading outages:', error);
+            this.data.outages = [];
+        }
+    }
+    
+    updateOutagesList() {
+        const container = document.getElementById('outagesList');
+        if (!container) return;
+        
+        const outages = this.data.outages;
+        
+        if (!outages || outages.length === 0) {
+            container.innerHTML = `
+                <div class="outage-item">
+                    <div class="text-center text-muted">
+                        <i class="bi bi-check-circle text-success" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <div>No active outages</div>
+                        <small>All systems are operational</small>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = outages.map(outage => `
+            <div class="outage-item" data-outage-id="${outage.id}">
+                <div class="outage-header-info">
+                    <div class="outage-title-info">
+                        <div class="outage-name">${outage.title}</div>
+                        <div class="outage-status ${outage.status === 'resolved' ? 'resolved' : ''}">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            ${outage.status}
+                        </div>
+                    </div>
+                    <div class="outage-actions">
+                        <button class="outage-action-btn edit" onclick="dashboardManager.editOutage(${outage.id})" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="outage-action-btn resolve" onclick="dashboardManager.resolveOutage(${outage.id})" title="Resolve">
+                            <i class="bi bi-check-circle"></i>
+                        </button>
+                        <button class="outage-action-btn delete" onclick="dashboardManager.deleteOutage(${outage.id})" title="Delete">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="outage-description">${outage.description}</div>
+                <div class="outage-meta">
+                    ${outage.ticket_id ? `
+                        <div class="outage-meta-item">
+                            <i class="bi bi-ticket-detailed"></i>
+                            <span>Ticket: ${outage.ticket_id}</span>
+                        </div>
+                    ` : ''}
+                    ${outage.affected_systems ? `
+                        <div class="outage-meta-item">
+                            <i class="bi bi-gear"></i>
+                            <span>Systems: ${outage.affected_systems}</span>
+                        </div>
+                    ` : ''}
+                    <div class="outage-meta-item">
+                        <i class="bi bi-clock"></i>
+                        <span>Created: ${this.formatTimestamp(outage.created_at)}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    async loadActivity() {
+        try {
+            const response = await fetch('/api/admin/activity');
+            const activity = await response.json();
+            this.data.activity = activity || [];
+            this.updateActivityList();
+        } catch (error) {
+            console.error('Error loading activity:', error);
+            this.data.activity = [];
+        }
+    }
+    
+    updateActivityList() {
+        const container = document.getElementById('recentActivity');
+        if (!container) return;
+        
+        const activities = this.data.activity;
+        
+        if (!activities || activities.length === 0) {
+            container.innerHTML = `
+                <div class="activity-item">
+                    <div class="text-center text-muted">
+                        <i class="bi bi-clock-history" style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <div>No recent activity</div>
+                        <small>Activity will appear here</small>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = activities.map(activity => `
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="bi bi-${this.getActivityIcon(activity.action)}"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-text">${activity.user} ${activity.action} ${activity.details || ''}</div>
+                    <div class="activity-meta">
+                        <span class="activity-user">${activity.user}</span>
+                        <span class="activity-time">${this.formatTimestamp(activity.timestamp)}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    getActivityIcon(action) {
+        const icons = {
+            'login': 'box-arrow-in-right',
+            'logout': 'box-arrow-left',
+            'search': 'search',
+            'create': 'plus-circle',
+            'update': 'pencil',
+            'delete': 'trash',
+            'default': 'circle'
+        };
+        return icons[action.toLowerCase()] || icons.default;
+    }
+    
+    formatLastSeen(timestamp) {
+        if (!timestamp) return 'Never';
+        
+        const lastSeen = new Date(timestamp);
+        const now = new Date();
+        const diff = now - lastSeen;
+        
+        if (diff < 60000) return 'Just now';
+        if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+        if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+        return lastSeen.toLocaleDateString();
+    }
+    
+    formatTimestamp(timestamp) {
+        if (!timestamp) return 'Unknown';
+        
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diff = now - date;
+        
+        if (diff < 60000) return 'Just now';
+        if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+        if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+        return date.toLocaleDateString();
+    }
+    
+    updateLastSeenWidgets() {
+        const lastSeenElements = document.querySelectorAll('.last-seen[data-last-seen]');
+        lastSeenElements.forEach(element => {
+            const lastSeen = element.getAttribute('data-last-seen');
+            element.textContent = this.formatLastSeen(lastSeen);
+        });
+    }
+    
+    initializeRealTimeUpdates() {
+        // Get socket instance from global manager
+        if (window.yamSocketManager && window.yamSocketManager.socket) {
+            this.socket = window.yamSocketManager.socket;
+            
+            // Listen for real-time updates
+            this.socket.on('dashboard_update', (data) => {
+                console.log('Dashboard update received:', data);
+                this.handleDashboardUpdate(data);
+            });
+            
+            this.socket.on('user_status_change', (data) => {
+                console.log('User status change:', data);
+                this.handleUserStatusChange(data);
+            });
+            
+            this.socket.on('outage_update', (data) => {
+                console.log('Outage update:', data);
+                this.handleOutageUpdate(data);
+            });
+            
+            this.socket.on('activity_update', (data) => {
+                console.log('Activity update:', data);
+                this.handleActivityUpdate(data);
+            });
+        }
+    }
+    
+    handleDashboardUpdate(data) {
+        if (data.metrics) {
+            this.data.metrics = { ...this.data.metrics, ...data.metrics };
+            this.updateMetrics();
+        }
+        
+        if (data.users) {
+            this.data.users = data.users;
+            this.updateUsersList(data.users);
+        }
+    }
+    
+    handleUserStatusChange(data) {
+        // Update specific user in the list
+        const userIndex = this.data.users.findIndex(u => u.id === data.user_id);
+        if (userIndex !== -1) {
+            this.data.users[userIndex] = { ...this.data.users[userIndex], ...data };
+            this.updateUsersList(this.data.users);
+        }
+    }
+    
+    handleOutageUpdate(data) {
+        if (data.type === 'created') {
+            this.data.outages.unshift(data.outage);
+        } else if (data.type === 'updated') {
+            const index = this.data.outages.findIndex(o => o.id === data.outage.id);
+            if (index !== -1) {
+                this.data.outages[index] = data.outage;
+            }
+        } else if (data.type === 'deleted') {
+            this.data.outages = this.data.outages.filter(o => o.id !== data.outage_id);
+        }
+        
+        this.updateOutagesList();
+    }
+    
+    handleActivityUpdate(data) {
+        if (data.type === 'new') {
+            this.data.activity.unshift(data.activity);
+            // Keep only last 10 activities
+            this.data.activity = this.data.activity.slice(0, 10);
+            this.updateActivityList();
+        }
+    }
+    
+    setupAutoRefresh() {
+        // Refresh metrics every 30 seconds
+        this.refreshIntervals.metrics = setInterval(() => {
+            this.refreshMetrics();
+        }, 30000);
+        
+        // Refresh users every 60 seconds
+        this.refreshIntervals.users = setInterval(() => {
+            this.refreshUsers();
+        }, 60000);
+        
+        // Refresh outages every 2 minutes
+        this.refreshIntervals.outages = setInterval(() => {
+            this.refreshOutages();
+        }, 120000);
+        
+        // Refresh activity every 5 minutes
+        this.refreshIntervals.activity = setInterval(() => {
+            this.refreshActivity();
+        }, 300000);
+        
+        // Update last-seen timestamps every minute
+        this.refreshIntervals.lastSeen = setInterval(() => {
+            this.updateLastSeenWidgets();
+        }, 60000);
+    }
+    
+    async refreshMetrics() {
+        try {
+            const response = await fetch('/api/admin/dashboard');
+            const data = await response.json();
+            if (!data.error) {
+                this.data.metrics = data;
+                this.updateMetrics();
+            }
+        } catch (error) {
+            console.error('Error refreshing metrics:', error);
+        }
+    }
+    
+    async refreshUsers() {
+        try {
+            const response = await fetch('/api/admin/dashboard');
+            const data = await response.json();
+            if (!data.error && data.online_users) {
+                this.updateUsersList(data.online_users);
+            }
+        } catch (error) {
+            console.error('Error refreshing users:', error);
+        }
+    }
+    
+    async refreshOutages() {
+        await this.loadOutages();
+    }
+    
+    async refreshActivity() {
+        await this.loadActivity();
+    }
+    
+    initializeCharts() {
+        // Initialize charts if the function exists
+        if (typeof window.initializeCharts === 'function') {
+            setTimeout(() => {
+                window.initializeCharts();
+            }, 100);
+        }
+    }
+    
+    setupEventListeners() {
+        // Set up refresh button handlers
+        const reloadUsersBtn = document.getElementById('reloadUsersBtn');
+        if (reloadUsersBtn) {
+            reloadUsersBtn.addEventListener('click', () => {
+                this.refreshUsers();
+                this.showToast('Users refreshed', 'info');
+            });
+        }
+        
+        // Set up outage form handler
+        const saveOutageBtn = document.getElementById('saveOutage');
+        if (saveOutageBtn) {
+            saveOutageBtn.addEventListener('click', () => {
+                this.createOutage();
+            });
+        }
+        
+        // Initialize modal event listeners
+        this.initializeModalEvents();
+        
+        // CRITICAL: Force all interactive elements to be clickable
+        this.forceInteractiveElements();
+    }
+    
+    forceInteractiveElements() {
+        console.log('Forcing interactive elements to be clickable...');
+        
+        // Force all buttons to be interactive
+        const allButtons = document.querySelectorAll('button, .btn, .btn-modern, [data-bs-toggle="modal"], [data-bs-target], [onclick]');
+        allButtons.forEach(btn => {
+            btn.style.pointerEvents = 'auto';
+            btn.style.cursor = 'pointer';
+            btn.style.zIndex = '10001';
+            btn.style.position = 'relative';
+            
+            // Add click event listener for debugging
+            btn.addEventListener('click', (e) => {
+                console.log('Button clicked:', e.target);
+            });
+        });
+        
+        // Force all user items to be interactive
+        const userItems = document.querySelectorAll('.user-item');
+        userItems.forEach(item => {
+            item.style.pointerEvents = 'auto';
+            item.style.cursor = 'pointer';
+            item.style.zIndex = '10001';
+            item.style.position = 'relative';
+            
+            // Add click event listener for debugging
+            item.addEventListener('click', (e) => {
+                console.log('User item clicked:', e.target);
+                const userId = item.getAttribute('data-user-id');
+                const userData = item.getAttribute('data-user-data');
+                if (userId && userData) {
+                    try {
+                        const user = JSON.parse(userData);
+                        if (window.teamMembersManager) {
+                            window.teamMembersManager.showUserDetails(user);
+                        }
+                    } catch (error) {
+                        console.error('Error parsing user data:', error);
+                    }
+                }
+            });
+        });
+        
+        // Force all scrollable containers to be interactive
+        const scrollableContainers = document.querySelectorAll('.scrollable-container, .activity-feed');
+        scrollableContainers.forEach(container => {
+            container.style.pointerEvents = 'auto';
+            container.style.zIndex = '1000';
+            container.style.position = 'relative';
+            container.style.overflowY = 'auto';
+        });
+        
+        console.log('Interactive elements forced to be clickable');
+    }
+    
+    initializeModalEvents() {
+        // Ensure modals are properly initialized and interactive
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            // Ensure modal backdrop doesn't interfere
+            const backdrop = modal.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.style.zIndex = '99998';
+                backdrop.style.pointerEvents = 'auto';
+            }
+            
+            // Ensure modal content is properly positioned
+            const modalContent = modal.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.style.zIndex = '100001';
+                modalContent.style.position = 'relative';
+            }
+            
+            // Add click event to close modal when clicking outside
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    const closeBtn = modal.querySelector('.btn-close');
+                    if (closeBtn) {
+                        closeBtn.click();
+                    }
+                }
+            });
+            
+            // Ensure all interactive elements in modal are clickable
+            const interactiveElements = modal.querySelectorAll('button, input, select, textarea, a');
+            interactiveElements.forEach(element => {
+                element.style.pointerEvents = 'auto';
+                element.style.zIndex = '100004';
+                element.style.position = 'relative';
+            });
+        });
+        
+        // Override Bootstrap modal behavior if needed
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const originalShow = bootstrap.Modal.prototype.show;
+            bootstrap.Modal.prototype.show = function() {
+                // Ensure body has modal-open class
+                document.body.classList.add('modal-open');
+                
+                // Call original show method
+                originalShow.call(this);
+                
+                // Ensure modal is properly positioned
+                const modalElement = this._element;
+                if (modalElement) {
+                    modalElement.style.zIndex = '99999';
+                    modalElement.style.position = 'fixed';
+                    modalElement.style.top = '0';
+                    modalElement.style.left = '0';
+                    modalElement.style.width = '100vw';
+                    modalElement.style.height = '100vh';
+                    modalElement.style.display = 'flex';
+                    modalElement.style.alignItems = 'center';
+                    modalElement.style.justifyContent = 'center';
+                    modalElement.style.background = 'rgba(0, 0, 0, 0.5)';
+                    modalElement.style.backdropFilter = 'blur(8px)';
+                }
+            };
+            
+            const originalHide = bootstrap.Modal.prototype.hide;
+            bootstrap.Modal.prototype.hide = function() {
+                // Remove modal-open class from body
+                document.body.classList.remove('modal-open');
+                
+                // Call original hide method
+                originalHide.call(this);
+            };
+        }
+    }
+    
+    async createOutage() {
+        const title = document.getElementById('outageTitle')?.value?.trim();
+        const description = document.getElementById('outageDescription')?.value?.trim();
+        const ticketId = document.getElementById('outageTicket')?.value?.trim();
+        const affectedSystems = document.getElementById('affectedSystems')?.value?.trim();
+        const notifyTeams = document.getElementById('notifyTeams')?.checked;
+        
+        if (!title || !description) {
+            this.showToast('Please fill in all required fields', 'error');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/admin/outages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title,
+                    description,
+                    ticket_id: ticketId || null,
+                    affected_systems: affectedSystems || null,
+                    notify_teams: notifyTeams
+                })
+            });
+            
+            if (response.ok) {
+                const newOutage = await response.json();
+                this.data.outages.unshift(newOutage);
+                this.updateOutagesList();
+                
+                // Close modal and reset form
+                const modal = bootstrap.Modal.getInstance(document.getElementById('outageModal'));
+                modal.hide();
+                document.getElementById('outageForm').reset();
+                
+                this.showToast('Outage created successfully', 'success');
+            } else {
+                throw new Error('Failed to create outage');
+            }
+        } catch (error) {
+            console.error('Error creating outage:', error);
+            this.showToast('Error creating outage', 'error');
+        }
+    }
+    
+    async resolveOutage(outageId) {
+        try {
+            const response = await fetch(`/api/admin/outages/${outageId}/resolve`, {
+                method: 'POST'
+            });
+            
+            if (response.ok) {
+                const outageIndex = this.data.outages.findIndex(o => o.id === outageId);
+                if (outageIndex !== -1) {
+                    this.data.outages[outageIndex].status = 'resolved';
+                    this.updateOutagesList();
+                }
+                
+                this.showToast('Outage resolved successfully', 'success');
+            } else {
+                throw new Error('Failed to resolve outage');
+            }
+        } catch (error) {
+            console.error('Error resolving outage:', error);
+            this.showToast('Error resolving outage', 'error');
+        }
+    }
+    
+    async deleteOutage(outageId) {
+        if (!confirm('Are you sure you want to delete this outage?')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/api/admin/outages/${outageId}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                this.data.outages = this.data.outages.filter(o => o.id !== outageId);
+                this.updateOutagesList();
+                
+                this.showToast('Outage deleted successfully', 'success');
+            } else {
+                throw new Error('Failed to delete outage');
+            }
+        } catch (error) {
+            console.error('Error deleting outage:', error);
+            this.showToast('Error deleting outage', 'error');
+        }
+    }
+    
+    editOutage(outageId) {
+        // TODO: Implement edit functionality
+        this.showToast('Edit functionality coming soon', 'info');
+    }
+    
+    setFallbackData() {
+        this.data.metrics = {
+            open_tickets: 0,
+            active_outages: 0,
+            online_users: [],
+            system_health: 98
+        };
+        this.updateMetrics();
+        this.updateUsersList([]);
+        this.updateOutagesList();
+        this.updateActivityList();
+    }
+    
+    showToast(message, type = 'info', duration = 5000) {
+        if (typeof window.showToast === 'function') {
+            window.showToast(message, type, duration);
+        } else {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+    }
+    
+    destroy() {
+        // Clear all intervals
+        Object.values(this.refreshIntervals).forEach(interval => {
+            clearInterval(interval);
+        });
+        
+        // Remove socket listeners
+        if (this.socket) {
+            this.socket.off('dashboard_update');
+            this.socket.off('user_status_change');
+            this.socket.off('outage_update');
+            this.socket.off('activity_update');
+        }
+        
+        console.log('Dashboard Manager destroyed');
+    }
+}
+
+// Initialize dashboard manager when DOM is loaded
+let dashboardManager;
+
+document.addEventListener('DOMContentLoaded', () => {
+    dashboardManager = new DashboardManager();
+    window.dashboardManager = dashboardManager;
+    
+    // CRITICAL: Force all interactive elements to be clickable after a short delay
+    setTimeout(() => {
+        if (dashboardManager && dashboardManager.forceInteractiveElements) {
+            dashboardManager.forceInteractiveElements();
+        }
+        
+        // Additional force for any remaining elements
+        const allInteractiveElements = document.querySelectorAll('button, .btn, .btn-modern, .user-item, .activity-item, [data-bs-toggle="modal"], [data-bs-target], [onclick], .clickable');
+        allInteractiveElements.forEach(element => {
+            element.style.pointerEvents = 'auto';
+            element.style.cursor = 'pointer';
+            element.style.zIndex = '10001';
+            element.style.position = 'relative';
+        });
+        
+        console.log('All interactive elements forced to be clickable');
+    }, 1000);
+});
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (dashboardManager) {
+        dashboardManager.destroy();
+    }
+});
+
+// Export for global access
+window.DashboardManager = DashboardManager;
+</script>
+{% endmacro %} 

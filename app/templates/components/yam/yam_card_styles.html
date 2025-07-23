@@ -1,0 +1,130 @@
+<!-- YAM Card and Component Styles -->
+{% macro render_yam_card_styles() %}
+<style>
+/* ENHANCED CARD STYLES - BETTER CONTAINMENT */
+.yam-card-enhanced {
+    background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
+    border-radius: 12px !important; /* Increased radius */
+    padding: 1.25rem !important; /* Increased padding */
+    border: 1px solid #404040;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important; /* Enhanced shadow */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden !important; /* Prevent overflow */
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    min-height: 120px !important; /* Minimum height */
+}
+
+.yam-card-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px !important; /* Increased height */
+    background: linear-gradient(90deg, #5865f2, #7289da, #5865f2);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+.yam-card-enhanced:hover {
+    transform: translateY(-3px) !important; /* Enhanced hover */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+    border-color: #5865f2;
+}
+
+/* ENHANCED ACTION BUTTONS - BETTER LAYOUT */
+.yam-action-group {
+    background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
+    border-radius: 12px !important; /* Increased radius */
+    padding: 1.25rem !important; /* Increased padding */
+    border: 1px solid #404040;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important; /* Prevent overflow */
+    min-height: 200px !important; /* Minimum height */
+}
+
+.yam-action-group h3 {
+    font-size: 1.2rem !important; /* Increased size */
+    font-weight: 600;
+    color: #e0e0e0;
+    margin-bottom: 1rem !important; /* Increased margin */
+    display: flex;
+    align-items: center;
+    gap: 0.75rem !important; /* Increased gap */
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+.yam-action-group h3 i {
+    color: #5865f2;
+    font-size: 1.1rem !important; /* Increased size */
+}
+
+.yam-action-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important; /* Increased min width */
+    gap: 0.875rem !important; /* Increased gap */
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.yam-action-btn {
+    background: #404040;
+    border: 1px solid #505050;
+    color: #e0e0e0;
+    padding: 0.875rem 1.125rem !important; /* Increased padding */
+    border-radius: 8px !important; /* Increased radius */
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem !important; /* Increased gap */
+    font-size: 0.9rem !important; /* Increased font */
+    font-weight: 500;
+    text-decoration: none;
+    min-height: 48px !important; /* Increased height */
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    text-align: left !important;
+}
+
+.yam-action-btn:hover {
+    background: #505050;
+    border-color: #5865f2;
+    transform: translateY(-2px) !important; /* Enhanced hover */
+    box-shadow: 0 4px 12px rgba(88, 101, 242, 0.3) !important;
+    text-decoration: none;
+    color: #e0e0e0;
+}
+
+.yam-action-btn:active {
+    transform: translateY(0);
+}
+
+.yam-action-btn i {
+    font-size: 1.1rem !important; /* Increased size */
+    color: #5865f2;
+    flex-shrink: 0 !important; /* Prevent icon shrinking */
+}
+
+.yam-action-btn span {
+    flex: 1 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+</style>
+{% endmacro %} 

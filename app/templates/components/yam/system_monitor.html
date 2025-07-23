@@ -1,0 +1,1145 @@
+{% macro render_system_monitor(current_user) %}
+<!-- YAM System Monitor Component -->
+<div id="yamSystemMonitor" class="yam-system-monitor">
+    <div class="monitor-header">
+        <h4 class="monitor-title">
+            <i class="bi bi-cpu"></i>
+            System Monitor
+        </h4>
+        <div class="monitor-controls">
+            <button class="monitor-control-btn" id="yamMonitorRefresh" title="Refresh Data">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <button class="monitor-control-btn" id="yamMonitorAlerts" title="Alert Settings">
+                <i class="bi bi-bell"></i>
+            </button>
+            <div class="monitor-status" id="yamSystemStatus">
+                <i class="bi bi-circle-fill"></i>
+                <span>Healthy</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="monitor-grid">
+        <!-- CPU Usage -->
+        <div class="monitor-card cpu-card">
+            <div class="card-header">
+                <h5>CPU Usage</h5>
+                <span class="card-subtitle">Processor performance</span>
+            </div>
+            <div class="metric-display">
+                <div class="metric-circle" id="yamCpuCircle">
+                    <div class="circle-progress">
+                        <svg viewBox="0 0 100 100">
+                            <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
+                            <circle class="circle-progress-bar" cx="50" cy="50" r="40" id="yamCpuProgress"></circle>
+                        </svg>
+                        <div class="circle-text">
+                            <span class="circle-value" id="yamCpuValue">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Cores:</span>
+                        <span class="detail-value" id="yamCpuCores">0</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Load:</span>
+                        <span class="detail-value" id="yamCpuLoad">0.00</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Temp:</span>
+                        <span class="detail-value" id="yamCpuTemp">0°C</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Memory Usage -->
+        <div class="monitor-card memory-card">
+            <div class="card-header">
+                <h5>Memory Usage</h5>
+                <span class="card-subtitle">RAM consumption</span>
+            </div>
+            <div class="metric-display">
+                <div class="metric-circle" id="yamMemoryCircle">
+                    <div class="circle-progress">
+                        <svg viewBox="0 0 100 100">
+                            <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
+                            <circle class="circle-progress-bar" cx="50" cy="50" r="40" id="yamMemoryProgress"></circle>
+                        </svg>
+                        <div class="circle-text">
+                            <span class="circle-value" id="yamMemoryValue">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Used:</span>
+                        <span class="detail-value" id="yamMemoryUsed">0 GB</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Total:</span>
+                        <span class="detail-value" id="yamMemoryTotal">0 GB</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Available:</span>
+                        <span class="detail-value" id="yamMemoryAvailable">0 GB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Disk Usage -->
+        <div class="monitor-card disk-card">
+            <div class="card-header">
+                <h5>Disk Usage</h5>
+                <span class="card-subtitle">Storage consumption</span>
+            </div>
+            <div class="metric-display">
+                <div class="metric-circle" id="yamDiskCircle">
+                    <div class="circle-progress">
+                        <svg viewBox="0 0 100 100">
+                            <circle class="circle-bg" cx="50" cy="50" r="40"></circle>
+                            <circle class="circle-progress-bar" cx="50" cy="50" r="40" id="yamDiskProgress"></circle>
+                        </svg>
+                        <div class="circle-text">
+                            <span class="circle-value" id="yamDiskValue">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Used:</span>
+                        <span class="detail-value" id="yamDiskUsed">0 GB</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Total:</span>
+                        <span class="detail-value" id="yamDiskTotal">0 GB</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Free:</span>
+                        <span class="detail-value" id="yamDiskFree">0 GB</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Network Usage -->
+        <div class="monitor-card network-card">
+            <div class="card-header">
+                <h5>Network</h5>
+                <span class="card-subtitle">Bandwidth usage</span>
+            </div>
+            <div class="network-metrics">
+                <div class="network-item">
+                    <div class="network-icon">
+                        <i class="bi bi-arrow-down"></i>
+                    </div>
+                    <div class="network-info">
+                        <div class="network-label">Download</div>
+                        <div class="network-value" id="yamNetworkDown">0 Mbps</div>
+                        <div class="network-change" id="yamNetworkDownChange">+0%</div>
+                    </div>
+                </div>
+                <div class="network-item">
+                    <div class="network-icon">
+                        <i class="bi bi-arrow-up"></i>
+                    </div>
+                    <div class="network-info">
+                        <div class="network-label">Upload</div>
+                        <div class="network-value" id="yamNetworkUp">0 Mbps</div>
+                        <div class="network-change" id="yamNetworkUpChange">+0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Database Health -->
+        <div class="monitor-card database-card">
+            <div class="card-header">
+                <h5>Database</h5>
+                <span class="card-subtitle">Connection & performance</span>
+            </div>
+            <div class="database-metrics">
+                <div class="db-status" id="yamDbStatus">
+                    <i class="bi bi-check-circle"></i>
+                    <span>Connected</span>
+                </div>
+                <div class="db-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Connections:</span>
+                        <span class="detail-value" id="yamDbConnections">0</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Queries/sec:</span>
+                        <span class="detail-value" id="yamDbQueries">0</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Response:</span>
+                        <span class="detail-value" id="yamDbResponse">0ms</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Logs -->
+        <div class="monitor-card logs-card">
+            <div class="card-header">
+                <h5>System Logs</h5>
+                <span class="card-subtitle">Recent events</span>
+            </div>
+            <div class="logs-container">
+                <div class="logs-list" id="yamSystemLogs">
+                    <!-- Loading state -->
+                    <div class="loading-state">
+                        <i class="bi bi-list-ul"></i>
+                        <div>Loading system logs...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Alert Settings Modal -->
+    <div class="modal fade" id="yamAlertSettingsModal" tabindex="-1" aria-labelledby="yamAlertSettingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="yamAlertSettingsModalLabel">
+                        <i class="bi bi-bell"></i>
+                        Alert Settings
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert-settings">
+                        <div class="setting-group">
+                            <h6>CPU Alerts</h6>
+                            <div class="setting-item">
+                                <label>Warning Threshold:</label>
+                                <input type="number" id="yamCpuWarning" value="70" min="0" max="100">%
+                            </div>
+                            <div class="setting-item">
+                                <label>Critical Threshold:</label>
+                                <input type="number" id="yamCpuCritical" value="90" min="0" max="100">%
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <h6>Memory Alerts</h6>
+                            <div class="setting-item">
+                                <label>Warning Threshold:</label>
+                                <input type="number" id="yamMemoryWarning" value="80" min="0" max="100">%
+                            </div>
+                            <div class="setting-item">
+                                <label>Critical Threshold:</label>
+                                <input type="number" id="yamMemoryCritical" value="95" min="0" max="100">%
+                            </div>
+                        </div>
+                        <div class="setting-group">
+                            <h6>Disk Alerts</h6>
+                            <div class="setting-item">
+                                <label>Warning Threshold:</label>
+                                <input type="number" id="yamDiskWarning" value="85" min="0" max="100">%
+                            </div>
+                            <div class="setting-item">
+                                <label>Critical Threshold:</label>
+                                <input type="number" id="yamDiskCritical" value="95" min="0" max="100">%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="yamSaveAlertSettings">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.yam-system-monitor {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.yam-system-monitor::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #ff6b6b, #feca57, #ff6b6b);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.monitor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.monitor-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.monitor-title i {
+    color: #ff6b6b;
+}
+
+.monitor-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.monitor-control-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+}
+
+.monitor-control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.monitor-control-btn:active {
+    transform: scale(0.95);
+}
+
+.monitor-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 0.25rem 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+.monitor-status i {
+    color: #4caf50;
+    font-size: 0.7rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.monitor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.monitor-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.monitor-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    margin-bottom: 1rem;
+}
+
+.card-header h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0 0 0.25rem 0;
+}
+
+.card-subtitle {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.metric-display {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.metric-circle {
+    flex-shrink: 0;
+}
+
+.circle-progress {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.circle-progress svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.circle-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 8;
+}
+
+.circle-progress-bar {
+    fill: none;
+    stroke: #4caf50;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 251.2;
+    stroke-dashoffset: 251.2;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+.circle-progress-bar.warning {
+    stroke: #ff9800;
+}
+
+.circle-progress-bar.critical {
+    stroke: #f44336;
+}
+
+.circle-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.circle-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.metric-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.detail-label {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.detail-value {
+    color: #fff;
+    font-weight: 600;
+}
+
+.network-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.network-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.network-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2196f3, #03a9f4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.network-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.network-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.25rem;
+}
+
+.network-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.25rem;
+}
+
+.network-change {
+    font-size: 0.75rem;
+    color: #4caf50;
+    font-weight: 600;
+}
+
+.database-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.db-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    border-radius: 8px;
+    color: #4caf50;
+    font-weight: 600;
+}
+
+.db-status.error {
+    background: rgba(244, 67, 54, 0.1);
+    border-color: rgba(244, 67, 54, 0.3);
+    color: #f44336;
+}
+
+.db-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.logs-container {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.logs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.log-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    border-left: 3px solid transparent;
+}
+
+.log-item.info {
+    border-left-color: #2196f3;
+}
+
+.log-item.warning {
+    border-left-color: #ff9800;
+}
+
+.log-item.error {
+    border-left-color: #f44336;
+}
+
+.log-time {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.7rem;
+    min-width: 60px;
+}
+
+.log-message {
+    color: #fff;
+    flex: 1;
+}
+
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    gap: 1rem;
+}
+
+.loading-state i {
+    font-size: 2rem;
+    color: #ff6b6b;
+    animation: pulse 2s infinite;
+}
+
+.alert-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.setting-group {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.setting-group h6 {
+    color: #fff;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.setting-item label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
+.setting-item input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    width: 80px;
+    text-align: center;
+}
+
+.setting-item input:focus {
+    outline: none;
+    border-color: #ff6b6b;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .yam-system-monitor {
+        padding: 1rem;
+    }
+    
+    .monitor-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .monitor-controls {
+        align-self: flex-end;
+    }
+    
+    .monitor-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .metric-display {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .network-metrics {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .network-item {
+        flex: 1;
+        min-width: 200px;
+    }
+}
+</style>
+
+<script>
+// YAM System Monitor Component
+window.yamSystemMonitor = {
+    data: {
+        cpu: { usage: 0, cores: 0, load: 0, temp: 0 },
+        memory: { used: 0, total: 0, available: 0, usage: 0 },
+        disk: { used: 0, total: 0, free: 0, usage: 0 },
+        network: { down: 0, up: 0, downChange: 0, upChange: 0 },
+        database: { connected: true, connections: 0, queries: 0, response: 0 },
+        logs: []
+    },
+    alerts: {
+        cpu: { warning: 70, critical: 90 },
+        memory: { warning: 80, critical: 95 },
+        disk: { warning: 85, critical: 95 }
+    },
+    updateInterval: null,
+    
+    init() {
+        this.setupEventListeners();
+        this.setupSocketListeners();
+        this.loadSystemData();
+        this.startMonitoring();
+        console.log('YAM System Monitor: Component initialized');
+    },
+    
+    setupEventListeners() {
+        // Refresh button
+        const refreshBtn = document.getElementById('yamMonitorRefresh');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => this.loadSystemData());
+        }
+        
+        // Alert settings button
+        const alertsBtn = document.getElementById('yamMonitorAlerts');
+        if (alertsBtn) {
+            alertsBtn.addEventListener('click', () => this.showAlertSettings());
+        }
+        
+        // Save alert settings
+        const saveBtn = document.getElementById('yamSaveAlertSettings');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => this.saveAlertSettings());
+        }
+    },
+    
+    setupSocketListeners() {
+        if (window.yamDashboard && window.yamDashboard.socket) {
+            const socket = window.yamDashboard.socket;
+            
+            socket.on('system_metrics', (data) => {
+                this.updateMetrics(data);
+            });
+            
+            socket.on('system_alert', (data) => {
+                this.handleSystemAlert(data);
+            });
+        }
+    },
+    
+    async loadSystemData() {
+        try {
+            const response = await fetch('/api/system/metrics', {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                this.updateMetrics(data);
+            } else {
+                // Fallback to simulated data
+                this.updateMetrics(this.generateSimulatedData());
+            }
+        } catch (error) {
+            console.error('Error loading system data:', error);
+            this.updateMetrics(this.generateSimulatedData());
+        }
+    },
+    
+    updateMetrics(data) {
+        this.data = { ...this.data, ...data };
+        this.updateDisplays();
+        this.checkAlerts();
+    },
+    
+    updateDisplays() {
+        this.updateCpuDisplay();
+        this.updateMemoryDisplay();
+        this.updateDiskDisplay();
+        this.updateNetworkDisplay();
+        this.updateDatabaseDisplay();
+        this.updateLogsDisplay();
+        this.updateSystemStatus();
+    },
+    
+    updateCpuDisplay() {
+        const cpu = this.data.cpu;
+        
+        // Update circle progress
+        const progress = document.getElementById('yamCpuProgress');
+        if (progress) {
+            const circumference = 2 * Math.PI * 40;
+            const offset = circumference - (cpu.usage / 100) * circumference;
+            progress.style.strokeDashoffset = offset;
+            
+            // Update color based on usage
+            progress.className = 'circle-progress-bar';
+            if (cpu.usage >= this.alerts.cpu.critical) {
+                progress.classList.add('critical');
+            } else if (cpu.usage >= this.alerts.cpu.warning) {
+                progress.classList.add('warning');
+            }
+        }
+        
+        // Update values
+        document.getElementById('yamCpuValue').textContent = `${cpu.usage}%`;
+        document.getElementById('yamCpuCores').textContent = cpu.cores;
+        document.getElementById('yamCpuLoad').textContent = cpu.load.toFixed(2);
+        document.getElementById('yamCpuTemp').textContent = `${cpu.temp}°C`;
+    },
+    
+    updateMemoryDisplay() {
+        const memory = this.data.memory;
+        
+        // Update circle progress
+        const progress = document.getElementById('yamMemoryProgress');
+        if (progress) {
+            const circumference = 2 * Math.PI * 40;
+            const offset = circumference - (memory.usage / 100) * circumference;
+            progress.style.strokeDashoffset = offset;
+            
+            // Update color based on usage
+            progress.className = 'circle-progress-bar';
+            if (memory.usage >= this.alerts.memory.critical) {
+                progress.classList.add('critical');
+            } else if (memory.usage >= this.alerts.memory.warning) {
+                progress.classList.add('warning');
+            }
+        }
+        
+        // Update values
+        document.getElementById('yamMemoryValue').textContent = `${memory.usage}%`;
+        document.getElementById('yamMemoryUsed').textContent = `${memory.used} GB`;
+        document.getElementById('yamMemoryTotal').textContent = `${memory.total} GB`;
+        document.getElementById('yamMemoryAvailable').textContent = `${memory.available} GB`;
+    },
+    
+    updateDiskDisplay() {
+        const disk = this.data.disk;
+        
+        // Update circle progress
+        const progress = document.getElementById('yamDiskProgress');
+        if (progress) {
+            const circumference = 2 * Math.PI * 40;
+            const offset = circumference - (disk.usage / 100) * circumference;
+            progress.style.strokeDashoffset = offset;
+            
+            // Update color based on usage
+            progress.className = 'circle-progress-bar';
+            if (disk.usage >= this.alerts.disk.critical) {
+                progress.classList.add('critical');
+            } else if (disk.usage >= this.alerts.disk.warning) {
+                progress.classList.add('warning');
+            }
+        }
+        
+        // Update values
+        document.getElementById('yamDiskValue').textContent = `${disk.usage}%`;
+        document.getElementById('yamDiskUsed').textContent = `${disk.used} GB`;
+        document.getElementById('yamDiskTotal').textContent = `${disk.total} GB`;
+        document.getElementById('yamDiskFree').textContent = `${disk.free} GB`;
+    },
+    
+    updateNetworkDisplay() {
+        const network = this.data.network;
+        
+        document.getElementById('yamNetworkDown').textContent = `${network.down} Mbps`;
+        document.getElementById('yamNetworkUp').textContent = `${network.up} Mbps`;
+        document.getElementById('yamNetworkDownChange').textContent = `${network.downChange > 0 ? '+' : ''}${network.downChange}%`;
+        document.getElementById('yamNetworkUpChange').textContent = `${network.upChange > 0 ? '+' : ''}${network.upChange}%`;
+    },
+    
+    updateDatabaseDisplay() {
+        const db = this.data.database;
+        const statusElement = document.getElementById('yamDbStatus');
+        
+        if (statusElement) {
+            if (db.connected) {
+                statusElement.innerHTML = '<i class="bi bi-check-circle"></i><span>Connected</span>';
+                statusElement.className = 'db-status';
+            } else {
+                statusElement.innerHTML = '<i class="bi bi-x-circle"></i><span>Disconnected</span>';
+                statusElement.className = 'db-status error';
+            }
+        }
+        
+        document.getElementById('yamDbConnections').textContent = db.connections;
+        document.getElementById('yamDbQueries').textContent = db.queries;
+        document.getElementById('yamDbResponse').textContent = `${db.response}ms`;
+    },
+    
+    updateLogsDisplay() {
+        const container = document.getElementById('yamSystemLogs');
+        if (!container) return;
+        
+        if (this.data.logs.length === 0) {
+            container.innerHTML = `
+                <div class="loading-state">
+                    <i class="bi bi-list-ul"></i>
+                    <div>No recent logs</div>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = this.data.logs.map(log => `
+            <div class="log-item ${log.level}">
+                <div class="log-time">${this.formatTime(log.timestamp)}</div>
+                <div class="log-message">${log.message}</div>
+            </div>
+        `).join('');
+    },
+    
+    updateSystemStatus() {
+        const statusElement = document.getElementById('yamSystemStatus');
+        if (!statusElement) return;
+        
+        // Determine overall system status
+        let status = 'healthy';
+        let color = '#4caf50';
+        
+        if (this.data.cpu.usage >= this.alerts.cpu.critical ||
+            this.data.memory.usage >= this.alerts.memory.critical ||
+            this.data.disk.usage >= this.alerts.disk.critical) {
+            status = 'critical';
+            color = '#f44336';
+        } else if (this.data.cpu.usage >= this.alerts.cpu.warning ||
+                   this.data.memory.usage >= this.alerts.memory.warning ||
+                   this.data.disk.usage >= this.alerts.disk.warning) {
+            status = 'warning';
+            color = '#ff9800';
+        }
+        
+        const icon = statusElement.querySelector('i');
+        const text = statusElement.querySelector('span');
+        
+        icon.style.color = color;
+        text.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+    },
+    
+    checkAlerts() {
+        const alerts = [];
+        
+        if (this.data.cpu.usage >= this.alerts.cpu.critical) {
+            alerts.push({ level: 'critical', component: 'CPU', message: `CPU usage critical: ${this.data.cpu.usage}%` });
+        } else if (this.data.cpu.usage >= this.alerts.cpu.warning) {
+            alerts.push({ level: 'warning', component: 'CPU', message: `CPU usage high: ${this.data.cpu.usage}%` });
+        }
+        
+        if (this.data.memory.usage >= this.alerts.memory.critical) {
+            alerts.push({ level: 'critical', component: 'Memory', message: `Memory usage critical: ${this.data.memory.usage}%` });
+        } else if (this.data.memory.usage >= this.alerts.memory.warning) {
+            alerts.push({ level: 'warning', component: 'Memory', message: `Memory usage high: ${this.data.memory.usage}%` });
+        }
+        
+        if (this.data.disk.usage >= this.alerts.disk.critical) {
+            alerts.push({ level: 'critical', component: 'Disk', message: `Disk usage critical: ${this.data.disk.usage}%` });
+        } else if (this.data.disk.usage >= this.alerts.disk.warning) {
+            alerts.push({ level: 'warning', component: 'Disk', message: `Disk usage high: ${this.data.disk.usage}%` });
+        }
+        
+        // Send alerts if any
+        if (alerts.length > 0) {
+            this.sendAlerts(alerts);
+        }
+    },
+    
+    sendAlerts(alerts) {
+        // Send to notification system if available
+        if (window.yamNotifications) {
+            alerts.forEach(alert => {
+                window.yamNotifications.addNotification(
+                    alert.level === 'critical' ? 'error' : 'warning',
+                    `${alert.component} Alert`,
+                    alert.message
+                );
+            });
+        }
+        
+        // Emit to Socket.IO
+        if (window.yamDashboard && window.yamDashboard.socket) {
+            window.yamDashboard.socket.emit('system_alert', { alerts });
+        }
+    },
+    
+    showAlertSettings() {
+        // Populate current values
+        document.getElementById('yamCpuWarning').value = this.alerts.cpu.warning;
+        document.getElementById('yamCpuCritical').value = this.alerts.cpu.critical;
+        document.getElementById('yamMemoryWarning').value = this.alerts.memory.warning;
+        document.getElementById('yamMemoryCritical').value = this.alerts.memory.critical;
+        document.getElementById('yamDiskWarning').value = this.alerts.disk.warning;
+        document.getElementById('yamDiskCritical').value = this.alerts.disk.critical;
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('yamAlertSettingsModal'));
+        modal.show();
+    },
+    
+    saveAlertSettings() {
+        this.alerts = {
+            cpu: {
+                warning: parseInt(document.getElementById('yamCpuWarning').value),
+                critical: parseInt(document.getElementById('yamCpuCritical').value)
+            },
+            memory: {
+                warning: parseInt(document.getElementById('yamMemoryWarning').value),
+                critical: parseInt(document.getElementById('yamMemoryCritical').value)
+            },
+            disk: {
+                warning: parseInt(document.getElementById('yamDiskWarning').value),
+                critical: parseInt(document.getElementById('yamDiskCritical').value)
+            }
+        };
+        
+        // Save to localStorage
+        localStorage.setItem('yam_system_alerts', JSON.stringify(this.alerts));
+        
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('yamAlertSettingsModal'));
+        modal.hide();
+        
+        // Check alerts with new settings
+        this.checkAlerts();
+    },
+    
+    generateSimulatedData() {
+        return {
+            cpu: {
+                usage: Math.floor(Math.random() * 100),
+                cores: 8,
+                load: Math.random() * 4,
+                temp: Math.floor(Math.random() * 30) + 40
+            },
+            memory: {
+                used: Math.floor(Math.random() * 8) + 4,
+                total: 16,
+                available: Math.floor(Math.random() * 8) + 2,
+                usage: Math.floor(Math.random() * 100)
+            },
+            disk: {
+                used: Math.floor(Math.random() * 200) + 100,
+                total: 500,
+                free: Math.floor(Math.random() * 200) + 50,
+                usage: Math.floor(Math.random() * 100)
+            },
+            network: {
+                down: Math.floor(Math.random() * 100) + 10,
+                up: Math.floor(Math.random() * 50) + 5,
+                downChange: Math.floor(Math.random() * 20) - 10,
+                upChange: Math.floor(Math.random() * 20) - 10
+            },
+            database: {
+                connected: true,
+                connections: Math.floor(Math.random() * 20) + 5,
+                queries: Math.floor(Math.random() * 100) + 10,
+                response: Math.floor(Math.random() * 50) + 5
+            },
+            logs: this.generateSimulatedLogs()
+        };
+    },
+    
+    generateSimulatedLogs() {
+        const logLevels = ['info', 'warning', 'error'];
+        const logMessages = [
+            'System check completed successfully',
+            'Database connection established',
+            'User authentication successful',
+            'Cache cleared automatically',
+            'Backup process started',
+            'High memory usage detected',
+            'Network latency increased',
+            'Disk space running low'
+        ];
+        
+        const logs = [];
+        for (let i = 0; i < 5; i++) {
+            logs.push({
+                timestamp: Date.now() - (i * 60000),
+                level: logLevels[Math.floor(Math.random() * logLevels.length)],
+                message: logMessages[Math.floor(Math.random() * logMessages.length)]
+            });
+        }
+        
+        return logs.reverse();
+    },
+    
+    formatTime(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    },
+    
+    startMonitoring() {
+        // Update every 30 seconds
+        this.updateInterval = setInterval(() => {
+            this.loadSystemData();
+        }, 30000);
+    },
+    
+    destroy() {
+        if (this.updateInterval) {
+            clearInterval(this.updateInterval);
+        }
+        console.log('YAM System Monitor: Component destroyed');
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.yamSystemMonitor) {
+        window.yamSystemMonitor.init();
+    }
+});
+
+// Register with YAM Dashboard if available
+if (window.yamDashboard) {
+    window.yamDashboard.registerComponent('systemMonitor', window.yamSystemMonitor);
+}
+</script>
+{% endmacro %} 

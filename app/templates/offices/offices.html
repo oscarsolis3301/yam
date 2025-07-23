@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4" style="margin-left: 4.5rem;">
+    <div class="row justify-content-center">
+        <div class="col-10">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title mb-0">Offices</h3>
+                    <div class="d-flex gap-3">
+                        <!-- Search Box -->
+                        <div class="input-group" style="width: 300px;">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" id="searchInput" class="form-control" placeholder="Search offices...">
+                        </div>
+                        <!-- Filter Dropdown -->
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-funnel"></i> Filters
+                            </button>
+                            <div class="dropdown-menu p-3" style="width: 300px;" aria-labelledby="filterDropdown">
+                                <h6 class="dropdown-header">Filter Options</h6>
+                                <div id="filterContainer">
+                                    {% set columns = ['Office Number', 'Internal Name', 'Name', 'Phone', 'Address', 'Operations Manager'] %}
+                                    {% for column in columns %}
+                                        <div class="mb-2">
+                                            <label class="form-label">{{ column }}</label>
+                                            <input type="text" class="form-control filter-input" data-column="{{ column }}" placeholder="Filter {{ column }}">
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="d-flex justify-content-between mt-3">
+                                    <button class="btn btn-sm btn-outline-secondary" id="clearFilters">Clear All</button>
+                                    <button class="btn btn-sm btn-primary" id="applyFilters">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm" id="officesTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10%">Office Number</th>
+                                    <th style="width: 15%">Internal Name</th>
+                                    <th style="width: 15%">Name</th>
+                                    <th style="width: 10%">Phone</th>
+                                    <th style="width: 35%">Address</th>
+                                    <th style="width: 15%">Operations Manager</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for office in offices %}
+                                    <tr>
+                                        <td>{{ office.get('Number', '') }}</td>
+                                        <td>{{ office.get('Internal Name', '') }}</td>
+                                        <td>{{ office.get('Name', '') }}</td>
+                                        <td>{{ office.get('Phone', '') }}</td>
+                                        <td>
+                                            {% set address = office.get('Address', '') %}
+                                            {% set city = office.get('City', '') %}
+                                            {% set county = office.get('County', '') %}
+                                            {% set state = office.get('State', '') %}
+                                            {% set zip = office.get('Zip', '') %}
+                                            {{ [address, city, county, state, zip]|select('string')|join(', ') }}
+                                        </td>
+                                        <td>{{ office.get('Operations Manager', '') }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const table = document.getElementById('officesTable');
+    const searchInput = document.getElementById('searchInput');
+    const filterInputs = document.querySelectorAll('.filter-input');
+    const clearFiltersBtn = document.getElementById('clearFilters');
+    const applyFiltersBtn = document.getElementById('applyFilters');
+    
+    let activeFilters = {};
+
+    // Search functionality
+    searchInput.addEventListener('input', function() {
+        const searchText = this.value.toLowerCase();
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        
+        for (let row of rows) {
+            const cells = row.getElementsByTagName('td');
+            let found = false;
+            
+            for (let cell of cells) {
+                if (cell.textContent.toLowerCase().includes(searchText)) {
+                    found = true;
+                    break;
+                }
+            }
+            
+            row.style.display = found ? '' : 'none';
+        }
+    });
+
+    // Filter functionality
+    function applyFilters() {
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        
+        for (let row of rows) {
+            const cells = row.getElementsByTagName('td');
+            let showRow = true;
+            
+            for (let [column, filterValue] of Object.entries(activeFilters)) {
+                if (!filterValue) continue;
+                
+                const columnIndex = Array.from(table.getElementsByTagName('th')).findIndex(
+                    th => th.textContent === column
+                );
+                
+                if (columnIndex !== -1) {
+                    const cellValue = cells[columnIndex].textContent.toLowerCase();
+                    if (!cellValue.includes(filterValue.toLowerCase())) {
+                        showRow = false;
+                        break;
+                    }
+                }
+            }
+            
+            row.style.display = showRow ? '' : 'none';
+        }
+    }
+
+    // Update filters when input changes
+    filterInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const column = this.dataset.column;
+            activeFilters[column] = this.value;
+        });
+    });
+
+    // Clear all filters
+    clearFiltersBtn.addEventListener('click', function() {
+        filterInputs.forEach(input => {
+            input.value = '';
+        });
+        activeFilters = {};
+        applyFilters();
+    });
+
+    // Apply filters button
+    applyFiltersBtn.addEventListener('click', function() {
+        applyFilters();
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 

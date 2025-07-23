@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Interactivity Test</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+            color: #fff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .test-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #fff;
+        }
+        
+        .test-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .test-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+        
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .status-panel {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-value {
+            font-weight: 600;
+        }
+        
+        .status-value.success {
+            color: #28a745;
+        }
+        
+        .status-value.error {
+            color: #dc3545;
+        }
+        
+        .status-value.warning {
+            color: #ffc107;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            z-index: 1055 !important;
+            pointer-events: auto !important;
+        }
+        
+        .modal-dialog {
+            z-index: 1056 !important;
+            pointer-events: auto !important;
+        }
+        
+        .modal-content {
+            background: rgba(30, 30, 30, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            color: #fff;
+            z-index: 1057 !important;
+            pointer-events: auto !important;
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+        }
+        
+        .modal-title {
+            color: #fff;
+            font-weight: 600;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .btn-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            position: relative;
+        }
+        
+        .btn-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .btn-close::before,
+        .btn-close::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 2px;
+            background: #fff;
+            border-radius: 1px;
+            pointer-events: none;
+        }
+        
+        .btn-close::before {
+            transform: rotate(45deg);
+        }
+        
+        .btn-close::after {
+            transform: rotate(-45deg);
+        }
+        
+        /* Ensure all modal elements are interactive */
+        .modal *,
+        .modal-dialog *,
+        .modal-content * {
+            pointer-events: auto !important;
+        }
+        
+        /* Modal animations */
+        .modal.fade .modal-dialog {
+            transition: transform 0.3s ease-out;
+            transform: translate(0, -50px);
+        }
+        
+        .modal.show .modal-dialog {
+            transform: none;
+        }
+        
+        /* Body scroll lock when modal is open */
+        body.modal-open {
+            overflow: hidden !important;
+            padding-right: 0 !important;
+        }
+        
+        .interactive-test {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .interactive-test:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: scale(1.02);
+        }
+        
+        .interactive-test:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 class="test-title">Modal Interactivity Test</h1>
+        
+        <div class="test-buttons">
+            <button class="test-btn btn-primary" onclick="testBootstrapModal()">
+                <i class="bi bi-window"></i> Bootstrap Modal
+            </button>
+            <button class="test-btn btn-success" onclick="testCustomModal()">
+                <i class="bi bi-window-stack"></i> Custom Modal
+            </button>
+            <button class="test-btn btn-warning" onclick="testInteractiveElements()">
+                <i class="bi bi-mouse"></i> Interactive Test
+            </button>
+            <button class="test-btn btn-danger" onclick="testModalClose()">
+                <i class="bi bi-x-circle"></i> Close All Modals
+            </button>
+            <button class="test-btn btn-info" onclick="checkModalStatus()">
+                <i class="bi bi-info-circle"></i> Check Status
+            </button>
+        </div>
+        
+        <div class="status-panel">
+            <h5>Test Status</h5>
+            <div class="status-item">
+                <span>Bootstrap Loaded:</span>
+                <span class="status-value" id="bootstrapStatus">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span>Modal Elements:</span>
+                <span class="status-value" id="modalElementsStatus">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span>Pointer Events:</span>
+                <span class="status-value" id="pointerEventsStatus">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span>Z-Index Stack:</span>
+                <span class="status-value" id="zIndexStatus">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span>Interactive Elements:</span>
+                <span class="status-value" id="interactiveStatus">Checking...</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap Modal -->
+    <div class="modal fade" id="bootstrapTestModal" tabindex="-1" aria-labelledby="bootstrapTestModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bootstrapTestModalLabel">Bootstrap Modal Test</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This is a Bootstrap modal test. Try these interactions:</p>
+                    <ul>
+                        <li>Click the X button to close</li>
+                        <li>Click outside the modal (backdrop)</li>
+                        <li>Press the Escape key</li>
+                        <li>Click the interactive elements below</li>
+                    </ul>
+                    
+                    <div class="interactive-test" onclick="alert('Interactive element clicked!')">
+                        <strong>Click me!</strong> - This should be interactive
+                    </div>
+                    
+                    <div class="interactive-test" onclick="alert('Another interactive element!')">
+                        <strong>Click me too!</strong> - This should also work
+                    </div>
+                    
+                    <button class="btn btn-primary mt-3" onclick="alert('Button clicked!')">
+                        Test Button
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Custom Modal -->
+    <div class="modal fade" id="customTestModal" tabindex="-1" aria-labelledby="customTestModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="customTestModalLabel">Custom Modal Test</h5>
+                    <button type="button" class="btn-close" onclick="hideCustomModal()" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This is a custom modal implementation. Testing the same interactions:</p>
+                    <ul>
+                        <li>Click the X button to close</li>
+                        <li>Click outside the modal (backdrop)</li>
+                        <li>Press the Escape key</li>
+                        <li>Click the interactive elements below</li>
+                    </ul>
+                    
+                    <div class="interactive-test" onclick="alert('Custom modal interactive element clicked!')">
+                        <strong>Click me!</strong> - This should be interactive
+                    </div>
+                    
+                    <div class="interactive-test" onclick="alert('Another custom modal element!')">
+                        <strong>Click me too!</strong> - This should also work
+                    </div>
+                    
+                    <button class="btn btn-success mt-3" onclick="alert('Custom modal button clicked!')">
+                        Test Button
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Test functions
+        function testBootstrapModal() {
+            try {
+                const modal = new bootstrap.Modal(document.getElementById('bootstrapTestModal'));
+                modal.show();
+                updateStatus('Bootstrap modal opened successfully', 'success');
+            } catch (error) {
+                updateStatus('Bootstrap modal failed: ' + error.message, 'error');
+            }
+        }
+        
+        function testCustomModal() {
+            try {
+                const modalElement = document.getElementById('customTestModal');
+                modalElement.style.display = 'block';
+                modalElement.classList.add('show');
+                document.body.classList.add('modal-open');
+                
+                // Add backdrop
+                const backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop show';
+                backdrop.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    background: rgba(0, 0, 0, 0.5);
+                    z-index: 1054;
+                    cursor: pointer;
+                `;
+                backdrop.onclick = hideCustomModal;
+                document.body.appendChild(backdrop);
+                
+                // Add escape key handler
+                const escapeHandler = (e) => {
+                    if (e.key === 'Escape') {
+                        hideCustomModal();
+                        document.removeEventListener('keydown', escapeHandler);
+                    }
+                };
+                document.addEventListener('keydown', escapeHandler);
+                
+                updateStatus('Custom modal opened successfully', 'success');
+            } catch (error) {
+                updateStatus('Custom modal failed: ' + error.message, 'error');
+            }
+        }
+        
+        function hideCustomModal() {
+            try {
+                const modalElement = document.getElementById('customTestModal');
+                const backdrop = document.querySelector('.modal-backdrop');
+                
+                modalElement.classList.remove('show');
+                setTimeout(() => {
+                    modalElement.style.display = 'none';
+                }, 300);
+                
+                if (backdrop) {
+                    backdrop.remove();
+                }
+                
+                document.body.classList.remove('modal-open');
+                updateStatus('Custom modal closed successfully', 'success');
+            } catch (error) {
+                updateStatus('Custom modal close failed: ' + error.message, 'error');
+            }
+        }
+        
+        function testInteractiveElements() {
+            try {
+                const interactiveElements = document.querySelectorAll('.interactive-test');
+                let clickCount = 0;
+                
+                interactiveElements.forEach(element => {
+                    element.addEventListener('click', () => {
+                        clickCount++;
+                        updateStatus(`Interactive element clicked! (${clickCount})`, 'success');
+                    });
+                });
+                
+                updateStatus('Interactive elements test ready', 'success');
+            } catch (error) {
+                updateStatus('Interactive elements test failed: ' + error.message, 'error');
+            }
+        }
+        
+        function testModalClose() {
+            try {
+                // Close Bootstrap modals
+                const bootstrapModals = document.querySelectorAll('.modal.show');
+                bootstrapModals.forEach(modal => {
+                    const bsModal = bootstrap.Modal.getInstance(modal);
+                    if (bsModal) {
+                        bsModal.hide();
+                    }
+                });
+                
+                // Close custom modal
+                hideCustomModal();
+                
+                updateStatus('All modals closed', 'success');
+            } catch (error) {
+                updateStatus('Modal close failed: ' + error.message, 'error');
+            }
+        }
+        
+        function checkModalStatus() {
+            try {
+                // Check Bootstrap
+                const bootstrapLoaded = typeof bootstrap !== 'undefined' && bootstrap.Modal;
+                document.getElementById('bootstrapStatus').textContent = bootstrapLoaded ? 'Loaded' : 'Not Loaded';
+                document.getElementById('bootstrapStatus').className = 'status-value ' + (bootstrapLoaded ? 'success' : 'error');
+                
+                // Check modal elements
+                const modalElements = document.querySelectorAll('.modal');
+                const elementsExist = modalElements.length > 0;
+                document.getElementById('modalElementsStatus').textContent = elementsExist ? `${modalElements.length} found` : 'Not found';
+                document.getElementById('modalElementsStatus').className = 'status-value ' + (elementsExist ? 'success' : 'error');
+                
+                // Check pointer events
+                const pointerEvents = getComputedStyle(document.querySelector('.modal-content')).pointerEvents;
+                const pointerEventsOk = pointerEvents === 'auto';
+                document.getElementById('pointerEventsStatus').textContent = pointerEventsOk ? 'Auto' : pointerEvents;
+                document.getElementById('pointerEventsStatus').className = 'status-value ' + (pointerEventsOk ? 'success' : 'warning');
+                
+                // Check z-index
+                const zIndex = getComputedStyle(document.querySelector('.modal')).zIndex;
+                const zIndexOk = parseInt(zIndex) >= 1000;
+                document.getElementById('zIndexStatus').textContent = zIndex;
+                document.getElementById('zIndexStatus').className = 'status-value ' + (zIndexOk ? 'success' : 'warning');
+                
+                // Check interactive elements
+                const interactiveElements = document.querySelectorAll('.interactive-test');
+                const interactiveOk = interactiveElements.length > 0;
+                document.getElementById('interactiveStatus').textContent = interactiveOk ? `${interactiveElements.length} ready` : 'Not found';
+                document.getElementById('interactiveStatus').className = 'status-value ' + (interactiveOk ? 'success' : 'error');
+                
+                updateStatus('Status check completed', 'success');
+            } catch (error) {
+                updateStatus('Status check failed: ' + error.message, 'error');
+            }
+        }
+        
+        function updateStatus(message, type) {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+            
+            // Create a temporary status message
+            const statusDiv = document.createElement('div');
+            statusDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#ffc107'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                z-index: 10000;
+                animation: slideInRight 0.3s ease;
+            `;
+            statusDiv.textContent = message;
+            
+            document.body.appendChild(statusDiv);
+            
+            setTimeout(() => {
+                statusDiv.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (statusDiv.parentNode) {
+                        statusDiv.parentNode.removeChild(statusDiv);
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        // Add animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOutRight {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            checkModalStatus();
+            updateStatus('Modal test page loaded successfully', 'success');
+        });
+    </script>
+</body>
+</html> 

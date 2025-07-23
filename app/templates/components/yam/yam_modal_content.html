@@ -1,0 +1,87 @@
+<!-- YAM Modal System Content -->
+{% macro render_yam_modal_content(current_user, yam_status_indicator, yam_user_presence_map, yam_user_analytics, yam_user_activity_heatmap, yam_advanced_user_status, yam_system_monitor, yam_system_health_monitor, yam_team_performance_analytics, yam_team_collaboration, yam_recent_activity, yam_user_activity_tracker, yam_notifications, yam_team_chat) %}
+<!-- Modal System -->
+<div class="yam-modal-overlay" id="yamModalOverlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="yam-modal-container" id="yamModalContainer">
+        <div class="yam-modal-header">
+            <h3 id="yamModalTitle" class="yam-modal-title">Modal Title</h3>
+            <button class="yam-modal-close yam-focus-visible" 
+                    onclick="yamModals.closeModal()"
+                    aria-label="Close modal">
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="yam-modal-content" id="yamModalContent" role="document">
+            <!-- Modal content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<!-- Modal Content Templates (Hidden) -->
+<div style="display: none;" aria-hidden="true">
+    <!-- Status Modal -->
+    <div id="statusModalContent">
+        {{ yam_status_indicator.render_status_indicator(current_user) }}
+    </div>
+    
+    <!-- User Presence Map Modal -->
+    <div id="userPresenceModalContent">
+        {{ yam_user_presence_map.render_user_presence_map(current_user) }}
+    </div>
+    
+    <!-- User Analytics Modal -->
+    <div id="userAnalyticsModalContent">
+        {{ yam_user_analytics.render_user_analytics(current_user) }}
+    </div>
+    
+    <!-- Activity Heatmap Modal -->
+    <div id="activityHeatmapModalContent">
+        {{ yam_user_activity_heatmap.render_user_activity_heatmap(current_user) }}
+    </div>
+    
+    <!-- Advanced Status Modal -->
+    <div id="advancedStatusModalContent">
+        {{ yam_advanced_user_status.render_advanced_user_status(current_user) }}
+    </div>
+    
+    <!-- System Monitor Modal -->
+    <div id="systemMonitorModalContent">
+        {{ yam_system_monitor.render_system_monitor(current_user) }}
+    </div>
+    
+    <!-- System Health Modal -->
+    <div id="systemHealthModalContent">
+        {{ yam_system_health_monitor.render_system_health_monitor(current_user) }}
+    </div>
+    
+    <!-- Team Performance Modal -->
+    <div id="teamPerformanceModalContent">
+        {{ yam_team_performance_analytics.render_team_performance_analytics(current_user) }}
+    </div>
+    
+    <!-- Team Collaboration Modal -->
+    <div id="teamCollaborationModalContent">
+        {{ yam_team_collaboration.render_team_collaboration(current_user) }}
+    </div>
+    
+    <!-- Recent Activity Modal -->
+    <div id="recentActivityModalContent">
+        {{ yam_recent_activity.render_recent_activity(current_user) }}
+    </div>
+    
+    <!-- Activity Tracker Modal -->
+    <div id="activityTrackerModalContent">
+        {{ yam_user_activity_tracker.render_user_activity_tracker(current_user) }}
+    </div>
+    
+    <!-- Notifications Modal -->
+    <div id="notificationsModalContent">
+        {{ yam_notifications.render_notifications(current_user) }}
+    </div>
+    
+    <!-- Team Chat Modal -->
+    <div id="teamChatModalContent">
+        {{ yam_team_chat.render_team_chat(current_user) }}
+    </div>
+</div>
+{% endmacro %} 

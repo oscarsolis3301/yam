@@ -1,0 +1,1157 @@
+<style>
+/* CRITICAL: Prevent auto-opening of modals */
+.yam-modal-overlay {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.yam-modal-overlay:not(.yam-modal-active) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* CRITICAL: Prevent Bootstrap modals from auto-opening */
+.modal {
+    display: none !important;
+}
+
+.modal:not(.show) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* CRITICAL: Remove any modal backdrops */
+.modal-backdrop {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* PREMIUM DASHBOARD ENHANCEMENTS */
+
+/* Enhanced Background with Dynamic Gradients */
+.yam-dashboard-full {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%, #0a0a0a 100%);
+    background-size: 400% 400%;
+    /* animation removed */
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    padding: 0;
+    margin: 0;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* Enhanced Container with Glass Morphism */
+.yam-container-full {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 24px;
+    padding: 0 1rem 1rem 1rem; /* Remove top padding to prevent 5px spacing */
+    margin: 0;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.yam-container-full::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    /* animation removed */
+}
+
+/* Enhanced Welcome Banner */
+.yam-welcome-section {
+    margin: 0;
+    padding: 0;
+}
+
+.yam-welcome-banner {
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(35, 35, 35, 0.95) 100%);
+    backdrop-filter: blur(25px);
+    border-radius: 0;
+    padding: 2rem;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 32px 128px rgba(0, 0, 0, 0.6),
+        0 8px 32px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    /* transition removed */
+}
+
+/* Removed hover transform and shadow effects for welcome banner */
+
+.yam-welcome-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #667eea);
+    background-size: 200% 100%;
+    /* animation removed */
+    border-radius: 0;
+}
+
+/* Enhanced Main Content Grid */
+.yam-main-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+}
+
+/* Enhanced Cards with Premium Styling */
+.yam-card-enhanced {
+    background: linear-gradient(135deg, rgba(25, 25, 25, 0.95) 0%, rgba(40, 40, 40, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+        0 16px 64px rgba(0, 0, 0, 0.4),
+        0 4px 16px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+    /* transition removed */
+}
+
+.yam-card-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #667eea);
+    background-size: 200% 100%;
+    /* animation removed */
+    border-radius: 20px 20px 0 0;
+}
+
+/* Removed hover transform and shadow effects for main containers */
+
+/* Enhanced Quick Stats Section */
+.yam-quick-stats-section {
+    margin: 0;
+    padding: 0;
+}
+
+.yam-quick-stats-section .yam-card-enhanced {
+    padding: 0;
+    margin: 0;
+}
+
+/* Enhanced Stats Grid - SIDE BY SIDE LAYOUT */
+.stats-grid-side-by-side {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 2rem !important;
+    margin: 0 !important;
+    width: 100% !important;
+}
+
+.stat-item {
+    background: linear-gradient(135deg, rgba(30, 30, 30, 0.8) 0%, rgba(45, 45, 45, 0.8) 100%);
+    backdrop-filter: blur(15px);
+    border-radius: 16px;
+    padding: 2rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    display: flex !important;
+    align-items: center !important;
+    gap: 1.5rem !important;
+    min-height: 120px !important;
+}
+
+.stat-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 16px 16px 0 0;
+}
+
+.stat-item:hover {
+    /* transform: translateY(-4px); */
+    /* box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3); */
+}
+
+.stat-icon {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 16px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-bottom: 0 !important;
+    font-size: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0 !important;
+}
+
+.stat-info {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+}
+
+.stat-icon.online {
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+}
+
+.stat-icon.active {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+}
+
+.stat-icon.uptime {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
+}
+
+.stat-value {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    margin-bottom: 0.25rem !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    line-height: 1.2 !important;
+}
+
+.stat-label {
+    font-size: 0.9rem !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-weight: 500 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    line-height: 1.3 !important;
+}
+
+.stat-trend {
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.25rem !important;
+}
+
+.stat-details {
+    font-size: 0.8rem !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-weight: 400 !important;
+}
+
+/* Enhanced User Quick View */
+.user-quick-view-component {
+    height: 100%;
+}
+
+.user-profile-section {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(30, 30, 30, 0.6) 0%, rgba(45, 45, 45, 0.6) 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid rgba(102, 126, 234, 0.3);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    /* transition removed */
+    position: relative;
+}
+
+.user-avatar:hover {
+    /* hover effect removed */
+}
+
+.online-indicator {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 24px;
+    height: 24px;
+    background: #10b981;
+    border: 3px solid #1a1a1a;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.user-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.25rem;
+}
+
+.user-role {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+/* Enhanced User Stats Grid */
+.user-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin: 0;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, rgba(30, 30, 30, 0.6) 0%, rgba(45, 45, 45, 0.6) 100%);
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    /* transition removed */
+}
+
+.stat-card:hover {
+    /* hover effect removed */
+}
+
+/* Enhanced Actions Section */
+.yam-actions-section {
+    margin: 0;
+    padding: 0;
+}
+
+.yam-actions-grid-full {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin: 0;
+}
+
+.yam-action-group {
+    background: linear-gradient(135deg, rgba(25, 25, 25, 0.95) 0%, rgba(40, 40, 40, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 16px 64px rgba(0, 0, 0, 0.4);
+    /* transition removed */
+    position: relative;
+    overflow: hidden;
+    margin-top: 0;
+}
+
+.yam-action-group::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #667eea);
+    background-size: 200% 100%;
+    /* animation removed */
+    border-radius: 20px 20px 0 0;
+}
+
+/* Removed hover transform and shadow effects for action groups */
+
+.yam-action-group h3 {
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.yam-action-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.yam-action-btn {
+    background: linear-gradient(135deg, rgba(40, 40, 40, 0.8) 0%, rgba(60, 60, 60, 0.8) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    color: #ffffff;
+    font-weight: 500;
+    /* transition removed */
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.yam-action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.yam-action-btn:hover::before {
+    /* hover effect removed */
+}
+
+.yam-action-btn:hover {
+    /* hover effect removed */
+}
+
+.yam-action-btn i {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Enhanced Status Indicators */
+.status-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 0;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(30, 30, 30, 0.6) 0%, rgba(45, 45, 45, 0.6) 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.indicator-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.indicator-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+    /* animation removed */
+}
+
+.indicator-dot.error {
+    background: #ef4444;
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
+}
+
+.indicator-dot.warning {
+    background: #f59e0b;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+}
+
+.indicator-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+/* Enhanced Animations */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Component Animations - Removed */
+.yam-component {
+    /* animation removed */
+}
+
+.yam-card-enhanced {
+    /* animation removed */
+}
+
+.yam-action-group {
+    /* animation removed */
+}
+
+/* Enhanced Responsive Design */
+@media (max-width: 1200px) {
+    .yam-main-content-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .stats-grid-side-by-side {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .yam-container-full {
+        padding: 0 1rem 0 1rem;
+        margin: 0;
+    }
+    
+    .yam-welcome-banner {
+        padding: 2rem;
+    }
+    
+    .yam-card-enhanced {
+        padding: 1.5rem;
+    }
+    
+    .stats-grid-side-by-side {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1rem !important;
+    }
+    
+    .yam-actions-grid-full {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .user-profile-section {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .user-stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .yam-welcome-banner {
+        padding: 1.5rem;
+    }
+    
+    .yam-card-enhanced {
+        padding: 1rem;
+    }
+    
+    .stats-grid-side-by-side {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    
+    .stat-item {
+        padding: 1.5rem !important;
+        min-height: 100px !important;
+    }
+    
+    .yam-action-group {
+        padding: 1.5rem;
+    }
+    
+    .yam-action-buttons {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Enhanced Scrollbar */
+.yam-container-full::-webkit-scrollbar {
+    width: 8px;
+}
+
+.yam-container-full::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.yam-container-full::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #667eea, #764ba2);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.yam-container-full::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #764ba2, #667eea);
+}
+
+/* Enhanced Focus States */
+.yam-action-btn:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Enhanced Loading States */
+.loading-shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Enhanced Error States */
+.error-state {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Enhanced Success States */
+.success-state {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+/* Performance Optimizations */
+.yam-action-btn {
+    will-change: transform, box-shadow;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+    .yam-dashboard-full,
+    .yam-action-btn,
+    .stat-item,
+    .stat-card,
+    .user-avatar {
+        animation: none;
+        transition: none;
+    }
+    
+    .yam-action-btn:hover,
+    .stat-item:hover,
+    .stat-card:hover,
+    .user-avatar:hover {
+        transform: none;
+    }
+}
+
+/* Enhanced Typography */
+.yam-dashboard-full h1,
+.yam-dashboard-full h2,
+.yam-dashboard-full h3,
+.yam-dashboard-full h4,
+.yam-dashboard-full h5,
+.yam-dashboard-full h6 {
+    color: #ffffff;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.yam-dashboard-full p,
+.yam-dashboard-full span,
+.yam-dashboard-full div {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Enhanced Component Headers */
+.yam-component-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.yam-component-header h5 {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.yam-refresh-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 0.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.yam-refresh-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+/* Enhanced Last Updated */
+.last-updated {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+/* Real-time Update Styles */
+.connection-status {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.connection-status.connected {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.connection-status.disconnected {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Real-time connected state */
+.yam-container-full.realtime-connected {
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.yam-container-full.realtime-connected::before {
+    background: linear-gradient(90deg, #10b981, #059669, #10b981);
+}
+
+/* Notification System */
+.yam-notification {
+    position: fixed;
+    top: 4rem;
+    right: 1rem;
+    max-width: 400px;
+    background: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+    animation: slideInRight 0.3s ease-out;
+}
+
+.yam-notification.info {
+    border-left: 4px solid #3b82f6;
+}
+
+.yam-notification.success {
+    border-left: 4px solid #10b981;
+}
+
+.yam-notification.warning {
+    border-left: 4px solid #f59e0b;
+}
+
+.yam-notification.error {
+    border-left: 4px solid #ef4444;
+}
+
+.notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.notification-title {
+    font-weight: 600;
+    color: #ffffff;
+    font-size: 0.9rem;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.notification-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.notification-message {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Real-time update indicators */
+.realtime-indicator {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    animation: pulse 2s infinite;
+}
+
+.realtime-indicator.inactive {
+    background: rgba(255, 255, 255, 0.3);
+    animation: none;
+}
+
+/* System health indicators */
+.system-metric {
+    transition: all 0.3s ease;
+}
+
+.system-metric.normal {
+    color: #10b981;
+}
+
+.system-metric.warning {
+    color: #f59e0b;
+}
+
+.system-metric.error {
+    color: #ef4444;
+}
+
+.status-indicator {
+    transition: all 0.3s ease;
+}
+
+.status-indicator.online {
+    background: #10b981;
+}
+
+.status-indicator.offline {
+    background: #6b7280;
+}
+
+.status-indicator.warning {
+    background: #f59e0b;
+}
+
+.status-indicator.error {
+    background: #ef4444;
+}
+
+/* User status updates */
+.user-status {
+    transition: all 0.3s ease;
+}
+
+.user-status.online {
+    color: #10b981;
+}
+
+.user-status.offline {
+    color: #6b7280;
+}
+
+.user-status.away {
+    color: #f59e0b;
+}
+
+.user-status.busy {
+    color: #ef4444;
+}
+
+/* Auto-refresh indicator */
+.auto-refresh-indicator {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.5rem 1rem;
+    background: rgba(26, 26, 26, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    z-index: 1000;
+}
+
+/* Real-time data loading states */
+.realtime-loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.realtime-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+/* Enhanced pulse animation for real-time indicators */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.1);
+    }
+}
+
+/* CRITICAL: Enhanced Modal Z-Index Fixes for YAM Dashboard */
+/* Ensure all modals are properly visible and interactive */
+.modal {
+    z-index: 99999999 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.modal.show {
+    z-index: 99999999 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.modal.show .modal-dialog {
+    z-index: 99999999 !important;
+    position: relative !important;
+    margin: auto !important;
+    pointer-events: auto !important;
+}
+
+.modal.show .modal-content {
+    z-index: 99999999 !important;
+    pointer-events: auto !important;
+    position: relative !important;
+    background: rgba(26, 26, 26, 0.98) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 32px 128px rgba(0, 0, 0, 0.8) !important;
+}
+
+.modal-backdrop {
+    z-index: 99999998 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(0, 0, 0, 0.7) !important;
+    backdrop-filter: blur(5px) !important;
+}
+
+.modal-backdrop.show {
+    z-index: 99999998 !important;
+    opacity: 1 !important;
+}
+
+/* CRITICAL: Force all modal elements to be interactive */
+.modal * {
+    pointer-events: auto !important;
+}
+
+.modal input,
+.modal textarea,
+.modal select,
+.modal button {
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: auto !important;
+    background: rgba(40, 40, 40, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.modal input:focus,
+.modal textarea:focus,
+.modal select:focus {
+    background: rgba(50, 50, 50, 0.9) !important;
+    border-color: rgba(102, 126, 234, 0.5) !important;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2) !important;
+}
+
+/* CRITICAL: Ensure YAM modals are always on top */
+.yam-modal-overlay {
+    z-index: 99999999 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(0, 0, 0, 0.7) !important;
+    backdrop-filter: blur(5px) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.yam-modal-overlay .yam-modal-container {
+    z-index: 99999999 !important;
+    position: relative !important;
+    max-width: 90% !important;
+    max-height: 90% !important;
+    overflow: auto !important;
+}
+
+.yam-modal-overlay .yam-modal-content {
+    z-index: 99999999 !important;
+    background: rgba(26, 26, 26, 0.98) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 32px 128px rgba(0, 0, 0, 0.8) !important;
+    padding: 2rem !important;
+}
+
+/* CRITICAL: Fix for any hidden or invisible modals */
+.yam-modal-overlay[style*="display: flex"] {
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 99999999 !important;
+}
+
+.yam-modal-overlay[style*="display: flex"] .yam-modal-container {
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 99999999 !important;
+}
+
+/* CRITICAL: Ensure proper stacking context */
+.yam-dashboard-full {
+    position: relative;
+    z-index: 1;
+}
+
+.yam-container-full {
+    position: relative;
+    z-index: 1;
+}
+
+/* CRITICAL: Enhanced modal animations */
+.modal.fade .modal-dialog {
+    transition: transform 0.3s ease-out !important;
+    transform: translate(0, -50px) !important;
+}
+
+.modal.show .modal-dialog {
+    transform: none !important;
+}
+
+/* CRITICAL: Ensure form elements are properly styled */
+.modal .form-control,
+.modal .form-select {
+    background: rgba(40, 40, 40, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    padding: 0.75rem 1rem !important;
+}
+
+.modal .form-control:focus,
+.modal .form-select:focus {
+    background: rgba(50, 50, 50, 0.9) !important;
+    border-color: rgba(102, 126, 234, 0.5) !important;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2) !important;
+    color: #ffffff !important;
+}
+
+.modal .btn {
+    border-radius: 8px !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+
+.modal .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: none !important;
+    color: #ffffff !important;
+}
+
+.modal .btn-primary:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3) !important;
+}
+</style> 

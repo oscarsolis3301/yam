@@ -1,0 +1,594 @@
+{% extends "base.html" %}
+
+{% block title %}Dameware Remote Connection{% endblock %}
+
+{% block content %}
+{% include "sidebar.html" %}
+
+<div class="dameware-main-container">
+    <div class="dameware-card-macos">
+        <div class="dameware-header-macos">
+            <div class="dameware-icon-macos">
+                <i class="bi bi-display"></i>
+            </div>
+            <h1>Dameware Remote</h1>
+        </div>
+        <div class="dameware-tabs">
+            <button class="tab-btn active" id="tab-connect">Connect</button>
+            <button class="tab-btn" id="tab-creds">Credentials</button>
+            <button class="tab-btn" id="tab-debug">Debug</button>
+        </div>
+        <div class="tab-content" id="tab-content-connect">
+            <form class="dameware-form-macos" onsubmit="event.preventDefault(); connectToHost(hostInput.value);">
+                <label for="hostInput" class="input-label">Computer Name or IP</label>
+                <div class="input-row">
+                    <input type="text" id="hostInput" placeholder="e.g., DESKTOP-ABC123 or 192.168.1.100" class="host-input-macos" autocomplete="off">
+                    <button id="connectBtn" class="connect-btn-macos" type="submit">
+                        <i class="bi bi-play-fill"></i>
+                        Connect
+                    </button>
+                </div>
+            </form>
+            <div class="recent-hosts-macos">
+                <h3>Recent Connections</h3>
+                <div id="recentList" class="recent-list-macos"></div>
+            </div>
+            <div id="statusMessage" class="status-message-macos"></div>
+        </div>
+        <div class="tab-content" id="tab-content-creds" style="display:none;">
+            <form id="damewareCredsForm" class="dameware-creds-form-macos">
+                <label for="damewareUsername" class="input-label">Username</label>
+                <input type="text" id="damewareUsername" class="host-input-macos" placeholder="Domain Username" required>
+                <label for="damewareDomain" class="input-label">Domain</label>
+                <input type="text" id="damewareDomain" class="host-input-macos" placeholder="Domain (e.g., CORP)" required>
+                <label for="damewarePassword" class="input-label">Password</label>
+                <input type="password" id="damewarePassword" class="host-input-macos" placeholder="Password" required>
+                <label for="damewareAuthType" class="input-label">Authentication Type</label>
+                <select id="damewareAuthType" class="host-input-macos">
+                    <option value="ntlm">Windows NT Challenge/Response</option>
+                    <option value="encrypted">Encrypted Windows Login</option>
+                </select>
+                <div class="creds-btn-row">
+                    <button type="submit" id="saveCredsBtn" class="connect-btn-macos">Save</button>
+                    <button type="button" id="editCredsBtn" class="connect-btn-macos" style="display:none;">Edit</button>
+                </div>
+            </form>
+            <div id="credsStatusMessage" class="status-message-macos"></div>
+        </div>
+        <div class="tab-content" id="tab-content-debug" style="display:none;">
+            <div class="debug-section">
+                <h3>Dameware Debug Information</h3>
+                <button id="debugBtn" class="connect-btn-macos">Run Debug Check</button>
+                <div id="debugOutput" class="debug-output"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+:root {
+    --mac-bg-dark: #18191a;
+    --mac-card-dark: #232426;
+    --mac-border-dark: #313235;
+    --mac-text-dark: #f5f5f7;
+    --mac-text-secondary-dark: #b0b3b8;
+    --mac-blue: #0a84ff;
+    --mac-blue-hover: #0060df;
+    --mac-success: #30d158;
+    --mac-error: #ff453a;
+    --mac-shadow-dark: 0 4px 24px rgba(0,0,0,0.45);
+    --mac-shadow-hover-dark: 0 8px 32px rgba(0,0,0,0.55);
+}
+
+body, html {
+    background: var(--mac-bg-dark) !important;
+    color: var(--mac-text-dark);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.dameware-main-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--mac-bg-dark);
+    padding: 2rem 0;
+}
+
+.dameware-card-macos {
+    background: var(--mac-card-dark);
+    border-radius: 20px;
+    box-shadow: var(--mac-shadow-dark);
+    border: 1px solid var(--mac-border-dark);
+    max-width: 420px;
+    width: 100%;
+    padding: 2.5rem 2rem 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.dameware-header-macos {
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+.dameware-icon-macos {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--mac-blue), #5856d6);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    box-shadow: 0 2px 10px rgba(10, 132, 255, 0.18);
+}
+.dameware-icon-macos i {
+    font-size: 2rem;
+    color: white;
+}
+.dameware-header-macos h1 {
+    color: var(--mac-text-dark);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.dameware-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    justify-content: center;
+}
+.tab-btn {
+    background: none;
+    border: none;
+    color: var(--mac-text-secondary-dark);
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.5rem 1.5rem;
+    border-radius: 10px 10px 0 0;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.tab-btn.active {
+    background: var(--mac-bg-dark);
+    color: var(--mac-blue);
+    font-weight: 600;
+}
+
+.tab-content {
+    display: block;
+    animation: fadeIn 0.3s;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+}
+
+.dameware-form-macos {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+.input-label {
+    color: var(--mac-text-secondary-dark);
+    font-size: 0.98rem;
+    margin-bottom: 0.2rem;
+    font-weight: 500;
+}
+.input-row {
+    display: flex;
+    gap: 0.5rem;
+}
+.host-input-macos {
+    flex: 1;
+    padding: 0.9rem 1.1rem;
+    border: 1.5px solid var(--mac-border-dark);
+    border-radius: 10px;
+    font-size: 1rem;
+    color: var(--mac-text-dark);
+    background: var(--mac-bg-dark);
+    transition: border 0.2s, box-shadow 0.2s;
+}
+.host-input-macos:focus {
+    outline: none;
+    border-color: var(--mac-blue);
+    box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.12);
+}
+.connect-btn-macos {
+    background: var(--mac-blue);
+    color: white;
+    border: none;
+    padding: 0.9rem 1.3rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(10, 132, 255, 0.10);
+}
+.connect-btn-macos:hover {
+    background: var(--mac-blue-hover);
+    transform: translateY(-1px);
+}
+.connect-btn-macos:active {
+    transform: translateY(0);
+}
+.connect-btn-macos:disabled {
+    background: var(--mac-text-secondary-dark);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.recent-hosts-macos {
+    margin-top: 1.2rem;
+}
+.recent-hosts-macos h3 {
+    color: var(--mac-text-secondary-dark);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.7rem;
+}
+.recent-list-macos {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.recent-item-macos {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1rem;
+    background: var(--mac-bg-dark);
+    border-radius: 8px;
+    border: 1px solid var(--mac-border-dark);
+    transition: border 0.2s, background 0.2s;
+    cursor: pointer;
+}
+.recent-item-macos:hover {
+    background: #232426;
+    border-color: var(--mac-blue);
+}
+.recent-item-macos .host-name {
+    color: var(--mac-text-dark);
+    font-weight: 500;
+}
+.recent-item-macos .connect-quick {
+    background: none;
+    border: none;
+    color: var(--mac-blue);
+    cursor: pointer;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: background 0.2s;
+}
+.recent-item-macos .connect-quick:hover {
+    background: rgba(10, 132, 255, 0.10);
+}
+
+.status-message-macos {
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    margin-top: 1rem;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 1rem;
+    min-height: 0;
+}
+.status-message-macos.show {
+    opacity: 1;
+}
+.status-message-macos.success {
+    background: rgba(48, 209, 88, 0.10);
+    color: var(--mac-success);
+    border: 1px solid rgba(48, 209, 88, 0.18);
+}
+.status-message-macos.error {
+    background: rgba(255, 69, 58, 0.10);
+    color: var(--mac-error);
+    border: 1px solid rgba(255, 69, 58, 0.18);
+}
+
+.dameware-creds-form-macos {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin-top: 0.5rem;
+}
+.creds-btn-row {
+    display: flex;
+    gap: 0.7rem;
+    margin-top: 0.5rem;
+}
+
+.debug-section {
+    margin-top: 1rem;
+}
+.debug-section h3 {
+    color: var(--mac-text-secondary-dark);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+.debug-output {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--mac-bg-dark);
+    border-radius: 8px;
+    border: 1px solid var(--mac-border-dark);
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: var(--mac-text-dark);
+    white-space: pre-wrap;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+@media (max-width: 600px) {
+    .dameware-card-macos {
+        padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+        border-radius: 14px;
+        max-width: 98vw;
+    }
+    .dameware-main-container {
+        padding: 0.5rem 0;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab switching logic
+    const tabConnect = document.getElementById('tab-connect');
+    const tabCreds = document.getElementById('tab-creds');
+    const tabDebug = document.getElementById('tab-debug');
+    const tabContentConnect = document.getElementById('tab-content-connect');
+    const tabContentCreds = document.getElementById('tab-content-creds');
+    const tabContentDebug = document.getElementById('tab-content-debug');
+    
+    function switchTab(activeTab, activeContent, otherTabs, otherContents) {
+        activeTab.classList.add('active');
+        otherTabs.forEach(tab => tab.classList.remove('active'));
+        activeContent.style.display = '';
+        otherContents.forEach(content => content.style.display = 'none');
+    }
+    
+    tabConnect.addEventListener('click', function() {
+        switchTab(tabConnect, tabContentConnect, [tabCreds, tabDebug], [tabContentCreds, tabContentDebug]);
+    });
+    tabCreds.addEventListener('click', function() {
+        switchTab(tabCreds, tabContentCreds, [tabConnect, tabDebug], [tabContentConnect, tabContentDebug]);
+    });
+    tabDebug.addEventListener('click', function() {
+        switchTab(tabDebug, tabContentDebug, [tabConnect, tabCreds], [tabContentConnect, tabContentCreds]);
+    });
+
+    const hostInput = document.getElementById('hostInput');
+    const connectBtn = document.getElementById('connectBtn');
+    const statusMessage = document.getElementById('statusMessage');
+    const recentList = document.getElementById('recentList');
+    let recentConnections = JSON.parse(localStorage.getItem('dameware_recent') || '[]');
+
+    function updateRecentList() {
+        recentList.innerHTML = '';
+        recentConnections.slice(0, 5).forEach(host => {
+            const item = document.createElement('div');
+            item.className = 'recent-item-macos';
+            item.innerHTML = `
+                <span class="host-name">${host}</span>
+                <button class="connect-quick" onclick="connectToHost('${host}')">
+                    <i class="bi bi-play-fill"></i>
+                </button>
+            `;
+            recentList.appendChild(item);
+        });
+    }
+
+    function showStatus(message, type = 'success') {
+        statusMessage.textContent = message;
+        statusMessage.className = `status-message-macos ${type} show`;
+        setTimeout(() => {
+            statusMessage.classList.remove('show');
+        }, 5000);
+    }
+
+    function addToRecent(host) {
+        recentConnections = recentConnections.filter(h => h !== host);
+        recentConnections.unshift(host);
+        recentConnections = recentConnections.slice(0, 10);
+        localStorage.setItem('dameware_recent', JSON.stringify(recentConnections));
+        updateRecentList();
+    }
+
+    async function connectToHost(host) {
+        if (!host.trim()) {
+            showStatus('Please enter a host name or IP address', 'error');
+            return;
+        }
+        connectBtn.disabled = true;
+        connectBtn.classList.add('loading');
+        try {
+            const response = await fetch('/api/dameware/connect', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ host: host.trim() })
+            });
+            const data = await response.json();
+            if (data.success) {
+                let message = data.message || 'Connection launched.';
+                if (data.command) {
+                    message += ` (Command: ${data.command})`;
+                }
+                showStatus(message, 'success');
+                addToRecent(host.trim());
+                hostInput.value = '';
+            } else {
+                showStatus(data.error || 'Failed to connect.', 'error');
+            }
+        } catch (error) {
+            console.error('Dameware connection error:', error);
+            showStatus('Failed to connect. Please try again.', 'error');
+        } finally {
+            connectBtn.disabled = false;
+            connectBtn.classList.remove('loading');
+        }
+    }
+
+    connectBtn.addEventListener('click', () => {
+        connectToHost(hostInput.value);
+    });
+    hostInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            connectToHost(hostInput.value);
+        }
+    });
+    window.connectToHost = connectToHost;
+    updateRecentList();
+    hostInput.focus();
+
+    // Credentials logic
+    const damewareUsername = document.getElementById('damewareUsername');
+    const damewareDomain = document.getElementById('damewareDomain');
+    const damewarePassword = document.getElementById('damewarePassword');
+    const damewareAuthType = document.getElementById('damewareAuthType');
+    const damewareCredsForm = document.getElementById('damewareCredsForm');
+    const saveCredsBtn = document.getElementById('saveCredsBtn');
+    const editCredsBtn = document.getElementById('editCredsBtn');
+    const credsStatusMessage = document.getElementById('credsStatusMessage');
+    let credsLoaded = false;
+
+    async function loadDamewareCreds() {
+        try {
+            const res = await fetch('/api/settings/dameware_credentials');
+            const data = await res.json();
+            if (data.credentials) {
+                damewareUsername.value = data.credentials.dameware_username || '';
+                damewareDomain.value = data.credentials.dameware_domain || '';
+                damewarePassword.value = data.credentials.dameware_password || '';
+                damewareAuthType.value = data.credentials.dameware_auth_type || 'ntlm';
+                if (damewareUsername.value && damewareDomain.value && damewarePassword.value) {
+                    damewareUsername.disabled = true;
+                    damewareDomain.disabled = true;
+                    damewarePassword.disabled = true;
+                    damewareAuthType.disabled = true;
+                    saveCredsBtn.style.display = 'none';
+                    editCredsBtn.style.display = 'inline-block';
+                    credsLoaded = true;
+                } else {
+                    damewareUsername.disabled = false;
+                    damewareDomain.disabled = false;
+                    damewarePassword.disabled = false;
+                    damewareAuthType.disabled = false;
+                    saveCredsBtn.style.display = 'inline-block';
+                    editCredsBtn.style.display = 'none';
+                    credsLoaded = false;
+                }
+            }
+        } catch (err) {
+            credsStatusMessage.textContent = 'Failed to load Dameware credentials.';
+            credsStatusMessage.className = 'status-message-macos error show';
+        }
+    }
+
+    damewareCredsForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        saveCredsBtn.disabled = true;
+        credsStatusMessage.textContent = '';
+        try {
+            const res = await fetch('/api/settings/dameware_credentials', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    dameware_username: damewareUsername.value,
+                    dameware_domain: damewareDomain.value,
+                    dameware_password: damewarePassword.value,
+                    dameware_auth_type: damewareAuthType.value
+                })
+            });
+            const data = await res.json();
+            if (data.message) {
+                credsStatusMessage.textContent = data.message;
+                credsStatusMessage.className = 'status-message-macos success show';
+                loadDamewareCreds();
+            } else {
+                credsStatusMessage.textContent = data.error || 'Failed to save credentials.';
+                credsStatusMessage.className = 'status-message-macos error show';
+            }
+        } catch (err) {
+            credsStatusMessage.textContent = 'Failed to save credentials.';
+            credsStatusMessage.className = 'status-message-macos error show';
+        } finally {
+            saveCredsBtn.disabled = false;
+        }
+    });
+    editCredsBtn.addEventListener('click', function() {
+        damewareUsername.disabled = false;
+        damewareDomain.disabled = false;
+        damewarePassword.disabled = false;
+        damewareAuthType.disabled = false;
+        saveCredsBtn.style.display = 'inline-block';
+        editCredsBtn.style.display = 'none';
+        credsLoaded = false;
+    });
+    loadDamewareCreds();
+    
+    // Debug functionality
+    const debugBtn = document.getElementById('debugBtn');
+    const debugOutput = document.getElementById('debugOutput');
+    
+    debugBtn.addEventListener('click', async function() {
+        debugBtn.disabled = true;
+        debugBtn.textContent = 'Running...';
+        debugOutput.textContent = 'Running debug check...';
+        
+        try {
+            const response = await fetch('/api/dameware/debug');
+            const data = await response.json();
+            
+            let output = '=== Dameware Debug Information ===\n\n';
+            
+            // Dameware paths
+            output += 'Dameware Installation Paths:\n';
+            data.dameware_paths.forEach(pathInfo => {
+                const status = pathInfo.exists ? '✅' : '❌';
+                output += `${status} ${pathInfo.path}\n`;
+            });
+            
+            output += '\n';
+            if (data.found_path) {
+                output += `✅ Found Dameware at: ${data.found_path}\n`;
+            } else {
+                output += '❌ Dameware not found in any standard location\n';
+            }
+            
+            output += '\n';
+            output += `Credentials Configured: ${data.credentials_configured ? '✅ Yes' : '❌ No'}\n`;
+            
+            if (data.test_commands && data.test_commands.length > 0) {
+                output += '\nTest Commands:\n';
+                data.test_commands.forEach((cmd, index) => {
+                    output += `${index + 1}. ${cmd}\n`;
+                });
+            }
+            
+            debugOutput.textContent = output;
+            
+        } catch (error) {
+            debugOutput.textContent = `Error running debug: ${error.message}`;
+        } finally {
+            debugBtn.disabled = false;
+            debugBtn.textContent = 'Run Debug Check';
+        }
+    });
+});
+</script>
+{% endblock %} 

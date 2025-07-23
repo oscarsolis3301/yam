@@ -1,0 +1,1289 @@
+{% extends "base.html" %}
+
+{# Import YAM dashboard components #}
+{% import 'components/yam/yam_layout.html' as yam_layout %}
+{% import 'components/yam/welcome_banner.html' as yam_welcome %}
+{% import 'components/yam/quick_stats.html' as yam_quick_stats %}
+{% import 'components/yam/user_quick_view.html' as yam_user_quick_view %}
+{% import 'components/yam/daily_analytics.html' as yam_daily_analytics %}
+{% import 'components/yam/user_presence_map.html' as yam_user_presence_map %}
+{% import 'components/yam/user_analytics.html' as yam_user_analytics %}
+{% import 'components/yam/notifications.html' as yam_notifications %}
+{% import 'components/yam/team_chat.html' as yam_team_chat %}
+{% import 'components/yam/recent_activity.html' as yam_recent_activity %}
+{% import 'components/yam/system_monitor.html' as yam_system_monitor %}
+{% import 'components/yam/system_health_monitor.html' as yam_system_health_monitor %}
+{% import 'components/yam/team_performance_analytics.html' as yam_team_performance_analytics %}
+{% import 'components/yam/team_collaboration.html' as yam_team_collaboration %}
+<<<<<<< HEAD
+{% import 'components/yam/user_activity_heatmap.html' as yam_user_activity_heatmap %}
+{% import 'components/yam/user_activity_tracker.html' as yam_user_activity_tracker %}{% import 'components/yam/advanced_user_status.html' as yam_advanced_user_status %}
+=======
+{% import 'components/yam/user_activity_tracker.html' as yam_user_activity_tracker %}
+{% import 'components/yam/user_activity_heatmap.html' as yam_user_activity_heatmap %}
+{% import 'components/yam/advanced_user_status.html' as yam_advanced_user_status %}
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+
+{% block head %}
+<!-- Enhanced Meta Tags for Production -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<meta name="theme-color" content="#1a1a1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="YAM Dashboard">
+
+<!-- Preload Critical Resources -->
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" as="style">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" as="style">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/chart.js" as="script">
+
+<!-- Load Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- YAM Layout Styles -->
+{{ yam_layout.render_yam_layout() }}
+
+<!-- Include modular styles -->
+{% include 'components/yam/styles/yam_core_styles.html' %}
+{% include 'components/yam/styles/yam_container_styles.html' %}
+{% include 'components/yam/styles/yam_welcome_styles.html' %}
+{% include 'components/yam/styles/yam_grid_styles.html' %}
+{% include 'components/yam/styles/yam_card_styles.html' %}
+{% include 'components/yam/styles/yam_modal_styles.html' %}
+{% include 'components/yam/styles/yam_hover_animations.html' %}
+{% include 'components/yam/styles/yam_responsive_styles.html' %}
+
+<<<<<<< HEAD
+<!-- MONOTONE STYLES - Colors and animations only when needed -->
+{% include 'components/yam/styles/yam_monotone_styles.html' %}
+
+<!-- ENHANCED FOCUS DETECTION AND ROCKET ANIMATIONS -->
+<style>
+/* FOCUS DETECTION SYSTEM - Reduce colors when not actively viewed */
+.yam-dashboard-full {
+    position: relative;
+}
+
+.yam-dashboard-full:not(.yam-focused) {
+    /* Reduce colors when not focused */
+    filter: grayscale(0.3) brightness(0.8);
+    transition: filter 0.5s ease-in-out;
+}
+
+.yam-dashboard-full.yam-focused {
+    /* Restore colors when focused */
+    filter: none;
+    transition: filter 0.3s ease-in-out;
+}
+
+/* Container animations removed - only widget animations remain */
+.yam-card-enhanced {
+    animation: none !important; /* Remove container animations */
+    transition: none !important; /* Remove all container transitions */
+}
+
+.yam-card-enhanced:hover {
+    transform: none !important; /* Remove container hover animations */
+    box-shadow: 0 24px 96px rgba(0, 0, 0, 0.4) !important; /* Keep original shadow */
+}
+
+/* Remove animations from action groups (containers) */
+.yam-action-group {
+    animation: none !important;
+    transition: none !important;
+}
+
+.yam-action-group:hover {
+    transform: none !important;
+    box-shadow: 0 24px 96px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Remove animations from all container-level elements */
+.yam-welcome-section,
+.yam-main-content-grid,
+.yam-quick-stats-section,
+.yam-actions-section,
+.yam-user-section,
+.yam-analytics-section {
+    animation: none !important;
+    transition: none !important;
+}
+
+.yam-welcome-section:hover,
+.yam-main-content-grid:hover,
+.yam-quick-stats-section:hover,
+.yam-actions-section:hover,
+.yam-user-section:hover,
+.yam-analytics-section:hover {
+    transform: none !important;
+}
+
+/* ROCKET ANIMATIONS - Delegated to welcome banner component */
+/* These styles are now handled by the welcome banner component for better organization */
+
+/* Focus detection for containers */
+.yam-container-focused {
+    filter: none !important;
+    transition: filter 0.3s ease-in-out !important;
+}
+
+.yam-container-unfocused {
+    filter: grayscale(0.2) brightness(0.9) !important;
+    transition: filter 0.5s ease-in-out !important;
+}
+
+/* Widget animations preserved - ensure widgets within containers remain animated */
+.yam-component {
+    animation: fadeInUp 0.6s ease-out forwards !important;
+}
+
+.yam-component:hover {
+    transform: translateY(-2px) !important;
+    transition: transform 0.3s ease !important;
+}
+
+/* Preserve animations for specific widget elements */
+.yam-action-btn {
+    animation: fadeInUp 0.6s ease-out forwards !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.yam-action-btn:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25) !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #e0e0e0 !important;
+}
+
+/* Preserve animations for stats items */
+.stat-item {
+    animation: fadeInUp 0.6s ease-out forwards !important;
+    transition: all 0.3s ease !important;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Preserve animations for user avatar and elements */
+.user-avatar {
+    transition: all 0.3s ease !important;
+}
+
+.user-avatar:hover {
+    transform: scale(1.05) !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Preserve animations for chart containers */
+.chart-container {
+    animation: fadeInUp 0.6s ease-out forwards !important;
+    transition: all 0.3s ease !important;
+}
+
+.chart-container:hover {
+    transform: translateY(-2px) !important;
+}
+
+/* Preserve animations for info items */
+.info-item {
+    transition: all 0.3s ease !important;
+}
+
+.info-item:hover {
+    transform: translateY(-2px) !important;
+    background: rgba(88, 101, 242, 0.2) !important;
+    border-color: rgba(88, 101, 242, 0.4) !important;
+}
+
+/* Enhanced focus detection for better UX */
+.yam-dashboard-full.yam-focused .yam-card-enhanced {
+    filter: none !important;
+}
+
+.yam-dashboard-full:not(.yam-focused) .yam-card-enhanced {
+    filter: grayscale(0.1) brightness(0.95) !important;
+}
+
+/* Responsive adjustments for rocket animations */
+@media (max-width: 768px) {
+    .welcome-emoji:hover {
+        transform: translateY(-6px) rotate(12deg) scale(1.15) !important;
+    }
+    
+    .rocket-smoke {
+        width: 30px;
+        height: 50px;
+    }
+    
+    .rocket-smoke::before,
+    .rocket-smoke::after {
+        width: 6px;
+        height: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-emoji:hover {
+        transform: translateY(-4px) rotate(8deg) scale(1.1) !important;
+    }
+    
+    .rocket-smoke {
+        width: 25px;
+        height: 40px;
+    }
+    
+    .rocket-smoke::before,
+    .rocket-smoke::after {
+        width: 5px;
+        height: 12px;
+    }
+}
+
+/* Performance optimizations */
+.welcome-emoji,
+.rocket-smoke {
+    will-change: transform, opacity !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+}
+
+/* Accessibility improvements */
+.welcome-emoji:focus {
+    outline: 2px solid #4a90e2 !important;
+    outline-offset: 4px !important;
+}
+
+/* Reduced motion support - preserve widget animations */
+@media (prefers-reduced-motion: reduce) {
+    /* Disable container animations */
+    .yam-card-enhanced,
+    .yam-action-group,
+    .yam-welcome-section,
+    .yam-main-content-grid,
+    .yam-quick-stats-section,
+    .yam-actions-section,
+    .yam-user-section,
+    .yam-analytics-section {
+        animation: none !important;
+        transition: none !important;
+    }
+    
+    /* Disable container hover effects */
+    .yam-card-enhanced:hover,
+    .yam-action-group:hover,
+    .yam-welcome-section:hover,
+    .yam-main-content-grid:hover,
+    .yam-quick-stats-section:hover,
+    .yam-actions-section:hover,
+    .yam-user-section:hover,
+    .yam-analytics-section:hover {
+        transform: none !important;
+        animation: none !important;
+        transition: none !important;
+    }
+    
+    /* Keep widget animations for better UX */
+    .yam-component,
+    .yam-action-btn,
+    .stat-item,
+    .user-avatar,
+    .chart-container,
+    .info-item {
+        animation: fadeInUp 0.3s ease-out forwards !important; /* Reduced duration */
+        transition: all 0.2s ease !important; /* Reduced duration */
+    }
+    
+    .yam-component:hover,
+    .yam-action-btn:hover,
+    .stat-item:hover,
+    .user-avatar:hover,
+    .chart-container:hover,
+    .info-item:hover {
+        transform: translateY(-1px) !important; /* Reduced movement */
+        transition: all 0.2s ease !important;
+    }
+    
+    .welcome-emoji:hover {
+        transform: none !important;
+    }
+}
+</style><!-- UI/UX FIXES - COMPREHENSIVE IMPROVEMENTS -->
+=======
+<!-- UI/UX FIXES - COMPREHENSIVE IMPROVEMENTS -->
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+<style>
+/* CRITICAL FIXES FOR ALL UI/UX ISSUES */
+
+/* 1. REDUCE MARGIN BETWEEN WELCOME BANNER AND CONTAINERS */
+.yam-welcome-section {
+    margin-bottom: 0.25rem !important; /* Reduced from 0.5rem */
+}
+
+.yam-main-content-grid {
+    margin-bottom: 0.5rem !important; /* Reduced from 0.75rem */
+}
+
+.yam-quick-stats-section {
+    margin-bottom: 0.5rem !important; /* Reduced from 0.75rem */
+}
+
+.yam-actions-section {
+<<<<<<< HEAD
+margin-bottom: 0 !important; /* Remove bottom margin to touch page bottom */
+    padding-bottom: 0 !important; /* Remove bottom padding to touch page bottom */}
+=======
+    margin-bottom: 0.25rem !important; /* Reduced bottom margin to bring closer to page bottom */
+}
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+
+/* 2. FIX CONTENT CUT-OFF ISSUES - ENSURE ALL CONTENT IS VISIBLE */
+.yam-container-full {
+    min-height: 100vh;
+    max-height: none !important; /* Remove max-height constraint */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    position: relative;
+<<<<<<< HEAD
+padding: 0.75rem 0.75rem 0 0.75rem !important; /* Remove bottom padding */display: flex;
+=======
+    padding: 0.75rem !important; /* Reduced padding */
+    padding-bottom: 1rem !important;
+    display: flex;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    flex-direction: column;
+    flex: 1;
+    gap: 0.5rem !important; /* Reduced gap between sections */
+}
+
+/* 3. FIX CONTAINER HEIGHTS TO PREVENT CUT-OFF */
+.yam-card-enhanced {
+    min-height: auto !important; /* Remove fixed min-height */
+    max-height: none !important; /* Remove max-height constraint */
+    overflow: visible !important; /* Allow content to be fully visible */
+    padding: 1.5rem 2rem !important; /* Reduced padding */
+}
+
+.yam-user-section,
+.yam-analytics-section {
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+/* 4. FIX USER QUICK VIEW - MOVE ONLINE BUTTON OUTSIDE PROFILE PICTURE */
+.user-avatar {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid rgba(88, 101, 242, 0.4);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+/* Move online indicator outside the profile picture */
+.online-indicator {
+    position: absolute;
+    bottom: -5px; /* Move outside the avatar */
+    right: -5px; /* Move outside the avatar */
+    width: 20px;
+    height: 20px;
+    background: #4ade80;
+    border: 3px solid #1a1a1a;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(74, 222, 128, 0.4);
+    z-index: 2;
+}
+
+/* 5. REMOVE LEFT-SIDE COLORS FROM ALL CONTAINERS */
+.yam-card-enhanced {
+    border-left: none !important; /* Remove left border colors */
+}
+
+.yam-stats-card,
+.yam-status-card,
+.yam-user-card,
+.yam-connection-card,
+.yam-analytics-card,
+.yam-stats-card-compact {
+    border-left: none !important; /* Remove all left border colors */
+}
+
+/* 6. BRING CONTAINERS CLOSER TOGETHER */
+.yam-main-content-grid {
+    gap: 0.75rem !important; /* Reduced from 1.5rem */
+}
+
+.yam-actions-grid-full {
+    gap: 0.5rem !important; /* Reduced from 0.75rem */
+}
+
+/* 7. ENSURE ALL TEXT AND CONTENT IS FULLY VISIBLE */
+.yam-card-enhanced * {
+    overflow: visible !important;
+}
+
+.yam-component * {
+    overflow: visible !important;
+}
+
+/* 8. FIX SPECIFIC COMPONENT HEIGHTS */
+.user-quick-view-component {
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+.daily-analytics-component {
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+.quick-stats-component {
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+/* 9. FIX CHART CONTAINERS TO PREVENT CUT-OFF */
+.chart-container {
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+.chart-wrapper {
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+/* 10. FIX STATS GRID TO PREVENT CUT-OFF */
+.stats-grid {
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+.user-stats-grid {
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+/* 11. ENSURE ALL STATS AND PERCENTAGES ARE VISIBLE */
+.stat-value,
+.stat-label {
+    overflow: visible !important;
+    white-space: nowrap !important;
+}
+
+.chart-stats .stat {
+    overflow: visible !important;
+}
+
+/* 12. FIX RESPONSIVE DESIGN FOR BETTER SPACING */
+@media (max-height: 900px) {
+    .yam-container-full {
+<<<<<<< HEAD
+padding: 0.5rem 0.5rem 0 0.5rem !important; /* Remove bottom padding */gap: 0.375rem !important;
+=======
+        padding: 0.5rem !important;
+        gap: 0.375rem !important;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    }
+    
+    .yam-welcome-section {
+        margin-bottom: 0.125rem !important;
+    }
+    
+    .yam-main-content-grid {
+        margin-bottom: 0.25rem !important;
+    }
+    
+    .yam-quick-stats-section {
+        margin-bottom: 0.25rem !important;
+    }
+}
+
+@media (max-height: 700px) {
+    .yam-container-full {
+<<<<<<< HEAD
+padding: 0.375rem 0.375rem 0 0.375rem !important; /* Remove bottom padding */gap: 0.25rem !important;
+=======
+        padding: 0.375rem !important;
+        gap: 0.25rem !important;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    }
+    
+    .yam-card-enhanced {
+        padding: 1.25rem 1.5rem !important;
+    }
+}
+
+/* 13. ENHANCED SCROLLBAR STYLING */
+.yam-container-full::-webkit-scrollbar {
+    width: 12px;
+    background: transparent;
+}
+
+.yam-container-full::-webkit-scrollbar-track {
+<<<<<<< HEAD
+background: linear-gradient(180deg, rgba(74, 144, 226, 0.1), rgba(123, 104, 238, 0.05));
+    border-radius: 6px;
+    border: 1px solid rgba(74, 144, 226, 0.2);box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+.yam-container-full::-webkit-scrollbar-thumb {
+background: linear-gradient(180deg, #4a90e2, #7b68ee);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);transition: all 0.3s ease;
+}
+
+.yam-container-full::-webkit-scrollbar-thumb:hover {
+background: linear-gradient(180deg, #7b68ee, #4a90e2);
+    box-shadow: 0 0 15px rgba(74, 144, 226, 0.8);transform: scaleX(1.1);
+}
+
+.yam-container-full::-webkit-scrollbar-thumb:active {
+background: linear-gradient(180deg, #9370db, #8a2be2);
+    box-shadow: 0 0 20px rgba(147, 112, 219, 0.8);}
+=======
+    background: linear-gradient(180deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.05));
+    border-radius: 6px;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+.yam-container-full::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #667eea, #764ba2);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+    transition: all 0.3s ease;
+}
+
+.yam-container-full::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #764ba2, #667eea);
+    box-shadow: 0 0 15px rgba(102, 126, 234, 0.8);
+    transform: scaleX(1.1);
+}
+
+.yam-container-full::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(180deg, #f093fb, #f5576c);
+    box-shadow: 0 0 20px rgba(240, 147, 251, 0.8);
+}
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+
+.yam-container-full::-webkit-scrollbar-corner {
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 6px;
+}
+
+/* Firefox scrollbar styling */
+.yam-container-full {
+    scrollbar-width: thin;
+<<<<<<< HEAD
+scrollbar-color: #4a90e2 rgba(74, 144, 226, 0.1);}
+=======
+    scrollbar-color: #667eea rgba(102, 126, 234, 0.1);
+}
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+
+/* 14. COMPREHENSIVE TEXT COLOR FIX */
+.yam-dashboard-full,
+.yam-dashboard-full *,
+.yam-container-full,
+.yam-container-full * {
+    color: #ffffff !important;
+}
+
+.yam-dashboard-full h1,
+.yam-dashboard-full h2,
+.yam-dashboard-full h3,
+.yam-dashboard-full h4,
+.yam-dashboard-full h5,
+.yam-dashboard-full h6,
+.yam-container-full h1,
+.yam-container-full h2,
+.yam-container-full h3,
+.yam-container-full h4,
+.yam-container-full h5,
+.yam-container-full h6 {
+    color: #ffffff !important;
+}
+
+.yam-dashboard-full p,
+.yam-dashboard-full span,
+.yam-dashboard-full div,
+.yam-container-full p,
+.yam-container-full span,
+.yam-container-full div {
+    color: #ffffff !important;
+}
+
+/* 15. PERFORMANCE OPTIMIZATIONS */
+.yam-card-enhanced,
+.yam-action-group,
+.yam-action-btn {
+    will-change: transform, box-shadow !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+}
+
+/* 16. ENSURE ALL COMPONENTS ARE PROPERLY SIZED */
+.yam-component {
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+.yam-component-item {
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+/* 17. FIX ANY REMAINING CLIPPING ISSUES */
+.yam-dashboard-full,
+.yam-container-full,
+.yam-card-enhanced,
+.yam-component,
+.yam-component-item {
+    clip-path: none !important;
+    -webkit-clip-path: none !important;
+}
+
+/* 18. FIX CONTAINER LINES - ENSURE LINES ARE INSIDE CONTAINERS LIKE WELCOME BANNER */
+/* Remove any lines that appear above containers */
+.yam-user-section::before,
+.yam-analytics-section::before,
+.yam-quick-stats-section::before,
+.yam-user-section::after,
+.yam-analytics-section::after,
+.yam-quick-stats-section::after {
+    display: none !important;
+}
+
+/* Ensure card-level lines are properly applied */
+.yam-user-section .yam-card-enhanced::before,
+.yam-analytics-section .yam-card-enhanced::before,
+.yam-quick-stats-section .yam-card-enhanced::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 6px !important;
+<<<<<<< HEAD
+background: linear-gradient(90deg, #4a90e2, #7b68ee, #9370db, #4a90e2) !important;background-size: 200% 100% !important;
+=======
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #667eea) !important;
+    background-size: 200% 100% !important;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    animation: shimmer 3s ease-in-out infinite !important;
+    border-radius: 36px 36px 0 0 !important;
+    z-index: 1 !important;
+}
+
+/* Remove any conflicting lines from individual components */
+.user-quick-view-component::before,
+.user-quick-view-component::after,
+.daily-analytics-component::before,
+.daily-analytics-component::after,
+.quick-stats-component::before,
+.quick-stats-component::after {
+    display: none !important;
+}
+
+/* Ensure component content is properly positioned */
+.user-quick-view-component .component-content,
+.daily-analytics-component .component-content,
+.quick-stats-component .component-content {
+    position: relative !important;
+    z-index: 2 !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* Fix any margin/padding issues that might create visual gaps */
+.yam-user-section,
+.yam-analytics-section,
+.yam-quick-stats-section {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Ensure containers have proper positioning for the ::before pseudo-element */
+.yam-user-section .yam-card-enhanced,
+.yam-analytics-section .yam-card-enhanced,
+.yam-quick-stats-section .yam-card-enhanced {
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* 19. ADDITIONAL FIXES FOR CONTAINER LINES - ENSURE PROPER POSITIONING */
+/* Force the card-level lines to be visible and properly positioned */
+.yam-user-section .yam-card-enhanced::before,
+.yam-analytics-section .yam-card-enhanced::before,
+.yam-quick-stats-section .yam-card-enhanced::before {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Ensure component content doesn't overlap the line */
+.yam-user-section .yam-card-enhanced .yam-component,
+.yam-analytics-section .yam-card-enhanced .yam-component,
+.yam-quick-stats-section .yam-card-enhanced .yam-component {
+    padding-top: 1rem !important;
+    margin-top: 0 !important;
+}
+
+/* Fix any potential z-index issues */
+.yam-user-section .yam-card-enhanced::before,
+.yam-analytics-section .yam-card-enhanced::before,
+.yam-quick-stats-section .yam-card-enhanced::before {
+    z-index: 1 !important;
+}
+
+.yam-user-section .yam-card-enhanced .yam-component,
+.yam-analytics-section .yam-card-enhanced .yam-component,
+.yam-quick-stats-section .yam-card-enhanced .yam-component {
+    z-index: 2 !important;
+    position: relative !important;
+}
+
+/* Ensure the line matches the welcome banner exactly */
+.yam-user-section .yam-card-enhanced::before,
+.yam-analytics-section .yam-card-enhanced::before,
+.yam-quick-stats-section .yam-card-enhanced::before {
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #667eea) !important;
+    background-size: 200% 100% !important;
+    animation: shimmer 3s ease-in-out infinite !important;
+    border-radius: 36px 36px 0 0 !important;
+    height: 6px !important;
+}
+
+/* Remove any potential margin/padding that might create visual gaps */
+.yam-user-section,
+.yam-analytics-section,
+.yam-quick-stats-section {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Ensure the card containers have the same styling as the welcome banner */
+.yam-user-section .yam-card-enhanced,
+.yam-analytics-section .yam-card-enhanced,
+.yam-quick-stats-section .yam-card-enhanced {
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(40, 40, 40, 0.95) 100%) !important;
+    backdrop-filter: blur(20px) !important;
+    border-radius: 36px !important;
+    border: 2px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 24px 96px rgba(0, 0, 0, 0.4) !important;
+    overflow: hidden !important;
+}
+<<<<<<< HEAD
+/* 20. ENHANCED DASHBOARD LAYOUT - IMPROVED SPACING AND ORGANIZATION */
+/* Welcome Banner Width Matching - Match the width of containers below */
+.yam-container-width-match {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+/* Ensure welcome banner matches the exact width of the main content grid */
+.yam-container-width-match .yam-welcome-banner {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.yam-main-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.yam-quick-stats-section {
+    grid-column: 1 / -1;
+    margin-bottom: 1rem;
+}
+
+/* 21. IMPROVED QUICK STATS LAYOUT - SIDE BY SIDE WIDGETS */
+.quick-stats-component .stats-grid-side-by-side {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1400px) {
+    .quick-stats-component .stats-grid-side-by-side {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .yam-main-content-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .quick-stats-component .stats-grid-side-by-side {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+/* 22. ENHANCED DASHBOARD FEEL - BETTER VISUAL HIERARCHY */
+.yam-dashboard-full {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
+    min-height: 100vh;
+}
+
+.yam-container-full {
+    background: transparent;
+    backdrop-filter: blur(10px);
+}
+
+/* 23. IMPROVED CARD STYLING FOR BETTER DASHBOARD FEEL - CONTAINER ANIMATIONS DISABLED */
+.yam-card-enhanced {
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(35, 35, 35, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 24px 96px rgba(0, 0, 0, 0.6);
+    transition: none !important; /* Disable container transitions */
+    animation: none !important; /* Disable container animations */
+}
+
+.yam-card-enhanced:hover {
+    transform: none !important; /* Disable container hover animations */
+    box-shadow: 0 24px 96px rgba(0, 0, 0, 0.6) !important; /* Keep original shadow */
+    border-color: rgba(255, 255, 255, 0.1) !important; /* Keep original border */
+}
+
+/* 24. ENHANCED ANIMATIONS FOR BETTER DASHBOARD EXPERIENCE */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Container animations completely disabled - only widget animations remain */
+.yam-card-enhanced {
+    animation: none !important; /* Disable all container animations */
+    transition: none !important; /* Disable all container transitions */
+}
+
+.yam-user-section .yam-card-enhanced { 
+    animation: none !important; 
+    transition: none !important;
+}
+.yam-analytics-section .yam-card-enhanced { 
+    animation: none !important; 
+    transition: none !important;
+}
+.yam-quick-stats-section .yam-card-enhanced { 
+    animation: none !important; 
+    transition: none !important;
+}
+
+/* Override any remaining container hover effects */
+.yam-card-enhanced:hover,
+.yam-action-group:hover,
+.yam-welcome-section:hover,
+.yam-main-content-grid:hover,
+.yam-quick-stats-section:hover,
+.yam-actions-section:hover,
+.yam-user-section:hover,
+.yam-analytics-section:hover {
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+}
+
+/* Override hover animation classes that might be applied to containers */
+.yam-hover-lift:hover,
+.yam-hover-glow:hover,
+.yam-hover-safe:hover {
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+}
+
+/* Ensure containers with hover classes have no animations */
+.yam-card-enhanced.yam-hover-lift,
+.yam-card-enhanced.yam-hover-glow,
+.yam-card-enhanced.yam-hover-safe,
+.yam-action-group.yam-hover-lift,
+.yam-action-group.yam-hover-glow,
+.yam-action-group.yam-hover-safe {
+    animation: none !important;
+    transition: none !important;
+}
+
+.yam-card-enhanced.yam-hover-lift:hover,
+.yam-card-enhanced.yam-hover-glow:hover,
+.yam-card-enhanced.yam-hover-safe:hover,
+.yam-action-group.yam-hover-lift:hover,
+.yam-action-group.yam-hover-glow:hover,
+.yam-action-group.yam-hover-safe:hover {
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+}
+
+/* Ensure action groups also have no animations */
+.yam-action-group {
+    animation: none !important;
+    transition: none !important;
+}
+
+.yam-action-group:hover {
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+}</style>
+=======
+</style>
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+{% endblock %}
+
+{% block content %}
+<!-- Modern YAM Dashboard - UI/UX OPTIMIZED -->
+<div class="yam-dashboard-full yam-page" id="yamDashboard">
+    <div class="yam-container-full yam-viewport-fit" id="yamContainer">
+<<<<<<< HEAD
+<!-- Welcome Section - Match container width -->
+        <div class="yam-welcome-section yam-container-width-match">{{ yam_welcome.render_welcome_banner(name, current_user) }}
+=======
+        <!-- Welcome Section -->
+        <div class="yam-welcome-section">
+            {{ yam_welcome.render_welcome_banner(name, current_user) }}
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+        </div>
+        
+        <!-- Main Content Grid -->
+        <div class="yam-main-content-grid">
+            <!-- User Quick View -->
+            <div class="yam-user-section">
+                <div class="yam-card-enhanced yam-user-card yam-hover-lift">
+                    {{ yam_user_quick_view.render_user_quick_view(current_user) }}
+                </div>
+            </div>
+            
+            <!-- Daily Analytics -->
+            <div class="yam-analytics-section">
+                <div class="yam-card-enhanced yam-analytics-card yam-hover-lift">
+                    {{ yam_daily_analytics.render_daily_analytics(current_user) }}
+                </div>
+            </div>
+        </div>
+        
+<<<<<<< HEAD
+<!-- Quick Stats Section - ENHANCED SIDE BY SIDE LAYOUT --><div class="yam-quick-stats-section">
+=======
+        <!-- Quick Stats Section -->
+        <div class="yam-quick-stats-section">
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+            <div class="yam-card-enhanced yam-stats-card-compact yam-hover-lift">
+                {{ yam_quick_stats.render_quick_stats(current_user) }}
+            </div>
+        </div>
+        
+        <!-- Action Buttons Section -->
+        <div class="yam-actions-section">
+            {% include 'components/yam/sections/yam_actions_section.html' %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal System -->
+{% include 'components/yam/sections/yam_modal_system.html' %}
+
+<!-- Modal Content Templates (Hidden) -->
+{% include 'components/yam/sections/yam_modal_content_templates.html' %}
+{% endblock %}
+
+{% block scripts %}
+<!-- Include modular scripts -->
+{% include 'components/yam/scripts/yam_core_scripts.html' %}
+{% include 'components/yam/scripts/yam_modal_scripts.html' %}
+{% include 'components/yam/scripts/yam_data_scripts.html' %}
+{% include 'components/yam/scripts/yam_utils_scripts.html' %}
+
+<<<<<<< HEAD
+<!-- Enhanced YAM Dashboard Initialization with Focus Detection and Rocket Animations -->
+<script>
+// Enhanced YAM Dashboard System with Focus Detection
+window.yamDashboard = {
+    components: {},
+    initialized: false,
+    focusTimeout: null,// Register component function
+=======
+<!-- Unified YAM Dashboard Initialization - ERROR FREE -->
+<script>
+// Unified YAM Dashboard System - No Conflicts
+window.yamDashboard = {
+    components: {},
+    initialized: false,
+    
+    // Register component function
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    registerComponent: function(name, component) {
+        try {
+            this.components[name] = component;
+            console.log(`YAM Component registered: ${name}`);
+            return true;
+        } catch (error) {
+            console.error(`Failed to register component ${name}:`, error);
+            return false;
+        }
+    },
+    
+    // Get component function
+    getComponent: function(name) {
+        return this.components[name] || null;
+    },
+    
+    init() {
+        if (this.initialized) {
+            console.log('YAM Dashboard already initialized');
+            return;
+        }
+        
+<<<<<<< HEAD
+this.setupFocusDetection();
+        this.setupRocketAnimations();this.setupResponsive();
+=======
+        this.setupResponsive();
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+        this.setupScrollbarOptimization();
+        this.setupErrorHandling();
+        this.fixContentVisibility();
+        this.initialized = true;
+<<<<<<< HEAD
+console.log('YAM Dashboard initialized successfully - Enhanced with Focus Detection and Rocket Animations');
+    },
+    
+    setupFocusDetection() {
+        const dashboard = document.getElementById('yamDashboard');
+        if (!dashboard) return;
+        
+        // Focus detection for the entire dashboard
+        const handleFocus = () => {
+            dashboard.classList.add('yam-focused');
+            dashboard.classList.remove('yam-container-unfocused');
+            dashboard.classList.add('yam-container-focused');
+            
+            // Clear any existing timeout
+            if (this.focusTimeout) {
+                clearTimeout(this.focusTimeout);
+            }
+        };
+        
+        const handleBlur = () => {
+            // Add a delay before removing focus to prevent flickering
+            this.focusTimeout = setTimeout(() => {
+                dashboard.classList.remove('yam-focused');
+                dashboard.classList.remove('yam-container-focused');
+                dashboard.classList.add('yam-container-unfocused');
+            }, 1000); // 1 second delay
+        };
+        
+        // Listen for focus events on the dashboard and its children
+        dashboard.addEventListener('focusin', handleFocus);
+        dashboard.addEventListener('focusout', handleBlur);
+        
+        // Also listen for mouse events
+        dashboard.addEventListener('mouseenter', handleFocus);
+        dashboard.addEventListener('mouseleave', handleBlur);
+        
+        // Listen for scroll events (user is actively viewing)
+        dashboard.addEventListener('scroll', handleFocus);
+        
+        // Listen for click events
+        dashboard.addEventListener('click', handleFocus);
+        
+        // Initial focus state
+        handleFocus();
+    },
+    
+    setupRocketAnimations() {
+        // Rocket animations are now handled by the welcome banner component
+        // This ensures better organization and prevents conflicts
+        console.log('Rocket animations delegated to welcome banner component');},
+    
+=======
+        console.log('YAM Dashboard initialized successfully - UI/UX Optimized');
+    },
+    
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    setupResponsive() {
+        // Handle responsive behavior
+        const handleResize = () => {
+            const container = document.getElementById('yamContainer');
+            if (container) {
+                // Adjust container based on viewport
+                if (window.innerWidth <= 768) {
+                    container.classList.add('mobile-view');
+                } else {
+                    container.classList.remove('mobile-view');
+                }
+            }
+        };
+        
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Initial call
+    },
+    
+    setupScrollbarOptimization() {
+        // Optimize scrollbar performance
+        const container = document.getElementById('yamContainer');
+        if (container) {
+            container.style.scrollBehavior = 'smooth';
+        }
+    },
+    
+    setupErrorHandling() {
+        // Global error handler
+        window.addEventListener('error', (event) => {
+            console.error('YAM Dashboard Error:', event.error);
+        });
+        
+        // Unhandled promise rejection handler
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('YAM Dashboard Unhandled Promise Rejection:', event.reason);
+        });
+    },
+    
+    fixContentVisibility() {
+        // Ensure all content is visible and not cut off
+        const containers = document.querySelectorAll('.yam-card-enhanced, .yam-component, .chart-container');
+        containers.forEach(container => {
+            if (container) {
+                container.style.overflow = 'visible';
+                container.style.maxHeight = 'none';
+                container.style.minHeight = 'auto';
+            }
+        });
+        
+        // Fix online indicator position
+        const onlineIndicators = document.querySelectorAll('.online-indicator');
+        onlineIndicators.forEach(indicator => {
+            if (indicator) {
+                indicator.style.bottom = '-5px';
+                indicator.style.right = '-5px';
+            }
+        });
+    }
+};
+
+// Simple Performance Monitoring - No Conflicts
+window.yamPerformance = {
+    startTime: performance.now(),
+    metrics: {},
+    
+    init() {
+        // Simple initialization - no complex setup
+        console.log('YAM Performance: Simple monitoring initialized');
+    },
+    
+    mark(name) {
+        this.metrics[name] = performance.now();
+    },
+    
+    measure(name, startMark, endMark) {
+        try {
+            const start = this.metrics[startMark] || this.startTime;
+            const end = this.metrics[endMark] || performance.now();
+            const duration = end - start;
+            console.log(`YAM Performance: ${name} took ${duration.toFixed(2)}ms`);
+            return duration;
+        } catch (error) {
+            console.warn(`YAM Performance: Could not measure ${name}`, error);
+            return 0;
+        }
+    },
+    
+    getMetrics() {
+        return {
+            ...this.metrics,
+            totalLoadTime: performance.now() - this.startTime
+        };
+    }
+};
+
+// Initialize immediately when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.yamPerformance.init();
+        window.yamDashboard.init();
+    });
+} else {
+    window.yamPerformance.init();
+    window.yamDashboard.init();
+}
+
+// Simple page load monitoring
+window.addEventListener('load', () => {
+    const loadTime = performance.now() - window.yamPerformance.startTime;
+    console.log(`YAM Performance: Total Page Load Time took ${loadTime.toFixed(2)}ms`);
+    
+    // Log performance metrics
+    const metrics = window.yamPerformance.getMetrics();
+    console.log('YAM Performance Metrics:', metrics);
+});
+
+// Safe component initialization wrapper
+window.safeInitComponent = function(componentName, initFunction) {
+    try {
+        if (typeof initFunction === 'function') {
+            initFunction();
+            console.log(`${componentName} component initialized`);
+        } else {
+            console.warn(`${componentName} init function not found`);
+        }
+    } catch (error) {
+        console.error(`Error initializing ${componentName}:`, error);
+    }
+};
+
+// Safe event listener wrapper
+window.safeAddEventListener = function(element, event, handler) {
+    try {
+        if (element && typeof element.addEventListener === 'function') {
+            element.addEventListener(event, handler);
+            return true;
+        } else {
+            console.warn('Element not found or addEventListener not available:', element);
+            return false;
+        }
+    } catch (error) {
+        console.error('Error adding event listener:', error);
+        return false;
+    }
+};
+</script>
+{% endblock %} 

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index2 Debug Test</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/styles.css') }}" />
+    
+    <style>
+        body {
+            background: #0f1419;
+            color: #fff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .debug-header {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 2rem;
+        }
+        
+        .debug-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .debug-info h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .debug-info pre {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            padding: 0.5rem;
+            color: #fff;
+            font-size: 0.8rem;
+            overflow-x: auto;
+        }
+        
+        .test-controls {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .test-controls h4 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        
+        .test-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin: 0.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .test-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .test-btn.success {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: rgba(76, 175, 80, 0.3);
+        }
+        
+        .test-btn.danger {
+            background: rgba(244, 67, 54, 0.2);
+            border-color: rgba(244, 67, 54, 0.3);
+        }
+        
+        .test-btn.warning {
+            background: rgba(255, 152, 0, 0.2);
+            border-color: rgba(255, 152, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-header">
+        <h1>Index2 Debug Test Page</h1>
+        <p>Testing Index2 components with comprehensive debugging enabled</p>
+    </div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3">
+                <!-- Debug Information -->
+                <div class="debug-info">
+                    <h4>Test Data</h4>
+                    <pre>{{ test_data | tojson(indent=2) }}</pre>
+                </div>
+                
+                <!-- Test Controls -->
+                <div class="test-controls">
+                    <h4>Test Controls</h4>
+                    
+                    <div>
+                        <button class="test-btn success" onclick="testOutageBanner()">
+                            Show Outage Banner
+                        </button>
+                        <button class="test-btn danger" onclick="hideOutageBanner()">
+                            Hide Outage Banner
+                        </button>
+                    </div>
+                    
+                    <div>
+                        <button class="test-btn success" onclick="testToast('success')">
+                            Success Toast
+                        </button>
+                        <button class="test-btn warning" onclick="testToast('warning')">
+                            Warning Toast
+                        </button>
+                        <button class="test-btn danger" onclick="testToast('error')">
+                            Error Toast
+                        </button>
+                    </div>
+                    
+                    <div>
+                        <button class="test-btn" onclick="toggleDebugPanel()">
+                            Toggle Debug Panel
+                        </button>
+                        <button class="test-btn" onclick="showDebugInfo()">
+                            Show Debug Info
+                        </button>
+                    </div>
+                    
+                    <div>
+                        <button class="test-btn" onclick="testUserModal()">
+                            Test User Modal
+                        </button>
+                        <button class="test-btn" onclick="refreshUsers()">
+                            Refresh Users
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Component Status -->
+                <div class="debug-info">
+                    <h4>Component Status</h4>
+                    <div id="componentStatus">
+                        <p>Loading component status...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-9">
+                <!-- Index2 Components -->
+                <div class="main-content">
+                    <!-- Import Index2 components -->
+                    {% from 'components/index2/outage_banner.html' import render_outage_banner as outage_banner %}
+                    {% from 'components/index2/welcome_banner.html' import render_welcome_banner as welcome_banner %}
+                    {% from 'components/index2/users_online.html' import render_users_online as users_online %}
+                    {% from 'components/index2/debug.html' import render_debug_panel as debug %}
+                    {% from 'components/index2/main_layout.html' import render_main_layout as main_layout %}
+                    
+                    <!-- Render Index2 components -->
+                    {{ main_layout(name, current_user) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Test functions
+        function testOutageBanner() {
+            if (window.showOutageBanner) {
+                window.showOutageBanner('Test Outage', 'This is a test outage for debugging purposes');
+                console.log('Test outage banner shown');
+            } else {
+                console.error('showOutageBanner function not available');
+            }
+        }
+        
+        function hideOutageBanner() {
+            if (window.hideOutageBanner) {
+                window.hideOutageBanner();
+                console.log('Test outage banner hidden');
+            } else {
+                console.error('hideOutageBanner function not available');
+            }
+        }
+        
+        function testToast(type) {
+            if (window.showToast) {
+                window.showToast(`This is a ${type} toast message`, type);
+                console.log(`${type} toast shown`);
+            } else {
+                console.error('showToast function not available');
+            }
+        }
+        
+        function testUserModal() {
+            // Simulate user modal
+            const modal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
+            if (modal) {
+                modal.show();
+                console.log('User modal shown');
+            } else {
+                console.error('User modal not found');
+            }
+        }
+        
+        function refreshUsers() {
+            if (window.usersOnline && window.usersOnline.refreshUsers) {
+                window.usersOnline.refreshUsers();
+                console.log('Users refreshed');
+            } else {
+                console.error('Users refresh function not available');
+            }
+        }
+        
+        function showDebugInfo() {
+            if (window.showDebugInfo) {
+                window.showDebugInfo();
+            } else {
+                console.error('showDebugInfo function not available');
+            }
+        }
+        
+        // Update component status
+        function updateComponentStatus() {
+            const statusDiv = document.getElementById('componentStatus');
+            if (!statusDiv) return;
+            
+            const components = {
+                'MainLayout': !!window.mainLayout,
+                'OutageBanner': !!window.outageBanner,
+                'WelcomeBanner': !!window.welcomeBanner,
+                'UsersOnline': !!window.usersOnline,
+                'DebugPanel': !!window.index2Debugger
+            };
+            
+            let html = '';
+            Object.entries(components).forEach(([name, loaded]) => {
+                const status = loaded ? '✅ Loaded' : '❌ Not Loaded';
+                const color = loaded ? 'text-success' : 'text-danger';
+                html += `<p class="${color}"><strong>${name}:</strong> ${status}</p>`;
+            });
+            
+            statusDiv.innerHTML = html;
+        }
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('[Index2 Test] Page loaded');
+            
+            // Update component status after a delay to allow components to initialize
+            setTimeout(() => {
+                updateComponentStatus();
+            }, 2000);
+            
+            // Update status every 5 seconds
+            setInterval(updateComponentStatus, 5000);
+        });
+        
+        // Global error handler for testing
+        window.addEventListener('error', (event) => {
+            console.error('[Index2 Test] Error caught:', event.error);
+        });
+        
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('[Index2 Test] Unhandled promise rejection:', event.reason);
+        });
+    </script>
+</body>
+</html> 

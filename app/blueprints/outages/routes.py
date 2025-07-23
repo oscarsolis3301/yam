@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from . import bp
 from extensions import db, socketio
 from app.models import Outage
-from app.config import FRESH_ENDPOINT, FRESH_API, TICKET_STATUSES, TICKET_SOURCES, TICKET_PRIORITIES
+from extensions import Config
 import logging
 import requests
 import datetime
@@ -167,7 +167,7 @@ def all_outages():
 
     if ticket:
         print("Fetching data from API...")
-        ticket_response = requests.get(f"{FRESH_ENDPOINT}tickets/{str(ticket)}?include=conversations", auth=(FRESH_API, 'PARENT_TICKET'))
+        ticket_response = requests.get(f"{Config.FRESH_ENDPOINT}tickets/{str(ticket)}?include=conversations", auth=(Config.FRESH_API, 'PARENT_TICKET'))
 
         if ticket_response.status_code != 200:
             print(f"Failed to fetch activities. Status code: {ticket_response.status_code}")
@@ -185,9 +185,9 @@ def all_outages():
             ticket_info['description'] = ticket['ticket']['description_text']
             date = datetime.datetime.strptime(str(ticket['ticket']['created_at']), "%Y-%m-%dT%H:%M:%SZ")
             ticket_info['created_date'] = date.strftime("%m-%d-%Y")
-            ticket_info["status"] = TICKET_STATUSES[int(ticket['ticket']['status'])]
-            ticket_info['source'] = TICKET_SOURCES[int(ticket['ticket']['source'])]
-            ticket_info['priority'] = TICKET_PRIORITIES[int(ticket['ticket']['priority'])]
+            ticket_info["status"] = Config.TICKET_STATUSES[int(ticket['ticket']['status'])]
+            ticket_info['source'] = Config.TICKET_SOURCES[int(ticket['ticket']['source'])]
+            ticket_info['priority'] = Config.TICKET_PRIORITIES[int(ticket['ticket']['priority'])]
             ticket_info['category'] = ticket['ticket']['category']
             ticket_info['subcat'] = ticket['ticket']['sub_category']
             ticket_info['itemcat'] = ticket['ticket']['item_category']
@@ -199,7 +199,7 @@ def all_outages():
         data = {}
 
         try:
-            all_tickets_request = requests.get(f"{FRESH_ENDPOINT}tickets/filter?query=\"tag:spark\"", auth=(FRESH_API, 'TICKETS'))
+            all_tickets_request = requests.get(f"{Config.FRESH_ENDPOINT}tickets/filter?query=\"tag:spark\"", auth=(Config.FRESH_API, 'TICKETS'))
             all_tickets = all_tickets_request.json().get('tickets', [])
             print(all_tickets)
             filtered_tickets = []
@@ -211,9 +211,9 @@ def all_outages():
                 ticket['description'] = item['description_text']
                 date = datetime.datetime.strptime(str(item['created_at']), "%Y-%m-%dT%H:%M:%SZ")
                 ticket['created_date'] = date.strftime("%m-%d-%Y")
-                ticket["status"] = TICKET_STATUSES[int(item['status'])]
-                ticket['source'] = TICKET_SOURCES[int(item['source'])]
-                ticket['priority'] = TICKET_PRIORITIES[int(item['priority'])]
+                ticket["status"] = Config.TICKET_STATUSES[int(item['status'])]
+                ticket['source'] = Config.TICKET_SOURCES[int(item['source'])]
+                ticket['priority'] = Config.TICKET_PRIORITIES[int(item['priority'])]
                 ticket['category'] = item['category']
                 ticket['subcat'] = item['sub_category']
                 ticket['itemcat'] = item['item_category']
@@ -234,7 +234,7 @@ def previous_outages():
 
     if ticket:
         print("Fetching data from API...")
-        ticket_response = requests.get(f"{FRESH_ENDPOINT}tickets/{str(ticket)}?include=conversations", auth=(FRESH_API, 'PARENT_TICKET'))
+        ticket_response = requests.get(f"{Config.FRESH_ENDPOINT}tickets/{str(ticket)}?include=conversations", auth=(Config.FRESH_API, 'PARENT_TICKET'))
 
         if ticket_response.status_code != 200:
             print(f"Failed to fetch activities. Status code: {ticket_response.status_code}")
@@ -249,9 +249,9 @@ def previous_outages():
             ticket_info['description'] = ticket['ticket']['description_text']
             date = datetime.datetime.strptime(str(ticket['ticket']['created_at']), "%Y-%m-%dT%H:%M:%SZ")
             ticket_info['created_date'] = date.strftime("%m-%d-%Y")
-            ticket_info["status"] = TICKET_STATUSES[int(ticket['ticket']['status'])]
-            ticket_info['source'] = TICKET_SOURCES[int(ticket['ticket']['source'])]
-            ticket_info['priority'] = TICKET_PRIORITIES[int(ticket['ticket']['priority'])]
+            ticket_info["status"] = Config.TICKET_STATUSES[int(ticket['ticket']['status'])]
+            ticket_info['source'] = Config.TICKET_SOURCES[int(ticket['ticket']['source'])]
+            ticket_info['priority'] = Config.TICKET_PRIORITIES[int(ticket['ticket']['priority'])]
             ticket_info['category'] = ticket['ticket']['category']
             ticket_info['subcat'] = ticket['ticket']['sub_category']
             ticket_info['itemcat'] = ticket['ticket']['item_category']
@@ -262,7 +262,7 @@ def previous_outages():
         data = {}
 
         try:
-            all_tickets_request = requests.get(f"{FRESH_ENDPOINT}tickets/filter?query=\"tag:spark AND status:4 OR tag:spark AND status:5\"", auth=(FRESH_API, 'TICKETS'))
+            all_tickets_request = requests.get(f"{Config.FRESH_ENDPOINT}tickets/filter?query=\"tag:spark AND status:4 OR tag:spark AND status:5\"", auth=(Config.FRESH_API, 'TICKETS'))
             all_tickets = all_tickets_request.json().get('tickets', [])
             print(all_tickets)
             
@@ -273,9 +273,9 @@ def previous_outages():
                 ticket['description'] = item['description_text']
                 date = datetime.datetime.strptime(str(item['created_at']), "%Y-%m-%dT%H:%M:%SZ")
                 ticket['created_date'] = date.strftime("%m-%d-%Y")
-                ticket["status"] = TICKET_STATUSES[int(item['status'])]
-                ticket['source'] = TICKET_SOURCES[int(item['source'])]
-                ticket['priority'] = TICKET_PRIORITIES[int(item['priority'])]
+                ticket["status"] = Config.TICKET_STATUSES[int(item['status'])]
+                ticket['source'] = Config.TICKET_SOURCES[int(item['source'])]
+                ticket['priority'] = Config.TICKET_PRIORITIES[int(item['priority'])]
                 ticket['category'] = item['category']
                 ticket['subcat'] = item['sub_category']
                 ticket['itemcat'] = item['item_category']
@@ -297,7 +297,7 @@ def current_outages():
 
     if ticket:
         print("Fetching data from API...")
-        ticket_response = requests.get(f"{FRESH_ENDPOINT}tickets/{str(ticket)}?include=conversations", auth=(FRESH_API, 'PARENT_TICKET'))
+        ticket_response = requests.get(f"{Config.FRESH_ENDPOINT}tickets/{str(ticket)}?include=conversations", auth=(Config.FRESH_API, 'PARENT_TICKET'))
 
         if ticket_response.status_code != 200:
             print(f"Failed to fetch activities. Status code: {ticket_response.status_code}")
@@ -311,9 +311,9 @@ def current_outages():
             ticket_info['description'] = ticket['ticket']['description_text']
             date = datetime.datetime.strptime(str(ticket['ticket']['created_at']), "%Y-%m-%dT%H:%M:%SZ")
             ticket_info['created_date'] = date.strftime("%m-%d-%Y")
-            ticket_info["status"] = TICKET_STATUSES[int(ticket['ticket']['status'])]
-            ticket_info['source'] = TICKET_SOURCES[int(ticket['ticket']['source'])]
-            ticket_info['priority'] = TICKET_PRIORITIES[int(ticket['ticket']['priority'])]
+            ticket_info["status"] = Config.TICKET_STATUSES[int(ticket['ticket']['status'])]
+            ticket_info['source'] = Config.TICKET_SOURCES[int(ticket['ticket']['source'])]
+            ticket_info['priority'] = Config.TICKET_PRIORITIES[int(ticket['ticket']['priority'])]
             ticket_info['category'] = ticket['ticket']['category']
             ticket_info['subcat'] = ticket['ticket']['sub_category']
             ticket_info['itemcat'] = ticket['ticket']['item_category']
@@ -321,7 +321,7 @@ def current_outages():
 
     else:
         try:
-            all_tickets_request = requests.get(f"{FRESH_ENDPOINT}tickets/filter?query=\"tag:spark AND status:2 OR tag:spark AND status:3 or tag:spark AND status:8 OR tag:spark AND status:9 OR tag:spark AND status:10\"", auth=(FRESH_API, 'TICKETS'))
+            all_tickets_request = requests.get(f"{Config.FRESH_ENDPOINT}tickets/filter?query=\"tag:spark AND status:2 OR tag:spark AND status:3 or tag:spark AND status:8 OR tag:spark AND status:9 OR tag:spark AND status:10\"", auth=(Config.FRESH_API, 'TICKETS'))
             all_tickets = all_tickets_request.json().get('tickets', [])
             print(all_tickets)
             
@@ -332,9 +332,9 @@ def current_outages():
                 ticket['description'] = item['description_text']
                 date = datetime.datetime.strptime(str(item['created_at']), "%Y-%m-%dT%H:%M:%SZ")
                 ticket['created_date'] = date.strftime("%m-%d-%Y")
-                ticket["status"] = TICKET_STATUSES[int(item['status'])]
-                ticket['source'] = TICKET_SOURCES[int(item['source'])]
-                ticket['priority'] = TICKET_PRIORITIES[int(item['priority'])]
+                ticket["status"] = Config.TICKET_STATUSES[int(item['status'])]
+                ticket['source'] = Config.TICKET_SOURCES[int(item['source'])]
+                ticket['priority'] = Config.TICKET_PRIORITIES[int(item['priority'])]
                 ticket['category'] = item['category']
                 ticket['subcat'] = item['sub_category']
                 ticket['itemcat'] = item['item_category']

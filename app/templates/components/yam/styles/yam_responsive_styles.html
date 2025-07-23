@@ -1,0 +1,432 @@
+<!-- YAM Responsive Styles - Responsive Design Breakpoints -->
+<style>
+/* RESPONSIVE DESIGN - ENHANCED */
+@media (max-width: 768px) {
+    .yam-container-full {
+        width: 100% !important;
+        margin-left: 0 !important;
+        padding: 1rem !important; /* Increased padding */
+        gap: 1.25rem !important; /* Increased gap */
+        max-width: 100% !important;
+    }
+    
+    /* Better mobile spacing */
+    .yam-stats-grid-full {
+        gap: 1.25rem !important;
+        min-height: auto !important;
+    }
+    
+    .yam-actions-grid-full {
+        gap: 1.25rem !important;
+        min-height: auto !important;
+    }
+    
+    .yam-analytics-grid {
+        gap: 1.25rem !important;
+        min-height: auto !important;
+    }
+    
+    .yam-welcome-full .yam-welcome-banner {
+        padding: 1.5rem !important;
+    }
+    
+    .yam-welcome-full .welcome-title {
+        font-size: 1.75rem !important; /* Adjusted for mobile */
+    }
+    
+    .yam-welcome-full .welcome-subtitle {
+        font-size: 1rem !important;
+    }
+    
+    .yam-welcome-full .info-item {
+        padding: 0.5rem 0.875rem !important;
+        font-size: 0.875rem !important;
+        max-width: 150px !important; /* Reduced for mobile */
+    }
+    
+    .yam-analytics-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    
+    .yam-stats-grid-full {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    
+    .yam-actions-grid-full {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    
+    .yam-action-buttons {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
+    
+    .yam-action-btn {
+        min-height: 52px !important; /* Increased for mobile */
+        font-size: 0.95rem !important;
+    }
+    
+    .yam-modal-container {
+        width: 95vw !important;
+        max-height: 95vh !important;
+    }
+    
+    .yam-modal-content {
+        max-height: calc(95vh - 80px) !important;
+    }
+    
+    .analytics-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    
+    .chart-container {
+        padding: 0.875rem !important;
+        min-height: 180px !important;
+    }
+    
+    .chart-container canvas {
+        max-height: 120px !important;
+    }
+    
+    .stat-value {
+        font-size: 1rem !important;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem !important;
+    }
+    
+    .yam-card-enhanced {
+        padding: 1rem !important;
+        min-height: 100px !important;
+    }
+    
+    .yam-action-group {
+        padding: 1rem !important;
+        min-height: 180px !important;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .yam-container-full {
+        padding: 1.25rem !important;
+        gap: 1.5rem !important;
+    }
+    
+    .yam-welcome-full .yam-welcome-banner {
+        padding: 1.75rem !important;
+    }
+    
+    .yam-welcome-full .welcome-title {
+        font-size: 2.25rem !important;
+    }
+    
+    .yam-welcome-full .welcome-subtitle {
+        font-size: 1.15rem !important;
+    }
+    
+    .yam-welcome-full .info-item {
+        max-width: 220px !important;
+    }
+    
+    .yam-analytics-grid {
+        min-height: 550px !important;
+    }
+    
+    .yam-stats-grid-full {
+        min-height: 400px !important;
+    }
+    
+    .yam-actions-grid-full {
+        min-height: 320px !important;
+    }
+    
+    .yam-action-btn {
+        min-height: 110px !important;
+        padding: 1.25rem !important;
+    }
+    
+    .chart-container {
+        min-height: 220px !important;
+    }
+    
+    .chart-container canvas {
+        max-height: 180px !important;
+    }
+}
+
+@media (min-width: 1025px) and (max-width: 1199px) {
+    .yam-container-full {
+        padding: 1.5rem !important;
+        gap: 1.75rem !important;
+    }
+    
+    .yam-welcome-full .yam-welcome-banner {
+        padding: 2rem !important;
+    }
+    
+    .yam-welcome-full .welcome-title {
+        font-size: 2.5rem !important;
+    }
+    
+    .yam-welcome-full .welcome-subtitle {
+        font-size: 1.2rem !important;
+    }
+    
+    .yam-welcome-full .info-item {
+        max-width: 250px !important;
+    }
+    
+    .yam-analytics-grid {
+        min-height: 600px !important;
+    }
+    
+    .yam-stats-grid-full {
+        min-height: 420px !important;
+    }
+    
+    .yam-actions-grid-full {
+        min-height: 330px !important;
+    }
+    
+    .yam-action-btn {
+        min-height: 115px !important;
+        padding: 1.5rem !important;
+    }
+    
+    .chart-container {
+        min-height: 250px !important;
+    }
+    
+    .chart-container canvas {
+        max-height: 200px !important;
+    }
+}
+
+@media (min-width: 1200px) {
+    .yam-container-full {
+        padding: 1rem !important;
+        gap: 1.5rem !important;
+    }
+    
+    .yam-welcome-full .yam-welcome-banner {
+        padding: 2rem !important;
+    }
+    
+    .yam-welcome-full .welcome-title {
+        font-size: 2.5rem !important;
+    }
+    
+    .yam-analytics-grid {
+        min-height: 700px !important;
+    }
+    
+    .yam-stats-grid-full {
+        min-height: 450px !important;
+    }
+    
+    .yam-actions-grid-full {
+        min-height: 350px !important;
+    }
+}
+
+/* Ultra Wide Screen Support */
+@media (min-width: 1600px) {
+    .yam-container-full {
+        max-width: 1400px !important;
+        margin: 0 auto !important;
+        margin-left: 3.5rem !important;
+    }
+    
+    .yam-welcome-full .yam-welcome-banner {
+        padding: 2.5rem !important;
+    }
+    
+    .yam-welcome-full .welcome-title {
+        font-size: 3rem !important;
+    }
+}
+
+/* High DPI Display Optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .yam-card-enhanced {
+        border-width: 0.5px;
+    }
+    
+    .yam-action-btn {
+        border-width: 0.5px;
+    }
+}
+
+/* Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+    .yam-card-enhanced,
+    .yam-action-btn,
+    .yam-welcome-banner::before {
+        /* All animations already removed */
+    }
+    
+    .yam-modal-overlay.show,
+    .yam-modal-container.show {
+        /* All animations already removed */
+    }
+}
+
+/* Dark Mode Enhancements */
+@media (prefers-color-scheme: dark) {
+    .yam-card-enhanced {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    }
+    
+    .yam-action-group {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+    }
+}
+
+/* Print Styles */
+@media print {
+    .yam-dashboard-full {
+        background: white !important;
+        color: black !important;
+    }
+    
+    .yam-card-enhanced {
+        background: white !important;
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+        break-inside: avoid !important;
+    }
+    
+    .yam-action-btn {
+        background: #f0f0f0 !important;
+        color: black !important;
+        border: 1px solid #ccc !important;
+    }
+    
+    .yam-welcome-banner {
+        background: white !important;
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+    }
+    
+    .chart-container {
+        background: white !important;
+        border: 1px solid #ccc !important;
+    }
+    
+    .chart-container canvas {
+        filter: grayscale(100%) !important;
+    }
+}
+
+/* Landscape Mobile Optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+    .yam-container-full {
+        padding: 0.75rem !important;
+        gap: 1rem !important;
+    }
+    
+    .yam-welcome-full .yam-welcome-banner {
+        padding: 1.25rem !important;
+    }
+    
+    .yam-welcome-full .welcome-title {
+        font-size: 1.5rem !important;
+    }
+    
+    .yam-welcome-full .welcome-subtitle {
+        font-size: 0.9rem !important;
+    }
+    
+    .yam-analytics-grid {
+        min-height: 300px !important;
+    }
+    
+    .yam-stats-grid-full {
+        min-height: 250px !important;
+    }
+    
+    .yam-actions-grid-full {
+        min-height: 200px !important;
+    }
+    
+    .chart-container {
+        min-height: 150px !important;
+    }
+    
+    .chart-container canvas {
+        max-height: 100px !important;
+    }
+}
+
+/* Accessibility Enhancements */
+@media (prefers-contrast: high) {
+    .yam-card-enhanced {
+        border: 2px solid #ffffff !important;
+        background: #000000 !important;
+    }
+    
+    .yam-action-btn {
+        border: 2px solid #ffffff !important;
+        background: #000000 !important;
+        color: #ffffff !important;
+    }
+    
+    .yam-welcome-banner {
+        border: 2px solid #ffffff !important;
+        background: #000000 !important;
+    }
+    
+    .chart-container {
+        border: 2px solid #ffffff !important;
+        background: #000000 !important;
+    }
+}
+
+/* Focus Management */
+.yam-focus-visible:focus-visible {
+    outline: 3px solid #5865f2 !important;
+    outline-offset: 2px !important;
+    border-radius: 4px !important;
+}
+
+/* Screen Reader Only */
+.yam-sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Performance Optimizations */
+.yam-dashboard-full * {
+    /* Remove all animations and transitions for instant loading */
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    will-change: auto !important;
+}
+
+/* Force Full Width on All Elements */
+.yam-dashboard-full,
+.yam-dashboard-full * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Ensure No Horizontal Scrolling */
+.yam-dashboard-full {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+</style> 

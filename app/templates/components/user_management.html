@@ -1,0 +1,47 @@
+{% macro render_user_management(current_user) %}
+<div class="dashboard-row">
+    <div class="dashboard-list-card" style="flex: 1; min-width: 0;">
+        <div class="dashboard-section-title d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                Users
+                <button class="btn btn-sm btn-outline-secondary ms-2" id="reloadUsersBtn" title="Reload users">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+                {% if current_user.role == 'admin' %}
+                <button class="btn btn-sm btn-outline-warning ms-1" onclick="triggerManualCleanup()" title="Cleanup stale users">
+                    <i class="bi bi-trash3"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-info ms-1" onclick="getPresenceStats()" title="Get presence stats">
+                    <i class="bi bi-info-circle"></i>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        <div class="scrollable-container">
+            <div id="onlineUsers" class="list-group"></div>
+        </div>
+    </div>
+    {% if current_user.role == 'user' %}
+    <div class="dashboard-list-card" style="flex: 1; min-width: 0;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="dashboard-section-title mb-0">Currently On Shift</div>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-primary active" data-filter="all">All</button>
+                <button type="button" class="btn btn-outline-primary" data-filter="dsc">DSC</button>
+                <button type="button" class="btn btn-outline-primary" data-filter="isc">ISC</button>
+            </div>
+        </div>
+        <div class="scrollable-container">
+            <div id="onShiftUsersCompact" class="list-group"></div>
+        </div>
+    </div>
+    {% else %}
+    <div class="dashboard-list-card" style="flex: 1; min-width: 0;">
+        <div class="dashboard-section-title">Recent Activity</div>
+        <div class="scrollable-container">
+            <div id="recentActivity" class="list-group"></div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endmacro %} 

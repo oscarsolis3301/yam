@@ -1,0 +1,535 @@
+{% macro render_debug_panel() %}
+<!-- Debug Panel -->
+<div id="debugPanel" class="debug-panel" style="display: none;">
+    <div class="debug-header">
+        <h4>Index2 Debug Panel</h4>
+        <button class="debug-close-btn" onclick="toggleDebugPanel()">
+            <i class="bi bi-x-lg"></i>
+        </button>
+    </div>
+    <div class="debug-content">
+        <div class="debug-section">
+            <h5>Component Status</h5>
+            <div id="componentStatus"></div>
+        </div>
+        <div class="debug-section">
+            <h5>Error Log</h5>
+            <div id="errorLog" class="error-log"></div>
+        </div>
+        <div class="debug-section">
+            <h5>Performance</h5>
+            <div id="performanceMetrics"></div>
+        </div>
+        <div class="debug-section">
+            <h5>Network Status</h5>
+            <div id="networkStatus"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Debug Toggle Button -->
+<button id="debugToggleBtn" class="debug-toggle-btn" onclick="toggleDebugPanel()" title="Toggle Debug Panel">
+    <i class="bi bi-bug"></i>
+</button>
+
+<style>
+.debug-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 400px;
+    max-height: 80vh;
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    z-index: 100000;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+}
+
+.debug-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.debug-header h4 {
+    margin: 0;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.debug-close-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.debug-close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.debug-content {
+    padding: 1rem;
+    max-height: calc(80vh - 60px);
+    overflow-y: auto;
+}
+
+.debug-section {
+    margin-bottom: 1.5rem;
+}
+
+.debug-section h5 {
+    color: #fff;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.25rem;
+}
+
+.debug-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    color: #fff;
+}
+
+.debug-item.success {
+    border-left: 3px solid #4caf50;
+}
+
+.debug-item.error {
+    border-left: 3px solid #f44336;
+}
+
+.debug-item.warning {
+    border-left: 3px solid #ff9800;
+}
+
+.debug-item.info {
+    border-left: 3px solid #2196f3;
+}
+
+.error-log {
+    max-height: 200px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    padding: 0.5rem;
+}
+
+.error-entry {
+    background: rgba(244, 67, 54, 0.1);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+    border-radius: 4px;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+    color: #ffcdd2;
+}
+
+.error-time {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.7rem;
+}
+
+.debug-toggle-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.debug-toggle-btn:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+    .debug-panel {
+        width: calc(100vw - 40px);
+        right: 20px;
+        left: 20px;
+    }
+}
+</style>
+
+<script>
+// Index2 Debug System
+class Index2Debugger {
+    constructor() {
+        this.errors = [];
+        this.warnings = [];
+        this.info = [];
+        this.performance = {};
+        this.components = {};
+        this.init();
+    }
+    
+    init() {
+        this.setupErrorHandling();
+        this.validateComponents();
+        this.monitorPerformance();
+        this.monitorNetwork();
+        this.updateDisplay();
+        
+        // Update display every 5 seconds
+        setInterval(() => {
+            this.updateDisplay();
+        }, 5000);
+    }
+    
+    setupErrorHandling() {
+        // Capture console errors
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const originalLog = console.log;
+        
+        console.error = (...args) => {
+            this.logError('Console Error', args.join(' '));
+            originalError.apply(console, args);
+        };
+        
+        console.warn = (...args) => {
+            this.logWarning('Console Warning', args.join(' '));
+            originalWarn.apply(console, args);
+        };
+        
+        console.log = (...args) => {
+            this.logInfo('Console Log', args.join(' '));
+            originalLog.apply(console, args);
+        };
+        
+        // Capture unhandled errors
+        window.addEventListener('error', (event) => {
+            this.logError('Unhandled Error', `${event.message} at ${event.filename}:${event.lineno}`);
+        });
+        
+        // Capture unhandled promise rejections
+        window.addEventListener('unhandledrejection', (event) => {
+            this.logError('Unhandled Promise Rejection', event.reason);
+        });
+    }
+    
+    validateComponents() {
+        // Check if all required components are loaded
+        const requiredComponents = [
+            'outageBanner',
+            'welcomeBanner', 
+            'usersOnline'
+        ];
+        
+        requiredComponents.forEach(component => {
+            try {
+                const element = document.getElementById(component);
+                if (element) {
+                    this.components[component] = {
+                        status: 'loaded',
+                        element: element,
+                        timestamp: Date.now()
+                    };
+                } else {
+                    this.components[component] = {
+                        status: 'missing',
+                        error: 'Element not found in DOM'
+                    };
+                    this.logError(`Component Missing`, `${component} element not found`);
+                }
+            } catch (error) {
+                this.components[component] = {
+                    status: 'error',
+                    error: error.message
+                };
+                this.logError(`Component Error`, `${component}: ${error.message}`);
+            }
+        });
+        
+        // Check for CSS conflicts
+        this.checkCSSConflicts();
+        
+        // Check for JavaScript conflicts
+        this.checkJSConflicts();
+    }
+    
+    checkCSSConflicts() {
+        const styles = document.styleSheets;
+        let conflicts = [];
+        
+        for (let i = 0; i < styles.length; i++) {
+            try {
+                const rules = styles[i].cssRules || styles[i].rules;
+                if (rules) {
+                    for (let j = 0; j < rules.length; j++) {
+                        const rule = rules[j];
+                        if (rule.selectorText && rule.selectorText.includes('!important')) {
+                            conflicts.push({
+                                selector: rule.selectorText,
+                                source: styles[i].href || 'inline'
+                            });
+                        }
+                    }
+                }
+            } catch (e) {
+                // CORS error or other issue
+            }
+        }
+        
+        if (conflicts.length > 0) {
+            this.logWarning('CSS Conflicts', `${conflicts.length} rules with !important found`);
+        }
+    }
+    
+    checkJSConflicts() {
+        // Check for global variable conflicts
+        const globalVars = ['mainLayout', 'outageBanner', 'welcomeBanner', 'usersOnline'];
+        globalVars.forEach(varName => {
+            if (window[varName] && typeof window[varName] !== 'function') {
+                this.logWarning('Global Variable Conflict', `${varName} already exists`);
+            }
+        });
+        
+        // Check for event listener conflicts
+        const eventTargets = ['window', 'document', 'body'];
+        eventTargets.forEach(target => {
+            try {
+                const targetObj = target === 'window' ? window : target === 'document' ? document : document.body;
+                // This is a basic check - in a real implementation you'd need to track listeners
+            } catch (e) {
+                this.logError('Event Listener Check Failed', e.message);
+            }
+        });
+    }
+    
+    monitorPerformance() {
+        // Monitor page load performance
+        if (window.performance && window.performance.timing) {
+            const timing = window.performance.timing;
+            this.performance = {
+                loadTime: timing.loadEventEnd - timing.navigationStart,
+                domReady: timing.domContentLoadedEventEnd - timing.navigationStart,
+                firstPaint: timing.responseStart - timing.navigationStart
+            };
+        }
+        
+        // Monitor memory usage
+        if (window.performance && window.performance.memory) {
+            this.performance.memory = {
+                used: window.performance.memory.usedJSHeapSize,
+                total: window.performance.memory.totalJSHeapSize,
+                limit: window.performance.memory.jsHeapSizeLimit
+            };
+        }
+    }
+    
+    monitorNetwork() {
+        // Monitor WebSocket connection
+        if (window.socketState && window.socketState.socket) {
+            this.network = {
+                websocket: window.socketState.socket.connected ? 'connected' : 'disconnected',
+                lastPing: Date.now()
+            };
+        } else {
+            this.network = {
+                websocket: 'not initialized'
+            };
+        }
+        
+        // Monitor fetch requests
+        const originalFetch = window.fetch;
+        window.fetch = (...args) => {
+            const startTime = Date.now();
+            return originalFetch(...args).then(response => {
+                const duration = Date.now() - startTime;
+                this.logInfo('Network Request', `${args[0]} - ${response.status} (${duration}ms)`);
+                return response;
+            }).catch(error => {
+                this.logError('Network Error', `${args[0]} - ${error.message}`);
+                throw error;
+            });
+        };
+    }
+    
+    logError(message, details) {
+        this.errors.push({
+            message,
+            details,
+            timestamp: new Date().toISOString(),
+            stack: new Error().stack
+        });
+        
+        // Keep only last 50 errors
+        if (this.errors.length > 50) {
+            this.errors.shift();
+        }
+    }
+    
+    logWarning(message, details) {
+        this.warnings.push({
+            message,
+            details,
+            timestamp: new Date().toISOString()
+        });
+        
+        if (this.warnings.length > 50) {
+            this.warnings.shift();
+        }
+    }
+    
+    logInfo(message, details) {
+        this.info.push({
+            message,
+            details,
+            timestamp: new Date().toISOString()
+        });
+        
+        if (this.info.length > 50) {
+            this.info.shift();
+        }
+    }
+    
+    updateDisplay() {
+        this.updateComponentStatus();
+        this.updateErrorLog();
+        this.updatePerformanceMetrics();
+        this.updateNetworkStatus();
+    }
+    
+    updateComponentStatus() {
+        const container = document.getElementById('componentStatus');
+        if (!container) return;
+        
+        let html = '';
+        Object.entries(this.components).forEach(([name, status]) => {
+            const statusClass = status.status === 'loaded' ? 'success' : 
+                              status.status === 'error' ? 'error' : 'warning';
+            html += `
+                <div class="debug-item ${statusClass}">
+                    <strong>${name}:</strong> ${status.status}
+                    ${status.error ? `<br><small>${status.error}</small>` : ''}
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+    
+    updateErrorLog() {
+        const container = document.getElementById('errorLog');
+        if (!container) return;
+        
+        let html = '';
+        this.errors.slice(-10).reverse().forEach(error => {
+            html += `
+                <div class="error-entry">
+                    <div class="error-time">${error.timestamp}</div>
+                    <strong>${error.message}</strong><br>
+                    <small>${error.details}</small>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+    
+    updatePerformanceMetrics() {
+        const container = document.getElementById('performanceMetrics');
+        if (!container) return;
+        
+        let html = '';
+        if (this.performance.loadTime) {
+            html += `<div class="debug-item info">Load Time: ${this.performance.loadTime}ms</div>`;
+        }
+        if (this.performance.memory) {
+            const usedMB = Math.round(this.performance.memory.used / 1024 / 1024);
+            const totalMB = Math.round(this.performance.memory.total / 1024 / 1024);
+            html += `<div class="debug-item info">Memory: ${usedMB}MB / ${totalMB}MB</div>`;
+        }
+        container.innerHTML = html;
+    }
+    
+    updateNetworkStatus() {
+        const container = document.getElementById('networkStatus');
+        if (!container) return;
+        
+        let html = '';
+        if (this.network) {
+            const statusClass = this.network.websocket === 'connected' ? 'success' : 'error';
+            html += `<div class="debug-item ${statusClass}">WebSocket: ${this.network.websocket}</div>`;
+        }
+        container.innerHTML = html;
+    }
+    
+    // Public methods for external use
+    getErrors() {
+        return this.errors;
+    }
+    
+    getWarnings() {
+        return this.warnings;
+    }
+    
+    getComponentStatus() {
+        return this.components;
+    }
+    
+    clearLogs() {
+        this.errors = [];
+        this.warnings = [];
+        this.info = [];
+    }
+}
+
+// Global debug functions
+window.toggleDebugPanel = function() {
+    const panel = document.getElementById('debugPanel');
+    if (panel) {
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+};
+
+window.showDebugInfo = function() {
+    if (window.index2Debugger) {
+        console.log('Index2 Debug Info:', {
+            errors: window.index2Debugger.getErrors(),
+            warnings: window.index2Debugger.getWarnings(),
+            components: window.index2Debugger.getComponentStatus()
+        });
+    }
+};
+
+// Initialize debugger when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.index2Debugger = new Index2Debugger();
+    
+    // Show debug panel in development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        setTimeout(() => {
+            toggleDebugPanel();
+        }, 1000);
+    }
+});
+
+// Export for testing
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = Index2Debugger;
+}
+</script>
+{% endmacro %} 

@@ -1,0 +1,966 @@
+{% macro render_team_performance_analytics(current_user) %}
+<!-- Team Performance Analytics Component -->
+<div class="yam-component team-performance-analytics" id="teamPerformanceAnalytics">
+    <div class="component-header">
+        <div class="header-content">
+            <div class="header-icon">
+                <i class="bi bi-graph-up-arrow"></i>
+            </div>
+            <div class="header-text">
+                <h3>Team Performance Analytics</h3>
+                <p>Real-time productivity insights & metrics</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-sm btn-outline-light" onclick="teamPerformanceAnalytics.toggleCharts()">
+                <i class="bi bi-bar-chart"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-light" onclick="teamPerformanceAnalytics.refresh()">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-light dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" onclick="teamPerformanceAnalytics.exportReport()">
+                        <i class="bi bi-download"></i> Export Report
+                    </a></li>
+                    <li><a class="dropdown-item" href="#" onclick="teamPerformanceAnalytics.showFilters()">
+                        <i class="bi bi-funnel"></i> Filters
+                    </a></li>
+                    <li><a class="dropdown-item" href="#" onclick="teamPerformanceAnalytics.showSettings()">
+                        <i class="bi bi-gear"></i> Settings
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="component-content">
+        <!-- Performance Overview -->
+        <div class="performance-overview">
+            <div class="performance-card productivity">
+                <div class="performance-icon">
+                    <i class="bi bi-speedometer2"></i>
+                </div>
+                <div class="performance-info">
+                    <div class="performance-value" id="productivityScore">85%</div>
+                    <div class="performance-label">Team Productivity</div>
+                    <div class="performance-trend positive">
+                        <i class="bi bi-arrow-up"></i>
+                        <span>+5.2%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="performance-card efficiency">
+                <div class="performance-icon">
+                    <i class="bi bi-lightning-charge"></i>
+                </div>
+                <div class="performance-info">
+                    <div class="performance-value" id="efficiencyScore">92%</div>
+                    <div class="performance-label">Work Efficiency</div>
+                    <div class="performance-trend positive">
+                        <i class="bi bi-arrow-up"></i>
+                        <span>+3.8%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="performance-card collaboration">
+                <div class="performance-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="performance-info">
+                    <div class="performance-value" id="collaborationScore">78%</div>
+                    <div class="performance-label">Collaboration</div>
+                    <div class="performance-trend neutral">
+                        <i class="bi bi-dash"></i>
+                        <span>0%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="performance-card response">
+                <div class="performance-icon">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="performance-info">
+                    <div class="performance-value" id="responseTime">2.3m</div>
+                    <div class="performance-label">Avg Response Time</div>
+                    <div class="performance-trend negative">
+                        <i class="bi bi-arrow-down"></i>
+                        <span>-12%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Team Performance Grid -->
+        <div class="team-performance-grid">
+            <div class="grid-header">
+                <h5>Individual Performance Metrics</h5>
+                <div class="grid-controls">
+                    <div class="metric-selector">
+                        <select class="form-select form-select-sm" id="metricSelector">
+                            <option value="productivity">Productivity</option>
+                            <option value="efficiency">Efficiency</option>
+                            <option value="collaboration">Collaboration</option>
+                            <option value="response">Response Time</option>
+                        </select>
+                    </div>
+                    <div class="time-period">
+                        <select class="form-select form-select-sm" id="timePeriod">
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="quarter">This Quarter</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="team-members-grid" id="teamMembersGrid">
+                <!-- Team member performance cards will be generated here -->
+            </div>
+        </div>
+        
+        <!-- Performance Charts -->
+        <div class="performance-charts" id="performanceCharts">
+            <div class="charts-header">
+                <h5>Performance Trends</h5>
+                <div class="chart-controls">
+                    <button class="btn btn-sm btn-outline-light" onclick="teamPerformanceAnalytics.toggleChartView()">
+                        <i class="bi bi-graph-up"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="charts-container">
+                <div class="chart-item">
+                    <h6>Productivity Trend</h6>
+                    <div class="chart-container" id="productivityChart">
+                        <!-- Productivity chart will be rendered here -->
+                    </div>
+                </div>
+                
+                <div class="chart-item">
+                    <h6>Team Activity Distribution</h6>
+                    <div class="chart-container" id="activityChart">
+                        <!-- Activity distribution chart will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Performance Insights -->
+        <div class="performance-insights">
+            <h5>Performance Insights</h5>
+            <div class="insights-container" id="insightsContainer">
+                <!-- Insights will be generated here -->
+            </div>
+        </div>
+        
+        <!-- Top Performers -->
+        <div class="top-performers">
+            <h5>Top Performers</h5>
+            <div class="performers-list" id="topPerformersList">
+                <!-- Top performers will be generated here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Team Performance Analytics Styles */
+.team-performance-analytics {
+    background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.performance-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.performance-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.performance-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, currentColor, transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.performance-card:hover::before {
+    opacity: 1;
+}
+
+.performance-card.productivity {
+    border-color: rgba(72, 187, 120, 0.3);
+}
+
+.performance-card.productivity .performance-icon {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+.performance-card.efficiency {
+    border-color: rgba(66, 153, 225, 0.3);
+}
+
+.performance-card.efficiency .performance-icon {
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+}
+
+.performance-card.collaboration {
+    border-color: rgba(159, 122, 234, 0.3);
+}
+
+.performance-card.collaboration .performance-icon {
+    background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+}
+
+.performance-card.response {
+    border-color: rgba(237, 137, 54, 0.3);
+}
+
+.performance-card.response .performance-icon {
+    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+}
+
+.performance-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.performance-info {
+    flex: 1;
+}
+
+.performance-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+}
+
+.performance-label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 0.25rem;
+}
+
+.performance-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.performance-trend.positive {
+    color: #48bb78;
+}
+
+.performance-trend.negative {
+    color: #f56565;
+}
+
+.performance-trend.neutral {
+    color: #a0aec0;
+}
+
+.team-performance-grid {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.grid-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.grid-header h5 {
+    color: #fff;
+    font-weight: 600;
+    margin: 0;
+}
+
+.grid-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.team-members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.member-performance-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.member-performance-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.member-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.member-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: white;
+    font-size: 1rem;
+}
+
+.member-info {
+    flex: 1;
+}
+
+.member-name {
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.25rem;
+}
+
+.member-role {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.member-status {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.member-status.online {
+    background: #48bb78;
+    box-shadow: 0 0 8px rgba(72, 187, 120, 0.5);
+}
+
+.member-status.away {
+    background: #ed8936;
+}
+
+.member-status.busy {
+    background: #f56565;
+}
+
+.member-status.offline {
+    background: #a0aec0;
+}
+
+.member-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.metric-item {
+    text-align: center;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+}
+
+.metric-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.25rem;
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.performance-charts {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.charts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.charts-header h5 {
+    color: #fff;
+    font-weight: 600;
+    margin: 0;
+}
+
+.charts-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+}
+
+.chart-item h6 {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.chart-container {
+    height: 200px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+}
+
+.performance-insights {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.performance-insights h5 {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.insights-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.insight-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    border-left: 3px solid;
+}
+
+.insight-item.positive {
+    border-left-color: #48bb78;
+}
+
+.insight-item.warning {
+    border-left-color: #ed8936;
+}
+
+.insight-item.negative {
+    border-left-color: #f56565;
+}
+
+.insight-icon {
+    font-size: 1rem;
+    margin-top: 0.125rem;
+}
+
+.insight-item.positive .insight-icon {
+    color: #48bb78;
+}
+
+.insight-item.warning .insight-icon {
+    color: #ed8936;
+}
+
+.insight-item.negative .insight-icon {
+    color: #f56565;
+}
+
+.insight-content {
+    flex: 1;
+}
+
+.insight-title {
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.25rem;
+}
+
+.insight-description {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.top-performers {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.top-performers h5 {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.performers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.performer-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.performer-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.performer-rank {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    font-size: 0.875rem;
+}
+
+.performer-rank.gold {
+    background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+}
+
+.performer-rank.silver {
+    background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+}
+
+.performer-rank.bronze {
+    background: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%);
+}
+
+.performer-info {
+    flex: 1;
+}
+
+.performer-name {
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.25rem;
+}
+
+.performer-role {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.performer-score {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .performance-overview {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .grid-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .grid-controls {
+        justify-content: space-between;
+    }
+    
+    .team-members-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .charts-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .performance-overview {
+        grid-template-columns: 1fr;
+    }
+    
+    .grid-controls {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+}
+</style>
+
+<script>
+// Team Performance Analytics Component
+window.teamPerformanceAnalytics = {
+    data: {
+        teamMembers: [],
+        performanceMetrics: {},
+        currentMetric: 'productivity',
+        currentPeriod: 'today',
+        insights: []
+    },
+    
+    init() {
+        this.setupEventListeners();
+        this.loadData();
+        this.startRealTimeUpdates();
+        console.log('Team Performance Analytics initialized');
+    },
+    
+    setupEventListeners() {
+        // Metric selector
+        document.getElementById('metricSelector').addEventListener('change', (e) => {
+            this.data.currentMetric = e.target.value;
+            this.updateTeamGrid();
+        });
+        
+        // Time period selector
+        document.getElementById('timePeriod').addEventListener('change', (e) => {
+            this.data.currentPeriod = e.target.value;
+            this.loadData();
+        });
+    },
+    
+    async loadData() {
+        try {
+            const response = await fetch(`/api/analytics/team-performance?period=${this.data.currentPeriod}`, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                this.data.teamMembers = data.teamMembers || [];
+                this.data.performanceMetrics = data.metrics || {};
+                this.data.insights = data.insights || [];
+                this.updateOverview();
+                this.updateTeamGrid();
+                this.updateInsights();
+                this.updateTopPerformers();
+            } else {
+                console.error('Failed to load team performance:', response.status);
+                this.generateMockData();
+            }
+        } catch (error) {
+            console.error('Error loading team performance:', error);
+            this.generateMockData();
+        }
+    },
+    
+    generateMockData() {
+        const mockMembers = [];
+        const roles = ['Developer', 'Designer', 'Manager', 'Support', 'Analyst'];
+        
+        for (let i = 1; i <= 12; i++) {
+            mockMembers.push({
+                id: i,
+                name: `Team Member ${i}`,
+                role: roles[Math.floor(Math.random() * roles.length)],
+                status: ['online', 'away', 'busy', 'offline'][Math.floor(Math.random() * 4)],
+                avatar: `TM${i}`,
+                metrics: {
+                    productivity: Math.floor(Math.random() * 30) + 70,
+                    efficiency: Math.floor(Math.random() * 25) + 75,
+                    collaboration: Math.floor(Math.random() * 20) + 80,
+                    response: Math.floor(Math.random() * 5) + 1
+                },
+                score: Math.floor(Math.random() * 20) + 80
+            });
+        }
+        
+        this.data.teamMembers = mockMembers;
+        this.data.performanceMetrics = {
+            productivity: 85,
+            efficiency: 92,
+            collaboration: 78,
+            response: 2.3
+        };
+        this.data.insights = [
+            {
+                type: 'positive',
+                title: 'Productivity Increased',
+                description: 'Team productivity has improved by 5.2% this week'
+            },
+            {
+                type: 'warning',
+                title: 'Response Time Alert',
+                description: 'Average response time has increased by 12%'
+            },
+            {
+                type: 'positive',
+                title: 'Collaboration Boost',
+                description: 'Team collaboration metrics are trending upward'
+            }
+        ];
+        
+        this.updateOverview();
+        this.updateTeamGrid();
+        this.updateInsights();
+        this.updateTopPerformers();
+    },
+    
+    updateOverview() {
+        const metrics = this.data.performanceMetrics;
+        
+        document.getElementById('productivityScore').textContent = `${metrics.productivity}%`;
+        document.getElementById('efficiencyScore').textContent = `${metrics.efficiency}%`;
+        document.getElementById('collaborationScore').textContent = `${metrics.collaboration}%`;
+        document.getElementById('responseTime').textContent = `${metrics.response}m`;
+    },
+    
+    updateTeamGrid() {
+        const grid = document.getElementById('teamMembersGrid');
+        grid.innerHTML = '';
+        
+        const sortedMembers = [...this.data.teamMembers].sort((a, b) => 
+            b.metrics[this.data.currentMetric] - a.metrics[this.data.currentMetric]
+        );
+        
+        sortedMembers.forEach(member => {
+            const card = document.createElement('div');
+            card.className = 'member-performance-card';
+            
+            const metricValue = member.metrics[this.data.currentMetric];
+            const metricLabel = this.data.currentMetric.charAt(0).toUpperCase() + this.data.currentMetric.slice(1);
+            
+            card.innerHTML = `
+                <div class="member-header">
+                    <div class="member-avatar">${member.avatar}</div>
+                    <div class="member-info">
+                        <div class="member-name">${member.name}</div>
+                        <div class="member-role">${member.role}</div>
+                    </div>
+                    <div class="member-status ${member.status}"></div>
+                </div>
+                <div class="member-metrics">
+                    <div class="metric-item">
+                        <div class="metric-value">${metricValue}${this.data.currentMetric === 'response' ? 'm' : '%'}</div>
+                        <div class="metric-label">${metricLabel}</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">${member.score}</div>
+                        <div class="metric-label">Overall Score</div>
+                    </div>
+                </div>
+            `;
+            
+            grid.appendChild(card);
+        });
+    },
+    
+    updateInsights() {
+        const container = document.getElementById('insightsContainer');
+        container.innerHTML = '';
+        
+        this.data.insights.forEach(insight => {
+            const item = document.createElement('div');
+            item.className = `insight-item ${insight.type}`;
+            
+            const icon = this.getInsightIcon(insight.type);
+            
+            item.innerHTML = `
+                <div class="insight-icon">
+                    <i class="bi ${icon}"></i>
+                </div>
+                <div class="insight-content">
+                    <div class="insight-title">${insight.title}</div>
+                    <div class="insight-description">${insight.description}</div>
+                </div>
+            `;
+            
+            container.appendChild(item);
+        });
+    },
+    
+    updateTopPerformers() {
+        const list = document.getElementById('topPerformersList');
+        list.innerHTML = '';
+        
+        const topPerformers = [...this.data.teamMembers]
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 5);
+        
+        topPerformers.forEach((performer, index) => {
+            const item = document.createElement('div');
+            item.className = 'performer-item';
+            
+            const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : 'bronze';
+            const rankText = index + 1;
+            
+            item.innerHTML = `
+                <div class="performer-rank ${rankClass}">${rankText}</div>
+                <div class="performer-info">
+                    <div class="performer-name">${performer.name}</div>
+                    <div class="performer-role">${performer.role}</div>
+                </div>
+                <div class="performer-score">${performer.score}</div>
+            `;
+            
+            list.appendChild(item);
+        });
+    },
+    
+    getInsightIcon(type) {
+        const icons = {
+            positive: 'check-circle',
+            warning: 'exclamation-triangle',
+            negative: 'x-circle'
+        };
+        return icons[type] || 'info-circle';
+    },
+    
+    startRealTimeUpdates() {
+        if (window.yamDashboard && window.yamDashboard.socket) {
+            const socket = window.yamDashboard.socket;
+            
+            socket.on('performance_update', (data) => {
+                // Update performance metrics in real-time
+                if (data.metrics) {
+                    this.data.performanceMetrics = { ...this.data.performanceMetrics, ...data.metrics };
+                    this.updateOverview();
+                }
+                
+                if (data.teamMembers) {
+                    this.data.teamMembers = data.teamMembers;
+                    this.updateTeamGrid();
+                    this.updateTopPerformers();
+                }
+            });
+            
+            socket.on('performance_insight', (insight) => {
+                this.data.insights.unshift(insight);
+                this.data.insights = this.data.insights.slice(0, 5); // Keep last 5 insights
+                this.updateInsights();
+            });
+        }
+    },
+    
+    toggleCharts() {
+        const charts = document.getElementById('performanceCharts');
+        charts.style.display = charts.style.display === 'none' ? 'block' : 'none';
+    },
+    
+    toggleChartView() {
+        const container = document.querySelector('.charts-container');
+        if (container.style.gridTemplateColumns === 'repeat(auto-fit, minmax(400px, 1fr))') {
+            container.style.gridTemplateColumns = '1fr';
+        } else {
+            container.style.gridTemplateColumns = 'repeat(auto-fit, minmax(400px, 1fr))';
+        }
+    },
+    
+    refresh() {
+        this.loadData();
+    },
+    
+    exportReport() {
+        const data = {
+            teamMembers: this.data.teamMembers,
+            performanceMetrics: this.data.performanceMetrics,
+            insights: this.data.insights,
+            period: this.data.currentPeriod,
+            exportedAt: new Date().toISOString()
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `team-performance-${this.data.currentPeriod}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    },
+    
+    showFilters() {
+        alert('Performance Filters\n\n- Filter by team member\n- Filter by role\n- Filter by performance range\n- Export filtered results');
+    },
+    
+    showSettings() {
+        alert('Team Performance Settings\n\n- Configure performance thresholds\n- Set notification preferences\n- Customize metrics calculation\n- Manage data retention');
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('teamPerformanceAnalytics')) {
+        window.teamPerformanceAnalytics.init();
+    }
+});
+</script>
+{% endmacro %} 

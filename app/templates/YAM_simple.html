@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>YAM Dashboard - Simple</title>
+<style>
+    .yam-simple-dashboard {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem;
+        color: white;
+    }
+    .yam-simple-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 2rem;
+        backdrop-filter: blur(20px);
+    }
+    .yam-simple-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .yam-simple-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    .yam-simple-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.8;
+    }
+    .yam-simple-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    .yam-simple-card {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .yam-simple-card h3 {
+        margin-top: 0;
+        color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="yam-simple-dashboard">
+    <div class="yam-simple-content">
+        <div class="yam-simple-header">
+            <h1 class="yam-simple-title">YAM Dashboard</h1>
+            <p class="yam-simple-subtitle">Welcome, {{ name }}!</p>
+        </div>
+        
+        <div class="yam-simple-info">
+            <div class="yam-simple-card">
+                <h3>User Information</h3>
+                <p><strong>Username:</strong> {{ user }}</p>
+                <p><strong>Email:</strong> {{ user_email }}</p>
+                <p><strong>Role:</strong> {{ current_user.role if current_user and current_user.role else 'User' }}</p>
+            </div>
+            
+            <div class="yam-simple-card">
+                <h3>System Status</h3>
+                <p><strong>Status:</strong> <span style="color: #4caf50;">Online</span></p>
+                <p><strong>Session:</strong> Active</p>
+                <p><strong>Last Activity:</strong> {{ current_user.last_activity if current_user and hasattr(current_user, 'last_activity') else 'Now' }}</p>
+            </div>
+            
+            <div class="yam-simple-card">
+                <h3>Quick Actions</h3>
+                <p><a href="{{ url_for('main.menu_page') }}" style="color: #fff; text-decoration: underline;">Outages Menu</a></p>
+                <p><a href="{{ url_for('auth.logout') }}" style="color: #fff; text-decoration: underline;">Logout</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+console.log('YAM Simple Dashboard loaded successfully');
+console.log('User:', '{{ user }}');
+console.log('Name:', '{{ name }}');
+</script>
+{% endblock %} 

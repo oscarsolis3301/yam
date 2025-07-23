@@ -1,0 +1,161 @@
+{% macro render_dashboard_sidebar(current_user) %}
+<!-- Dashboard Sidebar -->
+<aside class="dashboard-sidebar" id="dashboardSidebar">
+    <!-- Sidebar Header -->
+    <div class="sidebar-header">
+        <div class="sidebar-logo">
+            <i class="bi bi-grid-3x3-gap-fill"></i>
+            <span>Dashboard</span>
+        </div>
+    </div>
+    
+    <!-- Navigation Menu -->
+    <nav class="sidebar-nav">
+        <div class="nav-item">
+            <a href="#dashboard" class="nav-link active" data-section="dashboard">
+                <i class="bi bi-house-door-fill nav-icon"></i>
+                <span>Dashboard</span>
+            </a>
+        </div>
+        
+        <div class="nav-item">
+            <a href="#analytics" class="nav-link" data-section="analytics">
+                <i class="bi bi-graph-up nav-icon"></i>
+                <span>Analytics</span>
+            </a>
+        </div>
+        
+        <div class="nav-item">
+            <a href="#users" class="nav-link" data-section="users">
+                <i class="bi bi-people-fill nav-icon"></i>
+                <span>Users</span>
+            </a>
+        </div>
+        
+        <div class="nav-item">
+            <a href="#projects" class="nav-link" data-section="projects">
+                <i class="bi bi-folder-fill nav-icon"></i>
+                <span>Projects</span>
+            </a>
+        </div>
+        
+        <div class="nav-item">
+            <a href="#tasks" class="nav-link" data-section="tasks">
+                <i class="bi bi-check2-square nav-icon"></i>
+                <span>Tasks</span>
+            </a>
+        </div>
+        
+        <div class="nav-item">
+            <a href="#messages" class="nav-link" data-section="messages">
+                <i class="bi bi-chat-dots-fill nav-icon"></i>
+                <span>Messages</span>
+                <span class="badge bg-danger ms-auto">3</span>
+            </a>
+        </div>
+        
+        <div class="nav-item">
+            <a href="#notifications" class="nav-link" data-section="notifications">
+                <i class="bi bi-bell-fill nav-icon"></i>
+                <span>Notifications</span>
+                <span class="badge bg-warning ms-auto">5</span>
+            </a>
+        </div>
+        
+        <div class="nav-item">
+            <a href="#settings" class="nav-link" data-section="settings">
+                <i class="bi bi-gear-fill nav-icon"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+        
+        <div class="nav-item">
+            <a href="#help" class="nav-link" data-section="help">
+                <i class="bi bi-question-circle-fill nav-icon"></i>
+                <span>Help</span>
+            </a>
+        </div>
+    </nav>
+    
+    <!-- User Profile Section -->
+    <div class="sidebar-user" style="padding: 2rem; border-top: 1px solid var(--card-border); margin-top: auto;">
+        <div class="user-profile">
+            <div class="user-avatar">
+                {% if current_user and current_user.first_name %}
+                    {{ current_user.first_name[0].upper() }}
+                {% else %}
+                    U
+                {% endif %}
+            </div>
+            <div class="user-info">
+                <div class="user-name">
+                    {% if current_user and current_user.first_name %}
+                        {{ current_user.first_name }} {{ current_user.last_name or '' }}
+                    {% else %}
+                        User
+                    {% endif %}
+                </div>
+                <div class="user-role">
+                    {% if current_user and current_user.role %}
+                        {{ current_user.role.title() }}
+                    {% else %}
+                        User
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" id="mobileMenuToggle" style="display: none; position: fixed; top: 1rem; left: 1rem; z-index: 1001; background: var(--primary-gradient); border: none; color: white; padding: 0.5rem; border-radius: 8px; cursor: pointer;">
+    <i class="bi bi-list"></i>
+</button>
+
+<style>
+.sidebar-user {
+    margin-top: auto;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+}
+
+.user-profile:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.user-role {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.badge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 12px;
+}
+
+@media (max-width: 1024px) {
+    .mobile-menu-toggle {
+        display: block !important;
+    }
+}
+</style>
+{% endmacro %} 

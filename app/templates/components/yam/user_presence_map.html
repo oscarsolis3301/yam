@@ -1,0 +1,1066 @@
+{% macro render_user_presence_map(current_user) %}
+<!-- YAM User Presence Map Component -->
+<div id="yamUserPresenceMap" class="yam-user-presence-map">
+    <div class="map-header">
+        <h4 class="map-title">
+            <i class="bi bi-grid-3x3-gap"></i>
+            Team Presence Map
+            <span class="real-time-indicator" id="yamRealTimeIndicator">
+                <i class="bi bi-circle-fill"></i>
+                <span>Live</span>
+            </span>
+        </h4>
+        <div class="map-controls">
+            <button class="map-control-btn" id="yamMapViewToggle" title="Toggle View">
+                <i class="bi bi-grid-3x3"></i>
+            </button>
+            <button class="map-control-btn" id="yamMapFilterBtn" title="Filter Users">
+                <i class="bi bi-funnel"></i>
+            </button>
+            <button class="map-control-btn" id="yamMapRefreshBtn" title="Refresh">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <button class="map-control-btn" id="yamMapAutoRefreshBtn" title="Auto Refresh" data-enabled="true">
+                <i class="bi bi-play-circle"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div class="map-filters" id="yamMapFilters">
+        <div class="filter-group">
+            <label class="filter-label">Status:</label>
+            <div class="filter-options">
+                <label class="filter-option">
+                    <input type="checkbox" value="online" checked>
+                    <span class="filter-indicator online"></span>
+                    <span>Online</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" value="away" checked>
+                    <span class="filter-indicator away"></span>
+                    <span>Away</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" value="busy" checked>
+                    <span class="filter-indicator busy"></span>
+                    <span>Busy</span>
+                </label>
+                <label class="filter-option">
+                    <input type="checkbox" value="offline" checked>
+                    <span class="filter-indicator offline"></span>
+                    <span>Offline</span>
+                </label>
+            </div>
+        </div>
+        <div class="filter-group">
+            <label class="filter-label">Search:</label>
+            <input type="text" id="yamMapSearch" placeholder="Search users..." class="map-search-input">
+        </div>
+    </div>
+    
+    <div class="map-container">
+        <div id="yamUserGrid" class="user-grid">
+            <!-- Loading state -->
+            <div class="loading-state">
+                <i class="bi bi-people"></i>
+                <div>Loading team presence...</div>
+                <div class="loading-subtitle">Mapping user locations</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="map-stats">
+        <div class="stat-item">
+            <i class="bi bi-circle-fill online"></i>
+            <span id="yamOnlineCount">0</span>
+            <span>Online</span>
+        </div>
+        <div class="stat-item">
+            <i class="bi bi-moon away"></i>
+            <span id="yamAwayCount">0</span>
+            <span>Away</span>
+        </div>
+        <div class="stat-item">
+            <i class="bi bi-slash-circle busy"></i>
+            <span id="yamBusyCount">0</span>
+            <span>Busy</span>
+        </div>
+        <div class="stat-item">
+            <i class="bi bi-circle offline"></i>
+            <span id="yamOfflineCount">0</span>
+            <span>Offline</span>
+        </div>
+        <div class="stat-item">
+            <i class="bi bi-clock"></i>
+            <span id="yamLastUpdate">--</span>
+            <span>Updated</span>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div class="modal fade" id="yamUserMapModal" tabindex="-1" aria-labelledby="yamUserMapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="yamUserMapModalLabel">
+                    <i class="bi bi-person-circle"></i>
+                    User Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="yamUserMapModalContent">
+                <!-- User details will be populated here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* YAM User Presence Map Styles */
+.yam-user-presence-map {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 1.5rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.map-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.map-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.real-time-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #4caf50;
+    background: rgba(76, 175, 80, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.real-time-indicator i {
+    animation: pulse 2s infinite;
+    color: #4caf50;
+}
+
+.map-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.map-control-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+.map-control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.map-control-btn.active {
+    background: rgba(102, 126, 234, 0.3);
+    border-color: rgba(102, 126, 234, 0.5);
+}
+
+.map-filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.filter-options {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.filter-option input[type="checkbox"] {
+    display: none;
+}
+
+.filter-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.filter-indicator.online { background: #4caf50; }
+.filter-indicator.away { background: #ff9800; }
+.filter-indicator.busy { background: #f44336; }
+.filter-indicator.offline { background: #9e9e9e; }
+
+.filter-option input[type="checkbox"]:checked + .filter-indicator {
+    border-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.map-search-input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    width: 200px;
+}
+
+.map-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.map-container {
+    margin-bottom: 1.5rem;
+}
+
+.user-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    min-height: 200px;
+}
+
+.user-grid.list-view {
+    grid-template-columns: 1fr;
+}
+
+.user-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.user-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.user-card.online {
+    border-color: rgba(76, 175, 80, 0.3);
+    background: rgba(76, 175, 80, 0.05);
+}
+
+.user-card.away {
+    border-color: rgba(255, 152, 0, 0.3);
+    background: rgba(255, 152, 0, 0.05);
+}
+
+.user-card.busy {
+    border-color: rgba(244, 67, 54, 0.3);
+    background: rgba(244, 67, 54, 0.05);
+}
+
+.user-card.offline {
+    border-color: rgba(158, 158, 158, 0.3);
+    background: rgba(158, 158, 158, 0.05);
+    opacity: 0.6;
+}
+
+.user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin: 0 auto 0.75rem;
+    position: relative;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-avatar.online::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    background: #4caf50;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.6);
+    animation: pulse 2s infinite;
+}
+
+.user-avatar.away::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    background: #ff9800;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(255, 152, 0, 0.6);
+}
+
+.user-avatar.busy::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    background: #f44336;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(244, 67, 54, 0.6);
+}
+
+.user-avatar.offline::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    background: #9e9e9e;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.25rem;
+    word-wrap: break-word;
+}
+
+.user-status {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: capitalize;
+}
+
+.user-role {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 0.25rem;
+}
+
+.map-stats {
+    display: flex;
+    justify-content: space-around;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.stat-item i {
+    font-size: 1.2rem;
+}
+
+.stat-item i.online { color: #4caf50; }
+.stat-item i.away { color: #ff9800; }
+.stat-item i.busy { color: #f44336; }
+.stat-item i.offline { color: #9e9e9e; }
+
+.loading-state, .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: rgba(255, 255, 255, 0.7);
+    gap: 1rem;
+    text-align: center;
+}
+
+.loading-state i, .empty-state i {
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.loading-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .map-filters {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .filter-options {
+        justify-content: center;
+    }
+    
+    .map-search-input {
+        width: 100%;
+    }
+    
+    .user-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 0.75rem;
+    }
+    
+    .map-stats {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    
+    .stat-item {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .yam-user-presence-map {
+        padding: 1rem;
+    }
+    
+    .map-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .map-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .user-grid {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 0.5rem;
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .user-name {
+        font-size: 0.8rem;
+    }
+    
+    .user-status, .user-role {
+        font-size: 0.7rem;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* User Details Modal Styles */
+.user-details {
+    padding: 1rem 0;
+}
+
+.user-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.user-avatar-large {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.5rem;
+    position: relative;
+}
+
+.user-info h6 {
+    margin: 0 0 0.5rem 0;
+    font-weight: 600;
+}
+
+.user-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.detail-label {
+    font-size: 0.85rem;
+    color: rgba(0, 0, 0, 0.6);
+    font-weight: 500;
+}
+
+.detail-value {
+    font-size: 0.9rem;
+    color: rgba(0, 0, 0, 0.8);
+    font-weight: 600;
+}
+</style>
+
+<script>
+// Enhanced YAM User Presence Map with Real-time Updates
+window.yamUserPresenceMap = {
+    users: [],
+    filteredUsers: [],
+    viewMode: 'grid',
+    filters: {
+        online: true,
+        away: true,
+        busy: true,
+        offline: true
+    },
+    searchTerm: '',
+    autoRefreshEnabled: true,
+    autoRefreshInterval: null,
+    lastUpdate: null,
+    socket: null,
+    
+    init() {
+        this.setupEventListeners();
+        this.setupSocketConnection();
+        this.loadUsers();
+        this.startAutoRefresh();
+        console.log('YAM User Presence Map: Component initialized with real-time updates');
+    },
+    
+    setupEventListeners() {
+        // View toggle
+        const viewToggle = document.getElementById('yamMapViewToggle');
+        if (viewToggle) {
+            viewToggle.addEventListener('click', () => this.toggleView());
+        }
+        
+        // Filter button
+        const filterBtn = document.getElementById('yamMapFilterBtn');
+        if (filterBtn) {
+            filterBtn.addEventListener('click', () => this.toggleFilters());
+        }
+        
+        // Refresh button
+        const refreshBtn = document.getElementById('yamMapRefreshBtn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => this.loadUsers());
+        }
+        
+        // Auto refresh button
+        const autoRefreshBtn = document.getElementById('yamMapAutoRefreshBtn');
+        if (autoRefreshBtn) {
+            autoRefreshBtn.addEventListener('click', () => this.toggleAutoRefresh());
+        }
+        
+        // Filter checkboxes
+        document.querySelectorAll('.filter-option input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => this.updateFilters());
+        });
+        
+        // Search input
+        const searchInput = document.getElementById('yamMapSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                this.searchTerm = e.target.value.toLowerCase();
+                this.applyFilters();
+            });
+        }
+        
+        // Listen for custom online users update events
+        window.addEventListener('onlineUsersUpdate', (event) => {
+            this.updateUsers(event.detail);
+        });
+    },
+    
+    setupSocketConnection() {
+        // Get socket from the fixed socket manager
+        if (window.yamSocketManagerFixed && window.yamSocketManagerFixed.getSocket) {
+            this.socket = window.yamSocketManagerFixed.getSocket();
+            
+            if (this.socket) {
+                // Listen for online users updates
+                this.socket.on('online_users_update', (users) => {
+                    console.log('YAM User Presence Map: Received real-time update:', users.length, 'users');
+                    this.updateUsers(users);
+                });
+                
+                // Listen for user status changes
+                this.socket.on('user_status_change', (userData) => {
+                    console.log('YAM User Presence Map: User status change:', userData);
+                    this.updateUserStatus(userData);
+                });
+                
+                // Listen for presence stats updates
+                this.socket.on('presence_stats_update', (stats) => {
+                    console.log('YAM User Presence Map: Presence stats update:', stats);
+                    this.updateStats(stats);
+                });
+                
+                // Request initial data
+                this.socket.emit('get_online_users');
+            }
+        }
+        
+        // Fallback: Listen for global events
+        window.addEventListener('onlineUsersUpdate', (event) => {
+            this.updateUsers(event.detail);
+        });
+    },
+    
+    async loadUsers() {
+        try {
+            console.log('YAM User Presence Map: Loading users...');
+            
+            const response = await fetch('/api/users/online', {
+                headers: {
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log('YAM User Presence Map: Loaded users from API:', data.users?.length || 0);
+                this.updateUsers(data.users || []);
+                
+                // Update stats if available
+                if (data.total_users !== undefined) {
+                    this.updateStats({
+                        total_users: data.total_users,
+                        online_users: data.online_users || 0
+                    });
+                }
+            } else {
+                console.error('YAM User Presence Map: Failed to load users:', response.status);
+                this.showEmptyState('Failed to load users');
+            }
+        } catch (error) {
+            console.error('YAM User Presence Map: Error loading users:', error);
+            this.showEmptyState('Error loading users');
+        }
+    },
+    
+    updateUsers(users) {
+        console.log('YAM User Presence Map: Updating users:', users.length);
+        
+        // Normalize user data format
+        this.users = (users || []).map(user => ({
+            id: user.id || user.user_id,
+            username: user.username || user.name || 'Unknown',
+            email: user.email || '',
+            is_online: user.is_online || false,
+            status: user.status || (user.is_online ? 'online' : 'offline'),
+            role: user.role || 'user',
+            last_seen: user.last_seen || null,
+            profile_picture: user.profile_picture || 'default.png',
+            session_data: user.session_data || {}
+        }));
+        
+        this.applyFilters();
+        this.updateStats();
+        this.updateLastUpdate();
+        
+        // Emit custom event for other components
+        window.dispatchEvent(new CustomEvent('userPresenceMapUpdate', { 
+            detail: { users: this.users, filteredUsers: this.filteredUsers } 
+        }));
+    },
+    
+    updateUserStatus(userData) {
+        const userIndex = this.users.findIndex(u => u.id === userData.id);
+        if (userIndex !== -1) {
+            // Update existing user
+            this.users[userIndex] = { ...this.users[userIndex], ...userData };
+            console.log('YAM User Presence Map: Updated user status:', userData.username);
+        } else if (userData.is_online) {
+            // Add new online user
+            this.users.unshift({
+                id: userData.id,
+                username: userData.username || userData.name || 'Unknown',
+                email: userData.email || '',
+                is_online: true,
+                status: 'online',
+                role: userData.role || 'user',
+                last_seen: userData.last_seen || new Date().toISOString(),
+                profile_picture: userData.profile_picture || 'default.png'
+            });
+            console.log('YAM User Presence Map: Added new online user:', userData.username);
+        }
+        
+        this.applyFilters();
+        this.updateStats();
+        this.updateLastUpdate();
+    },
+    
+    updateFilters() {
+        this.filters = {
+            online: document.querySelector('input[value="online"]').checked,
+            away: document.querySelector('input[value="away"]').checked,
+            busy: document.querySelector('input[value="busy"]').checked,
+            offline: document.querySelector('input[value="offline"]').checked
+        };
+        
+        this.applyFilters();
+    },
+    
+    applyFilters() {
+        this.filteredUsers = this.users.filter(user => {
+            // Status filter
+            const status = user.status || (user.is_online ? 'online' : 'offline');
+            if (!this.filters[status]) return false;
+            
+            // Search filter
+            if (this.searchTerm) {
+                const searchFields = [
+                    user.username || '',
+                    user.email || '',
+                    user.role || ''
+                ].join(' ').toLowerCase();
+                
+                if (!searchFields.includes(this.searchTerm)) return false;
+            }
+            
+            return true;
+        });
+        
+        this.renderUsers();
+    },
+    
+    renderUsers() {
+        const container = document.getElementById('yamUserGrid');
+        if (!container) return;
+        
+        if (this.filteredUsers.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-people"></i>
+                    <div>No users found</div>
+                    <div>Try adjusting your filters or search terms</div>
+                </div>
+            `;
+            return;
+        }
+        
+        // Sort users: online first, then by name
+        const sortedUsers = [...this.filteredUsers].sort((a, b) => {
+            if (a.is_online !== b.is_online) return b.is_online - a.is_online;
+            return (a.username || '').localeCompare(b.username || '');
+        });
+        
+        container.innerHTML = sortedUsers.map(user => this.createUserCard(user)).join('');
+        
+        // Add click handlers to user cards
+        container.querySelectorAll('.user-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const userId = card.dataset.userId;
+                const user = this.users.find(u => u.id == userId);
+                if (user) {
+                    this.showUserDetails(user);
+                }
+            });
+        });
+    },
+    
+    createUserCard(user) {
+        const status = user.status || (user.is_online ? 'online' : 'offline');
+        const initials = this.getInitials(user.username);
+        const role = user.role || 'User';
+        
+        return `
+            <div class="user-card ${status}" data-user-id="${user.id}">
+                <div class="user-avatar ${status}">${initials}</div>
+                <div class="user-name">${this.escapeHtml(user.username)}</div>
+                <div class="user-status">${status}</div>
+                <div class="user-role">${role}</div>
+            </div>
+        `;
+    },
+    
+    getInitials(name) {
+        return name
+            .split(' ')
+            .map(word => word.charAt(0))
+            .join('')
+            .toUpperCase()
+            .slice(0, 2);
+    },
+    
+    updateStats(stats = null) {
+        const userStats = {
+            online: 0,
+            away: 0,
+            busy: 0,
+            offline: 0
+        };
+        
+        this.users.forEach(user => {
+            const status = user.status || (user.is_online ? 'online' : 'offline');
+            userStats[status]++;
+        });
+        
+        document.getElementById('yamOnlineCount').textContent = userStats.online;
+        document.getElementById('yamAwayCount').textContent = userStats.away;
+        document.getElementById('yamBusyCount').textContent = userStats.busy;
+        document.getElementById('yamOfflineCount').textContent = userStats.offline;
+        
+        // Update real-time indicator
+        const indicator = document.getElementById('yamRealTimeIndicator');
+        if (indicator) {
+            indicator.style.opacity = this.socket && this.socket.connected ? '1' : '0.5';
+        }
+    },
+    
+    updateLastUpdate() {
+        this.lastUpdate = new Date();
+        const lastUpdateElement = document.getElementById('yamLastUpdate');
+        if (lastUpdateElement) {
+            lastUpdateElement.textContent = this.lastUpdate.toLocaleTimeString();
+        }
+    },
+    
+    startAutoRefresh() {
+        if (this.autoRefreshEnabled) {
+            this.autoRefreshInterval = setInterval(() => {
+                if (this.socket && this.socket.connected) {
+                    this.socket.emit('get_online_users');
+                } else {
+                    this.loadUsers();
+                }
+            }, 30000); // Refresh every 30 seconds
+        }
+    },
+    
+    stopAutoRefresh() {
+        if (this.autoRefreshInterval) {
+            clearInterval(this.autoRefreshInterval);
+            this.autoRefreshInterval = null;
+        }
+    },
+    
+    toggleAutoRefresh() {
+        this.autoRefreshEnabled = !this.autoRefreshEnabled;
+        const btn = document.getElementById('yamMapAutoRefreshBtn');
+        
+        if (this.autoRefreshEnabled) {
+            this.startAutoRefresh();
+            if (btn) {
+                btn.innerHTML = '<i class="bi bi-pause-circle"></i>';
+                btn.title = 'Pause Auto Refresh';
+                btn.classList.add('active');
+            }
+        } else {
+            this.stopAutoRefresh();
+            if (btn) {
+                btn.innerHTML = '<i class="bi bi-play-circle"></i>';
+                btn.title = 'Start Auto Refresh';
+                btn.classList.remove('active');
+            }
+        }
+    },
+    
+    toggleView() {
+        this.viewMode = this.viewMode === 'grid' ? 'list' : 'grid';
+        const container = document.getElementById('yamUserGrid');
+        const toggleBtn = document.getElementById('yamMapViewToggle');
+        
+        if (container) {
+            container.className = `user-grid ${this.viewMode}-view`;
+        }
+        
+        if (toggleBtn) {
+            if (this.viewMode === 'list') {
+                toggleBtn.innerHTML = '<i class="bi bi-grid-3x3"></i>';
+                toggleBtn.title = 'Grid View';
+            } else {
+                toggleBtn.innerHTML = '<i class="bi bi-list"></i>';
+                toggleBtn.title = 'List View';
+            }
+        }
+        
+        this.renderUsers();
+    },
+    
+    toggleFilters() {
+        const filters = document.getElementById('yamMapFilters');
+        const filterBtn = document.getElementById('yamMapFilterBtn');
+        
+        if (filters) {
+            const isVisible = filters.style.display !== 'none';
+            filters.style.display = isVisible ? 'none' : 'flex';
+        }
+        
+        if (filterBtn) {
+            filterBtn.classList.toggle('active');
+        }
+    },
+    
+    showUserDetails(user) {
+        const modal = new bootstrap.Modal(document.getElementById('yamUserMapModal'));
+        const content = document.getElementById('yamUserMapModalContent');
+        
+        if (content) {
+            const status = user.status || (user.is_online ? 'online' : 'offline');
+            const lastSeen = user.last_seen ? new Date(user.last_seen).toLocaleString() : 'Unknown';
+            
+            content.innerHTML = `
+                <div class="user-details">
+                    <div class="user-header">
+                        <div class="user-avatar-large ${status}">${this.getInitials(user.username)}</div>
+                        <div class="user-info">
+                            <h6>${this.escapeHtml(user.username)}</h6>
+                            <span class="user-role">${user.role || 'User'}</span>
+                            <span class="user-status">${status}</span>
+                        </div>
+                    </div>
+                    <div class="user-details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Email:</span>
+                            <span class="detail-value">${user.email || 'Not provided'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Status:</span>
+                            <span class="detail-value">${status}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Last Seen:</span>
+                            <span class="detail-value">${lastSeen}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Online:</span>
+                            <span class="detail-value">${user.is_online ? 'Yes' : 'No'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        modal.show();
+    },
+    
+    showEmptyState(message) {
+        const container = document.getElementById('yamUserGrid');
+        if (container) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-people"></i>
+                    <div>${message}</div>
+                </div>
+            `;
+        }
+    },
+    
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    },
+    
+    destroy() {
+        this.stopAutoRefresh();
+        if (this.socket) {
+            this.socket.off('online_users_update');
+            this.socket.off('user_status_change');
+            this.socket.off('presence_stats_update');
+        }
+        console.log('YAM User Presence Map: Component destroyed');
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.yamUserPresenceMap) {
+        window.yamUserPresenceMap.init();
+    }
+});
+
+// Register with YAM Dashboard if available
+if (window.yamDashboard) {
+    window.yamDashboard.registerComponent('userPresenceMap', window.yamUserPresenceMap);
+}
+</script>
+{% endmacro %} 

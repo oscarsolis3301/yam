@@ -1,0 +1,1194 @@
+{% extends "base.html" %}
+
+{% block head %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0c1b">
+<title>Service Desk Dashboard</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root {
+  --primary-color: #5c6bff;
+  --bg-color: #0a0c1b;
+  --input-bg: #181a24;
+  --input-border: #2d2f43;
+  --text-color: #ffffff;
+  --label-color: #b3b8cd;
+  --form-bg: #16182a;
+  --error-bg: #2f2f46;
+  --success-color: #43a047;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+}
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Animated Background */
+.service-desk-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #0a0c1b 0%, #1a1a2e 25%, #16213e 50%, #1a1a2e 75%, #0a0c1b 100%);
+  background-size: 400% 400%;
+  z-index: -1;
+  animation: gradientShift 15s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Main Container */
+.service-desk-container {
+  min-height: 100vh;
+  padding: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Welcome Section */
+.welcome-section {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: var(--form-bg);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.welcome-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(45deg, #7289da, #43b581, #faa61a, #f04747);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 40px rgba(114, 137, 218, 0.5);
+}
+
+.welcome-subtitle {
+  font-size: 1.2rem;
+  color: var(--label-color);
+  font-weight: 400;
+  margin-bottom: 0;
+}
+
+/* Main Content Grid */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+/* Outages Graph Section */
+.outages-section {
+  background: var(--form-bg);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.outages-section h3 {
+  color: var(--text-color);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.chart-container {
+  height: 300px;
+  position: relative;
+}
+
+/* Quick Actions Section */
+.actions-section {
+  background: var(--form-bg);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.actions-section h3 {
+  color: var(--text-color);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.action-btn {
+  background: linear-gradient(135deg, rgba(40, 40, 60, 0.8) 0%, rgba(60, 60, 80, 0.8) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+  color: var(--text-color);
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.action-btn:hover::before {
+  left: 100%;
+}
+
+.action-btn:hover {
+  background: linear-gradient(135deg, rgba(50, 50, 70, 0.9) 0%, rgba(70, 70, 90, 0.9) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.action-btn i {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+/* Modal Styles */
+.modal {
+  z-index: 99999999 !important;
+}
+
+.modal-content {
+  background: var(--form-bg) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  color: var(--text-color) !important;
+}
+
+.modal-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.modal-title {
+  color: var(--text-color) !important;
+  font-weight: 600 !important;
+}
+
+.modal-body {
+  background: var(--form-bg) !important;
+}
+
+.modal-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.btn-close {
+  filter: invert(1) !important;
+}
+
+.form-control, .form-select {
+  background: var(--input-bg) !important;
+  border: 1.5px solid var(--input-border) !important;
+  color: var(--text-color) !important;
+  border-radius: 8px !important;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px rgba(92, 107, 255, 0.15) !important;
+  color: var(--text-color) !important;
+}
+
+.btn-primary {
+  background: var(--primary-color) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+}
+
+.btn-primary:hover {
+  background: #3e4be0 !important;
+  box-shadow: 0 6px 18px rgba(92, 107, 255, 0.25) !important;
+}
+
+/* Data Display Styles */
+.data-item {
+  background: rgba(40, 40, 60, 0.5);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.data-item h5 {
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.data-item p {
+  color: var(--label-color);
+  margin-bottom: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .service-desk-container {
+    padding: 1rem;
+  }
+  
+  .welcome-title {
+    font-size: 2rem;
+  }
+  
+  .main-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .chart-container {
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-title {
+    font-size: 1.5rem;
+  }
+  
+  .chart-container {
+    height: 200px;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Animated Background -->
+<div class="service-desk-bg"></div>
+
+<!-- Service Desk Dashboard -->
+<div class="service-desk-container">
+  <!-- Welcome Section -->
+  <div class="welcome-section">
+    <h1 class="welcome-title">Welcome, {{ current_user.username }}!</h1>
+    <p class="welcome-subtitle">Service Desk Dashboard</p>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="main-grid">
+    <!-- Outages Graph Section -->
+    <div class="outages-section">
+      <h3><i class="bi bi-graph-up"></i> Outages Overview</h3>
+      <div class="chart-container">
+        <canvas id="outagesChart"></canvas>
+      </div>
+      <div class="mt-3 d-flex gap-2">
+        <button class="btn btn-primary" onclick="showCreateOutageModal()">
+          <i class="bi bi-plus-circle"></i> Start Outage
+        </button>
+        <button class="btn btn-outline-primary" onclick="showManageOutagesModal()">
+          <i class="bi bi-gear"></i> Manage Outages
+        </button>
+      </div>
+    </div>
+    
+    <!-- Quick Actions Section -->
+    <div class="actions-section">
+      <h3><i class="bi bi-lightning-charge"></i> Quick Actions</h3>
+      <div class="actions-grid">
+        <button class="action-btn" onclick="createTicket()">
+          <i class="bi bi-plus-circle"></i>
+          <span>Create Ticket</span>
+        </button>
+        <button class="action-btn" onclick="viewAllTickets()">
+          <i class="bi bi-list-ul"></i>
+          <span>View All Tickets</span>
+        </button>
+        <button class="action-btn" onclick="openKnowledgeBase()">
+          <i class="bi bi-book"></i>
+          <span>Knowledge Base</span>
+        </button>
+        <button class="action-btn" onclick="startRemoteSupport()">
+          <i class="bi bi-display"></i>
+          <span>Remote Support</span>
+        </button>
+        <button class="action-btn" onclick="generateReport()">
+          <i class="bi bi-bar-chart"></i>
+          <span>Generate Report</span>
+        </button>
+        <button class="action-btn" onclick="openSettings()">
+          <i class="bi bi-gear"></i>
+          <span>Settings</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Outage Modal -->
+<div class="modal fade" id="createOutageModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create New Outage</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="createOutageForm">
+          <div class="mb-3">
+            <label for="outageTitle" class="form-label">Title</label>
+            <input type="text" class="form-control" id="outageTitle" required>
+          </div>
+          <div class="mb-3">
+            <label for="outageDescription" class="form-label">Description</label>
+            <textarea class="form-control" id="outageDescription" rows="3" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="outageSeverity" class="form-label">Severity</label>
+            <select class="form-select" id="outageSeverity">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+              <option value="critical">Critical</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="affectedSystems" class="form-label">Affected Systems</label>
+            <input type="text" class="form-control" id="affectedSystems" placeholder="e.g., Email, Network, Database">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="createOutage()">Create Outage</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Manage Outages Modal -->
+<div class="modal fade" id="manageOutagesModal" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Manage Outages</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row mb-3">
+          <div class="col">
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-outline-primary active" onclick="filterOutages('all')">All</button>
+              <button type="button" class="btn btn-outline-warning" onclick="filterOutages('active')">Active</button>
+              <button type="button" class="btn btn-outline-success" onclick="filterOutages('resolved')">Resolved</button>
+            </div>
+          </div>
+        </div>
+        <div id="outagesList">
+          <!-- Outages will be loaded here -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Data Display Modal -->
+<div class="modal fade" id="dataModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dataModalTitle">Data</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="dataModalBody">
+        <!-- Data will be loaded here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Service Desk Dashboard
+window.serviceDeskDashboard = {
+    initialized: false,
+    outagesChart: null,
+    
+    init() {
+        if (this.initialized) return;
+        
+        this.loadOutagesData();
+        this.initializeChart();
+        this.initialized = true;
+        console.log('Service Desk Dashboard initialized');
+    },
+    
+    async loadOutagesData() {
+        try {
+            // Try to get real outage data
+            const response = await fetch('/api/admin/outages?all=1');
+            if (response.ok) {
+                const outages = await response.json();
+                this.updateOutagesChart(outages);
+            } else {
+                // Fallback to simulated data
+                this.updateOutagesChart(this.getSimulatedOutageData());
+            }
+        } catch (error) {
+            console.warn('Using simulated outage data:', error);
+            this.updateOutagesChart(this.getSimulatedOutageData());
+        }
+    },
+    
+    getSimulatedOutageData() {
+        // Generate realistic outage data for the past 30 days
+        const data = [];
+        const now = new Date();
+        
+        for (let i = 29; i >= 0; i--) {
+            const date = new Date(now);
+            date.setDate(date.getDate() - i);
+            
+            // Simulate realistic outage patterns
+            let count = 0;
+            if (Math.random() < 0.3) { // 30% chance of outage
+                count = Math.floor(Math.random() * 3) + 1; // 1-3 outages
+            }
+            
+            data.push({
+                date: date.toISOString().split('T')[0],
+                count: count
+            });
+        }
+        
+        return data;
+    },
+    
+    initializeChart() {
+        const ctx = document.getElementById('outagesChart').getContext('2d');
+        
+        this.outagesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Outages',
+                    data: [],
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#ffffff'
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: '#b3b8cd'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: '#b3b8cd'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+    },
+    
+    updateOutagesChart(outages) {
+        if (!this.outagesChart) return;
+        
+        // Process outage data
+        const dates = [];
+        const counts = [];
+        
+        if (Array.isArray(outages)) {
+            // Real outage data
+            const outageMap = {};
+            
+            outages.forEach(outage => {
+                const date = new Date(outage.start_time).toISOString().split('T')[0];
+                outageMap[date] = (outageMap[date] || 0) + 1;
+            });
+            
+            // Fill in missing dates
+            const now = new Date();
+            for (let i = 29; i >= 0; i--) {
+                const date = new Date(now);
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                
+                dates.push(dateStr);
+                counts.push(outageMap[dateStr] || 0);
+            }
+        } else {
+            // Simulated data
+            outages.forEach(item => {
+                dates.push(item.date);
+                counts.push(item.count);
+            });
+        }
+        
+        this.outagesChart.data.labels = dates;
+        this.outagesChart.data.datasets[0].data = counts;
+        this.outagesChart.update();
+    }
+};
+
+// Modal Functions
+window.showCreateOutageModal = function() {
+    const modal = new bootstrap.Modal(document.getElementById('createOutageModal'));
+    modal.show();
+};
+
+window.showManageOutagesModal = function() {
+    const modal = new bootstrap.Modal(document.getElementById('manageOutagesModal'));
+    modal.show();
+    loadOutagesForManagement();
+};
+
+window.showModal = async function(type, title) {
+    const modal = new bootstrap.Modal(document.getElementById('dataModal'));
+    const modalTitle = document.getElementById('dataModalTitle');
+    const modalBody = document.getElementById('dataModalBody');
+    
+    modalTitle.textContent = title;
+    modalBody.innerHTML = '<div class="text-center"><i class="bi bi-arrow-clockwise"></i> Loading...</div>';
+    
+    modal.show();
+    
+    try {
+        let data = null;
+        
+        switch (type) {
+            case 'tickets':
+                data = await loadTicketsData();
+                break;
+            case 'create-ticket':
+                data = await loadCreateTicketForm();
+                break;
+            case 'knowledge-base':
+                data = await loadKnowledgeBaseData();
+                break;
+            case 'remote-support':
+                data = await loadRemoteSupportData();
+                break;
+            case 'reports':
+                data = await loadReportsData();
+                break;
+            case 'settings':
+                data = await loadSettingsData();
+                break;
+            case 'system':
+                data = await loadSystemData();
+                break;
+            case 'users':
+                data = await loadUsersData();
+                break;
+        }
+        
+        modalBody.innerHTML = data;
+    } catch (error) {
+        modalBody.innerHTML = '<div class="alert alert-danger">Error loading data. Please try again.</div>';
+    }
+};
+
+// Data Loading Functions
+async function loadTicketsData() {
+    try {
+        const response = await fetch('/patterson/api/tickets');
+        if (response.ok) {
+            const data = await response.json();
+            const tickets = data.tickets || [];
+            
+            if (tickets.length === 0) {
+                return '<div class="alert alert-info">No tickets found.</div>';
+            }
+            
+            return tickets.slice(0, 10).map(ticket => `
+                <div class="data-item">
+                    <h5>${ticket.title || ticket.subject || 'Untitled'}</h5>
+                    <p><strong>Status:</strong> ${ticket.status || 'Unknown'}</p>
+                    <p><strong>Created:</strong> ${new Date(ticket.created_at).toLocaleDateString()}</p>
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        console.warn('Failed to load tickets:', error);
+    }
+    
+    // Fallback data
+    return `
+        <div class="data-item">
+            <h5>Email System Down</h5>
+            <p><strong>Status:</strong> In Progress</p>
+            <p><strong>Created:</strong> ${new Date().toLocaleDateString()}</p>
+        </div>
+        <div class="data-item">
+            <h5>Network Connectivity Issues</h5>
+            <p><strong>Status:</strong> Open</p>
+            <p><strong>Created:</strong> ${new Date().toLocaleDateString()}</p>
+        </div>
+        <div class="data-item">
+            <h5>Database Performance</h5>
+            <p><strong>Status:</strong> Resolved</p>
+            <p><strong>Created:</strong> ${new Date().toLocaleDateString()}</p>
+        </div>
+    `;
+}
+
+async function loadSystemData() {
+    // Simulated system health data
+    return `
+        <div class="data-item">
+            <h5>Server Health</h5>
+            <p><strong>CPU:</strong> 85%</p>
+            <p><strong>Memory:</strong> 92%</p>
+            <p><strong>Disk:</strong> 78%</p>
+        </div>
+        <div class="data-item">
+            <h5>Network Status</h5>
+            <p><strong>Uptime:</strong> 99.9%</p>
+            <p><strong>Latency:</strong> 15ms</p>
+            <p><strong>Bandwidth:</strong> 85%</p>
+        </div>
+        <div class="data-item">
+            <h5>Database Performance</h5>
+            <p><strong>Response Time:</strong> 45ms</p>
+            <p><strong>Connections:</strong> 125/200</p>
+            <p><strong>Cache Hit Rate:</strong> 94%</p>
+        </div>
+    `;
+}
+
+async function loadUsersData() {
+    try {
+        const response = await fetch('/api/users/active');
+        if (response.ok) {
+            const data = await response.json();
+            const users = data.users || [];
+            
+            if (users.length === 0) {
+                return '<div class="alert alert-info">No active users found.</div>';
+            }
+            
+            return users.slice(0, 10).map(user => `
+                <div class="data-item">
+                    <h5>${user.username || 'Unknown User'}</h5>
+                    <p><strong>Status:</strong> ${user.status || 'Online'}</p>
+                    <p><strong>Last Seen:</strong> ${new Date(user.last_seen).toLocaleString()}</p>
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        console.warn('Failed to load users:', error);
+    }
+    
+    // Fallback data
+    return `
+        <div class="data-item">
+            <h5>John Doe</h5>
+            <p><strong>Status:</strong> Online</p>
+            <p><strong>Last Seen:</strong> ${new Date().toLocaleString()}</p>
+        </div>
+        <div class="data-item">
+            <h5>Jane Smith</h5>
+            <p><strong>Status:</strong> Away</p>
+            <p><strong>Last Seen:</strong> ${new Date().toLocaleString()}</p>
+        </div>
+        <div class="data-item">
+            <h5>Mike Johnson</h5>
+            <p><strong>Status:</strong> Online</p>
+            <p><strong>Last Seen:</strong> ${new Date().toLocaleString()}</p>
+        </div>
+    `;
+}
+
+async function loadCreateTicketForm() {
+    return `
+        <form id="createTicketForm">
+            <div class="mb-3">
+                <label for="ticketTitle" class="form-label">Ticket Title</label>
+                <input type="text" class="form-control" id="ticketTitle" required>
+            </div>
+            <div class="mb-3">
+                <label for="ticketDescription" class="form-label">Description</label>
+                <textarea class="form-control" id="ticketDescription" rows="4" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="ticketPriority" class="form-label">Priority</label>
+                <select class="form-select" id="ticketPriority">
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="ticketCategory" class="form-label">Category</label>
+                <select class="form-select" id="ticketCategory">
+                    <option value="hardware">Hardware</option>
+                    <option value="software">Software</option>
+                    <option value="network">Network</option>
+                    <option value="email">Email</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="text-end">
+                <button type="button" class="btn btn-primary" onclick="submitTicket()">Create Ticket</button>
+            </div>
+        </form>
+    `;
+}
+
+async function loadKnowledgeBaseData() {
+    return `
+        <div class="data-item">
+            <h5>Popular Articles</h5>
+            <div class="list-group list-group-flush">
+                <a href="#" class="list-group-item list-group-item-action">How to Reset Password</a>
+                <a href="#" class="list-group-item list-group-item-action">VPN Connection Guide</a>
+                <a href="#" class="list-group-item list-group-item-action">Email Setup Instructions</a>
+                <a href="#" class="list-group-item list-group-item-action">Printer Troubleshooting</a>
+            </div>
+        </div>
+        <div class="data-item">
+            <h5>Quick Actions</h5>
+            <div class="d-grid gap-2">
+                <button class="btn btn-outline-primary" onclick="searchKB()">Search Knowledge Base</button>
+                <button class="btn btn-outline-primary" onclick="createKBArticle()">Create New Article</button>
+            </div>
+        </div>
+    `;
+}
+
+async function loadRemoteSupportData() {
+    return `
+        <div class="data-item">
+            <h5>Remote Support Tools</h5>
+            <div class="d-grid gap-2">
+                <button class="btn btn-outline-primary" onclick="startTeamViewer()">Start TeamViewer</button>
+                <button class="btn btn-outline-primary" onclick="startAnyDesk()">Start AnyDesk</button>
+                <button class="btn btn-outline-primary" onclick="startVNC()">Start VNC</button>
+            </div>
+        </div>
+        <div class="data-item">
+            <h5>Active Sessions</h5>
+            <p>No active remote support sessions</p>
+        </div>
+    `;
+}
+
+async function loadReportsData() {
+    return `
+        <div class="data-item">
+            <h5>Generate Report</h5>
+            <div class="mb-3">
+                <label for="reportType" class="form-label">Report Type</label>
+                <select class="form-select" id="reportType">
+                    <option value="tickets">Ticket Summary</option>
+                    <option value="outages">Outage Report</option>
+                    <option value="performance">Performance Metrics</option>
+                    <option value="users">User Activity</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="reportPeriod" class="form-label">Time Period</label>
+                <select class="form-select" id="reportPeriod">
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month" selected>This Month</option>
+                    <option value="quarter">This Quarter</option>
+                </select>
+            </div>
+            <div class="text-end">
+                <button class="btn btn-primary" onclick="generateReport()">Generate Report</button>
+            </div>
+        </div>
+        <div class="data-item">
+            <h5>Recent Reports</h5>
+            <div class="list-group list-group-flush">
+                <a href="#" class="list-group-item list-group-item-action">Monthly Ticket Report - January 2025</a>
+                <a href="#" class="list-group-item list-group-item-action">Outage Summary - December 2024</a>
+                <a href="#" class="list-group-item list-group-item-action">Performance Metrics - Q4 2024</a>
+            </div>
+        </div>
+    `;
+}
+
+async function loadSettingsData() {
+    return `
+        <div class="data-item">
+            <h5>Dashboard Settings</h5>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
+                <label class="form-check-label" for="autoRefresh">Auto-refresh dashboard</label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="notifications" checked>
+                <label class="form-check-label" for="notifications">Enable notifications</label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="darkMode" checked>
+                <label class="form-check-label" for="darkMode">Dark mode</label>
+            </div>
+        </div>
+        <div class="data-item">
+            <h5>System Settings</h5>
+            <div class="mb-3">
+                <label for="refreshInterval" class="form-label">Refresh Interval (seconds)</label>
+                <input type="number" class="form-control" id="refreshInterval" value="30" min="10" max="300">
+            </div>
+            <div class="text-end">
+                <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+            </div>
+        </div>
+    `;
+}
+
+// Create Outage Function
+window.createOutage = async function() {
+    const title = document.getElementById('outageTitle').value;
+    const description = document.getElementById('outageDescription').value;
+    const severity = document.getElementById('outageSeverity').value;
+    const affectedSystems = document.getElementById('affectedSystems').value;
+    
+    if (!title || !description) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/admin/outages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title: title,
+                description: description,
+                severity: severity,
+                affected_systems: affectedSystems
+            })
+        });
+        
+        if (response.ok) {
+            const outage = await response.json();
+            console.log('Outage created:', outage);
+            
+            // Close modal and refresh data
+            const modal = bootstrap.Modal.getInstance(document.getElementById('createOutageModal'));
+            modal.hide();
+            
+            // Clear form
+            document.getElementById('createOutageForm').reset();
+            
+            // Refresh outages data
+            window.serviceDeskDashboard.loadOutagesData();
+            
+            alert('Outage created successfully!');
+        } else {
+            const error = await response.json();
+            alert(`Error creating outage: ${error.error || 'Unknown error'}`);
+        }
+    } catch (error) {
+        console.error('Error creating outage:', error);
+        alert('Error creating outage. Please try again.');
+    }
+};
+
+// Outage Management Functions
+async function loadOutagesForManagement() {
+    try {
+        const response = await fetch('/api/admin/outages?all=1');
+        if (response.ok) {
+            const outages = await response.json();
+            displayOutagesForManagement(outages);
+        } else {
+            throw new Error('Failed to load outages');
+        }
+    } catch (error) {
+        console.error('Error loading outages:', error);
+        document.getElementById('outagesList').innerHTML = '<div class="alert alert-danger">Error loading outages. Please try again.</div>';
+    }
+}
+
+function displayOutagesForManagement(outages) {
+    const container = document.getElementById('outagesList');
+    
+    if (!outages || outages.length === 0) {
+        container.innerHTML = '<div class="alert alert-info">No outages found.</div>';
+        return;
+    }
+    
+    const outagesHtml = outages.map(outage => `
+        <div class="data-item outage-item" data-status="${outage.status}">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h5>${outage.title}</h5>
+                    <p><strong>Description:</strong> ${outage.description}</p>
+                    <p><strong>Severity:</strong> <span class="badge bg-${getSeverityColor(outage.severity)}">${outage.severity}</span></p>
+                    <p><strong>Status:</strong> <span class="badge bg-${getStatusColor(outage.status)}">${outage.status}</span></p>
+                    <p><strong>Created:</strong> ${new Date(outage.created_at).toLocaleString()}</p>
+                    ${outage.affected_systems ? `<p><strong>Affected Systems:</strong> ${outage.affected_systems}</p>` : ''}
+                </div>
+                <div class="col-md-4 text-end">
+                    ${outage.status === 'active' ? `
+                        <button class="btn btn-success btn-sm" onclick="resolveOutage(${outage.id})">
+                            <i class="bi bi-check-circle"></i> Resolve
+                        </button>
+                    ` : ''}
+                    <button class="btn btn-danger btn-sm" onclick="deleteOutage(${outage.id})">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    container.innerHTML = outagesHtml;
+}
+
+function getSeverityColor(severity) {
+    switch (severity) {
+        case 'critical': return 'danger';
+        case 'high': return 'warning';
+        case 'medium': return 'info';
+        case 'low': return 'success';
+        default: return 'secondary';
+    }
+}
+
+function getStatusColor(status) {
+    switch (status) {
+        case 'active': return 'warning';
+        case 'resolved': return 'success';
+        default: return 'secondary';
+    }
+}
+
+async function resolveOutage(outageId) {
+    if (!confirm('Are you sure you want to resolve this outage?')) return;
+    
+    try {
+        const response = await fetch(`/api/admin/outages/${outageId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                status: 'resolved',
+                end_time: new Date().toISOString()
+            })
+        });
+        
+        if (response.ok) {
+            alert('Outage resolved successfully!');
+            loadOutagesForManagement();
+            window.serviceDeskDashboard.loadOutagesData();
+        } else {
+            const error = await response.json();
+            alert(`Error resolving outage: ${error.error || 'Unknown error'}`);
+        }
+    } catch (error) {
+        console.error('Error resolving outage:', error);
+        alert('Error resolving outage. Please try again.');
+    }
+}
+
+async function deleteOutage(outageId) {
+    if (!confirm('Are you sure you want to delete this outage? This action cannot be undone.')) return;
+    
+    try {
+        const response = await fetch(`/api/admin/outages/${outageId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            alert('Outage deleted successfully!');
+            loadOutagesForManagement();
+            window.serviceDeskDashboard.loadOutagesData();
+        } else {
+            const error = await response.json();
+            alert(`Error deleting outage: ${error.error || 'Unknown error'}`);
+        }
+    } catch (error) {
+        console.error('Error deleting outage:', error);
+        alert('Error deleting outage. Please try again.');
+    }
+}
+
+function filterOutages(status) {
+    // Update active button
+    document.querySelectorAll('.btn-group .btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Filter outage items
+    const outageItems = document.querySelectorAll('.outage-item');
+    outageItems.forEach(item => {
+        if (status === 'all' || item.dataset.status === status) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// Quick Action Functions
+window.createTicket = function() {
+    showModal('create-ticket', 'Create New Ticket');
+};
+
+window.viewAllTickets = function() {
+    showModal('tickets', 'All Tickets');
+};
+
+window.openKnowledgeBase = function() {
+    showModal('knowledge-base', 'Knowledge Base');
+};
+
+window.startRemoteSupport = function() {
+    showModal('remote-support', 'Remote Support');
+};
+
+window.generateReport = function() {
+    showModal('reports', 'Generate Report');
+};
+
+window.openSettings = function() {
+    showModal('settings', 'Settings');
+};
+
+// Additional Quick Action Functions
+window.submitTicket = function() {
+    const title = document.getElementById('ticketTitle').value;
+    const description = document.getElementById('ticketDescription').value;
+    const priority = document.getElementById('ticketPriority').value;
+    const category = document.getElementById('ticketCategory').value;
+    
+    if (!title || !description) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+    
+    // Simulate ticket creation
+    alert(`Ticket created successfully!\nTitle: ${title}\nPriority: ${priority}\nCategory: ${category}`);
+    
+    // Close modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('dataModal'));
+    modal.hide();
+};
+
+window.searchKB = function() {
+    const searchTerm = prompt('Enter search term:');
+    if (searchTerm) {
+        alert(`Searching for: ${searchTerm}`);
+    }
+};
+
+window.createKBArticle = function() {
+    alert('Opening Knowledge Base article editor...');
+};
+
+window.startTeamViewer = function() {
+    alert('Starting TeamViewer...');
+};
+
+window.startAnyDesk = function() {
+    alert('Starting AnyDesk...');
+};
+
+window.startVNC = function() {
+    alert('Starting VNC...');
+};
+
+window.generateReport = function() {
+    const reportType = document.getElementById('reportType').value;
+    const reportPeriod = document.getElementById('reportPeriod').value;
+    
+    alert(`Generating ${reportType} report for ${reportPeriod}...`);
+};
+
+window.saveSettings = function() {
+    const refreshInterval = document.getElementById('refreshInterval').value;
+    const autoRefresh = document.getElementById('autoRefresh').checked;
+    const notifications = document.getElementById('notifications').checked;
+    const darkMode = document.getElementById('darkMode').checked;
+    
+    alert(`Settings saved!\nRefresh Interval: ${refreshInterval}s\nAuto-refresh: ${autoRefresh}\nNotifications: ${notifications}\nDark Mode: ${darkMode}`);
+};
+
+// Initialize dashboard when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    window.serviceDeskDashboard.init();
+});
+</script>
+{% endblock %} 

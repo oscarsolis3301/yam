@@ -1,0 +1,3650 @@
+<!-- Specific Modal Styles -->
+<style>
+/* PDF Modal Styles */
+.pdf-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(24, 26, 26, 0.55);
+    z-index: 11000;
+    backdrop-filter: blur(8px);
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.pdf-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.pdf-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    background: #23272f;
+    z-index: 11100;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.4);
+    border-radius: 1.5rem;
+    width: min(95vw, 900px);
+    height: min(90vh, 750px);
+    min-width: 320px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1), transform 0.25s cubic-bezier(.4,0,.2,1);
+}
+
+.pdf-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.pdf-modal-header {
+    position: sticky;
+    top: 0;
+    background: #23272f;
+    padding: 1.2rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    z-index: 10;
+    border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.pdf-modal-title {
+    color: #7ecbff;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.pdf-modal-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 0;
+    background: #181a1a;
+    border-radius: 0 0 1.5rem 1.5rem;
+}
+
+/* Note Modal Styles - Enhanced macOS Design */
+.note-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 11000;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: opacity 0.3s cubic-bezier(.4,0,.2,1);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.note-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.note-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f7 100%);
+    z-index: 11100;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25), 0 0 0 0.5px rgba(0, 0, 0, 0.05);
+    border-radius: 20px;
+    width: 80vw;
+    height: 80vh;
+    min-width: 600px;
+    min-height: 500px;
+    max-width: 1200px;
+    max-height: 900px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.note-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+[data-bs-theme="dark"] .note-modal {
+    background: linear-gradient(135deg, #2b2b2d 0%, #1f1f23 100%);
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+}
+
+.note-modal-header {
+    position: sticky;
+    top: 0;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    z-index: 10;
+    border-radius: 20px 20px 0 0;
+    flex-shrink: 0;
+}
+
+[data-bs-theme="dark"] .note-modal-header {
+    background: rgba(43, 43, 45, 0.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.note-modal-title {
+    color: #1d1d1f;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+    flex: 1;
+    letter-spacing: -0.01em;
+}
+
+[data-bs-theme="dark"] .note-modal-title {
+    color: #f5f5f7;
+}
+
+.note-modal-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.note-modal-content {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 0 0 20px 20px;
+}
+
+[data-bs-theme="dark"] .note-modal-content {
+    background: rgba(43, 43, 45, 0.6);
+}
+
+/* Note Content Styles - Enhanced Layout */
+.note-view-only, .note-editable-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 2rem;
+    gap: 1.5rem;
+}
+
+[data-bs-theme="dark"] .note-view-only, 
+[data-bs-theme="dark"] .note-editable-view {
+    color: #f5f5f7;
+}
+
+.note-content-display {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.note-text-content {
+    flex: 1;
+    line-height: 1.6;
+    font-size: 1rem;
+    white-space: pre-wrap;
+    color: #1d1d1f;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    overflow-y: auto;
+    /* Hide scrollbars but keep functionality */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Hide scrollbar for WebKit browsers */
+.note-text-content::-webkit-scrollbar {
+    display: none;
+}
+
+[data-bs-theme="dark"] .note-text-content {
+    color: #f5f5f7;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.note-meta-info {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    margin: 0 -2rem -2rem -2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-bottom: 2rem;
+    border-radius: 0 0 20px 20px;
+}
+
+[data-bs-theme="dark"] .note-meta-info {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(43, 43, 45, 0.4);
+}
+
+.note-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.note-tag {
+    background: rgba(0, 122, 255, 0.1);
+    color: #007aff;
+    padding: 0.4rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid rgba(0, 122, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+[data-bs-theme="dark"] .note-tag {
+    background: rgba(10, 132, 255, 0.15);
+    color: #0a84ff;
+    border: 1px solid rgba(10, 132, 255, 0.3);
+}
+
+/* Note editing styles */
+.note-edit-mode {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.note-title-edit {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 500;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.note-title-edit:focus {
+    border-color: #007bff;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.note-editor-container {
+    min-height: 300px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.note-edit-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.note-edit-btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 12px;
+    border: 1px solid;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.note-edit-btn.primary {
+    background: #007aff;
+    border-color: #007aff;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+.note-edit-btn.primary:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+}
+
+.note-edit-btn.secondary {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #1d1d1f;
+}
+
+.note-edit-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+[data-bs-theme="dark"] .note-edit-btn.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #f5f5f7;
+}
+
+[data-bs-theme="dark"] .note-edit-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Ticket Modal Styles */
+.ticket-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(24, 26, 26, 0.55);
+    z-index: 11000;
+    backdrop-filter: blur(8px);
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.ticket-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.ticket-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    background: #23272f;
+    z-index: 11100;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.4);
+    border-radius: 1.5rem;
+    width: min(90vw, 600px);
+    max-height: min(85vh, 700px);
+    min-width: 320px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1), transform 0.25s cubic-bezier(.4,0,.2,1);
+}
+
+.ticket-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.ticket-modal-header {
+    position: sticky;
+    top: 0;
+    background: #23272f;
+    padding: 1.2rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    z-index: 10;
+    border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.ticket-modal-title {
+    color: #f8f9fa;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.ticket-modal-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 2rem;
+    background: #181a1a;
+    border-radius: 0 0 1.5rem 1.5rem;
+}
+
+.ticket-user-info {
+    background: rgba(0, 123, 255, 0.1);
+    border: 1px solid rgba(0, 123, 255, 0.3);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    color: #f8f9fa;
+    margin-bottom: 1.5rem;
+}
+
+.ticket-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Password Reset Modal Styles */
+.password-reset-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(24, 26, 26, 0.55);
+    z-index: 11000;
+    backdrop-filter: blur(8px);
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.password-reset-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.password-reset-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    background: #23272f;
+    z-index: 11100;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.4);
+    border-radius: 1.5rem;
+    width: min(90vw, 600px);
+    max-height: min(85vh, 700px);
+    min-width: 320px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1), transform 0.25s cubic-bezier(.4,0,.2,1);
+}
+
+.password-reset-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.password-reset-modal-header {
+    position: sticky;
+    top: 0;
+    background: #23272f;
+    padding: 1.2rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    z-index: 10;
+    border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.password-reset-modal-title {
+    color: #f8f9fa;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.password-reset-modal-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 2rem;
+    background: #181a1a;
+    border-radius: 0 0 1.5rem 1.5rem;
+}
+
+.password-reset-user-info {
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    color: #f8f9fa;
+    margin-bottom: 1.5rem;
+}
+
+.password-reset-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Form styling for modals */
+.ticket-modal .form-label,
+.password-reset-modal .form-label {
+    color: #f8f9fa;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.ticket-modal .form-control,
+.ticket-modal .form-select,
+.password-reset-modal .form-control,
+.password-reset-modal .form-select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0.5rem;
+    color: #fff;
+    padding: 0.75rem;
+}
+
+.ticket-modal .form-control:focus,
+.ticket-modal .form-select:focus,
+.password-reset-modal .form-control:focus,
+.password-reset-modal .form-select:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    color: #fff;
+}
+
+.ticket-modal .form-control::placeholder,
+.password-reset-modal .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.ticket-modal .form-select option,
+.password-reset-modal .form-select option {
+    background: #2c3034;
+    color: #fff;
+}
+
+.ticket-modal .form-check-label,
+.password-reset-modal .form-check-label {
+    color: #f8f9fa;
+}
+
+.ticket-modal .form-check-input:checked,
+.password-reset-modal .form-check-input:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.ticket-modal .form-text,
+.password-reset-modal .form-text {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.ticket-modal .alert,
+.password-reset-modal .alert {
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    color: #ffc107;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Close modal functionality */
+.pdf-modal-overlay:not(.active),
+.note-modal-overlay:not(.active),
+.ticket-modal-overlay:not(.active),
+.password-reset-modal-overlay:not(.active) {
+    display: none;
+}
+
+.pdf-modal:not(.active),
+.note-modal:not(.active),
+.ticket-modal:not(.active),
+.password-reset-modal:not(.active) {
+    display: none;
+}
+
+/* Anchor-based "view all" items */
+.suggestion-viewall.result-item { 
+    display: flex; 
+    align-items: flex-start; 
+    cursor: pointer; 
+    text-decoration: none;
+    color: inherit;
+}
+
+.suggestion-viewall.result-item:hover { 
+    background: rgba(0,123,255,.05); 
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Quill editor dark theme overrides for modal */
+.note-modal .ql-toolbar {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 0.5rem 0.5rem 0 0 !important;
+}
+
+.note-modal .ql-container {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-top: none !important;
+    border-radius: 0 0 0.5rem 0.5rem !important;
+    color: #fff !important;
+}
+
+.note-modal .ql-editor {
+    color: #fff !important;
+    min-height: 200px !important;
+}
+
+.note-modal .ql-toolbar .ql-stroke {
+    stroke: #fff !important;
+}
+
+.note-modal .ql-toolbar .ql-fill {
+    fill: #fff !important;
+}
+
+.note-modal .ql-toolbar .ql-picker {
+    color: #fff !important;
+}
+
+.note-modal .ql-editor.ql-blank::before {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* User Profile Modal Styles - macOS Inspired */
+.user-profile-modal {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    background: rgba(249, 249, 251, 0.95);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15), 0 0 0 0.5px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    max-width: 1100px;
+    width: 90vw;
+    max-height: 90vh;
+    overflow: hidden;
+    position: relative;
+    color: #1d1d1f;
+    animation: macModalSlideIn 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+[data-bs-theme="dark"] .user-profile-modal {
+    background: rgba(30, 30, 32, 0.95);
+    color: #f5f5f7;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+}
+
+@keyframes macModalSlideIn {
+    from { 
+        opacity: 0; 
+        transform: scale(0.95) translateY(20px);
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1) translateY(0);
+    }
+}
+
+.mac-modal-header {
+    display: flex;
+    align-items: center;
+    padding: 20px 24px 16px;
+    gap: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+[data-bs-theme="dark"] .mac-modal-header {
+    background: rgba(42, 42, 45, 0.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mac-user-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(0, 122, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mac-user-info {
+    flex: 1;
+}
+
+.mac-user-name {
+    margin: 0 0 4px 0;
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #1d1d1f;
+}
+
+[data-bs-theme="dark"] .mac-user-name {
+    color: #f5f5f7;
+}
+
+.mac-user-role {
+    margin: 0 0 8px 0;
+    font-size: 0.9375rem;
+    color: #6e6e73;
+    font-weight: 500;
+}
+
+[data-bs-theme="dark"] .mac-user-role {
+    color: #98989d;
+}
+
+.mac-action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.mac-action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(0, 122, 255, 0.1);
+    color: #007aff;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    position: relative;
+}
+
+.mac-action-btn:hover {
+    background: rgba(0, 122, 255, 0.15);
+    transform: scale(1.05);
+}
+
+.mac-action-btn:active {
+    transform: scale(0.95);
+}
+
+[data-bs-theme="dark"] .mac-action-btn {
+    background: rgba(0, 122, 255, 0.2);
+}
+
+.mac-modal-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 20px 24px 24px;
+    background: rgba(255, 255, 255, 0.4);
+    overflow-y: auto;
+    max-height: calc(90vh - 120px);
+}
+
+[data-bs-theme="dark"] .mac-modal-content {
+    background: rgba(28, 28, 30, 0.6);
+}
+
+.mac-info-section {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    border-radius: 12px;
+    padding: 16px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+[data-bs-theme="dark"] .mac-info-section {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mac-section-title {
+    margin: 0 0 12px 0;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #1d1d1f;
+    letter-spacing: -0.01em;
+}
+
+[data-bs-theme="dark"] .mac-section-title {
+    color: #f5f5f7;
+}
+
+.mac-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 8px 12px;
+    font-size: 0.875rem;
+}
+
+.mac-info-label {
+    color: #6e6e73;
+    font-weight: 500;
+    align-self: start;
+}
+
+[data-bs-theme="dark"] .mac-info-label {
+    color: #98989d;
+}
+
+.mac-info-value {
+    color: #1d1d1f;
+    font-weight: 500;
+    word-break: break-word;
+    align-self: start;
+}
+
+[data-bs-theme="dark"] .mac-info-value {
+    color: #f5f5f7;
+}
+
+.mac-info-value a {
+    color: #007aff;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.mac-info-value a:hover {
+    color: #0051d5;
+    text-decoration: underline;
+}
+
+.mac-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    letter-spacing: 0.01em;
+}
+
+.mac-status-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.mac-badge-ok {
+    background: rgba(52, 199, 89, 0.15);
+    color: #34c759;
+}
+
+.mac-badge-locked {
+    background: rgba(255, 59, 48, 0.15);
+    color: #ff3b30;
+}
+
+.mac-badge-disabled {
+    background: rgba(142, 142, 147, 0.15);
+    color: #8e8e93;
+}
+
+.mac-badge-expired {
+    background: rgba(255, 204, 0, 0.15);
+    color: #ffcc00;
+}
+
+[data-bs-theme="dark"] .mac-badge-ok {
+    background: rgba(52, 199, 89, 0.2);
+    color: #30d158;
+}
+
+[data-bs-theme="dark"] .mac-badge-locked {
+    background: rgba(255, 69, 58, 0.2);
+    color: #ff453a;
+}
+
+[data-bs-theme="dark"] .mac-badge-disabled {
+    background: rgba(142, 142, 147, 0.2);
+    color: #98989d;
+}
+
+[data-bs-theme="dark"] .mac-badge-expired {
+    background: rgba(255, 214, 10, 0.2);
+    color: #ffd60a;
+}
+
+.mac-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(120, 120, 128, 0.16);
+    color: #6e6e73;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 500;
+    z-index: 10;
+}
+
+.mac-close-btn:hover {
+    background: rgba(120, 120, 128, 0.24);
+    color: #1d1d1f;
+}
+
+[data-bs-theme="dark"] .mac-close-btn {
+    background: rgba(120, 120, 128, 0.24);
+    color: #98989d;
+}
+
+[data-bs-theme="dark"] .mac-close-btn:hover {
+    background: rgba(120, 120, 128, 0.32);
+    color: #f5f5f7;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .mac-modal-content {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 16px 20px 20px;
+    }
+    
+    .mac-modal-header {
+        padding: 16px 20px 12px;
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+    
+    .user-profile-modal {
+        width: 95vw;
+        max-width: none;
+    }
+    
+    .mac-user-avatar {
+        width: 56px;
+        height: 56px;
+    }
+    
+    .mac-user-name {
+        font-size: 1.25rem;
+    }
+}
+
+// User Profile Modal Functions
+function createUserProfileModal(data) {
+    const avatarUrl = data.profile_picture ? `/static/uploads/profile_pictures/${data.profile_picture}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username)}&background=random&bold=true`;
+
+    const locked = data.locked_out === true;
+    const disabled = (data.account_status || '').toString().toLowerCase().includes('disabled');
+    const pwdExpired = data.password_expired === true;
+
+    const badge = (txt, cls) => `<span class="mac-status-badge ${cls}">${txt}</span>`;
+    const lockedBadge = locked ? badge('Locked', 'mac-badge-locked') : badge('Unlocked', 'mac-badge-ok');
+    const accountBadge = disabled ? badge('Disabled', 'mac-badge-disabled') : badge('Enabled', 'mac-badge-ok');
+    const pwdBadge = pwdExpired ? badge('Expired', 'mac-badge-expired') : badge('Valid', 'mac-badge-ok');
+
+    // Calculate time since password reset
+    function getPasswordResetTimeAgo(dateString) {
+        if (!dateString || dateString === 'N/A') return 'N/A';
+        try {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            if (diffDays === 0) return 'Today';
+            if (diffDays === 1) return '1 day ago';
+            return `${diffDays} days ago`;
+        } catch (e) {
+            return 'N/A';
+        }
+    }
+
+    const passwordResetDisplay = data.password_last_reset && data.password_last_reset !== 'N/A' 
+        ? `${data.password_last_reset} (${getPasswordResetTimeAgo(data.password_last_reset)})`
+        : 'N/A';
+
+    return `
+        <div class="user-profile-modal">
+            <button class="mac-close-btn" aria-label="Close" onclick="document.getElementById('universalSearchDetailModal').style.display='none'">×</button>
+            
+            <div class="mac-modal-header">
+                <img src="${avatarUrl}" alt="Avatar" class="mac-user-avatar" />
+                <div class="mac-user-info">
+                    <h3 class="mac-user-name">${data.full_name || data.username}</h3>
+                    <p class="mac-user-role">${data.role || data.title || 'User'}</p>
+                    <div class="mac-action-buttons">
+                        <button class="mac-action-btn" title="Create Ticket" onclick="handleButtonClick(this, () => openTicketModal('${data.username}','${data.email}','${data.full_name || data.username}'))">🎫</button>
+                        <button class="mac-action-btn" title="Reset Password" onclick="handleButtonClick(this, () => openPasswordResetModal('${data.username}','${data.email}','${data.full_name || data.username}'))">🔑</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mac-modal-content">
+                <div class="mac-info-section">
+                    <h4 class="mac-section-title">Contact Information</h4>
+                    <div class="mac-info-grid">
+                        <div class="mac-info-label">Email</div>
+                        <div class="mac-info-value"><a href="mailto:${data.email}">${data.email}</a></div>
+                        ${data.phone ? `<div class="mac-info-label">Phone</div><div class="mac-info-value"><a href="tel:${data.phone}">${data.phone}</a></div>` : ''}
+                        ${data.clock_id ? `<div class="mac-info-label">Clock ID</div><div class="mac-info-value">${data.clock_id}</div>` : ''}
+                        ${data.department ? `<div class="mac-info-label">Department</div><div class="mac-info-value">${data.department}</div>` : ''}
+                        ${data.title ? `<div class="mac-info-label">Title</div><div class="mac-info-value">${data.title}</div>` : ''}
+                    </div>
+                </div>
+
+                <div class="mac-info-section">
+                    <h4 class="mac-section-title">Account Status</h4>
+                    <div class="mac-info-grid">
+                        <div class="mac-info-label">Account</div>
+                        <div class="mac-info-value">${accountBadge}</div>
+                        <div class="mac-info-label">Lock Status</div>
+                        <div class="mac-info-value">${lockedBadge}</div>
+                        <div class="mac-info-label">Password</div>
+                        <div class="mac-info-value">${pwdBadge}</div>
+                        <div class="mac-info-label">Bad Logon Count</div>
+                        <div class="mac-info-value">${data.bad_logon_count ?? '0'}</div>
+                    </div>
+                </div>
+
+                <div class="mac-info-section">
+                    <h4 class="mac-section-title">Password Information</h4>
+                    <div class="mac-info-grid">
+                        <div class="mac-info-label">Last Reset</div>
+                        <div class="mac-info-value">${passwordResetDisplay}</div>
+                        ${data.password_expiration_date ? `<div class="mac-info-label">Expires</div><div class="mac-info-value">${data.password_expiration_date}</div>` : ''}
+                        ${data.mfa_status ? `<div class="mac-info-label">MFA Status</div><div class="mac-info-value">${data.mfa_status}</div>` : ''}
+                    </div>
+                </div>
+
+                <div class="mac-info-section">
+                    <h4 class="mac-section-title">Additional Information</h4>
+                    <div class="mac-info-grid">
+                        ${data.epic_status ? `<div class="mac-info-label">Epic Status</div><div class="mac-info-value">${data.epic_status}</div>` : ''}
+                        ${data.epic_block ? `<div class="mac-info-label">Epic Block</div><div class="mac-info-value">${data.epic_block}</div>` : ''}
+                        ${data.email_license ? `<div class="mac-info-label">Email License</div><div class="mac-info-value">${data.email_license}</div>` : ''}
+                        ${data.immutable_id ? `<div class="mac-info-label">Immutable ID</div><div class="mac-info-value" style="font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; font-size: 0.8125rem;">${data.immutable_id}</div>` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Helper to render user profile modal from Clock ID lookup
+window.showClockIdUserModal = function(userData) {
+    const modal = document.getElementById('universalSearchDetailModal');
+    if (!modal) {
+        console.error('universalSearchDetailModal not found');
+        return;
+    }
+    modal.style.display = 'flex';
+    const content = document.getElementById('universalSearchDetailContent');
+    if (!content) {
+        console.error('universalSearchDetailContent not found');
+        return;
+    }
+    content.innerHTML = createUserProfileModal(userData);
+};
+
+// Button click handler with visual feedback
+window.handleButtonClick = function(button, callback) {
+    // Add visual feedback
+    const originalTransform = button.style.transform;
+    const originalBackground = button.style.background;
+    
+    button.style.transform = 'scale(0.95)';
+    button.style.background = 'rgba(0, 123, 255, 0.6)';
+    
+    setTimeout(() => {
+        button.style.transform = originalTransform;
+        button.style.background = originalBackground;
+        callback();
+    }, 150);
+};
+
+// Enhanced button functionality matching original implementation
+window.openTicketModal = function(username, email, fullName) {
+    const modal = getOrCreateTicketModal();
+    const overlay = document.getElementById('universalSearchTicketModalOverlay');
+    const titleEl = document.getElementById('universalSearchTicketModalTitle');
+    const userInfoEl = document.getElementById('universalSearchTicketUserInfo');
+    
+    if (!modal || !overlay || !titleEl || !userInfoEl) return;
+    
+    titleEl.textContent = 'Create Service Desk Ticket';
+    userInfoEl.innerHTML = `
+        <div class="ticket-user-info">
+            <i class="bi bi-person-circle" style="color: #007bff; margin-right: 0.5rem;"></i>
+            <strong>${fullName}</strong> (${username})
+            <br><small style="color: rgba(255,255,255,0.7);">${email}</small>
+        </div>
+    `;
+    
+    modal.classList.add('active');
+    overlay.classList.add('active');
+    
+    // Store user data for form submission
+    window._currentTicketUser = { username, email, fullName };
+};
+
+window.openPasswordResetModal = function(username, email, fullName) {
+    const modal = getOrCreatePasswordResetModal();
+    const overlay = document.getElementById('universalSearchPasswordResetModalOverlay');
+    const titleEl = document.getElementById('universalSearchPasswordResetModalTitle');
+    const userInfoEl = document.getElementById('universalSearchPasswordResetUserInfo');
+    
+    if (!modal || !overlay || !titleEl || !userInfoEl) return;
+    
+    titleEl.textContent = 'Reset User Password';
+    userInfoEl.innerHTML = `
+        <div class="password-reset-user-info">
+            <i class="bi bi-person-circle" style="color: #dc3545; margin-right: 0.5rem;"></i>
+            <strong>${fullName}</strong> (${username})
+            <br><small style="color: rgba(255,255,255,0.7);">${email}</small>
+        </div>
+    `;
+    
+    modal.classList.add('active');
+    overlay.classList.add('active');
+    
+    // Store user data for form submission
+    window._currentPasswordResetUser = { username, email, fullName };
+};
+
+function getOrCreateTicketModal() {
+    let modal = document.getElementById('universalSearchTicketModal');
+    if (!modal) {
+        const modalHtml = `
+            <div class="ticket-modal" id="universalSearchTicketModal">
+                <div class="ticket-modal-header">
+                    <h3 class="ticket-modal-title" id="universalSearchTicketModalTitle">Create Service Desk Ticket</h3>
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="
+                        document.getElementById('universalSearchTicketModal').classList.remove('active');
+                        document.getElementById('universalSearchTicketModalOverlay').classList.remove('active');
+                    "></button>
+                </div>
+                <div class="ticket-modal-content">
+                    <div id="universalSearchTicketUserInfo" class="mb-3"></div>
+                    
+                    <form id="ticketCreationForm" class="ticket-form">
+                        <div class="form-group mb-3">
+                            <label for="ticketCategory" class="form-label">Category</label>
+                            <select class="form-select" id="ticketCategory" required>
+                                <option value="">Select category...</option>
+                                <option value="password_reset">Password Reset</option>
+                                <option value="account_access">Account Access</option>
+                                <option value="software_install">Software Installation</option>
+                                <option value="hardware_issue">Hardware Issue</option>
+                                <option value="network_issue">Network Issue</option>
+                                <option value="email_issue">Email Issue</option>
+                                <option value="epic_access">Epic Access</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="ticketPriority" class="form-label">Priority</label>
+                            <select class="form-select" id="ticketPriority" required>
+                                <option value="">Select priority...</option>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="ticketSubject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="ticketSubject" placeholder="Brief description of the issue" required>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="ticketDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="ticketDescription" rows="4" placeholder="Detailed description of the issue, steps to reproduce, etc." required></textarea>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="ticketTemplate" class="form-label">Quick Templates</label>
+                            <select class="form-select" id="ticketTemplate" onchange="applyTicketTemplate()">
+                                <option value="">Select a template...</option>
+                                <option value="password_reset">Password Reset Request</option>
+                                <option value="account_unlock">Account Unlock Request</option>
+                                <option value="software_request">Software Installation Request</option>
+                                <option value="epic_access">Epic Access Request</option>
+                                <option value="email_setup">Email Setup/Configuration</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label">Additional Options</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="ticketUrgent" onchange="updatePriority()">
+                                <label class="form-check-label" for="ticketUrgent">
+                                    Mark as urgent
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="ticketFollowUp">
+                                <label class="form-check-label" for="ticketFollowUp">
+                                    Schedule follow-up call
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="ticket-actions">
+                            <button type="button" class="btn btn-secondary" onclick="
+                                document.getElementById('universalSearchTicketModal').classList.remove('active');
+                                document.getElementById('universalSearchTicketModalOverlay').classList.remove('active');
+                            ">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Create Ticket
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+        
+        const overlayHtml = `
+            <div class="ticket-modal-overlay" id="universalSearchTicketModalOverlay"></div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        document.body.insertAdjacentHTML('beforeend', overlayHtml);
+        
+        // Add event listeners
+        document.getElementById('ticketCreationForm').addEventListener('submit', handleTicketSubmission);
+        
+        modal = document.getElementById('universalSearchTicketModal');
+    }
+    
+    return modal;
+}
+
+function getOrCreatePasswordResetModal() {
+    let modal = document.getElementById('universalSearchPasswordResetModal');
+    if (!modal) {
+        const modalHtml = `
+            <div class="password-reset-modal" id="universalSearchPasswordResetModal">
+                <div class="password-reset-modal-header">
+                    <h3 class="password-reset-modal-title" id="universalSearchPasswordResetModalTitle">Reset User Password</h3>
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="
+                        document.getElementById('universalSearchPasswordResetModal').classList.remove('active');
+                        document.getElementById('universalSearchPasswordResetModalOverlay').classList.remove('active');
+                    "></button>
+                </div>
+                <div class="password-reset-modal-content">
+                    <div id="universalSearchPasswordResetUserInfo" class="mb-3"></div>
+                    
+                    <div class="password-reset-steps">
+                        <div class="step-indicator">
+                            <div class="step active" data-step="1">
+                                <div class="step-number">1</div>
+                                <div class="step-label">Verify Identity</div>
+                            </div>
+                            <div class="step" data-step="2">
+                                <div class="step-number">2</div>
+                                <div class="step-label">Reset Password</div>
+                            </div>
+                            <div class="step" data-step="3">
+                                <div class="step-number">3</div>
+                                <div class="step-label">Confirm</div>
+                            </div>
+                        </div>
+                        
+                        <div class="step-content" id="stepContent">
+                            <!-- Step content will be dynamically loaded -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        const overlayHtml = `
+            <div class="password-reset-modal-overlay" id="universalSearchPasswordResetModalOverlay"></div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        document.body.insertAdjacentHTML('beforeend', overlayHtml);
+        
+        modal = document.getElementById('universalSearchPasswordResetModal');
+        
+        // Initialize password reset flow
+        showPasswordResetStep(1);
+    }
+    
+    return modal;
+}
+
+// Ticket creation functions
+function applyTicketTemplate() {
+    const template = document.getElementById('ticketTemplate').value;
+    const subject = document.getElementById('ticketSubject');
+    const description = document.getElementById('ticketDescription');
+    const category = document.getElementById('ticketCategory');
+    const priority = document.getElementById('ticketPriority');
+    
+    const templates = {
+        password_reset: {
+            category: 'password_reset',
+            priority: 'medium',
+            subject: 'Password Reset Request',
+            description: 'User has requested a password reset for their account. Please assist with resetting their password and ensure they can log in successfully.'
+        },
+        account_unlock: {
+            category: 'account_access',
+            priority: 'high',
+            subject: 'Account Unlock Request',
+            description: 'User account has been locked due to multiple failed login attempts. Please unlock the account and verify user identity.'
+        },
+        software_request: {
+            category: 'software_install',
+            priority: 'medium',
+            subject: 'Software Installation Request',
+            description: 'User has requested installation of specific software. Please review the request and install the required software if approved.'
+        },
+        epic_access: {
+            category: 'epic_access',
+            priority: 'high',
+            subject: 'Epic Access Request',
+            description: 'User requires access to Epic system. Please verify their role and grant appropriate Epic access permissions.'
+        },
+        email_setup: {
+            category: 'email_issue',
+            priority: 'medium',
+            subject: 'Email Setup/Configuration',
+            description: 'User needs assistance with email setup or configuration. Please help configure their email client or resolve email-related issues.'
+        }
+    };
+    
+    if (template && templates[template]) {
+        const t = templates[template];
+        category.value = t.category;
+        priority.value = t.priority;
+        subject.value = t.subject;
+        description.value = t.description;
+    }
+}
+
+function updatePriority() {
+    const urgentCheckbox = document.getElementById('ticketUrgent');
+    const prioritySelect = document.getElementById('ticketPriority');
+    
+    if (urgentCheckbox.checked) {
+        prioritySelect.value = 'urgent';
+    } else if (prioritySelect.value === 'urgent') {
+        prioritySelect.value = 'medium';
+    }
+}
+
+function handleTicketSubmission(event) {
+    event.preventDefault();
+    
+    const formData = {
+        user: window._currentTicketUser,
+        category: document.getElementById('ticketCategory').value,
+        priority: document.getElementById('ticketPriority').value,
+        subject: document.getElementById('ticketSubject').value,
+        description: document.getElementById('ticketDescription').value,
+        urgent: document.getElementById('ticketUrgent').checked,
+        followUp: document.getElementById('ticketFollowUp').checked,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Show loading state
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="bi bi-hourglass"></i> Creating Ticket...';
+    submitBtn.disabled = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+        // Show success message
+        showTicketSuccess(formData);
+        
+        // Reset form
+        event.target.reset();
+        
+        // Close modal
+        document.getElementById('universalSearchTicketModal').classList.remove('active');
+        document.getElementById('universalSearchTicketModalOverlay').classList.remove('active');
+        
+        // Reset button
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }, 2000);
+}
+
+function showTicketSuccess(ticketData) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(40, 167, 69, 0.9);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 12000;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+        animation: slideIn 0.3s ease;
+        max-width: 400px;
+    `;
+    toast.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <span>✅</span>
+            <span><strong>Ticket Created Successfully</strong></span>
+        </div>
+        <div style="font-size: 0.9rem; opacity: 0.9;">
+            <strong>${ticketData.subject}</strong><br>
+            Category: ${ticketData.category.replace('_', ' ').toUpperCase()}<br>
+            Priority: ${ticketData.priority.toUpperCase()}<br>
+            Ticket ID: #${Math.floor(Math.random() * 9000) + 1000}
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideIn 0.3s ease reverse';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 5000);
+}
+
+// Password reset functions
+function showPasswordResetStep(step) {
+    const stepContent = document.getElementById('stepContent');
+    const steps = document.querySelectorAll('.step');
+    
+    // Update step indicators
+    steps.forEach((s, index) => {
+        if (index + 1 <= step) {
+            s.classList.add('active');
+        } else {
+            s.classList.remove('active');
+        }
+    });
+    
+    switch (step) {
+        case 1:
+            stepContent.innerHTML = `
+                <div class="verification-step">
+                    <h4>Step 1: Verify User Identity</h4>
+                    <p class="text-muted">Please verify the user's identity before proceeding with password reset.</p>
+                    
+                    <div class="verification-methods">
+                        <div class="verification-option">
+                            <input type="radio" id="verifyManager" name="verificationMethod" value="manager" checked>
+                            <label for="verifyManager">
+                                <i class="bi bi-person-check"></i>
+                                <strong>Manager Approval</strong>
+                                <small>Get approval from user's manager</small>
+                            </label>
+                        </div>
+                        
+                        <div class="verification-option">
+                            <input type="radio" id="verifySecurity" name="verificationMethod" value="security">
+                            <label for="verifySecurity">
+                                <i class="bi bi-shield-check"></i>
+                                <strong>Security Questions</strong>
+                                <small>Answer security questions</small>
+                            </label>
+                        </div>
+                        
+                        <div class="verification-option">
+                            <input type="radio" id="verifyID" name="verificationMethod" value="id">
+                            <label for="verifyID">
+                                <i class="bi bi-card-text"></i>
+                                <strong>ID Verification</strong>
+                                <small>Verify government-issued ID</small>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="verification-notes">
+                        <textarea class="form-control" placeholder="Add verification notes (optional)" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-primary" onclick="showPasswordResetStep(2)">
+                            <i class="bi bi-check-circle"></i> Verify & Continue
+                        </button>
+                    </div>
+                </div>
+            `;
+            break;
+            
+        case 2:
+            stepContent.innerHTML = `
+                <div class="reset-step">
+                    <h4>Step 2: Reset Password</h4>
+                    <p class="text-muted">Choose password reset method and configure new password settings.</p>
+                    
+                    <div class="reset-options">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Reset Method</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="resetTemporary" name="resetMethod" value="temporary" checked>
+                                <label class="form-check-label" for="resetTemporary">
+                                    <strong>Temporary Password</strong>
+                                    <small>Generate temporary password, user must change on next login</small>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="resetForceChange" name="resetMethod" value="force">
+                                <label class="form-check-label" for="resetForceChange">
+                                    <strong>Force Password Change</strong>
+                                    <small>User must change password immediately</small>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label">Password Complexity</label>
+                            <select class="form-select">
+                                <option value="standard">Standard (8+ chars, mixed case)</option>
+                                <option value="enhanced">Enhanced (12+ chars, special chars)</option>
+                                <option value="high">High Security (16+ chars, complex)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label">Password Expiration</label>
+                            <select class="form-select">
+                                <option value="30">30 days</option>
+                                <option value="60">60 days</option>
+                                <option value="90">90 days</option>
+                                <option value="never">Never expire</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-secondary" onclick="showPasswordResetStep(1)">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="showPasswordResetStep(3)">
+                            <i class="bi bi-key"></i> Reset Password
+                        </button>
+                    </div>
+                </div>
+            `;
+            break;
+            
+        case 3:
+            stepContent.innerHTML = `
+                <div class="confirmation-step">
+                    <h4>Step 3: Confirmation</h4>
+                    <p class="text-muted">Review the password reset details and confirm.</p>
+                    
+                    <div class="confirmation-details">
+                        <div class="detail-item">
+                            <strong>User:</strong> ${window._currentPasswordResetUser?.fullName || 'Unknown'}
+                        </div>
+                        <div class="detail-item">
+                            <strong>Username:</strong> ${window._currentPasswordResetUser?.username || 'Unknown'}
+                        </div>
+                        <div class="detail-item">
+                            <strong>Reset Method:</strong> Temporary Password
+                        </div>
+                        <div class="detail-item">
+                            <strong>Complexity:</strong> Standard
+                        </div>
+                        <div class="detail-item">
+                            <strong>Expiration:</strong> 30 days
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Note:</strong> A temporary password will be generated and sent to the user's email address. 
+                        The user will be required to change their password on their next login.
+                    </div>
+                    
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-secondary" onclick="showPasswordResetStep(2)">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <button type="button" class="btn btn-success" onclick="executePasswordReset()">
+                            <i class="bi bi-check-circle"></i> Confirm Reset
+                        </button>
+                    </div>
+                </div>
+            `;
+            break;
+    }
+}
+
+function executePasswordReset() {
+    const stepContent = document.getElementById('stepContent');
+    
+    // Show loading state
+    stepContent.innerHTML = `
+        <div class="reset-execution">
+            <h4>Executing Password Reset...</h4>
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3">Processing password reset request...</p>
+            </div>
+        </div>
+    `;
+    
+    // Simulate API call
+    setTimeout(() => {
+        showPasswordResetSuccess();
+    }, 3000);
+}
+
+function showPasswordResetSuccess() {
+    const stepContent = document.getElementById('stepContent');
+    
+    stepContent.innerHTML = `
+        <div class="reset-success">
+            <div class="text-center">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                <h4 class="mt-3">Password Reset Successful!</h4>
+                <p class="text-muted">The user's password has been reset successfully.</p>
+            </div>
+            
+            <div class="success-details">
+                <div class="detail-item">
+                    <strong>Temporary Password:</strong> 
+                    <code style="background: rgba(255,255,255,0.1); padding: 0.25rem 0.5rem; border-radius: 4px;">${generateTemporaryPassword()}</code>
+                </div>
+                <div class="detail-item">
+                    <strong>Email Sent:</strong> ✅ Yes
+                </div>
+                <div class="detail-item">
+                    <strong>Reset Time:</strong> ${new Date().toLocaleString()}
+                </div>
+            </div>
+            
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>Important:</strong> Please provide the temporary password to the user securely. 
+                They will be required to change it on their next login.
+            </div>
+            
+            <div class="step-actions">
+                <button type="button" class="btn btn-primary" onclick="
+                    document.getElementById('universalSearchPasswordResetModal').classList.remove('active');
+                    document.getElementById('universalSearchPasswordResetModalOverlay').classList.remove('active');
+                ">
+                    <i class="bi bi-check"></i> Done
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function generateTemporaryPassword() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+}
+
+// MacOS-themed Office Modal Creator
+function createOfficeModal(data) {
+    const formatPhone = (phone) => {
+        if (!phone || phone === 'N/A' || phone === '') return 'Not Available';
+        return phone;
+    };
+
+    const formatAddress = (address) => {
+        if (!address || address === 'N/A' || address === '') return 'Not Available';
+        return address;
+    };
+
+    // Generate dummy recent tickets for this office
+    const generateDummyTickets = (officeName) => {
+        const ticketTypes = ['Network Issue', 'Printer Problem', 'Software Installation', 'Hardware Replacement', 'Phone Issue', 'Access Request'];
+        const priorities = ['Low', 'Medium', 'High', 'Critical'];
+        const statuses = ['Open', 'In Progress', 'Pending', 'Resolved'];
+        const users = ['User123@company.com', 'User456@company.com', 'User789@company.com', 'User234@company.com', 'User567@company.com'];
+        
+        const tickets = [];
+        const ticketCount = Math.floor(Math.random() * 8) + 3; // 3-10 tickets
+        
+        for (let i = 0; i < ticketCount; i++) {
+            const ticketNumber = Math.floor(Math.random() * 90000) + 10000;
+            const ticketType = ticketTypes[Math.floor(Math.random() * ticketTypes.length)];
+            const priority = priorities[Math.floor(Math.random() * priorities.length)];
+            const status = statuses[Math.floor(Math.random() * statuses.length)];
+            const user = users[Math.floor(Math.random() * users.length)];
+            const daysAgo = Math.floor(Math.random() * 30) + 1;
+            const date = new Date();
+            date.setDate(date.getDate() - daysAgo);
+            
+            tickets.push({
+                id: `#${ticketNumber}`,
+                title: ticketType,
+                priority: priority.toLowerCase(),
+                status: status.toLowerCase().replace(' ', ''),
+                user: user,
+                date: date.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' })
+            });
+        }
+        
+        return tickets.slice(0, 8); // Show max 8 tickets
+    };
+
+    const tickets = generateDummyTickets(data['Internal Name'] || 'Office');
+    
+    const calculateSubnet = (ip) => {
+        if (!ip || ip === 'N/A' || ip === '') return 'N/A';
+        const parts = ip.split('.');
+        if (parts.length === 4) {
+            return `${parts[0]}.${parts[1]}.${parts[2]}.0/24`;
+        }
+        return 'N/A';
+    };
+
+    return `
+        <div class="office-modal">
+            <div class="mac-office-header">
+                <div class="mac-office-info">
+                    <h3>${data['Internal Name'] || 'Unknown Office'} ${data['Mnemonic'] ? `(${data['Mnemonic']})` : ''}</h3>
+                    <div class="mac-office-subtitle">${data['Location'] || 'Location not specified'}</div>
+                </div>
+                <div class="mac-action-buttons">
+                    <button class="mac-action-btn primary" onclick="callOffice('${formatPhone(data['Phone'])}')" data-tooltip="Call Office">
+                        📞
+                    </button>
+                    <button class="mac-action-btn secondary" onclick="getDirections('${formatAddress(data['Address'])}')" data-tooltip="Get Directions">
+                        🗺️
+                    </button>
+                    <button class="mac-action-btn" onclick="copyOfficeDetails(${JSON.stringify(data).replace(/"/g, '&quot;')})" data-tooltip="Copy Details">
+                        📋
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mac-office-content">
+                <div class="mac-left-section">
+                    <div class="mac-info-grid">
+                        <div class="mac-info-section">
+                            <h4>📞 Contact Information</h4>
+                            <div class="mac-info-item">
+                                <span class="mac-info-label">Phone</span>
+                                <span class="mac-info-value clickable" onclick="callOffice('${formatPhone(data['Phone'])}')">${formatPhone(data['Phone'])}</span>
+                            </div>
+                            <div class="mac-info-item">
+                                <span class="mac-info-label">Location</span>
+                                <span class="mac-info-value">${data['Location'] || 'Not Available'}</span>
+                            </div>
+                            <div class="mac-info-item">
+                                <span class="mac-info-label">Address</span>
+                                <span class="mac-info-value clickable" onclick="getDirections('${formatAddress(data['Address'])}')">${formatAddress(data['Address'])}</span>
+                            </div>
+                        </div>
+
+                        <div class="mac-info-section">
+                            <h4>👨‍💼 Management Information</h4>
+                            <div class="mac-info-item">
+                                <span class="mac-info-label">Operations Manager</span>
+                                <span class="mac-info-value">${data['Operations Manager'] || data['Manager'] || 'Not Available'}</span>
+                            </div>
+                            <div class="mac-info-item">
+                                <span class="mac-info-label">Office Code</span>
+                                <span class="mac-info-value">${data['Mnemonic'] || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mac-info-section mac-full-width">
+                        <h4>⚙️ Technical Information 
+                            <button class="mac-scan-button" onclick="openNetworkScanner('${data['IP']}')">
+                                🔍 Scan Range
+                            </button>
+                        </h4>
+                        <div class="mac-tech-grid">
+                            <div class="mac-tech-item">
+                                <span class="mac-tech-label">IP Address</span>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span class="mac-tech-value">${data['IP'] || 'N/A'}</span>
+                                    ${data['IP'] && data['IP'] !== 'N/A' ? `<button onclick="pingSpecificIP('${data['IP']}')" style="background: rgba(0, 122, 255, 0.1); border: 1px solid rgba(0, 122, 255, 0.2); border-radius: 4px; padding: 0.2rem 0.4rem; font-size: 0.7rem; color: #007AFF; cursor: pointer;">📡</button>` : ''}
+                                </div>
+                            </div>
+                            <div class="mac-tech-item">
+                                <span class="mac-tech-label">Office Number</span>
+                                <span class="mac-tech-value">${data['Number'] || 'N/A'}</span>
+                            </div>
+                            <div class="mac-tech-item">
+                                <span class="mac-tech-label">Subnet</span>
+                                <span class="mac-tech-value">${calculateSubnet(data['IP'])}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mac-tickets-section">
+                    <div class="mac-tickets-header">
+                        <h4>🎫 Recent Tickets <span class="mac-ticket-count">${tickets.length}</span></h4>
+                        <button class="mac-view-all-btn" onclick="viewAllTickets('${data['Internal Name']}')">View All</button>
+                    </div>
+                    <div class="mac-tickets-list">
+                        ${tickets.map(ticket => `
+                            <div class="mac-ticket-item" onclick="openTicket('${ticket.id}')">
+                                <div class="mac-ticket-header">
+                                    <span class="mac-ticket-id">${ticket.id}</span>
+                                    <span class="mac-ticket-priority ${ticket.priority}">${ticket.priority.toUpperCase()}</span>
+                                </div>
+                                <div class="mac-ticket-title">${ticket.title}</div>
+                                <div class="mac-ticket-meta">
+                                    <span>${ticket.user}</span>
+                                    <span class="mac-ticket-status ${ticket.status}">${ticket.status}</span>
+                                </div>
+                                <div style="font-size: 0.7rem; color: rgba(255, 255, 255, 0.5); margin-top: 0.2rem;">${ticket.date}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// MacOS-themed Workstation Modal Creator
+function createWorkstationModal(data) {
+    const formatUser = (user) => {
+        if (!user || user === 'N/A' || user === '') return 'No User Assigned';
+        return user;
+    };
+
+    const formatCompliance = (compliance) => {
+        if (!compliance || compliance === 'N/A' || compliance === '') return 'Unknown';
+        const status = compliance.toLowerCase();
+        if (status.includes('compliant')) {
+            return '<span style="color: #34c759;">✅ Compliant</span>';
+        } else if (status.includes('not compliant')) {
+            return '<span style="color: #ff3b30;">❌ Not Compliant</span>';
+        } else {
+            return compliance;
+        }
+    };
+
+    const formatOnlineStatus = (online) => {
+        if (online === true || online === 'true') {
+            return '<span style="color: #34c759;">🟢 Online</span>';
+        } else if (online === false || online === 'false') {
+            return '<span style="color: #ff3b30;">🔴 Offline</span>';
+        } else {
+            return '<span style="color: #ff9500;">⚡ Unknown</span>';
+        }
+    };
+
+    return `
+        <div class="workstation-modal">
+            <button class="mac-close-btn" aria-label="Close" onclick="document.getElementById('universalSearchDetailModal').style.display='none'">×</button>
+            
+            <div class="mac-modal-header">
+                <div class="mac-workstation-icon">
+                    <i class="bi bi-laptop" style="font-size: 2.5rem; color: #007aff;"></i>
+                </div>
+                <div class="mac-workstation-info">
+                    <h3 class="mac-workstation-name">${data.name || 'Unknown Workstation'}</h3>
+                    <p class="mac-workstation-os">${data.os || 'Unknown OS'} ${data.os_version || ''}</p>
+                    <div class="mac-action-buttons">
+                        <button class="mac-action-btn" title="Remote Control" onclick="handleButtonClick(this, () => openDameware('${data.name}'))">🖥️</button>
+                        <button class="mac-action-btn" title="Ping Device" onclick="handleButtonClick(this, () => pingDevice('${data.name}'))">📡</button>
+                        <button class="mac-action-btn" title="Copy Details" onclick="handleButtonClick(this, () => copyWorkstationDetails('${data.name}', '${data.user}', '${data.ip}'))">📋</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mac-modal-content">
+                <div class="mac-info-section">
+                    <h4 class="mac-section-title">User Information</h4>
+                    <div class="mac-info-grid">
+                        <div class="mac-info-label">Primary User</div>
+                        <div class="mac-info-value">${formatUser(data.user)}</div>
+                        <div class="mac-info-label">Managed By</div>
+                        <div class="mac-info-value">${data.managed_by || 'Not Available'}</div>
+                    </div>
+                </div>
+
+                <div class="mac-info-section">
+                    <h4 class="mac-section-title">System Information</h4>
+                    <div class="mac-info-grid">
+                        <div class="mac-info-label">Operating System</div>
+                        <div class="mac-info-value">${data.os || 'Unknown'}</div>
+                        <div class="mac-info-label">OS Version</div>
+                        <div class="mac-info-value">${data.os_version || 'Not Available'}</div>
+                        <div class="mac-info-label">IP Address</div>
+                        <div class="mac-info-value" style="font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; font-size: 0.9rem;">${data.ip || 'Not Available'}</div>
+                        <div class="mac-info-label">Status</div>
+                        <div class="mac-info-value">${formatOnlineStatus(data.online)}</div>
+                    </div>
+                </div>
+
+                <div class="mac-info-section">
+                    <h4 class="mac-section-title">Compliance & Security</h4>
+                    <div class="mac-info-grid">
+                        <div class="mac-info-label">Compliance Status</div>
+                        <div class="mac-info-value">${formatCompliance(data.compliance)}</div>
+                        <div class="mac-info-label">Device Enabled</div>
+                        <div class="mac-info-value">${data.enabled ? '✅ Yes' : '❌ No'}</div>
+                        <div class="mac-info-label">Account Locked</div>
+                        <div class="mac-info-value">${data.locked ? '🔒 Yes' : '🔓 No'}</div>
+                        <div class="mac-info-label">Last Logon</div>
+                        <div class="mac-info-value">${data.last_logon || 'Not Available'}</div>
+                    </div>
+                </div>
+
+                ${data.ou_groups ? `
+                <div class="mac-info-section">
+                    <h4 class="mac-section-title">Additional Information</h4>
+                    <div class="mac-info-grid">
+                        <div class="mac-info-label">OU Groups</div>
+                        <div class="mac-info-value" style="font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; font-size: 0.8125rem;">${data.ou_groups}</div>
+                        ${data.workstation_class ? `<div class="mac-info-label">Class</div><div class="mac-info-value">${data.workstation_class}</div>` : ''}
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+}
+
+// Enhanced showUniversalSearchDetail function
+window.showUniversalSearchDetail = function(type, idOrName) {
+    const modal = document.getElementById('universalSearchDetailModal');
+    if (!modal) {
+        console.error('universalSearchDetailModal not found');
+        return;
+    }
+    
+    modal.style.display = 'flex';
+    const content = document.getElementById('universalSearchDetailContent');
+    if (!content) {
+        console.error('universalSearchDetailContent not found');
+        return;
+    }
+    
+    content.innerHTML = '<div style="text-align:center;padding:2rem;"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-3">Loading details...</p></div>';
+    
+    let url = '';
+    if (type === 'office') {
+        url = `/offices/detail?name=${encodeURIComponent(idOrName)}`;
+    } else if (type === 'workstation') {
+        url = `/api/workstations/detail?name=${encodeURIComponent(idOrName)}`;
+    } else if (type === 'user') {
+        url = `/users/api/users/${encodeURIComponent(idOrName)}`;
+    } else {
+        content.innerHTML = '<div style="color:#f66;">Unknown type.</div>';
+        return;
+    }
+    
+    fetch(url).then(r => r.json()).then(data => {
+        if (!data || data.error) {
+            content.innerHTML = `<div style='color:#f66;text-align:center;padding:2rem;'>
+                <i class="bi bi-exclamation-triangle" style="font-size:3rem;"></i>
+                <h4>Not Found</h4>
+                <p>${data && data.error ? data.error : 'No data available.'}</p>
+            </div>`;
+            return;
+        }
+        
+        if (type === 'office') {
+            content.innerHTML = createOfficeModal(data);
+        } else if (type === 'workstation') {
+            content.innerHTML = createWorkstationModal(data);
+            
+            // Auto-ping the device when modal opens
+            setTimeout(() => {
+                if (data.name) {
+                    pingDeviceFromModal(data.name);
+                }
+            }, 500);
+        } else if (type === 'user') {
+            content.innerHTML = createUserProfileModal(data);
+        }
+    }).catch(err => {
+        content.innerHTML = `<div style='color:#f66;text-align:center;padding:2rem;'>
+            <i class="bi bi-wifi-off" style="font-size:3rem;"></i>
+            <h4>Connection Error</h4>
+            <p>Failed to load details: ${err.message}</p>
+        </div>`;
+    });
+};
+
+// Helper functions for actions
+function copyOfficeDetails(name, phone, address) {
+    const details = `Office: ${name}\nPhone: ${phone}\nAddress: ${address}`;
+    navigator.clipboard.writeText(details).then(() => {
+        showToast('Office details copied to clipboard!', 'success');
+    }).catch(() => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = details;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showToast('Office details copied to clipboard!', 'success');
+    });
+}
+
+function copyWorkstationDetails(name, user, ip) {
+    const details = `Workstation: ${name}\nUser: ${user}\nIP: ${ip}`;
+    navigator.clipboard.writeText(details).then(() => {
+        showToast('Workstation details copied to clipboard!', 'success');
+    }).catch(() => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = details;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showToast('Workstation details copied to clipboard!', 'success');
+    });
+}
+
+function openDameware(hostname) {
+    try {
+        window.open(`dwrcc://full-control?machine=${hostname}`, '_blank');
+        showToast('Opening Dameware Remote Control...', 'info');
+    } catch (error) {
+        showToast('Unable to open Dameware. Please check if it\'s installed.', 'warning');
+    }
+}
+
+function pingDevice(hostname) {
+    showToast('Pinging device...', 'info');
+    // This would typically make a call to a backend ping service
+    // For now, we'll simulate it
+    setTimeout(() => {
+        showToast(`Ping to ${hostname} completed. Check network tools for results.`, 'success');
+    }, 2000);
+}
+
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    const colors = {
+        success: '#34c759',
+        info: '#007aff',
+        warning: '#ff9500',
+        error: '#ff3b30'
+    };
+    
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${colors[type] || colors.info};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        z-index: 12000;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        font-weight: 500;
+        backdrop-filter: blur(20px);
+        animation: slideInToast 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        max-width: 400px;
+    `;
+    
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    // Add keyframes for animation
+    if (!document.getElementById('toast-animations')) {
+        const style = document.createElement('style');
+        style.id = 'toast-animations';
+        style.textContent = `
+            @keyframes slideInToast {
+                from { 
+                    transform: translateX(100%); 
+                    opacity: 0; 
+                }
+                to { 
+                    transform: translateX(0); 
+                    opacity: 1; 
+                }
+            }
+            @keyframes slideOutToast {
+                from { 
+                    transform: translateX(0); 
+                    opacity: 1; 
+                }
+                to { 
+                    transform: translateX(100%); 
+                    opacity: 0; 
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOutToast 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 4000);
+}
+
+// Helper Functions for Enhanced Office Modal
+function pingSpecificIP(ip) {
+    showToast(`Pinging ${ip}...`, 'info');
+    
+    // Simulate ping (in real implementation, this would be a backend API call)
+    setTimeout(() => {
+        const success = Math.random() > 0.3; // 70% success rate
+        const latency = Math.floor(Math.random() * 50) + 10; // 10-60ms
+        
+        if (success) {
+            showToast(`✅ Ping successful! ${ip} responded in ${latency}ms`, 'success');
+        } else {
+            showToast(`❌ Ping failed. ${ip} is not responding`, 'error');
+        }
+    }, 1500);
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showToast(`📋 Copied "${text}" to clipboard`, 'success');
+    }).catch(() => {
+        showToast('❌ Failed to copy to clipboard', 'error');
+    });
+}
+
+function viewAllTicketsForOffice(officeName) {
+    showToast(`Opening all tickets for ${officeName}...`, 'info');
+    // In a real implementation, this would redirect to a tickets page with office filter
+    setTimeout(() => {
+        // Simulate redirect
+        console.log(`Would redirect to tickets page filtered by office: ${officeName}`);
+    }, 500);
+}
+
+function openTicketDetail(ticketId) {
+    showToast(`Opening ticket #${ticketId}...`, 'info');
+    // In a real implementation, this would open a ticket detail modal/page
+    setTimeout(() => {
+        console.log(`Would open ticket detail for ticket #${ticketId}`);
+    }, 500);
+}
+
+// Toast notification system
+function showToast(message, type = 'info') {
+    const toastContainer = getOrCreateToastContainer();
+    
+    const toast = document.createElement('div');
+    toast.className = `mac-toast mac-toast-${type}`;
+    toast.innerHTML = `
+        <div class="mac-toast-content">
+            <span class="mac-toast-message">${message}</span>
+            <button class="mac-toast-close" onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    // Animate in
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.remove();
+            }
+        }, 300);
+    }, 5000);
+}
+
+function getOrCreateToastContainer() {
+    let container = document.getElementById('toastContainer');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'mac-toast-container';
+        document.body.appendChild(container);
+    }
+    return container;
+}
+
+// Copy office details to clipboard
+function copyOfficeDetails(name, phone, address) {
+    const details = `Office: ${name}\nPhone: ${phone || 'N/A'}\nAddress: ${address || 'N/A'}`;
+    copyToClipboard(details);
+}
+
+/* --- UNIFY MODAL THEMES (macOS-inspired) --- */
+.ticket-modal,
+.password-reset-modal,
+.note-modal,
+.pdf-modal {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    background: rgba(249, 249, 251, 0.95);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15), 0 0 0 0.5px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    color: #1d1d1f;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    overflow: hidden;
+    transition: opacity 0.25s cubic-bezier(.4,0,.2,1), transform 0.25s cubic-bezier(.4,0,.2,1);
+}
+[data-bs-theme="dark"] .ticket-modal,
+[data-bs-theme="dark"] .password-reset-modal,
+[data-bs-theme="dark"] .note-modal,
+[data-bs-theme="dark"] .pdf-modal {
+    background: rgba(30, 30, 32, 0.95);
+    color: #f5f5f7;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+}
+
+.ticket-modal-header,
+.password-reset-modal-header,
+.note-modal-header,
+.pdf-modal-header {
+    display: flex;
+    align-items: center;
+    padding: 20px 24px 16px;
+    gap: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+[data-bs-theme="dark"] .ticket-modal-header,
+[data-bs-theme="dark"] .password-reset-modal-header,
+[data-bs-theme="dark"] .note-modal-header,
+[data-bs-theme="dark"] .pdf-modal-header {
+    background: rgba(42, 42, 45, 0.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ticket-modal-title,
+.password-reset-modal-title,
+.note-modal-title,
+.pdf-modal-title {
+    color: #1d1d1f;
+    font-size: 1.375rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+[data-bs-theme="dark"] .ticket-modal-title,
+[data-bs-theme="dark"] .password-reset-modal-title,
+[data-bs-theme="dark"] .note-modal-title,
+[data-bs-theme="dark"] .pdf-modal-title {
+    color: #f5f5f7;
+}
+
+.ticket-modal-content,
+.password-reset-modal-content,
+.note-modal-content,
+.pdf-modal-content {
+    background: rgba(255, 255, 255, 0.4);
+    padding: 20px 24px 24px;
+    overflow-y: auto;
+    max-height: calc(90vh - 120px);
+}
+[data-bs-theme="dark"] .ticket-modal-content,
+[data-bs-theme="dark"] .password-reset-modal-content,
+[data-bs-theme="dark"] .note-modal-content,
+[data-bs-theme="dark"] .pdf-modal-content {
+    background: rgba(28, 28, 30, 0.6);
+}
+
+/* --- OFFICE & WORKSTATION MODALS: THEME ONLY, FLEXIBLE SIZE --- */
+.office-modal,
+.workstation-modal {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    background: rgba(249, 249, 251, 0.95);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15), 0 0 0 0.5px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    color: #1d1d1f;
+}
+[data-bs-theme="dark"] .office-modal,
+[data-bs-theme="dark"] .workstation-modal {
+    background: rgba(30, 30, 32, 0.95);
+    color: #f5f5f7;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+}
+
+.office-modal .mac-office-header,
+.workstation-modal .mac-modal-header {
+    display: flex;
+    align-items: center;
+    padding: 20px 24px 16px;
+    gap: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+[data-bs-theme="dark"] .office-modal .mac-office-header,
+[data-bs-theme="dark"] .workstation-modal .mac-modal-header {
+    background: rgba(42, 42, 45, 0.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+</style>
+
+<script>
+// User Profile Modal Functions
+function createUserProfileModal(data) {
+    const avatarUrl = data.profile_picture ? `/static/uploads/profile_pictures/${data.profile_picture}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(data.username)}&background=random&bold=true`;
+
+    const locked = data.locked_out === true;
+    const disabled = (data.account_status || '').toString().toLowerCase().includes('disabled');
+    const pwdExpired = data.password_expired === true;
+
+    const badge = (txt, cls) => `<span class="mac-status-badge ${cls}">${txt}</span>`;
+    const lockedBadge = locked ? badge('Locked', 'mac-badge-locked') : badge('Unlocked', 'mac-badge-ok');
+    const accountBadge = disabled ? badge('Disabled', 'mac-badge-disabled') : badge('Enabled', 'mac-badge-ok');
+    const pwdBadge = pwdExpired ? badge('Expired', 'mac-badge-expired') : badge('Valid', 'mac-badge-ok');
+
+    // Calculate time since password reset
+    function getPasswordResetTimeAgo(dateString) {
+        if (!dateString || dateString === 'N/A') return 'N/A';
+        try {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            if (diffDays === 0) return 'Today';
+            if (diffDays === 1) return '1 day ago';
+            return `${diffDays} days ago`;
+        } catch (e) {
+            return 'N/A';
+        }
+    }
+
+    const passwordResetDisplay = data.password_last_reset && data.password_last_reset !== 'N/A' 
+        ? `${data.password_last_reset} (${getPasswordResetTimeAgo(data.password_last_reset)})`
+        : 'N/A';
+
+    return `
+        <div class="user-profile-modal">
+            <button class="mac-close-btn" aria-label="Close" onclick="document.getElementById('universalSearchDetailModal').style.display='none'">×</button>
+            
+            <div class="mac-modal-header">
+                <img src="${avatarUrl}" alt="Avatar" class="mac-user-avatar" />
+                <div class="mac-user-info">
+                    <h3 class="mac-user-name">${data.full_name || data.username}</h3>
+                    <p class="mac-user-role">${data.role || data.title || 'User'}</p>
+                    <div class="mac-action-buttons">
+                        <button class="mac-action-btn" title="Create Ticket" onclick="handleButtonClick(this, () => openTicketModal('${data.username}','${data.email}','${data.full_name || data.username}'))">🎫</button>
+                        <button class="mac-action-btn" title="Reset Password" onclick="handleButtonClick(this, () => openPasswordResetModal('${data.username}','${data.email}','${data.full_name || data.username}'))">🔑</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mac-modal-content">
+                <div class="mac-info-section">
+                    <h4 class="mac-section-title">Contact Information</h4>
+                    <div class="mac-info-grid">
+                        <div class="mac-info-label">Email</div>
+                        <div class="mac-info-value"><a href="mailto:${data.email}">${data.email}</a></div>
+                        ${data.phone ? `<div class="mac-info-label">Phone</div><div class="mac-info-value"><a href="tel:${data.phone}">${data.phone}</a></div>` : ''}
+                        ${data.clock_id ? `<div class="mac-info-label">Clock ID</div><div class="mac-info-value">${data.clock_id}</div>` : ''}
+                        ${data.department ? `<div class="mac-info-label">Department</div><div class="mac-info-value">${data.department}</div>` : ''}
+                        ${data.title ? `<div class="mac-info-label">Title</div><div class="mac-info-value">${data.title}</div>` : ''}
+                    </div>
+                </div>
+
+                <div class="mac-info-section">
+                    <h4 class="mac-section-title">Account Status</h4>
+                    <div class="mac-info-grid">
+                        <div class="mac-info-label">Account</div>
+                        <div class="mac-info-value">${accountBadge}</div>
+                        <div class="mac-info-label">Lock Status</div>
+                        <div class="mac-info-value">${lockedBadge}</div>
+                        <div class="mac-info-label">Password</div>
+                        <div class="mac-info-value">${pwdBadge}</div>
+                        <div class="mac-info-label">Bad Logon Count</div>
+                        <div class="mac-info-value">${data.bad_logon_count ?? '0'}</div>
+                    </div>
+                </div>
+
+                <div class="mac-info-section">
+                    <h4 class="mac-section-title">Password Information</h4>
+                    <div class="mac-info-grid">
+                        <div class="mac-info-label">Last Reset</div>
+                        <div class="mac-info-value">${passwordResetDisplay}</div>
+                        ${data.password_expiration_date ? `<div class="mac-info-label">Expires</div><div class="mac-info-value">${data.password_expiration_date}</div>` : ''}
+                        ${data.mfa_status ? `<div class="mac-info-label">MFA Status</div><div class="mac-info-value">${data.mfa_status}</div>` : ''}
+                    </div>
+                </div>
+
+                <div class="mac-info-section">
+                    <h4 class="mac-section-title">Additional Information</h4>
+                    <div class="mac-info-grid">
+                        ${data.epic_status ? `<div class="mac-info-label">Epic Status</div><div class="mac-info-value">${data.epic_status}</div>` : ''}
+                        ${data.epic_block ? `<div class="mac-info-label">Epic Block</div><div class="mac-info-value">${data.epic_block}</div>` : ''}
+                        ${data.email_license ? `<div class="mac-info-label">Email License</div><div class="mac-info-value">${data.email_license}</div>` : ''}
+                        ${data.immutable_id ? `<div class="mac-info-label">Immutable ID</div><div class="mac-info-value" style="font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; font-size: 0.8125rem;">${data.immutable_id}</div>` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Helper to render user profile modal from Clock ID lookup
+window.showClockIdUserModal = function(userData) {
+    const modal = document.getElementById('universalSearchDetailModal');
+    if (!modal) {
+        console.error('universalSearchDetailModal not found');
+        return;
+    }
+    modal.style.display = 'flex';
+    const content = document.getElementById('universalSearchDetailContent');
+    if (!content) {
+        console.error('universalSearchDetailContent not found');
+        return;
+    }
+    content.innerHTML = createUserProfileModal(userData);
+};
+
+// Button click handler with visual feedback
+window.handleButtonClick = function(button, callback) {
+    // Add visual feedback
+    const originalTransform = button.style.transform;
+    const originalBackground = button.style.background;
+    
+    button.style.transform = 'scale(0.95)';
+    button.style.background = 'rgba(0, 123, 255, 0.6)';
+    
+    setTimeout(() => {
+        button.style.transform = originalTransform;
+        button.style.background = originalBackground;
+        callback();
+    }, 150);
+};
+
+// Enhanced button functionality matching original implementation
+window.openTicketModal = function(username, email, fullName) {
+    const modal = getOrCreateTicketModal();
+    const overlay = document.getElementById('universalSearchTicketModalOverlay');
+    const titleEl = document.getElementById('universalSearchTicketModalTitle');
+    const userInfoEl = document.getElementById('universalSearchTicketUserInfo');
+    
+    if (!modal || !overlay || !titleEl || !userInfoEl) return;
+    
+    titleEl.textContent = 'Create Service Desk Ticket';
+    userInfoEl.innerHTML = `
+        <div class="ticket-user-info">
+            <i class="bi bi-person-circle" style="color: #007bff; margin-right: 0.5rem;"></i>
+            <strong>${fullName}</strong> (${username})
+            <br><small style="color: rgba(255,255,255,0.7);">${email}</small>
+        </div>
+    `;
+    
+    modal.classList.add('active');
+    overlay.classList.add('active');
+    
+    // Store user data for form submission
+    window._currentTicketUser = { username, email, fullName };
+};
+
+window.openPasswordResetModal = function(username, email, fullName) {
+    const modal = getOrCreatePasswordResetModal();
+    const overlay = document.getElementById('universalSearchPasswordResetModalOverlay');
+    const titleEl = document.getElementById('universalSearchPasswordResetModalTitle');
+    const userInfoEl = document.getElementById('universalSearchPasswordResetUserInfo');
+    
+    if (!modal || !overlay || !titleEl || !userInfoEl) return;
+    
+    titleEl.textContent = 'Reset User Password';
+    userInfoEl.innerHTML = `
+        <div class="password-reset-user-info">
+            <i class="bi bi-person-circle" style="color: #dc3545; margin-right: 0.5rem;"></i>
+            <strong>${fullName}</strong> (${username})
+            <br><small style="color: rgba(255,255,255,0.7);">${email}</small>
+        </div>
+    `;
+    
+    modal.classList.add('active');
+    overlay.classList.add('active');
+    
+    // Store user data for form submission
+    window._currentPasswordResetUser = { username, email, fullName };
+};
+
+function getOrCreateTicketModal() {
+    let modal = document.getElementById('universalSearchTicketModal');
+    if (!modal) {
+        const modalHtml = `
+            <div class="ticket-modal" id="universalSearchTicketModal">
+                <div class="ticket-modal-header">
+                    <h3 class="ticket-modal-title" id="universalSearchTicketModalTitle">Create Service Desk Ticket</h3>
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="
+                        document.getElementById('universalSearchTicketModal').classList.remove('active');
+                        document.getElementById('universalSearchTicketModalOverlay').classList.remove('active');
+                    "></button>
+                </div>
+                <div class="ticket-modal-content">
+                    <div id="universalSearchTicketUserInfo" class="mb-3"></div>
+                    
+                    <form id="ticketCreationForm" class="ticket-form">
+                        <div class="form-group mb-3">
+                            <label for="ticketCategory" class="form-label">Category</label>
+                            <select class="form-select" id="ticketCategory" required>
+                                <option value="">Select category...</option>
+                                <option value="password_reset">Password Reset</option>
+                                <option value="account_access">Account Access</option>
+                                <option value="software_install">Software Installation</option>
+                                <option value="hardware_issue">Hardware Issue</option>
+                                <option value="network_issue">Network Issue</option>
+                                <option value="email_issue">Email Issue</option>
+                                <option value="epic_access">Epic Access</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="ticketPriority" class="form-label">Priority</label>
+                            <select class="form-select" id="ticketPriority" required>
+                                <option value="">Select priority...</option>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="ticketSubject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="ticketSubject" placeholder="Brief description of the issue" required>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="ticketDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="ticketDescription" rows="4" placeholder="Detailed description of the issue, steps to reproduce, etc." required></textarea>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="ticketTemplate" class="form-label">Quick Templates</label>
+                            <select class="form-select" id="ticketTemplate" onchange="applyTicketTemplate()">
+                                <option value="">Select a template...</option>
+                                <option value="password_reset">Password Reset Request</option>
+                                <option value="account_unlock">Account Unlock Request</option>
+                                <option value="software_request">Software Installation Request</option>
+                                <option value="epic_access">Epic Access Request</option>
+                                <option value="email_setup">Email Setup/Configuration</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label">Additional Options</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="ticketUrgent" onchange="updatePriority()">
+                                <label class="form-check-label" for="ticketUrgent">
+                                    Mark as urgent
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="ticketFollowUp">
+                                <label class="form-check-label" for="ticketFollowUp">
+                                    Schedule follow-up call
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="ticket-actions">
+                            <button type="button" class="btn btn-secondary" onclick="
+                                document.getElementById('universalSearchTicketModal').classList.remove('active');
+                                document.getElementById('universalSearchTicketModalOverlay').classList.remove('active');
+                            ">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Create Ticket
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+        
+        const overlayHtml = `
+            <div class="ticket-modal-overlay" id="universalSearchTicketModalOverlay"></div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        document.body.insertAdjacentHTML('beforeend', overlayHtml);
+        
+        // Add event listeners
+        document.getElementById('ticketCreationForm').addEventListener('submit', handleTicketSubmission);
+        
+        modal = document.getElementById('universalSearchTicketModal');
+    }
+    
+    return modal;
+}
+
+function getOrCreatePasswordResetModal() {
+    let modal = document.getElementById('universalSearchPasswordResetModal');
+    if (!modal) {
+        const modalHtml = `
+            <div class="password-reset-modal" id="universalSearchPasswordResetModal">
+                <div class="password-reset-modal-header">
+                    <h3 class="password-reset-modal-title" id="universalSearchPasswordResetModalTitle">Reset User Password</h3>
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="
+                        document.getElementById('universalSearchPasswordResetModal').classList.remove('active');
+                        document.getElementById('universalSearchPasswordResetModalOverlay').classList.remove('active');
+                    "></button>
+                </div>
+                <div class="password-reset-modal-content">
+                    <div id="universalSearchPasswordResetUserInfo" class="mb-3"></div>
+                    
+                    <div class="password-reset-steps">
+                        <div class="step-indicator">
+                            <div class="step active" data-step="1">
+                                <div class="step-number">1</div>
+                                <div class="step-label">Verify Identity</div>
+                            </div>
+                            <div class="step" data-step="2">
+                                <div class="step-number">2</div>
+                                <div class="step-label">Reset Password</div>
+                            </div>
+                            <div class="step" data-step="3">
+                                <div class="step-number">3</div>
+                                <div class="step-label">Confirm</div>
+                            </div>
+                        </div>
+                        
+                        <div class="step-content" id="stepContent">
+                            <!-- Step content will be dynamically loaded -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        const overlayHtml = `
+            <div class="password-reset-modal-overlay" id="universalSearchPasswordResetModalOverlay"></div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        document.body.insertAdjacentHTML('beforeend', overlayHtml);
+        
+        modal = document.getElementById('universalSearchPasswordResetModal');
+        
+        // Initialize password reset flow
+        showPasswordResetStep(1);
+    }
+    
+    return modal;
+}
+
+// Ticket creation functions
+function applyTicketTemplate() {
+    const template = document.getElementById('ticketTemplate').value;
+    const subject = document.getElementById('ticketSubject');
+    const description = document.getElementById('ticketDescription');
+    const category = document.getElementById('ticketCategory');
+    const priority = document.getElementById('ticketPriority');
+    
+    const templates = {
+        password_reset: {
+            category: 'password_reset',
+            priority: 'medium',
+            subject: 'Password Reset Request',
+            description: 'User has requested a password reset for their account. Please assist with resetting their password and ensure they can log in successfully.'
+        },
+        account_unlock: {
+            category: 'account_access',
+            priority: 'high',
+            subject: 'Account Unlock Request',
+            description: 'User account has been locked due to multiple failed login attempts. Please unlock the account and verify user identity.'
+        },
+        software_request: {
+            category: 'software_install',
+            priority: 'medium',
+            subject: 'Software Installation Request',
+            description: 'User has requested installation of specific software. Please review the request and install the required software if approved.'
+        },
+        epic_access: {
+            category: 'epic_access',
+            priority: 'high',
+            subject: 'Epic Access Request',
+            description: 'User requires access to Epic system. Please verify their role and grant appropriate Epic access permissions.'
+        },
+        email_setup: {
+            category: 'email_issue',
+            priority: 'medium',
+            subject: 'Email Setup/Configuration',
+            description: 'User needs assistance with email setup or configuration. Please help configure their email client or resolve email-related issues.'
+        }
+    };
+    
+    if (template && templates[template]) {
+        const t = templates[template];
+        category.value = t.category;
+        priority.value = t.priority;
+        subject.value = t.subject;
+        description.value = t.description;
+    }
+}
+
+function updatePriority() {
+    const urgentCheckbox = document.getElementById('ticketUrgent');
+    const prioritySelect = document.getElementById('ticketPriority');
+    
+    if (urgentCheckbox.checked) {
+        prioritySelect.value = 'urgent';
+    } else if (prioritySelect.value === 'urgent') {
+        prioritySelect.value = 'medium';
+    }
+}
+
+function handleTicketSubmission(event) {
+    event.preventDefault();
+    
+    const formData = {
+        user: window._currentTicketUser,
+        category: document.getElementById('ticketCategory').value,
+        priority: document.getElementById('ticketPriority').value,
+        subject: document.getElementById('ticketSubject').value,
+        description: document.getElementById('ticketDescription').value,
+        urgent: document.getElementById('ticketUrgent').checked,
+        followUp: document.getElementById('ticketFollowUp').checked,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Show loading state
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="bi bi-hourglass"></i> Creating Ticket...';
+    submitBtn.disabled = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+        // Show success message
+        showTicketSuccess(formData);
+        
+        // Reset form
+        event.target.reset();
+        
+        // Close modal
+        document.getElementById('universalSearchTicketModal').classList.remove('active');
+        document.getElementById('universalSearchTicketModalOverlay').classList.remove('active');
+        
+        // Reset button
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }, 2000);
+}
+
+function showTicketSuccess(ticketData) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(40, 167, 69, 0.9);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 12000;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+        animation: slideIn 0.3s ease;
+        max-width: 400px;
+    `;
+    toast.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <span>✅</span>
+            <span><strong>Ticket Created Successfully</strong></span>
+        </div>
+        <div style="font-size: 0.9rem; opacity: 0.9;">
+            <strong>${ticketData.subject}</strong><br>
+            Category: ${ticketData.category.replace('_', ' ').toUpperCase()}<br>
+            Priority: ${ticketData.priority.toUpperCase()}<br>
+            Ticket ID: #${Math.floor(Math.random() * 9000) + 1000}
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideIn 0.3s ease reverse';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 5000);
+}
+
+// Password reset functions
+function showPasswordResetStep(step) {
+    const stepContent = document.getElementById('stepContent');
+    const steps = document.querySelectorAll('.step');
+    
+    // Update step indicators
+    steps.forEach((s, index) => {
+        if (index + 1 <= step) {
+            s.classList.add('active');
+        } else {
+            s.classList.remove('active');
+        }
+    });
+    
+    switch (step) {
+        case 1:
+            stepContent.innerHTML = `
+                <div class="verification-step">
+                    <h4>Step 1: Verify User Identity</h4>
+                    <p class="text-muted">Please verify the user's identity before proceeding with password reset.</p>
+                    
+                    <div class="verification-methods">
+                        <div class="verification-option">
+                            <input type="radio" id="verifyManager" name="verificationMethod" value="manager" checked>
+                            <label for="verifyManager">
+                                <i class="bi bi-person-check"></i>
+                                <strong>Manager Approval</strong>
+                                <small>Get approval from user's manager</small>
+                            </label>
+                        </div>
+                        
+                        <div class="verification-option">
+                            <input type="radio" id="verifySecurity" name="verificationMethod" value="security">
+                            <label for="verifySecurity">
+                                <i class="bi bi-shield-check"></i>
+                                <strong>Security Questions</strong>
+                                <small>Answer security questions</small>
+                            </label>
+                        </div>
+                        
+                        <div class="verification-option">
+                            <input type="radio" id="verifyID" name="verificationMethod" value="id">
+                            <label for="verifyID">
+                                <i class="bi bi-card-text"></i>
+                                <strong>ID Verification</strong>
+                                <small>Verify government-issued ID</small>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="verification-notes">
+                        <textarea class="form-control" placeholder="Add verification notes (optional)" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-primary" onclick="showPasswordResetStep(2)">
+                            <i class="bi bi-check-circle"></i> Verify & Continue
+                        </button>
+                    </div>
+                </div>
+            `;
+            break;
+            
+        case 2:
+            stepContent.innerHTML = `
+                <div class="reset-step">
+                    <h4>Step 2: Reset Password</h4>
+                    <p class="text-muted">Choose password reset method and configure new password settings.</p>
+                    
+                    <div class="reset-options">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Reset Method</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="resetTemporary" name="resetMethod" value="temporary" checked>
+                                <label class="form-check-label" for="resetTemporary">
+                                    <strong>Temporary Password</strong>
+                                    <small>Generate temporary password, user must change on next login</small>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="resetForceChange" name="resetMethod" value="force">
+                                <label class="form-check-label" for="resetForceChange">
+                                    <strong>Force Password Change</strong>
+                                    <small>User must change password immediately</small>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label">Password Complexity</label>
+                            <select class="form-select">
+                                <option value="standard">Standard (8+ chars, mixed case)</option>
+                                <option value="enhanced">Enhanced (12+ chars, special chars)</option>
+                                <option value="high">High Security (16+ chars, complex)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label">Password Expiration</label>
+                            <select class="form-select">
+                                <option value="30">30 days</option>
+                                <option value="60">60 days</option>
+                                <option value="90">90 days</option>
+                                <option value="never">Never expire</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-secondary" onclick="showPasswordResetStep(1)">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="showPasswordResetStep(3)">
+                            <i class="bi bi-key"></i> Reset Password
+                        </button>
+                    </div>
+                </div>
+            `;
+            break;
+            
+        case 3:
+            stepContent.innerHTML = `
+                <div class="confirmation-step">
+                    <h4>Step 3: Confirmation</h4>
+                    <p class="text-muted">Review the password reset details and confirm.</p>
+                    
+                    <div class="confirmation-details">
+                        <div class="detail-item">
+                            <strong>User:</strong> ${window._currentPasswordResetUser?.fullName || 'Unknown'}
+                        </div>
+                        <div class="detail-item">
+                            <strong>Username:</strong> ${window._currentPasswordResetUser?.username || 'Unknown'}
+                        </div>
+                        <div class="detail-item">
+                            <strong>Reset Method:</strong> Temporary Password
+                        </div>
+                        <div class="detail-item">
+                            <strong>Complexity:</strong> Standard
+                        </div>
+                        <div class="detail-item">
+                            <strong>Expiration:</strong> 30 days
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Note:</strong> A temporary password will be generated and sent to the user's email address. 
+                        The user will be required to change their password on their next login.
+                    </div>
+                    
+                    <div class="step-actions">
+                        <button type="button" class="btn btn-secondary" onclick="showPasswordResetStep(2)">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </button>
+                        <button type="button" class="btn btn-success" onclick="executePasswordReset()">
+                            <i class="bi bi-check-circle"></i> Confirm Reset
+                        </button>
+                    </div>
+                </div>
+            `;
+            break;
+    }
+}
+
+function executePasswordReset() {
+    const stepContent = document.getElementById('stepContent');
+    
+    // Show loading state
+    stepContent.innerHTML = `
+        <div class="reset-execution">
+            <h4>Executing Password Reset...</h4>
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3">Processing password reset request...</p>
+            </div>
+        </div>
+    `;
+    
+    // Simulate API call
+    setTimeout(() => {
+        showPasswordResetSuccess();
+    }, 3000);
+}
+
+function showPasswordResetSuccess() {
+    const stepContent = document.getElementById('stepContent');
+    
+    stepContent.innerHTML = `
+        <div class="reset-success">
+            <div class="text-center">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                <h4 class="mt-3">Password Reset Successful!</h4>
+                <p class="text-muted">The user's password has been reset successfully.</p>
+            </div>
+            
+            <div class="success-details">
+                <div class="detail-item">
+                    <strong>Temporary Password:</strong> 
+                    <code style="background: rgba(255,255,255,0.1); padding: 0.25rem 0.5rem; border-radius: 4px;">${generateTemporaryPassword()}</code>
+                </div>
+                <div class="detail-item">
+                    <strong>Email Sent:</strong> ✅ Yes
+                </div>
+                <div class="detail-item">
+                    <strong>Reset Time:</strong> ${new Date().toLocaleString()}
+                </div>
+            </div>
+            
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>Important:</strong> Please provide the temporary password to the user securely. 
+                They will be required to change it on their next login.
+            </div>
+            
+            <div class="step-actions">
+                <button type="button" class="btn btn-primary" onclick="
+                    document.getElementById('universalSearchPasswordResetModal').classList.remove('active');
+                    document.getElementById('universalSearchPasswordResetModalOverlay').classList.remove('active');
+                ">
+                    <i class="bi bi-check"></i> Done
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function generateTemporaryPassword() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+}
+
+// MacOS-themed Office Modal Creator
+function createOfficeModal(data) {
+    const formatPhone = (phone) => {
+        if (!phone || phone === 'N/A' || phone === '') return 'Not Available';
+        return phone;
+    };
+
+    const formatAddress = (address) => {
+        if (!address || address === 'N/A' || address === '') return 'Not Available';
+        return address;
+    };
+
+    // Generate dummy recent tickets for this office
+    const generateDummyTickets = (officeName) => {
+        const ticketTypes = ['Network Issue', 'Printer Problem', 'Software Installation', 'Hardware Replacement', 'Phone Issue', 'Access Request'];
+        const priorities = ['Low', 'Medium', 'High', 'Critical'];
+        const statuses = ['Open', 'In Progress', 'Pending', 'Resolved'];
+        const users = ['User123@company.com', 'User456@company.com', 'User789@company.com', 'User234@company.com', 'User567@company.com'];
+        
+        const tickets = [];
+        const ticketCount = Math.floor(Math.random() * 8) + 3; // 3-10 tickets
+        
+        for (let i = 0; i < ticketCount; i++) {
+            const ticketNumber = Math.floor(Math.random() * 90000) + 10000;
+            const ticketType = ticketTypes[Math.floor(Math.random() * ticketTypes.length)];
+            const priority = priorities[Math.floor(Math.random() * priorities.length)];
+            const status = statuses[Math.floor(Math.random() * statuses.length)];
+            const user = users[Math.floor(Math.random() * users.length)];
+            const daysAgo = Math.floor(Math.random() * 30) + 1;
+            const date = new Date();
+            date.setDate(date.getDate() - daysAgo);
+            
+            tickets.push({
+                id: `#${ticketNumber}`,
+                title: ticketType,
+                priority: priority.toLowerCase(),
+                status: status.toLowerCase().replace(' ', ''),
+                user: user,
+                date: date.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' })
+            });
+        }
+        
+        return tickets.slice(0, 8); // Show max 8 tickets
+    };
+
+    const tickets = generateDummyTickets(data['Internal Name'] || 'Office');
+    
+    const calculateSubnet = (ip) => {
+        if (!ip || ip === 'N/A' || ip === '') return 'N/A';
+        const parts = ip.split('.');
+        if (parts.length === 4) {
+            return `${parts[0]}.${parts[1]}.${parts[2]}.0/24`;
+        }
+        return 'N/A';
+    };
+
+    return `
+        <div class="office-modal">
+            <div class="mac-office-header">
+                <div class="mac-office-info">
+                    <h3>${data['Internal Name'] || 'Unknown Office'} ${data['Mnemonic'] ? `(${data['Mnemonic']})` : ''}</h3>
+                    <div class="mac-office-subtitle">${data['Location'] || 'Location not specified'}</div>
+                </div>
+                <div class="mac-action-buttons">
+                    <button class="mac-action-btn primary" onclick="callOffice('${formatPhone(data['Phone'])}')" data-tooltip="Call Office">
+                        📞
+                    </button>
+                    <button class="mac-action-btn secondary" onclick="getDirections('${formatAddress(data['Address'])}')" data-tooltip="Get Directions">
+                        🗺️
+                    </button>
+                    <button class="mac-action-btn" onclick="copyOfficeDetails(${JSON.stringify(data).replace(/"/g, '&quot;')})" data-tooltip="Copy Details">
+                        📋
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mac-office-content">
+                <div class="mac-left-section">
+                    <div class="mac-info-grid">
+                        <div class="mac-info-section">
+                            <h4>📞 Contact Information</h4>
+                            <div class="mac-info-item">
+                                <span class="mac-info-label">Phone</span>
+                                <span class="mac-info-value clickable" onclick="callOffice('${formatPhone(data['Phone'])}')">${formatPhone(data['Phone'])}</span>
+                            </div>
+                            <div class="mac-info-item">
+                                <span class="mac-info-label">Location</span>
+                                <span class="mac-info-value">${data['Location'] || 'Not Available'}</span>
+                            </div>
+                            <div class="mac-info-item">
+                                <span class="mac-info-label">Address</span>
+                                <span class="mac-info-value clickable" onclick="getDirections('${formatAddress(data['Address'])}')">${formatAddress(data['Address'])}</span>
+                            </div>
+                        </div>
+
+                        <div class="mac-info-section">
+                            <h4>👨‍💼 Management Information</h4>
+                            <div class="mac-info-item">
+                                <span class="mac-info-label">Operations Manager</span>
+                                <span class="mac-info-value">${data['Operations Manager'] || data['Manager'] || 'Not Available'}</span>
+                            </div>
+                            <div class="mac-info-item">
+                                <span class="mac-info-label">Office Code</span>
+                                <span class="mac-info-value">${data['Mnemonic'] || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mac-info-section mac-full-width">
+                        <h4>⚙️ Technical Information 
+                            <button class="mac-scan-button" onclick="openNetworkScanner('${data['IP']}')">
+                                🔍 Scan Range
+                            </button>
+                        </h4>
+                        <div class="mac-tech-grid">
+                            <div class="mac-tech-item">
+                                <span class="mac-tech-label">IP Address</span>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span class="mac-tech-value">${data['IP'] || 'N/A'}</span>
+                                    ${data['IP'] && data['IP'] !== 'N/A' ? `<button onclick="pingSpecificIP('${data['IP']}')" style="background: rgba(0, 122, 255, 0.1); border: 1px solid rgba(0, 122, 255, 0.2); border-radius: 4px; padding: 0.2rem 0.4rem; font-size: 0.7rem; color: #007AFF; cursor: pointer;">📡</button>` : ''}
+                                </div>
+                            </div>
+                            <div class="mac-tech-item">
+                                <span class="mac-tech-label">Office Number</span>
+                                <span class="mac-tech-value">${data['Number'] || 'N/A'}</span>
+                            </div>
+                            <div class="mac-tech-item">
+                                <span class="mac-tech-label">Subnet</span>
+                                <span class="mac-tech-value">${calculateSubnet(data['IP'])}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mac-tickets-section">
+                    <div class="mac-tickets-header">
+                        <h4>🎫 Recent Tickets <span class="mac-ticket-count">${tickets.length}</span></h4>
+                        <button class="mac-view-all-btn" onclick="viewAllTickets('${data['Internal Name']}')">View All</button>
+                    </div>
+                    <div class="mac-tickets-list">
+                        ${tickets.map(ticket => `
+                            <div class="mac-ticket-item" onclick="openTicket('${ticket.id}')">
+                                <div class="mac-ticket-header">
+                                    <span class="mac-ticket-id">${ticket.id}</span>
+                                    <span class="mac-ticket-priority ${ticket.priority}">${ticket.priority.toUpperCase()}</span>
+                                </div>
+                                <div class="mac-ticket-title">${ticket.title}</div>
+                                <div class="mac-ticket-meta">
+                                    <span>${ticket.user}</span>
+                                    <span class="mac-ticket-status ${ticket.status}">${ticket.status}</span>
+                                </div>
+                                <div style="font-size: 0.7rem; color: rgba(255, 255, 255, 0.5); margin-top: 0.2rem;">${ticket.date}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// MacOS-themed Workstation Modal Creator
+function createWorkstationModal(data) {
+    const formatUser = (user) => {
+        if (!user || user === 'N/A' || user === '') return 'No User Assigned';
+        return user;
+    };
+
+    const formatCompliance = (compliance) => {
+        if (!compliance || compliance === 'N/A' || compliance === '') return 'Unknown';
+        const status = compliance.toLowerCase();
+        if (status.includes('compliant')) {
+            return '<span style="color: #34c759;">✅ Compliant</span>';
+        } else if (status.includes('not compliant')) {
+            return '<span style="color: #ff3b30;">❌ Not Compliant</span>';
+        } else {
+            return compliance;
+        }
+    };
+
+    const formatOnlineStatus = (online) => {
+        if (online === true || online === 'true') {
+            return '<span style="color: #34c759;">🟢 Online</span>';
+        } else if (online === false || online === 'false') {
+            return '<span style="color: #ff3b30;">🔴 Offline</span>';
+        } else {
+            return '<span style="color: #ff9500;">⚡ Unknown</span>';
+        }
+    };
+
+    return `
+        <div class="workstation-modal">
+            <button class="mac-close-btn" aria-label="Close" onclick="document.getElementById('universalSearchDetailModal').style.display='none'">×</button>
+            
+            <div class="mac-modal-header">
+                <div class="mac-workstation-icon">
+                    <i class="bi bi-laptop" style="font-size: 2.5rem; color: #007aff;"></i>
+                </div>
+                <div class="mac-workstation-info">
+                    <h3 class="mac-workstation-name">${data.name || 'Unknown Workstation'}</h3>
+                    <p class="mac-workstation-os">${data.os || 'Unknown OS'} ${data.os_version || ''}</p>
+                    <div class="mac-action-buttons">
+                        <button class="mac-action-btn" title="Remote Control" onclick="handleButtonClick(this, () => openDameware('${data.name}'))">🖥️</button>
+                        <button class="mac-action-btn" title="Ping Device" onclick="handleButtonClick(this, () => pingDevice('${data.name}'))">📡</button>
+                        <button class="mac-action-btn" title="Copy Details" onclick="handleButtonClick(this, () => copyWorkstationDetails('${data.name}', '${data.user}', '${data.ip}'))">📋</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mac-modal-content">
+                <div class="mac-info-section">
+                    <h4 class="mac-section-title">User Information</h4>
+                    <div class="mac-info-grid">
+                        <div class="mac-info-label">Primary User</div>
+                        <div class="mac-info-value">${formatUser(data.user)}</div>
+                        <div class="mac-info-label">Managed By</div>
+                        <div class="mac-info-value">${data.managed_by || 'Not Available'}</div>
+                    </div>
+                </div>
+
+                <div class="mac-info-section">
+                    <h4 class="mac-section-title">System Information</h4>
+                    <div class="mac-info-grid">
+                        <div class="mac-info-label">Operating System</div>
+                        <div class="mac-info-value">${data.os || 'Unknown'}</div>
+                        <div class="mac-info-label">OS Version</div>
+                        <div class="mac-info-value">${data.os_version || 'Not Available'}</div>
+                        <div class="mac-info-label">IP Address</div>
+                        <div class="mac-info-value" style="font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; font-size: 0.9rem;">${data.ip || 'Not Available'}</div>
+                        <div class="mac-info-label">Status</div>
+                        <div class="mac-info-value">${formatOnlineStatus(data.online)}</div>
+                    </div>
+                </div>
+
+                <div class="mac-info-section">
+                    <h4 class="mac-section-title">Compliance & Security</h4>
+                    <div class="mac-info-grid">
+                        <div class="mac-info-label">Compliance Status</div>
+                        <div class="mac-info-value">${formatCompliance(data.compliance)}</div>
+                        <div class="mac-info-label">Device Enabled</div>
+                        <div class="mac-info-value">${data.enabled ? '✅ Yes' : '❌ No'}</div>
+                        <div class="mac-info-label">Account Locked</div>
+                        <div class="mac-info-value">${data.locked ? '🔒 Yes' : '🔓 No'}</div>
+                        <div class="mac-info-label">Last Logon</div>
+                        <div class="mac-info-value">${data.last_logon || 'Not Available'}</div>
+                    </div>
+                </div>
+
+                ${data.ou_groups ? `
+                <div class="mac-info-section">
+                    <h4 class="mac-section-title">Additional Information</h4>
+                    <div class="mac-info-grid">
+                        <div class="mac-info-label">OU Groups</div>
+                        <div class="mac-info-value" style="font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; font-size: 0.8125rem;">${data.ou_groups}</div>
+                        ${data.workstation_class ? `<div class="mac-info-label">Class</div><div class="mac-info-value">${data.workstation_class}</div>` : ''}
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+}
+
+// Enhanced showUniversalSearchDetail function
+window.showUniversalSearchDetail = function(type, idOrName) {
+    const modal = document.getElementById('universalSearchDetailModal');
+    if (!modal) {
+        console.error('universalSearchDetailModal not found');
+        return;
+    }
+    
+    modal.style.display = 'flex';
+    const content = document.getElementById('universalSearchDetailContent');
+    if (!content) {
+        console.error('universalSearchDetailContent not found');
+        return;
+    }
+    
+    content.innerHTML = '<div style="text-align:center;padding:2rem;"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-3">Loading details...</p></div>';
+    
+    let url = '';
+    if (type === 'office') {
+        url = `/offices/detail?name=${encodeURIComponent(idOrName)}`;
+    } else if (type === 'workstation') {
+        url = `/api/workstations/detail?name=${encodeURIComponent(idOrName)}`;
+    } else if (type === 'user') {
+        url = `/users/api/users/${encodeURIComponent(idOrName)}`;
+    } else {
+        content.innerHTML = '<div style="color:#f66;">Unknown type.</div>';
+        return;
+    }
+    
+    fetch(url).then(r => r.json()).then(data => {
+        if (!data || data.error) {
+            content.innerHTML = `<div style='color:#f66;text-align:center;padding:2rem;'>
+                <i class="bi bi-exclamation-triangle" style="font-size:3rem;"></i>
+                <h4>Not Found</h4>
+                <p>${data && data.error ? data.error : 'No data available.'}</p>
+            </div>`;
+            return;
+        }
+        
+        if (type === 'office') {
+            content.innerHTML = createOfficeModal(data);
+        } else if (type === 'workstation') {
+            content.innerHTML = createWorkstationModal(data);
+            
+            // Auto-ping the device when modal opens
+            setTimeout(() => {
+                if (data.name) {
+                    pingDeviceFromModal(data.name);
+                }
+            }, 500);
+        } else if (type === 'user') {
+            content.innerHTML = createUserProfileModal(data);
+        }
+    }).catch(err => {
+        content.innerHTML = `<div style='color:#f66;text-align:center;padding:2rem;'>
+            <i class="bi bi-wifi-off" style="font-size:3rem;"></i>
+            <h4>Connection Error</h4>
+            <p>Failed to load details: ${err.message}</p>
+        </div>`;
+    });
+};
+
+// Helper functions for actions
+function copyOfficeDetails(name, phone, address) {
+    const details = `Office: ${name}\nPhone: ${phone}\nAddress: ${address}`;
+    navigator.clipboard.writeText(details).then(() => {
+        showToast('Office details copied to clipboard!', 'success');
+    }).catch(() => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = details;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showToast('Office details copied to clipboard!', 'success');
+    });
+}
+
+function copyWorkstationDetails(name, user, ip) {
+    const details = `Workstation: ${name}\nUser: ${user}\nIP: ${ip}`;
+    navigator.clipboard.writeText(details).then(() => {
+        showToast('Workstation details copied to clipboard!', 'success');
+    }).catch(() => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = details;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showToast('Workstation details copied to clipboard!', 'success');
+    });
+}
+
+function openDameware(hostname) {
+    try {
+        window.open(`dwrcc://full-control?machine=${hostname}`, '_blank');
+        showToast('Opening Dameware Remote Control...', 'info');
+    } catch (error) {
+        showToast('Unable to open Dameware. Please check if it\'s installed.', 'warning');
+    }
+}
+
+function pingDevice(hostname) {
+    showToast('Pinging device...', 'info');
+    // This would typically make a call to a backend ping service
+    // For now, we'll simulate it
+    setTimeout(() => {
+        showToast(`Ping to ${hostname} completed. Check network tools for results.`, 'success');
+    }, 2000);
+}
+
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    const colors = {
+        success: '#34c759',
+        info: '#007aff',
+        warning: '#ff9500',
+        error: '#ff3b30'
+    };
+    
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${colors[type] || colors.info};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        z-index: 12000;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        font-weight: 500;
+        backdrop-filter: blur(20px);
+        animation: slideInToast 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        max-width: 400px;
+    `;
+    
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    // Add keyframes for animation
+    if (!document.getElementById('toast-animations')) {
+        const style = document.createElement('style');
+        style.id = 'toast-animations';
+        style.textContent = `
+            @keyframes slideInToast {
+                from { 
+                    transform: translateX(100%); 
+                    opacity: 0; 
+                }
+                to { 
+                    transform: translateX(0); 
+                    opacity: 1; 
+                }
+            }
+            @keyframes slideOutToast {
+                from { 
+                    transform: translateX(0); 
+                    opacity: 1; 
+                }
+                to { 
+                    transform: translateX(100%); 
+                    opacity: 0; 
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOutToast 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 4000);
+}
+
+// Helper Functions for Enhanced Office Modal
+function pingSpecificIP(ip) {
+    showToast(`Pinging ${ip}...`, 'info');
+    
+    // Simulate ping (in real implementation, this would be a backend API call)
+    setTimeout(() => {
+        const success = Math.random() > 0.3; // 70% success rate
+        const latency = Math.floor(Math.random() * 50) + 10; // 10-60ms
+        
+        if (success) {
+            showToast(`✅ Ping successful! ${ip} responded in ${latency}ms`, 'success');
+        } else {
+            showToast(`❌ Ping failed. ${ip} is not responding`, 'error');
+        }
+    }, 1500);
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showToast(`📋 Copied "${text}" to clipboard`, 'success');
+    }).catch(() => {
+        showToast('❌ Failed to copy to clipboard', 'error');
+    });
+}
+
+function viewAllTicketsForOffice(officeName) {
+    showToast(`Opening all tickets for ${officeName}...`, 'info');
+    // In a real implementation, this would redirect to a tickets page with office filter
+    setTimeout(() => {
+        // Simulate redirect
+        console.log(`Would redirect to tickets page filtered by office: ${officeName}`);
+    }, 500);
+}
+
+function openTicketDetail(ticketId) {
+    showToast(`Opening ticket #${ticketId}...`, 'info');
+    // In a real implementation, this would open a ticket detail modal/page
+    setTimeout(() => {
+        console.log(`Would open ticket detail for ticket #${ticketId}`);
+    }, 500);
+}
+
+// Toast notification system
+function showToast(message, type = 'info') {
+    const toastContainer = getOrCreateToastContainer();
+    
+    const toast = document.createElement('div');
+    toast.className = `mac-toast mac-toast-${type}`;
+    toast.innerHTML = `
+        <div class="mac-toast-content">
+            <span class="mac-toast-message">${message}</span>
+            <button class="mac-toast-close" onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    
+    // Animate in
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.remove();
+            }
+        }, 300);
+    }, 5000);
+}
+
+function getOrCreateToastContainer() {
+    let container = document.getElementById('toastContainer');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'mac-toast-container';
+        document.body.appendChild(container);
+    }
+    return container;
+}
+
+// Copy office details to clipboard
+function copyOfficeDetails(name, phone, address) {
+    const details = `Office: ${name}\nPhone: ${phone || 'N/A'}\nAddress: ${address || 'N/A'}`;
+    copyToClipboard(details);
+}
+</script> 

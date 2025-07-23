@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Universal Search - {{ query }}{% endblock %}
+
+{% block head %}
+{{ super() }}
+<!-- Quill Rich Text Editor CSS -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<!-- Include all component styles -->
+{% include 'components/universal_search_page/styles.html' %}
+{% include 'components/universal_search_page/modal_styles.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="universal-search-page">
+    <div class="us-container">
+        <!-- Header Component -->
+        {% include 'components/universal_search_page/header.html' %}
+        
+        <!-- Filters Bar Component -->
+        {% include 'components/universal_search_page/filters_bar.html' %}
+
+        <!-- Loading State Component -->
+        {% include 'components/universal_search_page/loading_state.html' %}
+
+        <!-- No Results Component -->
+        {% include 'components/universal_search_page/no_results.html' %}
+
+        <!-- Search Results Component -->
+        {% include 'components/universal_search_page/search_results.html' %}
+
+        <!-- Pagination Component -->
+        {% include 'components/universal_search_page/pagination.html' %}
+    </div>
+</div>
+
+<!-- PDF Modal Component -->
+{% include 'components/universal_search_page/pdf_modal.html' %}
+
+<!-- Note Modal Component -->
+{% include 'components/universal_search_page/note_modal.html' %}
+
+<!-- Filter Modal Component -->
+{% include 'components/universal_search_page/filter_modal.html' %}
+
+<!-- Include all JavaScript functionality -->
+{% include 'components/universal_search_page/script.html' %}
+{% include 'components/universal_search_page/modal_functions.html' %}
+{% include 'components/universal_search_page/suggestions.html' %}
+{% endblock %} 

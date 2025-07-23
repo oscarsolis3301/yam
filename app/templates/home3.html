@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>ADAPT Home</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap">
+        <link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='CSS/Adapt_bulmaStyle.css')}}">
+        <link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='CSS/Adapt_myStyle.css')}}">
+        <link rel="stylesheet" type='text/css' href="{{ url_for('static', filename='CSS/Adapt_homeStyle.css')}}">
+        <script src="/static/JS/homeScript.js "></script>
+        <link rel="icon" type="image/x-icon" href="/static/images/Y.ico">
+
+    </head>
+    <body>
+        <!--start of main body wrapping of entire page-->
+        <div class="">
+            <!--start of main div of entire page-->
+            <section>
+                <!--start of content section-->
+                <nav class="navbar has-background-dark is-hidden-desktop is-hidden-touch">
+                    <!--start of hamburger-->
+                    <div class="navbar-brand is-align-items-center">
+                        <a class="navbar-item" href="#">
+                            <img class="image" src="../static/images/adapt-logo.svg" alt="alt" width="auto" id="burgerLogo">
+                        </a>
+                        <button class="navbar-burger navbar-menu-open has-text-white" role="button" aria-expanded="false">
+                            <span aria-hidden="true"></span>
+                            <span aria-hidden="true"></span>
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </nav>
+                <!--end of hamburger-->
+                <section class="mb-0" style="white-space: nowrap">
+                    <nav class="navbar" style='background-color:#2e3347;'>
+                        <div class="navbar-brand is-align-items-center navbar-brand-input-container">
+                            <a href="/">
+                                <image class='ml-6 pl-6' src="../static/images/logoPDS_no_words.png">
+                            </a>
+                        </div>
+                        <a href="/">
+                            <div id="adaptLogo">
+                                <div id="adaptNewLogo"></div>
+                                <div id="adaptLogoText"></div>
+                            </div>
+                        </a>
+                        <div class="navbar-menu mr-6 pr-6">
+                            <div class="navbar-end">
+                                <div class="navbar-item pr-3">
+                                <!--<a class="button is-ghost p-0 mr-5 has-text-grey-light" href="#">
+                      <svg width="18" height="20" viewbox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 0H3C2.20435 0 1.44129 0.316071 0.87868 0.87868C0.316071 1.44129 0 2.20435 0 3V14C0 14.7956 0.316071 15.5587 0.87868 16.1213C1.44129 16.6839 2.20435 17 3 17H5.59L8.29 19.71C8.38344 19.8027 8.49426 19.876 8.61609 19.9258C8.73793 19.9755 8.86839 20.0008 9 20C9.23834 20 9.46886 19.9149 9.65 19.76L12.87 17H15C15.7956 17 16.5587 16.6839 17.1213 16.1213C17.6839 15.5587 18 14.7956 18 14V3C18 2.20435 17.6839 1.44129 17.1213 0.87868C16.5587 0.316071 15.7956 0 15 0ZM16 14C16 14.2652 15.8946 14.5196 15.7071 14.7071C15.5196 14.8946 15.2652 15 15 15H12.5C12.2617 15 12.0311 15.0851 11.85 15.24L9.05 17.64L6.71 15.29C6.61656 15.1973 6.50574 15.124 6.38391 15.0742C6.26207 15.0245 6.13161 14.9992 6 15H3C2.73478 15 2.48043 14.8946 2.29289 14.7071C2.10536 14.5196 2 14.2652 2 14V3C2 2.73478 2.10536 2.48043 2.29289 2.29289C2.48043 2.10536 2.73478 2 3 2H15C15.2652 2 15.5196 2.10536 15.7071 2.29289C15.8946 2.48043 16 2.73478 16 3V14Z" fill="currentColor"></path>
+                      </svg>
+                    </a>-->
+                                <!--<a class="js-modal-trigger button is-ghost p-0 has-text-grey-light" data-target='notifModal'>
+                      <svg width="16" height="20" viewbox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 11.18V8C13.9986 6.58312 13.4958 5.21247 12.5806 4.13077C11.6655 3.04908 10.3971 2.32615 9 2.09V1C9 0.734784 8.89464 0.48043 8.70711 0.292893C8.51957 0.105357 8.26522 0 8 0C7.73478 0 7.48043 0.105357 7.29289 0.292893C7.10536 0.48043 7 0.734784 7 1V2.09C5.60294 2.32615 4.33452 3.04908 3.41939 4.13077C2.50425 5.21247 2.00144 6.58312 2 8V11.18C1.41645 11.3863 0.910998 11.7681 0.552938 12.2729C0.194879 12.7778 0.00173951 13.3811 0 14V16C0 16.2652 0.105357 16.5196 0.292893 16.7071C0.48043 16.8946 0.734784 17 1 17H4.14C4.37028 17.8474 4.873 18.5954 5.5706 19.1287C6.26819 19.6621 7.1219 19.951 8 19.951C8.8781 19.951 9.73181 19.6621 10.4294 19.1287C11.127 18.5954 11.6297 17.8474 11.86 17H15C15.2652 17 15.5196 16.8946 15.7071 16.7071C15.8946 16.5196 16 16.2652 16 16V14C15.9983 13.3811 15.8051 12.7778 15.4471 12.2729C15.089 11.7681 14.5835 11.3863 14 11.18ZM4 8C4 6.93913 4.42143 5.92172 5.17157 5.17157C5.92172 4.42143 6.93913 4 8 4C9.06087 4 10.0783 4.42143 10.8284 5.17157C11.5786 5.92172 12 6.93913 12 8V11H4V8ZM8 18C7.65097 17.9979 7.30857 17.9045 7.00683 17.7291C6.70509 17.5536 6.45451 17.3023 6.28 17H9.72C9.54549 17.3023 9.29491 17.5536 8.99317 17.7291C8.69143 17.9045 8.34903 17.9979 8 18ZM14 15H2V14C2 13.7348 2.10536 13.4804 2.29289 13.2929C2.48043 13.1054 2.73478 13 3 13H13C13.2652 13 13.5196 13.1054 13.7071 13.2929C13.8946 13.4804 14 13.7348 14 14V15Z" fill="currentColor"></path>
+                      </svg>
+                      <img id='notifs' style='filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(148deg) brightness(103%) contrast(102%);' src="/static/images/bell.svg">
+                    </a>-->
+                                </div>
+                                <div class="navbar-item has-dropdown-with-icons is-hoverable">
+                                    <button class="button p-0 is-flex is-align-items-center has-text-weight-normal" style='background-color:#2e3347; border:none;'>
+                                        <div class="mr-3">
+                                            <p class="is-size-6" style='color:white;'>oscar.solis@pacden.com</p>
+                                            <p class='is-size-6' style='color:white;'>PDS Service Desk</p>
+                                        </div>
+                                        <span>
+                                            <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M14.0833 7.66675C13.75 7.33341 13.25 7.33341 12.9166 7.66675L9.99996 10.5834L7.08329 7.66675C6.74996 7.33341 6.24996 7.33341 5.91663 7.66675C5.58329 8.00008 5.58329 8.50008 5.91663 8.83342L9.41663 12.3334C9.58329 12.5001 9.74996 12.5834 9.99996 12.5834C10.25 12.5834 10.4166 12.5001 10.5833 12.3334L14.0833 8.83342C14.4166 8.50008 14.4166 8.00008 14.0833 7.66675Z" fill="white"></path>
+                                            </svg>
+                                        </span>
+                                    </button>
+                                    <div class='navbar-dropdown'>
+                                        <a class='navbar-item is-center' href='/logout_user/'>
+                                            <svg class="mr-3 has-text-grey-dark" width="14" height="16" viewBox="0 0 14 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M0.333618 8.99996C0.333618 9.22097 0.421416 9.43293 0.577696 9.58922C0.733976 9.7455 0.945938 9.83329 1.16695 9.83329H7.49195L5.57528 11.7416C5.49718 11.8191 5.43518 11.9113 5.39287 12.0128C5.35057 12.1144 5.32879 12.2233 5.32879 12.3333C5.32879 12.4433 5.35057 12.5522 5.39287 12.6538C5.43518 12.7553 5.49718 12.8475 5.57528 12.925C5.65275 13.0031 5.74492 13.0651 5.84647 13.1074C5.94802 13.1497 6.05694 13.1715 6.16695 13.1715C6.27696 13.1715 6.38588 13.1497 6.48743 13.1074C6.58898 13.0651 6.68115 13.0031 6.75862 12.925L10.0919 9.59163C10.1678 9.51237 10.2273 9.41892 10.2669 9.31663C10.3503 9.11374 10.3503 8.88618 10.2669 8.68329C10.2273 8.581 10.1678 8.48755 10.0919 8.40829L6.75862 5.07496C6.68092 4.99726 6.58868 4.93563 6.48716 4.89358C6.38564 4.85153 6.27683 4.82988 6.16695 4.82988C6.05707 4.82988 5.94826 4.85153 5.84674 4.89358C5.74522 4.93563 5.65298 4.99726 5.57528 5.07496C5.49759 5.15266 5.43595 5.2449 5.3939 5.34642C5.35185 5.44794 5.33021 5.55674 5.33021 5.66663C5.33021 5.77651 5.35185 5.88532 5.3939 5.98683C5.43595 6.08835 5.49759 6.18059 5.57528 6.25829L7.49195 8.16663H1.16695C0.945938 8.16663 0.733976 8.25442 0.577696 8.4107C0.421416 8.56698 0.333618 8.77895 0.333618 8.99996V8.99996ZM11.1669 0.666626H2.83362C2.17058 0.666626 1.53469 0.930018 1.06585 1.39886C0.59701 1.8677 0.333618 2.50358 0.333618 3.16663V5.66663C0.333618 5.88764 0.421416 6.0996 0.577696 6.25588C0.733976 6.41216 0.945938 6.49996 1.16695 6.49996C1.38797 6.49996 1.59993 6.41216 1.75621 6.25588C1.91249 6.0996 2.00028 5.88764 2.00028 5.66663V3.16663C2.00028 2.94561 2.08808 2.73365 2.24436 2.57737C2.40064 2.42109 2.6126 2.33329 2.83362 2.33329H11.1669C11.388 2.33329 11.5999 2.42109 11.7562 2.57737C11.9125 2.73365 12.0003 2.94561 12.0003 3.16663V14.8333C12.0003 15.0543 11.9125 15.2663 11.7562 15.4225C11.5999 15.5788 11.388 15.6666 11.1669 15.6666H2.83362C2.6126 15.6666 2.40064 15.5788 2.24436 15.4225C2.08808 15.2663 2.00028 15.0543 2.00028 14.8333V12.3333C2.00028 12.1123 1.91249 11.9003 1.75621 11.744C1.59993 11.5878 1.38797 11.5 1.16695 11.5C0.945938 11.5 0.733976 11.5878 0.577696 11.744C0.421416 11.9003 0.333618 12.1123 0.333618 12.3333V14.8333C0.333618 15.4963 0.59701 16.1322 1.06585 16.6011C1.53469 17.0699 2.17058 17.3333 2.83362 17.3333H11.1669C11.83 17.3333 12.4659 17.0699 12.9347 16.6011C13.4036 16.1322 13.6669 15.4963 13.6669 14.8333V3.16663C13.6669 2.50358 13.4036 1.8677 12.9347 1.39886C12.4659 0.930018 11.83 0.666626 11.1669 0.666626Z" fill="currentColor"></path>
+                                            </svg>
+                                            <span>Log Out</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+                    <div style='background-color:white; box-shadow: 0px 14px 9px 6px  #e9e9e9;'>
+                        <nav class='topNavBarCon'>
+                            <div class="childFlexBackButtonTopNavBar" id="backButtonTopNavBar">
+                                <div class="spanContainer">
+                                    <span class="arrowSvgCon spanContainerItem">
+                                        <span class="containsSvg">
+                                            <svg style="color: rgb(50, 56, 67);" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                                                <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z" fill="#323843"></path>
+                                            </svg>
+                                        </span>
+                                    </span>
+                                    <span class="backToMainCon spanContainerItem">
+                                        <span class="backToMainText">Back to main</span>
+                                        <span class="backTextOnly">Back</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <!--<div class="topNavBarItem dropdown is-hoverable">
+                  <div class='is-flex is-justify-content-center dropdown-trigger'>
+                    <button class="diagnosticsBox is-flex is-align-items-center has-text-weight-normal" aria-haspopup='true' aria-controls='diagnostic-menu' style='background-color:white; border:none;'>
+                      <div class="spaceBetweenDropArrow mr-3">
+                        <p class="is-size-6" style='color:#7a7a7a; font-weight:bold;'>Diagnostics</p>
+                      </div>                        
+                      <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14.0833 7.66675C13.75 7.33341 13.25 7.33341 12.9166 7.66675L9.99996 10.5834L7.08329 7.66675C6.74996 7.33341 6.24996 7.33341 5.91663 7.66675C5.58329 8.00008 5.58329 8.50008 5.91663 8.83342L9.41663 12.3334C9.58329 12.5001 9.74996 12.5834 9.99996 12.5834C10.25 12.5834 10.4166 12.5001 10.5833 12.3334L14.0833 8.83342C14.4166 8.50008 14.4166 8.00008 14.0833 7.66675Z" fill="#526172"></path>
+                      </svg>                        
+                    </button>   
+                  </div>                   
+                  <div class='dropdown-menu' id='diagnostic-menu' role='menu'>
+                    <div class='dropdown-content'>
+                      <a class='js-modal-trigger dropdown-item' data-target='SOPModal'>
+                        <svg class='pt-1 mr-2' width="16" height="16" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M476.59,227.05l-.16-.07L49.35,49.84A23.56,23.56,0,0,0,27.14,52,24.65,24.65,0,0,0,16,72.59V185.88a24,24,0,0,0,19.52,23.57l232.93,43.07a4,4,0,0,1,0,7.86L35.53,303.45A24,24,0,0,0,16,327V440.31A23.57,23.57,0,0,0,26.59,460a23.94,23.94,0,0,0,13.22,4,24.55,24.55,0,0,0,9.52-1.93L476.4,285.94l.19-.09a32,32,0,0,0,0-58.8Z"fill='#7a7a7a'/>
+                        </svg>                           
+                        <span style='color:#7a7a7a; font-weight:bold;'>Office Diagnostic</span>
+                      </a>
+                      <hr class="dropdown-divider">
+                      <a class='js-modal-trigger dropdown-item' data-target='NetModal'>
+                        <svg class='pt-1 mr-2' width="16" height="16" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M476.59,227.05l-.16-.07L49.35,49.84A23.56,23.56,0,0,0,27.14,52,24.65,24.65,0,0,0,16,72.59V185.88a24,24,0,0,0,19.52,23.57l232.93,43.07a4,4,0,0,1,0,7.86L35.53,303.45A24,24,0,0,0,16,327V440.31A23.57,23.57,0,0,0,26.59,460a23.94,23.94,0,0,0,13.22,4,24.55,24.55,0,0,0,9.52-1.93L476.4,285.94l.19-.09a32,32,0,0,0,0-58.8Z"fill='#7a7a7a'/>
+                        </svg> 
+                        <span style='color:#7a7a7a; font-weight:bold;'>Network Diagnostic</span>
+                      </a>
+                      <hr class='dropdown-divider'>
+                      <a class='js-modal-trigger dropdown-item' data-target='CADModal'>
+                        <svg class='pt-1 mr-2' width="16" height="16" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M476.59,227.05l-.16-.07L49.35,49.84A23.56,23.56,0,0,0,27.14,52,24.65,24.65,0,0,0,16,72.59V185.88a24,24,0,0,0,19.52,23.57l232.93,43.07a4,4,0,0,1,0,7.86L35.53,303.45A24,24,0,0,0,16,327V440.31A23.57,23.57,0,0,0,26.59,460a23.94,23.94,0,0,0,13.22,4,24.55,24.55,0,0,0,9.52-1.93L476.4,285.94l.19-.09a32,32,0,0,0,0-58.8Z"fill='#7a7a7a'/>
+                        </svg> 
+                        <span style='color:#7a7a7a; font-weight:bold;'>CAD/CAM Diagnostic</span>
+                      </a>
+                      <hr class="dropdown-divider">
+                      <a class='js-modal-trigger dropdown-item' data-target='WorkstationModal'>
+                        <svg class='pt-1 mr-2' width="16" height="16" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M476.59,227.05l-.16-.07L49.35,49.84A23.56,23.56,0,0,0,27.14,52,24.65,24.65,0,0,0,16,72.59V185.88a24,24,0,0,0,19.52,23.57l232.93,43.07a4,4,0,0,1,0,7.86L35.53,303.45A24,24,0,0,0,16,327V440.31A23.57,23.57,0,0,0,26.59,460a23.94,23.94,0,0,0,13.22,4,24.55,24.55,0,0,0,9.52-1.93L476.4,285.94l.19-.09a32,32,0,0,0,0-58.8Z"fill='#7a7a7a'/>
+                        </svg> 
+                        <span style='color:#7a7a7a; font-weight:bold;'>Workstation Diagnostic</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>-->
+                            <div class="topNavBarItem dropdown is-hoverable ml-1">
+                                <div class='is-flex is-justify-content-center dropdown-trigger'>
+                                    <button class="is-flex is-align-items-center has-text-weight-normal" aria-haspopup='true' aria-controls='diagnostic-menu' style='background-color:white; border:none;'>
+                                        <div class="spaceBetweenDropArrow mr-3">
+                                            <p class="is-size-6" style='color:#7a7a7a; font-weight:bold;'>Tools</p>
+                                        </div>
+                                        <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M14.0833 7.66675C13.75 7.33341 13.25 7.33341 12.9166 7.66675L9.99996 10.5834L7.08329 7.66675C6.74996 7.33341 6.24996 7.33341 5.91663 7.66675C5.58329 8.00008 5.58329 8.50008 5.91663 8.83342L9.41663 12.3334C9.58329 12.5001 9.74996 12.5834 9.99996 12.5834C10.25 12.5834 10.4166 12.5001 10.5833 12.3334L14.0833 8.83342C14.4166 8.50008 14.4166 8.00008 14.0833 7.66675Z" fill="#526172"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class='dropdown-menu' id='diagnostic-menu' role='menu'>
+                                    <div class='dropdown-content linksDropDown'>
+                                        <a class='js-modal-trigger dropdown-item' data-target="UserModal">
+                                            <svg class='pt-1 mr-2' width="16" height="16" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M476.59,227.05l-.16-.07L49.35,49.84A23.56,23.56,0,0,0,27.14,52,24.65,24.65,0,0,0,16,72.59V185.88a24,24,0,0,0,19.52,23.57l232.93,43.07a4,4,0,0,1,0,7.86L35.53,303.45A24,24,0,0,0,16,327V440.31A23.57,23.57,0,0,0,26.59,460a23.94,23.94,0,0,0,13.22,4,24.55,24.55,0,0,0,9.52-1.93L476.4,285.94l.19-.09a32,32,0,0,0,0-58.8Z" fill='#7a7a7a'/>
+                                            </svg>
+                                            <span style='color:#7a7a7a; font-weight:bold;'>User AD/FS Tool</span>
+                                        </a>
+                                        <hr class='dropdown-divider'>
+                                        <a class='js-modal-trigger dropdown-item' data-target="OfficeTicketModal">
+                                            <svg class='pt-1 mr-2' width="16" height="16" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M476.59,227.05l-.16-.07L49.35,49.84A23.56,23.56,0,0,0,27.14,52,24.65,24.65,0,0,0,16,72.59V185.88a24,24,0,0,0,19.52,23.57l232.93,43.07a4,4,0,0,1,0,7.86L35.53,303.45A24,24,0,0,0,16,327V440.31A23.57,23.57,0,0,0,26.59,460a23.94,23.94,0,0,0,13.22,4,24.55,24.55,0,0,0,9.52-1.93L476.4,285.94l.19-.09a32,32,0,0,0,0-58.8Z" fill='#7a7a7a'/>
+                                            </svg>
+                                            <span style='color:#7a7a7a; font-weight:bold;'>Office FS Ticket Lookup</span>
+                                        </a>
+                                        <hr class='dropdown-divider'>
+                                        <a class='dropdown-item js-modal-trigger' data-target="DiagnosticPageModal">
+                                            <svg class='pt-1 mr-2' width="16" height="16" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M476.59,227.05l-.16-.07L49.35,49.84A23.56,23.56,0,0,0,27.14,52,24.65,24.65,0,0,0,16,72.59V185.88a24,24,0,0,0,19.52,23.57l232.93,43.07a4,4,0,0,1,0,7.86L35.53,303.45A24,24,0,0,0,16,327V440.31A23.57,23.57,0,0,0,26.59,460a23.94,23.94,0,0,0,13.22,4,24.55,24.55,0,0,0,9.52-1.93L476.4,285.94l.19-.09a32,32,0,0,0,0-58.8Z" fill='#7a7a7a'/>
+                                            </svg>
+                                            <span style='color:#7a7a7a; font-weight:bold;'>Diagnostic Office Search</span>
+                                        </a>
+                                        <hr class='dropdown-divider'>
+                                        <a class='dropdown-item js-modal-trigger' data-target="WorkstationModal">
+                                            <svg class='pt-1 mr-2' width="16" height="16" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M476.59,227.05l-.16-.07L49.35,49.84A23.56,23.56,0,0,0,27.14,52,24.65,24.65,0,0,0,16,72.59V185.88a24,24,0,0,0,19.52,23.57l232.93,43.07a4,4,0,0,1,0,7.86L35.53,303.45A24,24,0,0,0,16,327V440.31A23.57,23.57,0,0,0,26.59,460a23.94,23.94,0,0,0,13.22,4,24.55,24.55,0,0,0,9.52-1.93L476.4,285.94l.19-.09a32,32,0,0,0,0-58.8Z" fill='#7a7a7a'/>
+                                            </svg>
+                                            <span style='color:#7a7a7a; font-weight:bold;'>Workstation Search</span>
+                                        </a>
+                                        <hr class='dropdown-divider'>
+                                        <a class='dropdown-item' href='/NacLanding' target='_blank'>
+                                            <svg class='pt-1 mr-2' width="16" height="16" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M476.59,227.05l-.16-.07L49.35,49.84A23.56,23.56,0,0,0,27.14,52,24.65,24.65,0,0,0,16,72.59V185.88a24,24,0,0,0,19.52,23.57l232.93,43.07a4,4,0,0,1,0,7.86L35.53,303.45A24,24,0,0,0,16,327V440.31A23.57,23.57,0,0,0,26.59,460a23.94,23.94,0,0,0,13.22,4,24.55,24.55,0,0,0,9.52-1.93L476.4,285.94l.19-.09a32,32,0,0,0,0-58.8Z" fill='#7a7a7a'/>
+                                            </svg>
+                                            <span style='color:#7a7a7a; font-weight:bold;'>NAC Solutions</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="topNavBarItem dropdown is-hoverable ml-1">
+                                <div class='is-flex is-justify-content-center dropdown-trigger'>
+                                    <button class="is-flex is-align-items-center has-text-weight-normal" aria-haspopup='true' aria-controls='links-menu' style='background-color:white; border:none;'>
+                                        <div class="spaceBetweenDropArrow mr-3">
+                                            <p class="is-size-6" style='color:#7a7a7a; font-weight:bold;'>Links</p>
+                                        </div>
+                                        <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M14.0833 7.66675C13.75 7.33341 13.25 7.33341 12.9166 7.66675L9.99996 10.5834L7.08329 7.66675C6.74996 7.33341 6.24996 7.33341 5.91663 7.66675C5.58329 8.00008 5.58329 8.50008 5.91663 8.83342L9.41663 12.3334C9.58329 12.5001 9.74996 12.5834 9.99996 12.5834C10.25 12.5834 10.4166 12.5001 10.5833 12.3334L14.0833 8.83342C14.4166 8.50008 14.4166 8.00008 14.0833 7.66675Z" fill="#526172"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class='dropdown-menu' id='links-menu' role='menu'>
+                                    <div class='dropdown-content linksDropDown'>
+                                        <a class='dropdown-item' href="https://app.smartsheet.com/b/form/12398cd5bf7e4e108d83b2c2e50e89ef" target="_blank">
+                                            <svg class='pt-1 mr-3 has-text-grey-dark' height="18" width="18" viewBox="0 -64 640 640" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M519.2 127.9l-47.6-47.6A56.252 56.252 0 0 0 432 64H205.2c-14.8 0-29.1 5.9-39.6 16.3L118 127.9H0v255.7h64c17.6 0 31.8-14.2 31.9-31.7h9.1l84.6 76.4c30.9 25.1 73.8 25.7 105.6 3.8 12.5 10.8 26 15.9 41.1 15.9 18.2 0 35.3-7.4 48.8-24 22.1 8.7 48.2 2.6 64-16.8l26.2-32.3c5.6-6.9 9.1-14.8 10.9-23h57.9c.1 17.5 14.4 31.7 31.9 31.7h64V127.9H519.2zM48 351.6c-8.8 0-16-7.2-16-16s7.2-16 16-16 16 7.2 16 16c0 8.9-7.2 16-16 16zm390-6.9l-26.1 32.2c-2.8 3.4-7.8 4-11.3 1.2l-23.9-19.4-30 36.5c-6 7.3-15 4.8-18 2.4l-36.8-31.5-15.6 19.2c-13.9 17.1-39.2 19.7-55.3 6.6l-97.3-88H96V175.8h41.9l61.7-61.6c2-.8 3.7-1.5 5.7-2.3H262l-38.7 35.5c-29.4 26.9-31.1 72.3-4.4 101.3 14.8 16.2 61.2 41.2 101.5 4.4l8.2-7.5 108.2 87.8c3.4 2.8 3.9 7.9 1.2 11.3zm106-40.8h-69.2c-2.3-2.8-4.9-5.4-7.7-7.7l-102.7-83.4 12.5-11.4c6.5-6 7-16.1 1-22.6L367 167.1c-6-6.5-16.1-6.9-22.6-1l-55.2 50.6c-9.5 8.7-25.7 9.4-34.6 0-9.3-9.9-8.5-25.1 1.2-33.9l65.6-60.1c7.4-6.8 17-10.5 27-10.5l83.7-.2c2.1 0 4.1.8 5.5 2.3l61.7 61.6H544v128zm48 47.7c-8.8 0-16-7.2-16-16s7.2-16 16-16 16 7.2 16 16c0 8.9-7.2 16-16 16z" fill='currentColor'/>
+                                            </svg>
+                                            <span class="mr-auto" style='color:#7a7a7a; font-weight:bold;'>Submit a Script Idea</span>
+                                        </a>
+                                        <hr class='dropdown-divider'>
+                                        <a class='dropdown-item' href="https://www.pdsconnect2.com/pbi-reports/iris---imaging-informatics-pbi/" target="_blank">
+                                            <svg class="pt-1 mr-3 has-text-grey-dark" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M9.0002 0.666626C4.41687 0.666626 0.66687 4.41663 0.66687 8.99996C0.66687 13.5833 4.41687 17.3333 9.0002 17.3333C13.5835 17.3333 17.3335 13.5833 17.3335 8.99996C17.3335 4.41663 13.5835 0.666626 9.0002 0.666626ZM2.58354 10.6666C2.41687 10.0833 2.33354 9.58329 2.33354 8.99996C2.33354 8.41663 2.41687 7.91663 2.58354 7.33329H4.16687C4.0002 8.41663 4.0002 9.58329 4.16687 10.6666H2.58354ZM3.2502 12.3333H4.41687C4.58354 13.0833 4.83354 13.8333 5.2502 14.5C4.41687 13.9166 3.7502 13.1666 3.2502 12.3333ZM4.41687 5.66663H3.2502C3.7502 4.83329 4.41687 4.08329 5.2502 3.49996C4.83354 4.16663 4.58354 4.91663 4.41687 5.66663ZM8.16687 15.4166C7.16687 14.6666 6.41687 13.5833 6.16687 12.3333H8.16687V15.4166ZM8.16687 10.6666H5.7502C5.66687 10.0833 5.66687 9.58329 5.66687 8.99996C5.66687 8.41663 5.66687 7.91663 5.7502 7.33329H8.16687V10.6666ZM8.16687 5.66663H6.16687C6.41687 4.41663 7.16687 3.33329 8.16687 2.58329V5.66663ZM14.7502 5.66663H13.5835C13.4169 4.91663 13.1669 4.16663 12.7502 3.49996C13.5835 4.08329 14.2502 4.83329 14.7502 5.66663ZM9.83354 2.58329C10.8335 3.33329 11.5835 4.41663 11.8335 5.66663H9.83354V2.58329ZM9.83354 15.4166V12.3333H11.8335C11.5835 13.5833 10.8335 14.6666 9.83354 15.4166ZM12.2502 10.6666H9.83354V7.33329H12.2502C12.3335 8.41663 12.3335 9.58329 12.2502 10.6666ZM12.8335 14.5C13.1669 13.8333 13.4169 13.0833 13.6669 12.3333H14.8335C14.2502 13.1666 13.5835 13.9166 12.8335 14.5ZM13.9169 10.6666C14.0835 9.58329 14.0835 8.41663 13.9169 7.33329H15.5002C15.8335 8.41663 15.8335 9.58329 15.5002 10.6666H13.9169Z" fill="currentColor"></path>
+                                            </svg>
+                                            <span class="mr-auto" style='color:#7a7a7a; font-weight:bold;'>IRIS</span>
+                                        </a>
+                                        <hr class="dropdown-divider">
+                                        <a class='dropdown-item' href="https://pacificdental.freshservice.com/a/solutions/articles/filters/all_articles" target="_blank">
+                                            <svg class="pt-1 mr-3 has-text-grey-dark" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M16.6416 0.716687C16.0442 0.613798 15.4394 0.560837 14.8332 0.558353C12.7652 0.556658 10.7403 1.14966 8.99991 2.26669C7.25503 1.16433 5.23045 0.585879 3.16657 0.60002C2.56045 0.602503 1.95558 0.655464 1.35824 0.758353C1.16258 0.792085 0.985392 0.894569 0.858585 1.04735C0.731779 1.20013 0.663688 1.39316 0.666574 1.59169V11.5917C0.66479 11.7141 0.690013 11.8355 0.740449 11.9471C0.790886 12.0586 0.865296 12.1577 0.958385 12.2373C1.05147 12.3169 1.16096 12.3749 1.27904 12.4074C1.39712 12.4398 1.5209 12.4459 1.64157 12.425C2.83576 12.2183 4.05924 12.2526 5.23996 12.5259C6.42068 12.7993 7.53476 13.3061 8.51657 14.0167L8.61657 14.075H8.70824C8.80066 14.1135 8.89979 14.1334 8.99991 14.1334C9.10003 14.1334 9.19916 14.1135 9.29157 14.075H9.38324L9.48324 14.0167C10.4582 13.2903 11.5691 12.767 12.75 12.4778C13.931 12.1887 15.158 12.1395 16.3582 12.3334C16.4789 12.3542 16.6027 12.3482 16.7208 12.3157C16.8389 12.2833 16.9483 12.2252 17.0414 12.1456C17.1345 12.0661 17.2089 11.967 17.2594 11.8554C17.3098 11.7438 17.335 11.6225 17.3332 11.5V1.50002C17.3246 1.31015 17.2512 1.12895 17.1254 0.986468C16.9996 0.843991 16.8289 0.7488 16.6416 0.716687ZM8.16657 11.7917C6.62481 10.9806 4.90867 10.5573 3.16657 10.5584C2.89157 10.5584 2.61657 10.5584 2.33324 10.5584V2.22502C2.61079 2.20902 2.88903 2.20902 3.16657 2.22502C4.9444 2.22306 6.68342 2.74476 8.16657 3.72502V11.7917ZM15.6666 10.5917C15.3832 10.5917 15.1082 10.5917 14.8332 10.5917C13.0911 10.5906 11.375 11.0139 9.83324 11.825V3.72502C11.3164 2.74476 13.0554 2.22306 14.8332 2.22502C15.1108 2.20902 15.389 2.20902 15.6666 2.22502V10.5917ZM16.6416 14.05C16.0442 13.9471 15.4394 13.8942 14.8332 13.8917C12.7652 13.89 10.7403 14.483 8.99991 15.6C7.2595 14.483 5.2346 13.89 3.16657 13.8917C2.56045 13.8942 1.95558 13.9471 1.35824 14.05C1.24976 14.0672 1.14576 14.1057 1.05221 14.1633C0.95866 14.2208 0.877409 14.2963 0.81313 14.3854C0.748851 14.4744 0.702812 14.5753 0.677661 14.6822C0.65251 14.7891 0.648742 14.9 0.666574 15.0084C0.708923 15.2248 0.835316 15.4156 1.01807 15.539C1.20082 15.6623 1.42502 15.7083 1.64157 15.6667C2.83576 15.4599 4.05924 15.4942 5.23996 15.7676C6.42068 16.0409 7.53476 16.5478 8.51657 17.2584C8.65771 17.3588 8.82665 17.4128 8.99991 17.4128C9.17316 17.4128 9.34211 17.3588 9.48324 17.2584C10.4651 16.5478 11.5791 16.0409 12.7599 15.7676C13.9406 15.4942 15.1641 15.4599 16.3582 15.6667C16.5748 15.7083 16.799 15.6623 16.9817 15.539C17.1645 15.4156 17.2909 15.2248 17.3332 15.0084C17.3511 14.9 17.3473 14.7891 17.3222 14.6822C17.297 14.5753 17.251 14.4744 17.1867 14.3854C17.1224 14.2963 17.0412 14.2208 16.9476 14.1633C16.8541 14.1057 16.7501 14.0672 16.6416 14.05Z" fill="currentColor"></path>
+                                            </svg>
+                                            <span class="mr-auto" style='color:#7a7a7a; font-weight:bold;'>Knowledge Base</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="topNavBarItem dropdown is-hoverable ml-1">
+                                <div class='is-flex is-justify-content-center dropdown-trigger'>
+                                    <button class="is-flex is-align-items-center has-text-weight-normal" aria-haspopup='true' aria-controls='links-menu' style='background-color:white; border:none;'>
+                                        <div class="spaceBetweenDropArrow mr-3">
+                                            <p class="is-size-6" style='color:#7a7a7a; font-weight:bold;'>Reporting</p>
+                                        </div>
+                                        <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M14.0833 7.66675C13.75 7.33341 13.25 7.33341 12.9166 7.66675L9.99996 10.5834L7.08329 7.66675C6.74996 7.33341 6.24996 7.33341 5.91663 7.66675C5.58329 8.00008 5.58329 8.50008 5.91663 8.83342L9.41663 12.3334C9.58329 12.5001 9.74996 12.5834 9.99996 12.5834C10.25 12.5834 10.4166 12.5001 10.5833 12.3334L14.0833 8.83342C14.4166 8.50008 14.4166 8.00008 14.0833 7.66675Z" fill="#526172"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class='dropdown-menu' id='ReportingMenu' role='menu'>
+                                    <div class='dropdown-content'>
+                                        <a class=' dropdown-item' href="https://app.powerbi.com/groups/4955b2a8-c296-439e-a9f0-bf19f0013fcb/reports/0e4b3da1-70fc-45c9-aa2c-79f85f249d35/ReportSection97beeed146e2320c5642?experience=power-bi" target="_blank">
+                                            <svg class='pt-1 mr-2' width="16" height="16" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M476.59,227.05l-.16-.07L49.35,49.84A23.56,23.56,0,0,0,27.14,52,24.65,24.65,0,0,0,16,72.59V185.88a24,24,0,0,0,19.52,23.57l232.93,43.07a4,4,0,0,1,0,7.86L35.53,303.45A24,24,0,0,0,16,327V440.31A23.57,23.57,0,0,0,26.59,460a23.94,23.94,0,0,0,13.22,4,24.55,24.55,0,0,0,9.52-1.93L476.4,285.94l.19-.09a32,32,0,0,0,0-58.8Z" fill='#7a7a7a'/>
+                                            </svg>
+                                            <span style='color:#7a7a7a; font-weight:bold;'>Service Desk Reporting (ITOM)</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="childFlexBackButtonTopNavBar" id="hideThisBackButton">
+                                <div class="spanContainer">
+                                    <span class="arrowSvgCon spanContainerItem">
+                                        <span class="containsSvg">
+                                            <svg style="color: rgb(50, 56, 67);" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                                                <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z" fill="#323843"></path>
+                                            </svg>
+                                        </span>
+                                    </span>
+                                    <span class="backToMainCon spanContainerItem">
+                                        <span class="backToMainText">Back to main</span>
+                                        <span class="backTextOnly">Back</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </nav>
+                        <!--end of topNavBarContainer-->
+                    </div>
+                </section>
+                <center>
+                    <br>
+                    <br>
+                    <h4 style="font-size:150%; font-weight:bold;">Welcome to ADAPT!  Choose an option below:</h4>
+                    <br>
+                    <br>
+                </center>
+            </section>
+            <section class="section section-space-tiles">
+                <!--start of section for tiles row 1-->
+                <div class="container">
+                    <div class="columns is-multiline is-justify-content-center">
+                        <!--OFFICES SECTION-->
+                        <div class="column is-3-desktop is-6-tablet selection">
+                            <div class="box box-give-hover WorkstationSolutionsBoxFlexCon js-modal-trigger" data-target="DiagnosticPageModal">
+                                <div class="WorkstationSolutionsHeader is-flex is-align-items-center">
+                                    <!--<img id='WorkstationSolutionsImage' class="folder-icon has-text-primary mr-2" src = "/static/images/blue-folder.svg" alt="folder" height="18px" width="16px"/>-->
+                                    <h3 id='WorkstationSolutionsSolutions' class="is-size-6" style='font-weight:bold;'>Start with an Office</h3>
+                                    <!--span class="ml-auto tag is-primary is-light has-text-grey">7 Scripts</span-->
+                                </div>
+                                <!--<h3 id='WorkstationSolutionsH' class="mb-4 is-size-3" style='font-weight:bold; text-align:center;'>Workstation</h3>-->
+                                <center class="tileLogo">
+                                    <br>
+                                    <img class="imageLogo" width='110' src="../static/images/office.png">
+                                </center>
+                                <div class="backButtonTile childFlexBackButtonTile">
+                                    <div class="spanContainer">
+                                        <span class="arrowSvgCon spanContainerItem">
+                                            <span class="containsSvg">
+                                                <svg class="backButtonArrowSvg" style="color: rgb(50, 56, 67);" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                                                    <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z" fill="#323843"></path>
+                                                </svg>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--WORKSTATION SECTION-->
+                        <div class="column is-3-desktop is-6-tablet selection">
+                            <div class="box box-give-hover WorkstationSolutionsBoxFlexCon js-modal-trigger" data-target="WorkstationModal">
+                                <div class="WorkstationSolutionsHeader is-flex is-align-items-center">
+                                    <!--<img id='WorkstationSolutionsImage' class="folder-icon has-text-primary mr-2" src = "/static/images/blue-folder.svg" alt="folder" height="18px" width="16px"/>-->
+                                    <h3 id='WorkstationSolutionsSolutions' class="is-size-6" style='font-weight:bold;'>Start with a Workstation</h3>
+                                    <!--span class="ml-auto tag is-primary is-light has-text-grey">7 Scripts</span-->
+                                </div>
+                                <!--<h3 id='WorkstationSolutionsH' class="mb-4 is-size-3" style='font-weight:bold; text-align:center;'>Workstation</h3>-->
+                                <center class="tileLogo">
+                                    <br>
+                                    <img class="imageLogo" width='110' src="/static/images/workstationfront.png">
+                                </center>
+                                <div class="backButtonTile childFlexBackButtonTile">
+                                    <div class="spanContainer">
+                                        <span class="arrowSvgCon spanContainerItem">
+                                            <span class="containsSvg">
+                                                <svg class="backButtonArrowSvg" style="color: rgb(50, 56, 67);" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                                                    <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z" fill="#323843"></path>
+                                                </svg>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--USERS SECTION-->
+                        <div class="column is-3-desktop is-6-tablet selection">
+                            <div class="box box-give-hover WorkstationSolutionsBoxFlexCon js-modal-trigger" data-target="UserModal">
+                                <div class="is-flex is-align-items-center">
+                                    <h3 class="is-size-6" style='font-weight:bold;'>Start with a User</h3>
+                                </div>
+                                <center class="tileLogo">
+                                    <br>
+                                    <img class="imageLogo" src="{{url_for('static', filename='images/user.png')}}">
+                                </center>
+                                <div class="backButtonTile childFlexBackButtonTile">
+                                    <div class="spanContainer">
+                                        <span class="arrowSvgCon spanContainerItem">
+                                            <span class="containsSvg">
+                                                <svg class="backButtonArrowSvg" style="color: rgb(50, 56, 67);" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                                                    <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z" fill="#323843"></path>
+                                                </svg>
+                                            </span>
+                                        </span>
+                                        <span class="backToMainCon spanContainerItem">
+                                            <span class="backToMainText">Back to main</span>
+                                            <span class="backTextOnly">Back</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--OUTAGES SECTION-->
+                        <div class="column is-3-desktop is-6-tablet selection">
+                            <a href="/spark">
+
+                            <div class="box box-give-hover WorkstationSolutionsBoxFlexCon">
+                                <div class="is-flex is-align-items-center">
+                                    <h3 class="is-size-6" style="font-weight: bold;">Outages</h3>
+                                </div>
+                                <center class="tileLogo">
+                                    <br>
+                                        <img class="imageLogo" src="../static/images/alert.png" alt="Alert Icon">
+                                </center>
+                                <div class="backButtonTile childFlexBackButtonTile" style="display: none;">
+                                    <div class="spanContainer">
+                                        <span class="arrowSvgCon spanContainerItem">
+                                            <span class="containsSvg">
+                                                <svg class="backButtonArrowSvg" style="color: rgb(50, 56, 67);" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                                    <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z" fill="#323843"></path>
+                                                </svg>
+                                            </span>
+                                        </span>
+                                        <span class="backToMainCon spanContainerItem">
+                                            <span class="backToMainText">Back to main</span>
+                                            <span class="backTextOnly">Back</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            </a>
+
+                        </div>
+                        <!--JARVIS SECTION-->
+                        <div class="column is-3-desktop is-6-tablet selection">
+                            <a href="/ai/jarvis">
+
+                            <div class="box box-give-hover WorkstationSolutionsBoxFlexCon">
+                                <div class="is-flex is-align-items-center">
+                                    <h3 class="is-size-6" style="font-weight: bold;">Jarvis</h3>
+                                </div>
+                                <center class="tileLogo">
+                                    <br>
+                                        <img class="imageLogo" src="../static/images/ai.png" alt="Alert Icon">
+                                </center>
+                                <div class="backButtonTile childFlexBackButtonTile" style="display: none;">
+                                    <div class="spanContainer">
+                                        <span class="arrowSvgCon spanContainerItem">
+                                            <span class="containsSvg">
+                                                <svg class="backButtonArrowSvg" style="color: rgb(50, 56, 67);" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                                    <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z" fill="#323843"></path>
+                                                </svg>
+                                            </span>
+                                        </span>
+                                        <span class="backToMainCon spanContainerItem">
+                                            <span class="backToMainText">Back to main</span>
+                                            <span class="backTextOnly">Back</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            </a>
+
+                        </div>
+
+                        <!--TRACKING SECTION-->
+                        <div class="column is-3-desktop is-6-tablet selection">
+                            <a href="/tracking/">
+
+                            <div class="box box-give-hover WorkstationSolutionsBoxFlexCon">
+                                <div class="is-flex is-align-items-center">
+                                    <h3 class="is-size-6" style="font-weight: bold;">Tracking</h3>
+                                </div>
+                                <center class="tileLogo">
+                                    <br>
+                                        <img class="imageLogo" src="../static/images/blue_tracking.png" alt="Alert Icon">
+                                </center>
+                                <div class="backButtonTile childFlexBackButtonTile" style="display: none;">
+                                    <div class="spanContainer">
+                                        <span class="arrowSvgCon spanContainerItem">
+                                            <span class="containsSvg">
+                                                <svg class="backButtonArrowSvg" style="color: rgb(50, 56, 67);" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                                    <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z" fill="#323843"></path>
+                                                </svg>
+                                            </span>
+                                        </span>
+                                        <span class="backToMainCon spanContainerItem">
+                                            <span class="backToMainText">Back to main</span>
+                                            <span class="backTextOnly">Back</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            </a>
+
+                        </div>
+                </div>
+        </div>
+</section>
+<div id="OfficeModal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class='modal-card-head'>
+            <p class='modal-card-title'>Office/Workstation Search</p>
+        </header>
+        <section class='modal-card-body'>
+            <div class="box">
+                <center>
+                    <form name="form" method="GET" action="/Office/">
+                        <input class='input is-primary' type='text' name="office" id="officetext" placeholder='Enter Office Mnemonic, Office Number or Workstation Hostname'>
+                        <br>
+                        <br>
+                        <input class='button is-primary' type='submit' id="btnsubmit" onclick="subOfficeQuery()" value='Submit'>
+                    </form>
+                </center>
+            </div>
+        </section>
+    </div>
+</div>
+<div id="SOPModal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class='modal-card-head'>
+            <p class='modal-card-title'>Office Diagnostic</p>
+        </header>
+        <section class='modal-card-body'>
+            <div class="box">
+                <center>
+                    <form name="form" method="GET" action="/SOPLoad/">
+                        <input class='input is-primary' type='text' name="hiddenOffice" id="SOPofficetext" placeholder='Enter Office Mnemonic or Office Number'>
+                        <br>
+                        <br>
+                        <input class='button is-primary' type='submit' id="sopSubButton" onclick="sopSub()" value='Submit'>
+                    </form>
+                </center>
+            </div>
+        </section>
+    </div>
+</div>
+<div id="WorkstationModal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class='modal-card-head'>
+            <p class='modal-card-title'>Workstation Lookup</p>
+        </header>
+        <section class='modal-card-body'>
+            <div class="box">
+                <center>
+                    <form name="form" method="GET" action="/SingleLoad/" target='_blank'>
+                        <input class='input is-primary' type='text' name="hiddenWorkstation" id="SOPworkstationtext" placeholder='Enter Workstation'>
+                        <br>
+                        <br>
+                        <input class='button is-primary' type='submit' id="WorkstationSubButton" value='Submit'>
+                    </form>
+                </center>
+            </div>
+        </section>
+    </div>
+</div>
+<div id="CADModal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class='modal-card-head'>
+            <p class='modal-card-title'>CAD/CAM Office Diagnostic</p>
+        </header>
+        <section class='modal-card-body'>
+            <div class="box">
+                <center>
+                    <form name="form" method="GET" action="/CADLoad/">
+                        <input class='input is-primary' type='text' name="hiddenCADOffice" id="CADofficetext" placeholder='Enter Office Mnemonic or Office Number'>
+                        <br>
+                        <br>
+                        <input class='button is-primary' type='submit' id="cadSubButton" onclick="cadSub()" value='Submit'>
+                    </form>
+                </center>
+            </div>
+        </section>
+    </div>
+</div>
+<div id="NetModal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class='modal-card-head'>
+            <p class='modal-card-title'>Office Network Diagnostic</p>
+        </header>
+        <section class='modal-card-body'>
+            <div class="box">
+                <center>
+                    <form name="form" method="GET" action="/NetLoad">
+                        <input class='input is-primary' type='text' name="hiddenNetOffice" id="NETofficetext" placeholder='Enter Office Mnemonic or Office Number'>
+                        <br>
+                        <br>
+                        <input class='button is-primary' type='submit' id="netSubButton" onclick="netSub()" value='Submit'>
+                    </form>
+                </center>
+            </div>
+        </section>
+    </div>
+</div>
+<div id='notifModal' class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Notifications</p>
+            <button class="delete" aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+            <p>Welcome to the new ADAPT UI!</p>
+            <br>
+            <p>Images used within the UI are currently Placeholders</p>
+            <br>
+            <p>Added StickyNotes Install to Software Deploys</p>
+            <br>
+            <p>Added a new AD User Tool</p>
+            <br>
+            <p>Allowed Office searches with just Office Number or Office Mnemonic</p>
+            <br>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button">Close</button>
+        </footer>
+    </div>
+</div>
+<div id="OutageModal" class="modal" onclick="window.location.href='/spark';">
+    <!-- <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class='modal-card-head'>
+            <p class='modal-card-title'>New AD User Search</p>
+        </header>
+        <section class='modal-card-body'>
+            <div class="box">
+                <form method="POST" name="UserForm" id="UserForm" action="/spark.html" target='_blank'>
+                    <input type="hidden" name="csrfmiddlewaretoken" value="aWi1LuUbOoAZYgVyzuh3u73aEiPvhmTCfI6AnpO45Q8xoSqAYTVIDs2B76j8M0ll">
+                    <label class="ml-6 mb-3">Input Username, First and Last Name, or Clock ID: </label>
+                    <div class="columns is-multiline is-justify-content-center">
+                        <div class='column'>
+                            <input class='ml-6 mt-4 input is-primary' type='text' name="usernametext" width="4rem" id="usernametext" placeholder='User'>
+                        </div>
+                        <div class='column'>
+                            <input class='button is-info searchButton ml-1 mt-4' type='button' id="usersub" onclick="userSub()" value='Submit'>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div> -->
+</div>
+
+<div id="UserModal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class='modal-card-head'>
+            <p class='modal-card-title'>New AD User Search</p>
+        </header>
+        <section class='modal-card-body'>
+            <div class="box">
+                <form method="POST" name="UserForm" id="UserForm" action="/spark.html" target='_blank'>
+                    <input type="hidden" name="csrfmiddlewaretoken" value="aWi1LuUbOoAZYgVyzuh3u73aEiPvhmTCfI6AnpO45Q8xoSqAYTVIDs2B76j8M0ll">
+                    <label class="ml-6 mb-3">Input Username, First and Last Name, or Clock ID: </label>
+                    <div class="columns is-multiline is-justify-content-center">
+                        <div class='column'>
+                            <input class='ml-6 mt-4 input is-primary' type='text' name="usernametext" width="4rem" id="usernametext" placeholder='User'>
+                        </div>
+                        <div class='column'>
+                            <input class='button is-info searchButton ml-1 mt-4' type='button' id="usersub" onclick="userSub()" value='Submit'>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+<div id="OfficeTicketModal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class='modal-card-head'>
+            <p class='modal-card-title'>Office FreshService Ticket Search</p>
+        </header>
+        <section class='modal-card-body'>
+            <div class="box">
+                <form method="POST" name="OfficeTicketForm" id="OfficeTicketForm" action="/OfficeTicket/">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="aWi1LuUbOoAZYgVyzuh3u73aEiPvhmTCfI6AnpO45Q8xoSqAYTVIDs2B76j8M0ll">
+                    <label class="ml-6 mb-3">Input Office Number or Mnemonic</label>
+                    <div class="columns is-multiline is-justify-content-center">
+                        <div class='column'>
+                            <input class='ml-6 mt-4 input is-primary' type='text' name="TicketOffice" width="4rem" id="TicketOffice" placeholder='Office Number or Mnemonic'>
+                            <br>
+                            <label class="label ml-6" id="officeticketlabel"></label>
+                        </div>
+                        <div class='column'>
+                            <input class='ml-6 mt-4 button is-primary' type='submit' id="usersub" onclick="officeSub()" value='Submit'>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>
+<div id="DiagnosticPageModal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class='modal-card-head'>
+            <p class='modal-card-title'>Office Search</p>
+        </header>
+        <section class='modal-card-body'>
+            <form method="GET" id='officeSearchForm' action="/diagnostic/dashboard/office/" target='_blank'>
+                <div class="box boxShadowNone columns is-multiline is-justify-content-center">
+                    <div class='column is-narrow'>
+                        <label class="label">Office Mnemonic or Number: </label>
+                        <input class='input is-primary' type='text' name="hiddenOffice" width="4rem" id="hiddenOffice" placeholder='Office'>
+                    </div>
+                    <div class='column is-narrow'>
+                        <div class="field" id="ItemCategory">
+                            <label class="label">Pre-Run Diagnostic:</label>
+                            <p class="control has-icons-left">
+                                <span class="select">
+                                    <select name="hiddenTask" id="hiddenTask">
+                                        <option selected='true'>None</option>
+                                        <option value='SOP'>Workstation</option>
+                                        <option value='clinicaldiag'>Clinical</option>
+                                        <option value='sensordiag'>Sensor</option>
+                                        <option value='netdiag'>Network</option>
+                                        <option value='caddiag'>CAD/CAM</option>
+                                    </select>
+                                </span>
+                                <span class='icon is-small is-left mt-3 ml-3'>
+                                    <svg width="13px" height="13px" viewBox="0 0 24 24" id="magicoon-Regular" xmlns="http://www.w3.org/2000/svg">
+                                        <defs>
+                                            <style>
+                                                .cls-1 {
+                                                    fill: #41416e;
+                                                }
+                                            </style>
+                                        </defs>
+                                        <title>menu</title>
+                                        <g id="menu-Regular">
+                                            <path id="menu-Regular-2" data-name="menu-Regular" class="cls-1" d="M2.25,5A.75.75,0,0,1,3,4.25H16a.75.75,0,0,1,0,1.5H3A.75.75,0,0,1,2.25,5ZM21,11.25H3a.75.75,0,0,0,0,1.5H21a.75.75,0,0,0,0-1.5Zm-9,7H3a.75.75,0,0,0,0,1.5h9a.75.75,0,0,0,0-1.5Z"/>
+                                        </g>
+                                    </svg>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class='column is-narrow'>
+                        <input class="button is-info searchButton mt-6 pr-5 is-pulled-left" type="button" id='officeSubmitButton' onclick='officeSearch()' value="search">
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+</div><script src="/static/JS/myScript1.js"></script>
+</body></html>

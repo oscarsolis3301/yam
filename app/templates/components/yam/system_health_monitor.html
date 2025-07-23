@@ -1,0 +1,1109 @@
+{% macro render_system_health_monitor(current_user) %}
+<!-- System Health Monitor Component -->
+<div class="yam-component system-health-monitor" id="systemHealthMonitor">
+    <div class="component-header">
+        <div class="header-content">
+            <div class="header-icon">
+                <i class="bi bi-heart-pulse"></i>
+            </div>
+            <div class="header-text">
+                <h3>System Health Monitor</h3>
+                <p>Real-time system monitoring & alerts</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-sm btn-outline-light" onclick="systemHealthMonitor.toggleAlerts()">
+                <i class="bi bi-bell"></i>
+                <span class="alert-badge" id="alertCount">0</span>
+            </button>
+            <button class="btn btn-sm btn-outline-light" onclick="systemHealthMonitor.refresh()">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-light dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" onclick="systemHealthMonitor.exportHealth()">
+                        <i class="bi bi-download"></i> Export Health Report
+                    </a></li>
+                    <li><a class="dropdown-item" href="#" onclick="systemHealthMonitor.showThresholds()">
+                        <i class="bi bi-sliders"></i> Alert Thresholds
+                    </a></li>
+                    <li><a class="dropdown-item" href="#" onclick="systemHealthMonitor.showSettings()">
+                        <i class="bi bi-gear"></i> Settings
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="component-content">
+        <!-- System Health Overview -->
+        <div class="health-overview">
+            <div class="health-card overall">
+                <div class="health-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <div class="health-info">
+                    <div class="health-value" id="overallHealth">95%</div>
+                    <div class="health-label">Overall Health</div>
+                    <div class="health-status excellent">Excellent</div>
+                </div>
+            </div>
+            
+            <div class="health-card cpu">
+                <div class="health-icon">
+                    <i class="bi bi-cpu"></i>
+                </div>
+                <div class="health-info">
+                    <div class="health-value" id="cpuUsage">45%</div>
+                    <div class="health-label">CPU Usage</div>
+                    <div class="health-status good">Good</div>
+                </div>
+            </div>
+            
+            <div class="health-card memory">
+                <div class="health-icon">
+                    <i class="bi bi-memory"></i>
+                </div>
+                <div class="health-info">
+                    <div class="health-value" id="memoryUsage">62%</div>
+                    <div class="health-label">Memory Usage</div>
+                    <div class="health-status good">Good</div>
+                </div>
+            </div>
+            
+            <div class="health-card disk">
+                <div class="health-icon">
+                    <i class="bi bi-hdd"></i>
+                </div>
+                <div class="health-info">
+                    <div class="health-value" id="diskUsage">78%</div>
+                    <div class="health-label">Disk Usage</div>
+                    <div class="health-status warning">Warning</div>
+                </div>
+            </div>
+            
+            <div class="health-card network">
+                <div class="health-icon">
+                    <i class="bi bi-wifi"></i>
+                </div>
+                <div class="health-info">
+                    <div class="health-value" id="networkStatus">100%</div>
+                    <div class="health-label">Network</div>
+                    <div class="health-status excellent">Excellent</div>
+                </div>
+            </div>
+            
+            <div class="health-card database">
+                <div class="health-icon">
+                    <i class="bi bi-database"></i>
+                </div>
+                <div class="health-info">
+                    <div class="health-value" id="dbHealth">98%</div>
+                    <div class="health-label">Database</div>
+                    <div class="health-status excellent">Excellent</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Real-time Monitoring Grid -->
+        <div class="monitoring-grid">
+            <div class="grid-header">
+                <h5>Real-time System Metrics</h5>
+                <div class="grid-controls">
+                    <div class="refresh-interval">
+                        <select class="form-select form-select-sm" id="refreshInterval">
+                            <option value="5">5s</option>
+                            <option value="10" selected>10s</option>
+                            <option value="30">30s</option>
+                            <option value="60">1m</option>
+                        </select>
+                    </div>
+                    <div class="view-toggle">
+                        <button class="btn btn-sm btn-outline-light active" data-view="grid">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-light" data-view="list">
+                            <i class="bi bi-list"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="metrics-grid" id="metricsGrid">
+                <!-- System metrics will be generated here -->
+            </div>
+        </div>
+        
+        <!-- System Alerts Panel -->
+        <div class="alerts-panel" id="alertsPanel" style="display: none;">
+            <div class="panel-header">
+                <h5>System Alerts</h5>
+                <button class="btn btn-sm btn-outline-light" onclick="systemHealthMonitor.closeAlerts()">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            
+            <div class="alerts-container" id="alertsContainer">
+                <!-- Alerts will be generated here -->
+            </div>
+        </div>
+        
+        <!-- Performance Charts -->
+        <div class="performance-charts">
+            <div class="charts-header">
+                <h5>System Performance Trends</h5>
+                <div class="chart-controls">
+                    <button class="btn btn-sm btn-outline-light" onclick="systemHealthMonitor.toggleChartView()">
+                        <i class="bi bi-graph-up"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="charts-container">
+                <div class="chart-item">
+                    <h6>CPU & Memory Usage</h6>
+                    <div class="chart-container" id="cpuMemoryChart">
+                        <!-- CPU & Memory chart will be rendered here -->
+                    </div>
+                </div>
+                
+                <div class="chart-item">
+                    <h6>Network & Disk I/O</h6>
+                    <div class="chart-container" id="networkDiskChart">
+                        <!-- Network & Disk chart will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Logs -->
+        <div class="system-logs">
+            <h5>Recent System Logs</h5>
+            <div class="logs-container" id="systemLogs">
+                <!-- System logs will be generated here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* System Health Monitor Styles */
+.system-health-monitor {
+    background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.health-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.health-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.health-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, currentColor, transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.health-card:hover::before {
+    opacity: 1;
+}
+
+.health-card.overall {
+    border-color: rgba(72, 187, 120, 0.3);
+}
+
+.health-card.overall .health-icon {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+.health-card.cpu {
+    border-color: rgba(66, 153, 225, 0.3);
+}
+
+.health-card.cpu .health-icon {
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+}
+
+.health-card.memory {
+    border-color: rgba(159, 122, 234, 0.3);
+}
+
+.health-card.memory .health-icon {
+    background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+}
+
+.health-card.disk {
+    border-color: rgba(237, 137, 54, 0.3);
+}
+
+.health-card.disk .health-icon {
+    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+}
+
+.health-card.network {
+    border-color: rgba(72, 187, 120, 0.3);
+}
+
+.health-card.network .health-icon {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+.health-card.database {
+    border-color: rgba(66, 153, 225, 0.3);
+}
+
+.health-card.database .health-icon {
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+}
+
+.health-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: white;
+}
+
+.health-info {
+    flex: 1;
+}
+
+.health-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+}
+
+.health-label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 0.25rem;
+}
+
+.health-status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.health-status.excellent {
+    background: rgba(72, 187, 120, 0.2);
+    color: #48bb78;
+}
+
+.health-status.good {
+    background: rgba(66, 153, 225, 0.2);
+    color: #4299e1;
+}
+
+.health-status.warning {
+    background: rgba(237, 137, 54, 0.2);
+    color: #ed8936;
+}
+
+.health-status.critical {
+    background: rgba(245, 101, 101, 0.2);
+    color: #f56565;
+}
+
+.alert-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #f56565;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.125rem 0.375rem;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+}
+
+.monitoring-grid {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.grid-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.grid-header h5 {
+    color: #fff;
+    font-weight: 600;
+    margin: 0;
+}
+
+.grid-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.metric-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.metric-title {
+    font-weight: 600;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.metric-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    color: #fff;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.metric-progress {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+}
+
+.metric-progress-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.metric-progress-bar.excellent {
+    background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+}
+
+.metric-progress-bar.good {
+    background: linear-gradient(90deg, #4299e1 0%, #3182ce 100%);
+}
+
+.metric-progress-bar.warning {
+    background: linear-gradient(90deg, #ed8936 0%, #dd6b20 100%);
+}
+
+.metric-progress-bar.critical {
+    background: linear-gradient(90deg, #f56565 0%, #e53e3e 100%);
+}
+
+.metric-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.alerts-panel {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.panel-header h5 {
+    color: #fff;
+    font-weight: 600;
+    margin: 0;
+}
+
+.alerts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.alert-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    border-left: 3px solid;
+    transition: all 0.3s ease;
+}
+
+.alert-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.alert-item.critical {
+    border-left-color: #f56565;
+    background: rgba(245, 101, 101, 0.1);
+}
+
+.alert-item.warning {
+    border-left-color: #ed8936;
+    background: rgba(237, 137, 54, 0.1);
+}
+
+.alert-item.info {
+    border-left-color: #4299e1;
+    background: rgba(66, 153, 225, 0.1);
+}
+
+.alert-icon {
+    font-size: 1rem;
+    margin-top: 0.125rem;
+}
+
+.alert-item.critical .alert-icon {
+    color: #f56565;
+}
+
+.alert-item.warning .alert-icon {
+    color: #ed8936;
+}
+
+.alert-item.info .alert-icon {
+    color: #4299e1;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert-title {
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.25rem;
+}
+
+.alert-description {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.5rem;
+}
+
+.alert-time {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.alert-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.alert-actions .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+.performance-charts {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.charts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.charts-header h5 {
+    color: #fff;
+    font-weight: 600;
+    margin: 0;
+}
+
+.charts-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+}
+
+.chart-item h6 {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.chart-container {
+    height: 200px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+}
+
+.system-logs {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.system-logs h5 {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.logs-container {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.log-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+}
+
+.log-level {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    min-width: 60px;
+    text-align: center;
+}
+
+.log-level.error {
+    background: rgba(245, 101, 101, 0.2);
+    color: #f56565;
+}
+
+.log-level.warning {
+    background: rgba(237, 137, 54, 0.2);
+    color: #ed8936;
+}
+
+.log-level.info {
+    background: rgba(66, 153, 225, 0.2);
+    color: #4299e1;
+}
+
+.log-level.debug {
+    background: rgba(160, 174, 192, 0.2);
+    color: #a0aec0;
+}
+
+.log-time {
+    color: rgba(255, 255, 255, 0.5);
+    min-width: 80px;
+}
+
+.log-message {
+    color: rgba(255, 255, 255, 0.8);
+    flex: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .health-overview {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .grid-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .grid-controls {
+        justify-content: space-between;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .charts-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .health-overview {
+        grid-template-columns: 1fr;
+    }
+    
+    .grid-controls {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+}
+</style>
+
+<script>
+// System Health Monitor Component
+window.systemHealthMonitor = {
+    data: {
+        metrics: {},
+        alerts: [],
+        refreshInterval: 10,
+        currentView: 'grid',
+        alertCount: 0
+    },
+    
+    init() {
+        this.setupEventListeners();
+        this.loadData();
+        this.startRealTimeUpdates();
+        this.startPeriodicRefresh();
+        console.log('System Health Monitor initialized');
+    },
+    
+    setupEventListeners() {
+        // Refresh interval selector
+        document.getElementById('refreshInterval').addEventListener('change', (e) => {
+            this.data.refreshInterval = parseInt(e.target.value);
+            this.startPeriodicRefresh();
+        });
+        
+        // View toggle
+        document.querySelectorAll('.view-toggle .btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.view-toggle .btn').forEach(b => b.classList.remove('active'));
+                e.target.closest('.btn').classList.add('active');
+                this.data.currentView = e.target.closest('.btn').dataset.view;
+                this.updateView();
+            });
+        });
+    },
+    
+    async loadData() {
+        try {
+            const response = await fetch('/api/system/health-metrics', {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                this.data.metrics = data.metrics || {};
+                this.data.alerts = data.alerts || [];
+                this.updateHealthOverview();
+                this.updateMetricsGrid();
+                this.updateAlerts();
+                this.updateSystemLogs();
+            } else {
+                console.error('Failed to load system health:', response.status);
+                this.generateMockData();
+            }
+        } catch (error) {
+            console.error('Error loading system health:', error);
+            this.generateMockData();
+        }
+    },
+    
+    generateMockData() {
+        this.data.metrics = {
+            overall: 95,
+            cpu: 45,
+            memory: 62,
+            disk: 78,
+            network: 100,
+            database: 98,
+            temperature: 42,
+            uptime: 99.8,
+            responseTime: 45,
+            throughput: 1250
+        };
+        
+        this.data.alerts = [
+            {
+                id: 1,
+                level: 'warning',
+                title: 'Disk Usage High',
+                description: 'Disk usage has reached 78% capacity',
+                timestamp: new Date().toISOString(),
+                component: 'disk'
+            },
+            {
+                id: 2,
+                level: 'info',
+                title: 'System Update Available',
+                description: 'New system update is ready for installation',
+                timestamp: new Date(Date.now() - 300000).toISOString(),
+                component: 'system'
+            }
+        ];
+        
+        this.updateHealthOverview();
+        this.updateMetricsGrid();
+        this.updateAlerts();
+        this.updateSystemLogs();
+    },
+    
+    updateHealthOverview() {
+        const metrics = this.data.metrics;
+        
+        document.getElementById('overallHealth').textContent = `${metrics.overall}%`;
+        document.getElementById('cpuUsage').textContent = `${metrics.cpu}%`;
+        document.getElementById('memoryUsage').textContent = `${metrics.memory}%`;
+        document.getElementById('diskUsage').textContent = `${metrics.disk}%`;
+        document.getElementById('networkStatus').textContent = `${metrics.network}%`;
+        document.getElementById('dbHealth').textContent = `${metrics.database}%`;
+        
+        // Update status indicators
+        this.updateHealthStatus('overall', metrics.overall);
+        this.updateHealthStatus('cpu', metrics.cpu);
+        this.updateHealthStatus('memory', metrics.memory);
+        this.updateHealthStatus('disk', metrics.disk);
+        this.updateHealthStatus('network', metrics.network);
+        this.updateHealthStatus('database', metrics.database);
+    },
+    
+    updateHealthStatus(component, value) {
+        const card = document.querySelector(`.health-card.${component}`);
+        if (!card) return;
+        
+        const statusElement = card.querySelector('.health-status');
+        let status = 'excellent';
+        let text = 'Excellent';
+        
+        if (value >= 90) {
+            status = 'excellent';
+            text = 'Excellent';
+        } else if (value >= 70) {
+            status = 'good';
+            text = 'Good';
+        } else if (value >= 50) {
+            status = 'warning';
+            text = 'Warning';
+        } else {
+            status = 'critical';
+            text = 'Critical';
+        }
+        
+        statusElement.className = `health-status ${status}`;
+        statusElement.textContent = text;
+    },
+    
+    updateMetricsGrid() {
+        const grid = document.getElementById('metricsGrid');
+        grid.innerHTML = '';
+        
+        const metrics = [
+            { key: 'cpu', title: 'CPU Usage', icon: 'bi-cpu', unit: '%' },
+            { key: 'memory', title: 'Memory Usage', icon: 'bi-memory', unit: '%' },
+            { key: 'disk', title: 'Disk Usage', icon: 'bi-hdd', unit: '%' },
+            { key: 'temperature', title: 'Temperature', icon: 'bi-thermometer-half', unit: '°C' },
+            { key: 'uptime', title: 'Uptime', icon: 'bi-clock', unit: '%' },
+            { key: 'responseTime', title: 'Response Time', icon: 'bi-speedometer2', unit: 'ms' },
+            { key: 'throughput', title: 'Throughput', icon: 'bi-arrow-repeat', unit: 'req/s' },
+            { key: 'network', title: 'Network', icon: 'bi-wifi', unit: '%' }
+        ];
+        
+        metrics.forEach(metric => {
+            const value = this.data.metrics[metric.key] || 0;
+            const card = document.createElement('div');
+            card.className = 'metric-card';
+            
+            let status = 'excellent';
+            if (value >= 90) status = 'excellent';
+            else if (value >= 70) status = 'good';
+            else if (value >= 50) status = 'warning';
+            else status = 'critical';
+            
+            card.innerHTML = `
+                <div class="metric-header">
+                    <div class="metric-title">${metric.title}</div>
+                    <div class="metric-icon">
+                        <i class="${metric.icon}"></i>
+                    </div>
+                </div>
+                <div class="metric-value">${value}${metric.unit}</div>
+                <div class="metric-progress">
+                    <div class="metric-progress-bar ${status}" style="width: ${Math.min(value, 100)}%"></div>
+                </div>
+                <div class="metric-details">
+                    <span>Current: ${value}${metric.unit}</span>
+                    <span>Peak: ${Math.round(value * 1.2)}${metric.unit}</span>
+                </div>
+            `;
+            
+            grid.appendChild(card);
+        });
+    },
+    
+    updateAlerts() {
+        this.data.alertCount = this.data.alerts.filter(alert => alert.level === 'critical' || alert.level === 'warning').length;
+        document.getElementById('alertCount').textContent = this.data.alertCount;
+        
+        const container = document.getElementById('alertsContainer');
+        container.innerHTML = '';
+        
+        this.data.alerts.forEach(alert => {
+            const item = document.createElement('div');
+            item.className = `alert-item ${alert.level}`;
+            
+            const icon = this.getAlertIcon(alert.level);
+            const timeAgo = this.getTimeAgo(new Date(alert.timestamp));
+            
+            item.innerHTML = `
+                <div class="alert-icon">
+                    <i class="bi ${icon}"></i>
+                </div>
+                <div class="alert-content">
+                    <div class="alert-title">${alert.title}</div>
+                    <div class="alert-description">${alert.description}</div>
+                    <div class="alert-time">${timeAgo}</div>
+                </div>
+                <div class="alert-actions">
+                    <button class="btn btn-sm btn-outline-light" onclick="systemHealthMonitor.dismissAlert(${alert.id})">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(item);
+        });
+    },
+    
+    updateSystemLogs() {
+        const container = document.getElementById('systemLogs');
+        container.innerHTML = '';
+        
+        // Generate mock system logs
+        const logs = [
+            { level: 'info', message: 'System health check completed successfully', time: new Date() },
+            { level: 'warning', message: 'Disk usage approaching threshold', time: new Date(Date.now() - 60000) },
+            { level: 'info', message: 'Database connection pool refreshed', time: new Date(Date.now() - 120000) },
+            { level: 'debug', message: 'Memory allocation optimized', time: new Date(Date.now() - 180000) },
+            { level: 'info', message: 'Network latency within normal range', time: new Date(Date.now() - 240000) }
+        ];
+        
+        logs.forEach(log => {
+            const item = document.createElement('div');
+            item.className = 'log-item';
+            
+            const time = log.time.toLocaleTimeString();
+            
+            item.innerHTML = `
+                <div class="log-level ${log.level}">${log.level.toUpperCase()}</div>
+                <div class="log-time">${time}</div>
+                <div class="log-message">${log.message}</div>
+            `;
+            
+            container.appendChild(item);
+        });
+    },
+    
+    getAlertIcon(level) {
+        const icons = {
+            critical: 'exclamation-triangle',
+            warning: 'exclamation-circle',
+            info: 'info-circle'
+        };
+        return icons[level] || 'info-circle';
+    },
+    
+    getTimeAgo(date) {
+        const now = new Date();
+        const diff = now - date;
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(diff / 3600000);
+        
+        if (hours > 0) return `${hours}h ago`;
+        if (minutes > 0) return `${minutes}m ago`;
+        return 'Just now';
+    },
+    
+    startRealTimeUpdates() {
+        if (window.yamDashboard && window.yamDashboard.socket) {
+            const socket = window.yamDashboard.socket;
+            
+            socket.on('system_health_update', (data) => {
+                if (data.metrics) {
+                    this.data.metrics = { ...this.data.metrics, ...data.metrics };
+                    this.updateHealthOverview();
+                    this.updateMetricsGrid();
+                }
+                
+                if (data.alerts) {
+                    this.data.alerts = data.alerts;
+                    this.updateAlerts();
+                }
+            });
+            
+            socket.on('system_alert', (alert) => {
+                this.data.alerts.unshift(alert);
+                this.data.alerts = this.data.alerts.slice(0, 10); // Keep last 10 alerts
+                this.updateAlerts();
+            });
+        }
+    },
+    
+    startPeriodicRefresh() {
+        // Clear existing interval
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+        }
+        
+        // Start new interval
+        this.refreshInterval = setInterval(() => {
+            this.loadData();
+        }, this.data.refreshInterval * 1000);
+    },
+    
+    toggleAlerts() {
+        const panel = document.getElementById('alertsPanel');
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    },
+    
+    closeAlerts() {
+        document.getElementById('alertsPanel').style.display = 'none';
+    },
+    
+    updateView() {
+        const grid = document.getElementById('metricsGrid');
+        
+        if (this.data.currentView === 'list') {
+            grid.style.gridTemplateColumns = '1fr';
+        } else {
+            grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))';
+        }
+    },
+    
+    toggleChartView() {
+        const container = document.querySelector('.charts-container');
+        if (container.style.gridTemplateColumns === 'repeat(auto-fit, minmax(400px, 1fr))') {
+            container.style.gridTemplateColumns = '1fr';
+        } else {
+            container.style.gridTemplateColumns = 'repeat(auto-fit, minmax(400px, 1fr))';
+        }
+    },
+    
+    refresh() {
+        this.loadData();
+    },
+    
+    dismissAlert(alertId) {
+        this.data.alerts = this.data.alerts.filter(alert => alert.id !== alertId);
+        this.updateAlerts();
+    },
+    
+    exportHealth() {
+        const data = {
+            metrics: this.data.metrics,
+            alerts: this.data.alerts,
+            exportedAt: new Date().toISOString()
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'system-health-report.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    },
+    
+    showThresholds() {
+        alert('Alert Thresholds\n\n- CPU Usage: 80% (Warning), 95% (Critical)\n- Memory Usage: 75% (Warning), 90% (Critical)\n- Disk Usage: 80% (Warning), 95% (Critical)\n- Temperature: 60°C (Warning), 80°C (Critical)');
+    },
+    
+    showSettings() {
+        alert('System Health Settings\n\n- Configure monitoring intervals\n- Set alert thresholds\n- Customize notification preferences\n- Manage data retention policies');
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('systemHealthMonitor')) {
+        window.systemHealthMonitor.init();
+    }
+});
+</script>
+{% endmacro %} 

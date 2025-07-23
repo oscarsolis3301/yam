@@ -1,0 +1,1138 @@
+{% macro render_team_collaboration(current_user) %}
+<!-- YAM Team Collaboration Component -->
+<div id="yamTeamCollaboration" class="yam-team-collaboration">
+    <div class="collaboration-header">
+        <h4 class="collaboration-title">
+            <i class="bi bi-people-fill"></i>
+            Team Collaboration
+        </h4>
+        <div class="collaboration-controls">
+            <button class="collaboration-control-btn" id="yamCollaborationRefresh" title="Refresh">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <button class="collaboration-control-btn" id="yamCreateWorkspace" title="Create Workspace">
+                <i class="bi bi-plus-lg"></i>
+            </button>
+            <div class="collaboration-status" id="yamCollaborationStatus">
+                <i class="bi bi-circle-fill"></i>
+                <span>Active</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="collaboration-grid">
+        <!-- Active Workspaces -->
+        <div class="collaboration-card workspaces-card">
+            <div class="card-header">
+                <h5>Active Workspaces</h5>
+                <span class="card-subtitle">Team collaboration spaces</span>
+            </div>
+            <div class="workspaces-list" id="yamWorkspacesList">
+                <!-- Workspaces will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Shared Files -->
+        <div class="collaboration-card files-card">
+            <div class="card-header">
+                <h5>Shared Files</h5>
+                <span class="card-subtitle">Recently shared documents</span>
+            </div>
+            <div class="files-list" id="yamFilesList">
+                <!-- Files will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Team Tasks -->
+        <div class="collaboration-card tasks-card">
+            <div class="card-header">
+                <h5>Team Tasks</h5>
+                <span class="card-subtitle">Collaborative task management</span>
+            </div>
+            <div class="tasks-container">
+                <div class="tasks-list" id="yamTasksList">
+                    <!-- Tasks will be populated here -->
+                </div>
+                <div class="task-input">
+                    <input type="text" id="yamNewTask" placeholder="Add new task..." class="task-input-field">
+                    <button id="yamAddTask" class="task-add-btn">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Team Calendar -->
+        <div class="collaboration-card calendar-card">
+            <div class="card-header">
+                <h5>Team Calendar</h5>
+                <span class="card-subtitle">Upcoming events & meetings</span>
+            </div>
+            <div class="calendar-container">
+                <div class="calendar-events" id="yamCalendarEvents">
+                    <!-- Events will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Create Workspace Modal -->
+    <div class="modal fade" id="yamCreateWorkspaceModal" tabindex="-1" aria-labelledby="yamCreateWorkspaceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="yamCreateWorkspaceModalLabel">
+                        <i class="bi bi-plus-lg"></i>
+                        Create New Workspace
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="yamWorkspaceName">Workspace Name</label>
+                        <input type="text" id="yamWorkspaceName" class="form-control" placeholder="Enter workspace name">
+                    </div>
+                    <div class="form-group">
+                        <label for="yamWorkspaceDescription">Description</label>
+                        <textarea id="yamWorkspaceDescription" class="form-control" rows="3" placeholder="Enter workspace description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="yamWorkspaceMembers">Invite Members</label>
+                        <select id="yamWorkspaceMembers" class="form-control" multiple>
+                            <!-- Members will be populated here -->
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="yamSaveWorkspace">Create Workspace</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- File Upload Modal -->
+    <div class="modal fade" id="yamFileUploadModal" tabindex="-1" aria-labelledby="yamFileUploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="yamFileUploadModalLabel">
+                        <i class="bi bi-upload"></i>
+                        Share File
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="file-upload-area" id="yamFileUploadArea">
+                        <i class="bi bi-cloud-upload"></i>
+                        <p>Drag and drop files here or click to browse</p>
+                        <input type="file" id="yamFileInput" multiple style="display: none;">
+                    </div>
+                    <div class="uploaded-files" id="yamUploadedFiles">
+                        <!-- Uploaded files will be shown here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="yamShareFiles">Share Files</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.yam-team-collaboration {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.yam-team-collaboration::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #a8e6cf, #88d8c0, #a8e6cf);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.collaboration-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.collaboration-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.collaboration-title i {
+    color: #a8e6cf;
+}
+
+.collaboration-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.collaboration-control-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+}
+
+.collaboration-control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.collaboration-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 0.25rem 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+.collaboration-status i {
+    color: #4caf50;
+    font-size: 0.7rem;
+    animation: pulse 2s infinite;
+}
+
+.collaboration-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.collaboration-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.collaboration-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.workspaces-list,
+.files-list,
+.tasks-list,
+.calendar-events {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.workspace-item,
+.file-item,
+.task-item,
+.event-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.workspace-item:hover,
+.file-item:hover,
+.task-item:hover,
+.event-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px);
+}
+
+.workspace-item {
+    border-left-color: #a8e6cf;
+}
+
+.file-item {
+    border-left-color: #ffd3b6;
+}
+
+.task-item.completed {
+    border-left-color: #4caf50;
+    opacity: 0.7;
+}
+
+.task-item.pending {
+    border-left-color: #ff9800;
+}
+
+.event-item {
+    border-left-color: #ff8b94;
+}
+
+.item-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.workspace-item .item-icon {
+    background: linear-gradient(135deg, #a8e6cf, #88d8c0);
+}
+
+.file-item .item-icon {
+    background: linear-gradient(135deg, #ffd3b6, #ffb347);
+}
+
+.task-item .item-icon {
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+}
+
+.event-item .item-icon {
+    background: linear-gradient(135deg, #ff8b94, #ff6b6b);
+}
+
+.item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.item-title {
+    font-size: 0.9rem;
+    color: #fff;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.item-description {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.25rem;
+}
+
+.item-meta {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.item-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.item-action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 0.25rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+}
+
+.item-action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.tasks-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.task-input {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.task-input-field {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.task-input-field:focus {
+    outline: none;
+    border-color: #a8e6cf;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.task-input-field::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.task-add-btn {
+    background: linear-gradient(135deg, #a8e6cf, #88d8c0);
+    border: none;
+    color: #000;
+    padding: 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.task-add-btn:hover {
+    transform: scale(1.05);
+}
+
+.file-upload-area {
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.file-upload-area:hover {
+    border-color: #a8e6cf;
+    background: rgba(168, 230, 207, 0.1);
+}
+
+.file-upload-area i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #a8e6cf;
+}
+
+.uploaded-files {
+    margin-top: 1rem;
+}
+
+.uploaded-file {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+
+.file-info {
+    flex: 1;
+}
+
+.file-name {
+    font-size: 0.9rem;
+    color: #fff;
+    margin-bottom: 0.25rem;
+}
+
+.file-size {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-control {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #a8e6cf;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .yam-team-collaboration {
+        padding: 1rem;
+    }
+    
+    .collaboration-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .collaboration-controls {
+        align-self: flex-end;
+    }
+    
+    .collaboration-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .task-input {
+        flex-direction: column;
+    }
+}
+</style>
+
+<script>
+// YAM Team Collaboration Component
+window.yamTeamCollaboration = {
+    data: {
+        workspaces: [],
+        files: [],
+        tasks: [],
+        events: []
+    },
+    
+    init() {
+        this.setupEventListeners();
+        this.setupSocketListeners();
+        this.loadCollaborationData();
+        this.startAutoRefresh();
+        console.log('YAM Team Collaboration: Component initialized');
+    },
+    
+    setupEventListeners() {
+        // Refresh button
+        const refreshBtn = document.getElementById('yamCollaborationRefresh');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => this.loadCollaborationData());
+        }
+        
+        // Create workspace button
+        const createBtn = document.getElementById('yamCreateWorkspace');
+        if (createBtn) {
+            createBtn.addEventListener('click', () => this.showCreateWorkspace());
+        }
+        
+        // Save workspace button
+        const saveBtn = document.getElementById('yamSaveWorkspace');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => this.createWorkspace());
+        }
+        
+        // Add task button
+        const addTaskBtn = document.getElementById('yamAddTask');
+        if (addTaskBtn) {
+            addTaskBtn.addEventListener('click', () => this.addTask());
+        }
+        
+        // Task input enter key
+        const taskInput = document.getElementById('yamNewTask');
+        if (taskInput) {
+            taskInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.addTask();
+                }
+            });
+        }
+        
+        // File upload area
+        const uploadArea = document.getElementById('yamFileUploadArea');
+        if (uploadArea) {
+            uploadArea.addEventListener('click', () => {
+                document.getElementById('yamFileInput').click();
+            });
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#a8e6cf';
+                uploadArea.style.background = 'rgba(168, 230, 207, 0.1)';
+            });
+            
+            uploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                uploadArea.style.background = 'transparent';
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                uploadArea.style.background = 'transparent';
+                
+                const files = e.dataTransfer.files;
+                this.handleFileUpload(files);
+            });
+        }
+        
+        // File input change
+        const fileInput = document.getElementById('yamFileInput');
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+                this.handleFileUpload(e.target.files);
+            });
+        }
+    },
+    
+    setupSocketListeners() {
+        if (window.yamDashboard && window.yamDashboard.socket) {
+            const socket = window.yamDashboard.socket;
+            
+            socket.on('workspace_update', (data) => {
+                this.updateWorkspaces(data.workspaces);
+            });
+            
+            socket.on('file_shared', (data) => {
+                this.addSharedFile(data.file);
+            });
+            
+            socket.on('task_update', (data) => {
+                this.updateTasks(data.tasks);
+            });
+            
+            socket.on('event_added', (data) => {
+                this.addEvent(data.event);
+            });
+        }
+    },
+    
+    async loadCollaborationData() {
+        try {
+            // Load workspaces
+            await this.loadWorkspaces();
+            
+            // Load shared files
+            await this.loadSharedFiles();
+            
+            // Load tasks
+            await this.loadTasks();
+            
+            // Load events
+            await this.loadEvents();
+            
+            // Update displays
+            this.updateDisplays();
+            
+        } catch (error) {
+            console.error('Error loading collaboration data:', error);
+        }
+    },
+    
+    async loadWorkspaces() {
+        try {
+            const response = await fetch('/api/collaboration/workspaces', {
+                headers: { 'Accept': 'application/json' }
+            });
+            
+            if (response.ok) {
+                this.data.workspaces = await response.json();
+            } else {
+                this.data.workspaces = this.generateSimulatedWorkspaces();
+            }
+        } catch (error) {
+            console.error('Error loading workspaces:', error);
+            this.data.workspaces = this.generateSimulatedWorkspaces();
+        }
+    },
+    
+    async loadSharedFiles() {
+        try {
+            const response = await fetch('/api/collaboration/files', {
+                headers: { 'Accept': 'application/json' }
+            });
+            
+            if (response.ok) {
+                this.data.files = await response.json();
+            } else {
+                this.data.files = this.generateSimulatedFiles();
+            }
+        } catch (error) {
+            console.error('Error loading files:', error);
+            this.data.files = this.generateSimulatedFiles();
+        }
+    },
+    
+    async loadTasks() {
+        try {
+            const response = await fetch('/api/collaboration/tasks', {
+                headers: { 'Accept': 'application/json' }
+            });
+            
+            if (response.ok) {
+                this.data.tasks = await response.json();
+            } else {
+                this.data.tasks = this.generateSimulatedTasks();
+            }
+        } catch (error) {
+            console.error('Error loading tasks:', error);
+            this.data.tasks = this.generateSimulatedTasks();
+        }
+    },
+    
+    async loadEvents() {
+        try {
+            const response = await fetch('/api/collaboration/events', {
+                headers: { 'Accept': 'application/json' }
+            });
+            
+            if (response.ok) {
+                this.data.events = await response.json();
+            } else {
+                this.data.events = this.generateSimulatedEvents();
+            }
+        } catch (error) {
+            console.error('Error loading events:', error);
+            this.data.events = this.generateSimulatedEvents();
+        }
+    },
+    
+    updateDisplays() {
+        this.updateWorkspacesList();
+        this.updateFilesList();
+        this.updateTasksList();
+        this.updateEventsList();
+    },
+    
+    updateWorkspacesList() {
+        const container = document.getElementById('yamWorkspacesList');
+        if (!container) return;
+        
+        // Ensure workspaces array exists
+        if (!this.data.workspaces || !Array.isArray(this.data.workspaces)) {
+            this.data.workspaces = [];
+        }
+        
+        if (this.data.workspaces.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-people"></i>
+                    <p>No active workspaces</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = this.data.workspaces.map(workspace => `
+            <div class="workspace-item">
+                <div class="item-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="item-info">
+                    <div class="item-title">${workspace.name}</div>
+                    <div class="item-description">${workspace.description}</div>
+                    <div class="item-meta">
+                        <span><i class="bi bi-person"></i> ${workspace.memberCount} members</span>
+                        <span><i class="bi bi-clock"></i> ${workspace.lastActivity}</span>
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button class="item-action-btn" onclick="yamTeamCollaboration.joinWorkspace('${workspace.id}')">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    },
+    
+    updateFilesList() {
+        const container = document.getElementById('yamFilesList');
+        if (!container) return;
+        
+        // Ensure files array exists
+        if (!this.data.files || !Array.isArray(this.data.files)) {
+            this.data.files = [];
+        }
+        
+        if (this.data.files.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-file-earmark"></i>
+                    <p>No shared files</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = this.data.files.map(file => `
+            <div class="file-item">
+                <div class="item-icon">
+                    <i class="bi bi-file-earmark"></i>
+                </div>
+                <div class="item-info">
+                    <div class="item-title">${file.name}</div>
+                    <div class="item-description">Shared by ${file.sharedBy}</div>
+                    <div class="item-meta">
+                        <span><i class="bi bi-clock"></i> ${file.sharedAt}</span>
+                        <span><i class="bi bi-download"></i> ${file.downloads} downloads</span>
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button class="item-action-btn" onclick="yamTeamCollaboration.downloadFile('${file.id}')">
+                        <i class="bi bi-download"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    },
+    
+    updateTasksList() {
+        const container = document.getElementById('yamTasksList');
+        if (!container) return;
+        
+        // Ensure tasks array exists
+        if (!this.data.tasks || !Array.isArray(this.data.tasks)) {
+            this.data.tasks = [];
+        }
+        
+        if (this.data.tasks.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-check2-square"></i>
+                    <p>No tasks yet</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = this.data.tasks.map(task => `
+            <div class="task-item ${task.completed ? 'completed' : 'pending'}">
+                <div class="item-icon">
+                    <i class="bi bi-check2-square"></i>
+                </div>
+                <div class="item-info">
+                    <div class="item-title">${task.title}</div>
+                    <div class="item-description">Assigned to ${task.assignedTo}</div>
+                    <div class="item-meta">
+                        <span><i class="bi bi-clock"></i> ${task.createdAt}</span>
+                        <span><i class="bi bi-person"></i> ${task.createdBy}</span>
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button class="item-action-btn" onclick="yamTeamCollaboration.toggleTask('${task.id}')">
+                        <i class="bi bi-${task.completed ? 'arrow-counterclockwise' : 'check'}"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    },
+    
+    updateEventsList() {
+        const container = document.getElementById('yamCalendarEvents');
+        if (!container) return;
+        
+        // Ensure events array exists
+        if (!this.data.events || !Array.isArray(this.data.events)) {
+            this.data.events = [];
+        }
+        
+        if (this.data.events.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-calendar-event"></i>
+                    <p>No upcoming events</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = this.data.events.map(event => `
+            <div class="event-item">
+                <div class="item-icon">
+                    <i class="bi bi-calendar-event"></i>
+                </div>
+                <div class="item-info">
+                    <div class="item-title">${event.title}</div>
+                    <div class="item-description">${event.description}</div>
+                    <div class="item-meta">
+                        <span><i class="bi bi-clock"></i> ${event.time}</span>
+                        <span><i class="bi bi-person"></i> ${event.organizer}</span>
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button class="item-action-btn" onclick="yamTeamCollaboration.joinEvent('${event.id}')">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    },
+    
+    showCreateWorkspace() {
+        // Populate members dropdown
+        this.populateMembersDropdown();
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('yamCreateWorkspaceModal'));
+        modal.show();
+    },
+    
+    async populateMembersDropdown() {
+        try {
+            const response = await fetch('/api/users/online');
+            if (response.ok) {
+                const data = await response.json();
+                const membersSelect = document.getElementById('yamWorkspaceMembers');
+                
+                membersSelect.innerHTML = data.users.map(user => 
+                    `<option value="${user.id}">${user.username}</option>`
+                ).join('');
+            }
+        } catch (error) {
+            console.error('Error loading members:', error);
+        }
+    },
+    
+    async createWorkspace() {
+        const name = document.getElementById('yamWorkspaceName').value;
+        const description = document.getElementById('yamWorkspaceDescription').value;
+        const members = Array.from(document.getElementById('yamWorkspaceMembers').selectedOptions).map(opt => opt.value);
+        
+        if (!name.trim()) {
+            alert('Please enter a workspace name');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/collaboration/workspaces', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: name,
+                    description: description,
+                    members: members
+                })
+            });
+            
+            if (response.ok) {
+                const workspace = await response.json();
+                this.data.workspaces.unshift(workspace);
+                this.updateWorkspacesList();
+                
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('yamCreateWorkspaceModal'));
+                modal.hide();
+                
+                // Clear form
+                document.getElementById('yamWorkspaceName').value = '';
+                document.getElementById('yamWorkspaceDescription').value = '';
+                document.getElementById('yamWorkspaceMembers').selectedIndex = -1;
+            }
+        } catch (error) {
+            console.error('Error creating workspace:', error);
+        }
+    },
+    
+    async addTask() {
+        const input = document.getElementById('yamNewTask');
+        const title = input.value.trim();
+        
+        if (!title) return;
+        
+        try {
+            const response = await fetch('/api/collaboration/tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: title,
+                    createdBy: 'Current User'
+                })
+            });
+            
+            if (response.ok) {
+                const task = await response.json();
+                this.data.tasks.unshift(task);
+                this.updateTasksList();
+                input.value = '';
+            }
+        } catch (error) {
+            console.error('Error adding task:', error);
+        }
+    },
+    
+    handleFileUpload(files) {
+        const uploadedFiles = document.getElementById('yamUploadedFiles');
+        
+        Array.from(files).forEach(file => {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'uploaded-file';
+            fileItem.innerHTML = `
+                <div class="file-info">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-size">${this.formatFileSize(file.size)}</div>
+                </div>
+            `;
+            uploadedFiles.appendChild(fileItem);
+        });
+    },
+    
+    formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    },
+    
+    generateSimulatedWorkspaces() {
+        return [
+            {
+                id: '1',
+                name: 'Project Alpha',
+                description: 'Main development workspace',
+                memberCount: 5,
+                lastActivity: '2 minutes ago'
+            },
+            {
+                id: '2',
+                name: 'Design Team',
+                description: 'UI/UX collaboration space',
+                memberCount: 3,
+                lastActivity: '15 minutes ago'
+            }
+        ];
+    },
+    
+    generateSimulatedFiles() {
+        return [
+            {
+                id: '1',
+                name: 'project-specs.pdf',
+                sharedBy: 'John Doe',
+                sharedAt: '1 hour ago',
+                downloads: 12
+            },
+            {
+                id: '2',
+                name: 'design-mockups.zip',
+                sharedBy: 'Jane Smith',
+                sharedAt: '3 hours ago',
+                downloads: 8
+            }
+        ];
+    },
+    
+    generateSimulatedTasks() {
+        return [
+            {
+                id: '1',
+                title: 'Review project documentation',
+                assignedTo: 'John Doe',
+                createdAt: '2 hours ago',
+                createdBy: 'Jane Smith',
+                completed: false
+            },
+            {
+                id: '2',
+                title: 'Update user interface',
+                assignedTo: 'Mike Johnson',
+                createdAt: '1 day ago',
+                createdBy: 'John Doe',
+                completed: true
+            }
+        ];
+    },
+    
+    generateSimulatedEvents() {
+        return [
+            {
+                id: '1',
+                title: 'Team Standup',
+                description: 'Daily team meeting',
+                time: '9:00 AM',
+                organizer: 'John Doe'
+            },
+            {
+                id: '2',
+                title: 'Project Review',
+                description: 'Weekly project status review',
+                time: '2:00 PM',
+                organizer: 'Jane Smith'
+            }
+        ];
+    },
+    
+    startAutoRefresh() {
+        // Refresh data every 2 minutes
+        setInterval(() => {
+            this.loadCollaborationData();
+        }, 2 * 60 * 1000);
+    },
+    
+    destroy() {
+        console.log('YAM Team Collaboration: Component destroyed');
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.yamTeamCollaboration) {
+        window.yamTeamCollaboration.init();
+    }
+});
+
+// Register with YAM Dashboard if available
+if (window.yamDashboard) {
+    window.yamDashboard.registerComponent('teamCollaboration', window.yamTeamCollaboration);
+}
+</script>
+{% endmacro %} 

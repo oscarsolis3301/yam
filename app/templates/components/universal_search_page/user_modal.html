@@ -1,0 +1,437 @@
+<!-- Universal Search Page User Modal Component -->
+<div class="user-detail-modal" id="universalSearchDetailModal" style="display: none;">
+    <div class="user-detail-content" id="universalSearchDetailContent">
+        <!-- Content will be dynamically populated -->
+    </div>
+</div>
+
+<!-- Ticket Modal Component -->
+<div class="ticket-modal" id="universalSearchTicketModal" style="display: none;">
+    <div class="ticket-modal-header">
+        <h3 class="ticket-modal-title" id="universalSearchTicketModalTitle">Create Service Desk Ticket</h3>
+        <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="
+            document.getElementById('universalSearchTicketModal').style.display='none';
+            document.getElementById('universalSearchTicketModalOverlay').style.display='none';
+        "></button>
+    </div>
+    <div class="ticket-modal-content">
+        <div id="universalSearchTicketUserInfo" class="mb-3"></div>
+        
+        <form id="ticketCreationForm" class="ticket-form">
+            <div class="form-group mb-3">
+                <label for="ticketCategory" class="form-label">Category</label>
+                <select class="form-select" id="ticketCategory" required>
+                    <option value="">Select category...</option>
+                    <option value="password_reset">Password Reset</option>
+                    <option value="account_access">Account Access</option>
+                    <option value="software_install">Software Installation</option>
+                    <option value="hardware_issue">Hardware Issue</option>
+                    <option value="network_issue">Network Issue</option>
+                    <option value="email_issue">Email Issue</option>
+                    <option value="epic_access">Epic Access</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="ticketPriority" class="form-label">Priority</label>
+                <select class="form-select" id="ticketPriority" required>
+                    <option value="">Select priority...</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent</option>
+                </select>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="ticketSubject" class="form-label">Subject</label>
+                <input type="text" class="form-control" id="ticketSubject" placeholder="Brief description of the issue" required>
+            </div>
+            
+            <div class="form-group mb-3">
+                <label for="ticketDescription" class="form-label">Description</label>
+                <textarea class="form-control" id="ticketDescription" rows="4" placeholder="Detailed description of the issue, steps to reproduce, etc." required></textarea>
+            </div>
+            
+            <div class="ticket-actions">
+                <button type="button" class="btn btn-secondary" onclick="
+                    document.getElementById('universalSearchTicketModal').style.display='none';
+                    document.getElementById('universalSearchTicketModalOverlay').style.display='none';
+                ">
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Create Ticket
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Password Reset Modal Component -->
+<div class="password-reset-modal" id="universalSearchPasswordResetModal" style="display: none;">
+    <div class="password-reset-modal-header">
+        <h3 class="password-reset-modal-title" id="universalSearchPasswordResetModalTitle">Reset User Password</h3>
+        <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="
+            document.getElementById('universalSearchPasswordResetModal').style.display='none';
+            document.getElementById('universalSearchPasswordResetModalOverlay').style.display='none';
+        "></button>
+    </div>
+    <div class="password-reset-modal-content">
+        <div id="universalSearchPasswordResetUserInfo" class="mb-3"></div>
+        
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle"></i>
+            <strong>Warning:</strong> This action will reset the user's password. The user will need to change their password on next login.
+        </div>
+        
+        <div class="password-reset-actions">
+            <button type="button" class="btn btn-secondary" onclick="
+                document.getElementById('universalSearchPasswordResetModal').style.display='none';
+                document.getElementById('universalSearchPasswordResetModalOverlay').style.display='none';
+            ">
+                Cancel
+            </button>
+            <button type="button" class="btn btn-danger" onclick="handlePasswordReset()">
+                <i class="bi bi-key"></i> Reset Password
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Overlays -->
+<div class="user-detail-modal-overlay" id="universalSearchDetailModalOverlay" style="display: none;"></div>
+<div class="ticket-modal-overlay" id="universalSearchTicketModalOverlay" style="display: none;"></div>
+<div class="password-reset-modal-overlay" id="universalSearchPasswordResetModalOverlay" style="display: none;"></div>
+
+<style>
+/* User Detail Modal Styles */
+.user-detail-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #1e1e1e;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    z-index: 10001;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-detail-content {
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.user-detail-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 10000;
+    backdrop-filter: blur(8px);
+}
+
+/* User Profile Modal Styles */
+.user-profile-modal {
+    position: relative;
+    min-width: 600px;
+    max-width: 800px;
+}
+
+.mac-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.mac-close-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+    transform: scale(1.1);
+}
+
+.mac-modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+}
+
+.mac-user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    object-fit: cover;
+}
+
+.mac-user-info {
+    flex: 1;
+}
+
+.mac-user-name {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+}
+
+.mac-user-role {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    margin: 0 0 1rem 0;
+}
+
+.mac-action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.mac-action-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.mac-action-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.mac-modal-content {
+    padding: 2rem;
+    background: #1e1e1e;
+}
+
+.mac-info-section {
+    margin-bottom: 2rem;
+}
+
+.mac-section-title {
+    color: #007bff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(0, 123, 255, 0.3);
+}
+
+.mac-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 0.75rem;
+}
+
+.mac-info-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.mac-info-value {
+    color: white;
+    font-size: 0.95rem;
+}
+
+.mac-info-value a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.mac-info-value a:hover {
+    text-decoration: underline;
+}
+
+/* Status Badge Styles */
+.mac-status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mac-badge-ok {
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.mac-badge-locked {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.mac-badge-disabled {
+    background: rgba(108, 117, 125, 0.2);
+    color: #6c757d;
+    border: 1px solid rgba(108, 117, 125, 0.3);
+}
+
+.mac-badge-expired {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+/* Ticket Modal Styles */
+.ticket-modal, .password-reset-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #1e1e1e;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    z-index: 10001;
+    max-width: 600px;
+    width: 90vw;
+    max-height: 90vh;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ticket-modal-header, .password-reset-modal-header {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ticket-modal-title, .password-reset-modal-title {
+    color: white;
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.ticket-modal-content, .password-reset-modal-content {
+    padding: 1.5rem;
+    background: #1e1e1e;
+    max-height: calc(90vh - 80px);
+    overflow-y: auto;
+}
+
+.ticket-modal-overlay, .password-reset-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 10000;
+    backdrop-filter: blur(8px);
+}
+
+.form-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    background: #2a2a2a;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 8px;
+    padding: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    background: #2a2a2a;
+    border-color: #007bff;
+    color: white;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.ticket-actions, .password-reset-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.alert-warning {
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    color: #ffc107;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .user-profile-modal {
+        min-width: auto;
+        width: 95vw;
+    }
+    
+    .mac-modal-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .mac-info-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .mac-info-label {
+        font-weight: 600;
+        color: #007bff;
+    }
+    
+    .ticket-modal, .password-reset-modal {
+        width: 95vw;
+        max-height: 95vh;
+    }
+    
+    .ticket-actions, .password-reset-actions {
+        flex-direction: column;
+    }
+}
+</style> 

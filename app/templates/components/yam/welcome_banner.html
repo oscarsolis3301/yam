@@ -1,0 +1,1473 @@
+{% macro render_welcome_banner(name, current_user) %}
+<!-- YAM Welcome Banner Component - OPTIMIZED FOR INSTANT LOADING -->
+<div id="yamWelcomeBanner" class="yam-welcome-banner">
+    <div class="welcome-content">
+        <div class="welcome-left">
+            <h1 class="welcome-title yam-text-emoji-spacing">
+                <span class="text">Welcome to <span class="yam-brand">YAM</span>, <span class="welcome-name">{{ name }}</span></span>
+<<<<<<< HEAD
+<span class="emoji welcome-emoji" title="Click 3 times to blast off! 🚀" id="rocketEmoji">
+                    🚀
+                    <div class="rocket-smoke"></div>
+                </span></h1>
+=======
+                <span class="emoji welcome-emoji" title="Click for fun!">🚀</span>
+            </h1>
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+            <div class="welcome-subtitle">
+                Your Advanced Management Dashboard
+            </div>
+            <div class="welcome-info">
+                <span class="info-item">
+                    <i class="bi bi-calendar3"></i>
+                    <span id="currentDate">Loading...</span>
+                </span>
+                <span class="info-item">
+                    <i class="bi bi-geo-alt"></i>
+                    Pacific Time
+                </span>
+                <span class="info-item">
+                    <i class="bi bi-clock"></i>
+                    <span id="currentTime">Loading...</span>
+                </span>
+            </div>
+        </div>
+        <div class="welcome-right">
+            <div class="status-badges">
+                <div class="status-badge connected" id="connectionStatus">
+                    <i class="bi bi-wifi"></i>
+                    <span>Connected</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.yam-welcome-banner {
+<<<<<<< HEAD
+background: linear-gradient(135deg, rgba(20, 20, 20, 0.95) 0%, rgba(35, 35, 35, 0.95) 100%) !important;backdrop-filter: blur(20px) !important;
+    border-radius: 36px !important;
+    padding: 2.5rem 3rem !important;
+    border: 2px solid rgba(255, 255, 255, 0.1) !important;
+box-shadow: 0 24px 96px rgba(0, 0, 0, 0.6) !important;position: relative !important;
+=======
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(40, 40, 40, 0.95) 100%) !important;
+    backdrop-filter: blur(20px) !important;
+    border-radius: 36px !important;
+    padding: 2.5rem 3rem !important;
+    border: 2px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 24px 96px rgba(0, 0, 0, 0.4) !important;
+    position: relative !important;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    overflow: hidden !important;
+    margin-top: 0 !important;
+    margin-bottom: 0.5rem !important;
+    transform: translateY(0) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    min-height: 180px !important;
+<<<<<<< HEAD
+/* Match the width of the containers below */
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;}
+
+.yam-welcome-banner:hover {
+    transform: translateY(-4px) !important;
+box-shadow: 0 32px 100px rgba(0, 0, 0, 0.7) !important;border-color: rgba(255, 255, 255, 0.15) !important;
+=======
+}
+
+.yam-welcome-banner:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 32px 100px rgba(0, 0, 0, 0.45) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+}
+
+.yam-welcome-banner::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 6px !important;
+<<<<<<< HEAD
+background: linear-gradient(90deg, #4a90e2, #7b68ee, #9370db, #4a90e2) !important;background-size: 200% 100% !important;
+=======
+    background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #667eea) !important;
+    background-size: 200% 100% !important;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    animation: shimmer 3s ease-in-out infinite !important;
+    border-radius: 36px 36px 0 0 !important; /* Match the container's top border radius */
+}
+
+@keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.welcome-content {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    gap: 3rem !important;
+    position: relative !important;
+    z-index: 1 !important;
+    min-height: 140px !important;
+}
+
+.welcome-left {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+}
+
+.welcome-title {
+    font-size: 2.5rem !important;
+    font-weight: 800 !important;
+    margin: 0 !important;
+    color: #e0e0e0 !important;
+    line-height: 1.1 !important;
+    letter-spacing: -0.02em !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 1.25rem !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+.yam-brand {
+<<<<<<< HEAD
+background: linear-gradient(135deg, #4a90e2 0%, #7b68ee 50%, #9370db 100%) !important;-webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    font-weight: 900 !important;
+text-shadow: 0 0 60px rgba(74, 144, 226, 0.5) !important;position: relative !important;
+=======
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    font-weight: 900 !important;
+    text-shadow: 0 0 60px rgba(102, 126, 234, 0.5) !important;
+    position: relative !important;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+}
+
+.welcome-name {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+    font-weight: 700 !important;
+    position: relative !important;
+}
+
+.welcome-emoji {
+    margin-left: 1.25rem !important;
+    display: inline-block !important;
+    font-size: 2.25rem !important;
+    animation: rocketFloat 3s ease-in-out infinite !important;
+    filter: none !important;
+    position: relative !important;
+    z-index: 2 !important;
+    /* Ensure emoji is not affected by any gradients */
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    -webkit-text-fill-color: initial !important;
+    background-clip: initial !important;
+    color: inherit !important;
+    transform: translateZ(0) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+<<<<<<< HEAD
+cursor: pointer !important;
+    flex-shrink: 0 !important;
+    /* Add glow effect for better visibility */
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3) !important;}
+=======
+    cursor: default !important;
+    flex-shrink: 0 !important;
+}
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+
+.welcome-emoji:hover {
+    transform: translateY(-6px) rotate(12deg) scale(1.15) !important;
+    filter: drop-shadow(0 6px 12px rgba(255, 255, 255, 0.25)) !important;
+    animation: rocketHover 0.5s ease-in-out !important;
+}
+
+@keyframes rocketFloat {
+    0%, 100% { 
+        transform: translateY(0px) rotate(0deg) scale(1); 
+    }
+    50% { 
+        transform: translateY(-8px) rotate(8deg) scale(1.03); 
+<<<<<<< HEAD
+}
+}
+
+@keyframes rocketHover {
+    0% { transform: translateY(0) rotate(0deg) scale(1); }
+    50% { transform: translateY(-8px) rotate(15deg) scale(1.2); }
+    100% { transform: translateY(-6px) rotate(12deg) scale(1.15); }
+}
+
+@keyframes rocketPulse {
+    0% { transform: translateY(0) rotate(0deg) scale(1); }
+    50% { transform: translateY(-2px) rotate(2deg) scale(1.05); }
+    100% { transform: translateY(0) rotate(0deg) scale(1); }
+}
+
+/* Enhanced rocket smoke effects */
+.rocket-smoke {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 60px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
+
+.rocket-smoke::before,
+.rocket-smoke::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 8px;
+    height: 20px;
+    background: linear-gradient(to top, rgba(255, 165, 0, 0.9), rgba(255, 69, 0, 0.7), transparent);
+    border-radius: 50% 50% 0 0;
+    animation: smokeRise 2s ease-out infinite;
+    box-shadow: 0 0 10px rgba(255, 165, 0, 0.5);
+}
+
+.rocket-smoke::before {
+    left: 8px;
+    animation-delay: 0s;
+}
+
+.rocket-smoke::after {
+    right: 8px;
+    animation-delay: 0.5s;
+}
+
+@keyframes smokeRise {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.9;
+        background: linear-gradient(to top, rgba(255, 165, 0, 0.9), rgba(255, 69, 0, 0.7), transparent);
+    }
+    25% {
+        transform: translateY(-15px) scale(1.3);
+        opacity: 0.7;
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.8), rgba(255, 69, 0, 0.6), transparent);
+=======
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    }
+    50% {
+        transform: translateY(-30px) scale(1.6);
+        opacity: 0.5;
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.6), rgba(255, 69, 0, 0.4), transparent);
+    }
+    75% {
+        transform: translateY(-45px) scale(1.8);
+        opacity: 0.3;
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.4), rgba(255, 69, 0, 0.2), transparent);
+    }
+    100% {
+        transform: translateY(-60px) scale(2);
+        opacity: 0;
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.2), rgba(255, 69, 0, 0.1), transparent);
+    }
+}
+
+/* Enhanced hover effects with smoke */
+.welcome-emoji:hover .rocket-smoke {
+    opacity: 1;
+}
+
+/* Blast off animation for the rocket emoji */
+.welcome-emoji.blasting-off {
+    animation: rocketBlastOff 2s ease-in-out forwards !important;
+    z-index: 10;
+    /* Add glow effect during blast off */
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 255, 255, 0.6) !important;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5)) !important;
+}
+
+@keyframes rocketBlastOff {
+    0% {
+        transform: translateY(0) rotate(0deg) scale(1);
+        opacity: 1;
+        filter: brightness(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+    }
+    5% {
+        transform: translateY(-3px) rotate(1deg) scale(1.02);
+        opacity: 1;
+        filter: brightness(1.1) drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+    }
+    10% {
+        transform: translateY(-8px) rotate(3deg) scale(1.05);
+        opacity: 1;
+        filter: brightness(1.2) drop-shadow(0 0 12px rgba(255, 255, 255, 0.5));
+    }
+    15% {
+        transform: translateY(-15px) rotate(5deg) scale(1.08);
+        opacity: 1;
+        filter: brightness(1.3) drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
+    }
+    20% {
+        transform: translateY(-25px) rotate(8deg) scale(1.12);
+        opacity: 1;
+        filter: brightness(1.4) drop-shadow(0 0 20px rgba(255, 255, 255, 0.7));
+    }
+    25% {
+        transform: translateY(-40px) rotate(12deg) scale(1.15);
+        opacity: 1;
+        filter: brightness(1.5) drop-shadow(0 0 25px rgba(255, 255, 255, 0.8));
+    }
+    30% {
+        transform: translateY(-60px) rotate(15deg) scale(1.18);
+        opacity: 1;
+        filter: brightness(1.6) drop-shadow(0 0 30px rgba(255, 255, 255, 0.9));
+    }
+    35% {
+        transform: translateY(-85px) rotate(18deg) scale(1.22);
+        opacity: 1;
+        filter: brightness(1.7) drop-shadow(0 0 35px rgba(255, 255, 255, 1));
+    }
+    40% {
+        transform: translateY(-120px) rotate(22deg) scale(1.25);
+        opacity: 1;
+        filter: brightness(1.8) drop-shadow(0 0 40px rgba(255, 255, 255, 1));
+    }
+    45% {
+        transform: translateY(-160px) rotate(25deg) scale(1.28);
+        opacity: 0.95;
+        filter: brightness(1.9) drop-shadow(0 0 45px rgba(255, 255, 255, 1));
+    }
+    50% {
+        transform: translateY(-200px) rotate(28deg) scale(1.32);
+        opacity: 0.9;
+        filter: brightness(2) drop-shadow(0 0 50px rgba(255, 255, 255, 1));
+    }
+    55% {
+        transform: translateY(-250px) rotate(32deg) scale(1.35);
+        opacity: 0.85;
+        filter: brightness(2.1) drop-shadow(0 0 55px rgba(255, 255, 255, 1));
+    }
+    60% {
+        transform: translateY(-300px) rotate(35deg) scale(1.38);
+        opacity: 0.8;
+        filter: brightness(2.2) drop-shadow(0 0 60px rgba(255, 255, 255, 1));
+    }
+    65% {
+        transform: translateY(-350px) rotate(38deg) scale(1.42);
+        opacity: 0.7;
+        filter: brightness(2.3) drop-shadow(0 0 65px rgba(255, 255, 255, 1));
+    }
+    70% {
+        transform: translateY(-400px) rotate(40deg) scale(1.45);
+        opacity: 0.6;
+        filter: brightness(2.4) drop-shadow(0 0 70px rgba(255, 255, 255, 1));
+    }
+    75% {
+        transform: translateY(-450px) rotate(42deg) scale(1.48);
+        opacity: 0.5;
+        filter: brightness(2.5) drop-shadow(0 0 75px rgba(255, 255, 255, 1));
+    }
+    80% {
+        transform: translateY(-500px) rotate(45deg) scale(1.5);
+        opacity: 0.4;
+        filter: brightness(2.6) drop-shadow(0 0 80px rgba(255, 255, 255, 1));
+    }
+    85% {
+        transform: translateY(-550px) rotate(47deg) scale(1.52);
+        opacity: 0.3;
+        filter: brightness(2.7) drop-shadow(0 0 85px rgba(255, 255, 255, 1));
+    }
+    90% {
+        transform: translateY(-600px) rotate(48deg) scale(1.55);
+        opacity: 0.2;
+        filter: brightness(2.8) drop-shadow(0 0 90px rgba(255, 255, 255, 1));
+    }
+    95% {
+        transform: translateY(-650px) rotate(49deg) scale(1.57);
+        opacity: 0.1;
+        filter: brightness(2.9) drop-shadow(0 0 95px rgba(255, 255, 255, 1));
+    }
+    100% {
+        transform: translateY(-700px) rotate(50deg) scale(1.6);
+        opacity: 0;
+        filter: brightness(3) drop-shadow(0 0 100px rgba(255, 255, 255, 1));
+    }
+}
+
+/* Enhanced smoke during blast off - stays in place */
+.welcome-emoji.blasting-off .rocket-smoke {
+    opacity: 1;
+    animation: intenseSmoke 2s ease-in-out forwards;
+}
+
+/* Add blast-off sound effect simulation (visual feedback) */
+.welcome-emoji.blasting-off::after {
+    content: '💥';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    opacity: 0;
+    animation: blastEffect 0.8s ease-out forwards;
+    pointer-events: none;
+    z-index: 15;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+}
+
+/* Add shockwave effect */
+.welcome-emoji.blasting-off::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 165, 0, 0.6) 50%, transparent 100%);
+    border-radius: 50%;
+    opacity: 0;
+    animation: shockwave 1s ease-out forwards;
+    pointer-events: none;
+    z-index: 14;
+}
+
+@keyframes blastEffect {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.3);
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+    }
+    25% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.5);
+        filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.9));
+    }
+    50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(2);
+        filter: drop-shadow(0 0 20px rgba(255, 255, 255, 1));
+    }
+    75% {
+        opacity: 0.7;
+        transform: translate(-50%, -50%) scale(2.5);
+        filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.8));
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(3);
+        filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.6));
+    }
+}
+
+@keyframes shockwave {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.5);
+        background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(255, 165, 0, 0.8) 50%, transparent 100%);
+    }
+    25% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1.5);
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 165, 0, 0.6) 50%, transparent 100%);
+    }
+    50% {
+        opacity: 0.6;
+        transform: translate(-50%, -50%) scale(2.5);
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 165, 0, 0.4) 50%, transparent 100%);
+    }
+    75% {
+        opacity: 0.3;
+        transform: translate(-50%, -50%) scale(3.5);
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, rgba(255, 165, 0, 0.2) 50%, transparent 100%);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(4.5);
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 165, 0, 0.05) 50%, transparent 100%);
+    }
+}
+
+@keyframes intenseSmoke {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) scale(1);
+        background: linear-gradient(to top, rgba(255, 165, 0, 0.9), rgba(255, 69, 0, 0.7), transparent);
+    }
+    10% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.5);
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.9), rgba(255, 69, 0, 0.8), transparent);
+    }
+    20% {
+        opacity: 1;
+        transform: translateX(-50%) scale(2);
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.8), rgba(255, 69, 0, 0.7), transparent);
+    }
+    30% {
+        opacity: 1;
+        transform: translateX(-50%) scale(2.5);
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.7), rgba(255, 69, 0, 0.6), transparent);
+    }
+    40% {
+        opacity: 0.9;
+        transform: translateX(-50%) scale(3);
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.6), rgba(255, 69, 0, 0.5), transparent);
+    }
+    50% {
+        opacity: 0.8;
+        transform: translateX(-50%) scale(3.5);
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.5), rgba(255, 69, 0, 0.4), transparent);
+    }
+    60% {
+        opacity: 0.7;
+        transform: translateX(-50%) scale(4);
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.4), rgba(255, 69, 0, 0.3), transparent);
+    }
+    70% {
+        opacity: 0.5;
+        transform: translateX(-50%) scale(4.5);
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.3), rgba(255, 69, 0, 0.2), transparent);
+    }
+    80% {
+        opacity: 0.3;
+        transform: translateX(-50%) scale(5);
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.2), rgba(255, 69, 0, 0.1), transparent);
+    }
+    90% {
+        opacity: 0.1;
+        transform: translateX(-50%) scale(5.5);
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.1), rgba(255, 69, 0, 0.05), transparent);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) scale(6);
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.05), rgba(255, 69, 0, 0.02), transparent);
+    }
+}
+
+/* Additional smoke particles during blast off */
+.welcome-emoji.blasting-off .rocket-smoke::before,
+.welcome-emoji.blasting-off .rocket-smoke::after {
+    animation: intenseSmokeRise 2s ease-in-out forwards;
+}
+
+@keyframes intenseSmokeRise {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.9;
+        background: linear-gradient(to top, rgba(255, 165, 0, 0.9), rgba(255, 69, 0, 0.7), transparent);
+    }
+    10% {
+        transform: translateY(-20px) scale(1.5);
+        opacity: 0.8;
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.8), rgba(255, 69, 0, 0.6), transparent);
+    }
+    20% {
+        transform: translateY(-40px) scale(2);
+        opacity: 0.7;
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.7), rgba(255, 69, 0, 0.5), transparent);
+    }
+    30% {
+        transform: translateY(-60px) scale(2.5);
+        opacity: 0.6;
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.6), rgba(255, 69, 0, 0.4), transparent);
+    }
+    40% {
+        transform: translateY(-80px) scale(3);
+        opacity: 0.5;
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.5), rgba(255, 69, 0, 0.3), transparent);
+    }
+    50% {
+        transform: translateY(-100px) scale(3.5);
+        opacity: 0.4;
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.4), rgba(255, 69, 0, 0.2), transparent);
+    }
+    60% {
+        transform: translateY(-120px) scale(4);
+        opacity: 0.3;
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.3), rgba(255, 69, 0, 0.15), transparent);
+    }
+    70% {
+        transform: translateY(-140px) scale(4.5);
+        opacity: 0.2;
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.2), rgba(255, 69, 0, 0.1), transparent);
+    }
+    80% {
+        transform: translateY(-160px) scale(5);
+        opacity: 0.1;
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.1), rgba(255, 69, 0, 0.05), transparent);
+    }
+    90% {
+        transform: translateY(-180px) scale(5.5);
+        opacity: 0.05;
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.05), rgba(255, 69, 0, 0.02), transparent);
+    }
+    100% {
+        transform: translateY(-200px) scale(6);
+        opacity: 0;
+        background: linear-gradient(to top, rgba(255, 140, 0, 0.02), rgba(255, 69, 0, 0.01), transparent);
+    }
+}
+
+/* Rocket return animation */
+.welcome-emoji.returning {
+    animation: rocketReturn 1.5s ease-in-out forwards !important;
+    z-index: 10;
+}
+
+@keyframes rocketReturn {
+    0% {
+        transform: translateY(-500px) rotate(50deg) scale(1.5);
+        opacity: 0;
+    }
+    20% {
+        transform: translateY(-400px) rotate(40deg) scale(1.4);
+        opacity: 0.2;
+    }
+    40% {
+        transform: translateY(-300px) rotate(30deg) scale(1.3);
+        opacity: 0.4;
+    }
+    60% {
+        transform: translateY(-200px) rotate(20deg) scale(1.2);
+        opacity: 0.6;
+    }
+    80% {
+        transform: translateY(-100px) rotate(10deg) scale(1.1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(0) rotate(0deg) scale(1);
+        opacity: 1;}
+}
+
+@keyframes rocketHover {
+    0% { transform: translateY(0) rotate(0deg) scale(1); }
+    50% { transform: translateY(-8px) rotate(15deg) scale(1.2); }
+    100% { transform: translateY(-6px) rotate(12deg) scale(1.15); }
+}
+
+@keyframes rocketHover {
+    0% { transform: translateY(0) rotate(0deg) scale(1); }
+    50% { transform: translateY(-8px) rotate(15deg) scale(1.2); }
+    100% { transform: translateY(-6px) rotate(12deg) scale(1.15); }
+}
+
+.welcome-subtitle {
+    font-size: 1.4rem !important;
+    color: #b0b0b0 !important;
+    margin: 0 !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.02em !important;
+    line-height: 1.3 !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+.welcome-info {
+    display: flex !important;
+    align-items: center !important;
+    gap: 2rem !important;
+    color: #b0b0b0 !important;
+    font-size: 1rem !important;
+    flex-wrap: wrap !important;
+    margin-top: 0.5rem !important;
+}
+
+.info-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.875rem !important;
+    padding: 1rem 1.75rem !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    backdrop-filter: blur(10px) !important;
+    min-width: 180px !important;
+    min-height: 55px !important;
+}
+
+.info-item:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25) !important;
+}
+
+.info-item i {
+<<<<<<< HEAD
+color: #4a90e2 !important;font-size: 1.2rem !important;
+=======
+    color: #667eea !important;
+    font-size: 1.2rem !important;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    flex-shrink: 0 !important;
+}
+
+.info-item span {
+    font-weight: 500 !important;
+    line-height: 1.3 !important;
+    font-size: 0.95rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.welcome-right {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 1.25rem !important;
+    flex-shrink: 0 !important;
+}
+
+.status-badges {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+}
+
+.status-badge {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    padding: 1rem 1.75rem !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #b0b0b0 !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    backdrop-filter: blur(10px) !important;
+    min-width: 160px !important;
+    min-height: 55px !important;
+}
+
+.status-badge.connected {
+    background: rgba(34, 197, 94, 0.15) !important;
+    border-color: rgba(34, 197, 94, 0.3) !important;
+    color: #22c55e !important;
+}
+
+.status-badge.disconnected {
+    background: rgba(239, 68, 68, 0.15) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: #ef4444 !important;
+}
+
+.status-badge:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+}
+
+.status-badge i {
+    font-size: 1.2rem !important;
+    flex-shrink: 0 !important;
+}
+
+.status-badge span {
+    font-size: 0.95rem !important;
+}
+
+/* ENHANCED TEXT AND EMOJI SPACING */
+.yam-text-emoji-spacing {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1.25rem !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    flex-wrap: wrap !important;
+}
+
+.yam-text-emoji-spacing .text {
+    flex: 1 !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    min-width: 0 !important;
+}
+
+.yam-text-emoji-spacing .emoji {
+    flex-shrink: 0 !important;
+    font-size: 1.2em !important;
+    margin-left: 0 !important;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1200px) {
+    .yam-welcome-banner {
+        padding: 2.25rem 2.5rem !important;
+        min-height: 160px !important;
+    }
+    
+    .welcome-title {
+        font-size: 2.25rem !important;
+        gap: 1rem !important;
+    }
+    
+    .welcome-emoji {
+        font-size: 2rem !important;
+        margin-left: 1rem !important;
+    }
+    
+    .welcome-subtitle {
+        font-size: 1.3rem !important;
+    }
+    
+    .welcome-info {
+        gap: 1.75rem !important;
+        font-size: 0.95rem !important;
+<<<<<<< HEAD
+=======
+    }
+    
+    .info-item {
+        padding: 0.875rem 1.5rem !important;
+        min-width: 160px !important;
+        min-height: 50px !important;
+    }
+    
+    .status-badge {
+        padding: 0.875rem 1.5rem !important;
+        font-size: 0.95rem !important;
+        min-width: 140px !important;
+        min-height: 50px !important;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    }
+    
+    .info-item {
+        padding: 0.875rem 1.5rem !important;
+        min-width: 160px !important;
+        min-height: 50px !important;
+    }
+    
+    .status-badge {
+        padding: 0.875rem 1.5rem !important;
+        font-size: 0.95rem !important;
+        min-width: 140px !important;
+        min-height: 50px !important;
+}
+    
+    .rocket-smoke {
+        width: 35px;
+        height: 55px;
+    }
+    
+    .rocket-smoke::before,
+    .rocket-smoke::after {
+        width: 7px;
+        height: 18px;}
+}
+
+@media (max-width: 768px) {
+    .yam-welcome-banner {
+        padding: 2rem 2rem !important;
+        min-height: 140px !important;
+        border-radius: 28px !important;
+    }
+    
+    .yam-welcome-banner::before {
+        border-radius: 28px 28px 0 0 !important;
+    }
+    
+    .welcome-content {
+        flex-direction: column !important;
+        gap: 1.5rem !important;
+        text-align: center !important;
+        align-items: center !important;
+    }
+    
+    .welcome-left {
+        align-items: center !important;
+        text-align: center !important;
+    }
+    
+    .welcome-title {
+        font-size: 2rem !important;
+        gap: 0.875rem !important;
+        justify-content: center !important;
+    }
+    
+    .welcome-emoji {
+        font-size: 1.75rem !important;
+        margin-left: 0.875rem !important;
+    }
+    
+    .welcome-subtitle {
+        font-size: 1.2rem !important;
+    }
+    
+    .welcome-info {
+        gap: 1.25rem !important;
+        font-size: 0.9rem !important;
+        justify-content: center !important;
+    }
+    
+    .info-item {
+        padding: 0.75rem 1.25rem !important;
+        min-width: 140px !important;
+        min-height: 45px !important;
+        border-radius: 18px !important;
+<<<<<<< HEAD
+=======
+    }
+    
+    .info-item i {
+        font-size: 1.1rem !important;
+    }
+    
+    .info-item span {
+        font-size: 0.9rem !important;
+    }
+    
+    .status-badge {
+        padding: 0.75rem 1.25rem !important;
+        font-size: 0.9rem !important;
+        min-width: 120px !important;
+        min-height: 45px !important;
+        border-radius: 18px !important;
+    }
+    
+    .status-badge i {
+        font-size: 1.1rem !important;
+    }
+    
+    .status-badge span {
+        font-size: 0.85rem !important;
+    }
+    
+    .welcome-right {
+        align-items: center !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .yam-welcome-banner {
+        padding: 1.75rem 1.5rem !important;
+        min-height: 120px !important;
+        border-radius: 24px !important;
+    }
+    
+    .yam-welcome-banner::before {
+        border-radius: 24px 24px 0 0 !important;
+    }
+    
+    .welcome-title {
+        font-size: 1.75rem !important;
+        gap: 0.75rem !important;
+    }
+    
+    .welcome-emoji {
+        font-size: 1.5rem !important;
+        margin-left: 0.75rem !important;
+    }
+    
+    .welcome-subtitle {
+        font-size: 1.1rem !important;
+    }
+    
+    .welcome-info {
+        gap: 1rem !important;
+        font-size: 0.85rem !important;
+        justify-content: center !important;
+    }
+    
+    .info-item {
+        padding: 0.625rem 1rem !important;
+        min-width: 120px !important;
+        min-height: 40px !important;
+        border-radius: 16px !important;
+    }
+    
+    .info-item i {
+        font-size: 1rem !important;
+    }
+    
+    .info-item span {
+        font-size: 0.8rem !important;
+    }
+    
+    .status-badge {
+        padding: 0.625rem 1rem !important;
+        font-size: 0.8rem !important;
+        min-height: 40px !important;
+        border-radius: 14px !important;
+    }
+    
+    .status-badge i {
+        font-size: 1rem !important;
+    }
+    
+    .status-badge span {
+        font-size: 0.75rem !important;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    }
+    
+    .info-item i {
+        font-size: 1.1rem !important;
+    }
+    
+    .info-item span {
+        font-size: 0.9rem !important;
+    }
+    
+    .status-badge {
+        padding: 0.75rem 1.25rem !important;
+        font-size: 0.9rem !important;
+        min-width: 120px !important;
+        min-height: 45px !important;
+        border-radius: 18px !important;
+    }
+    
+    .status-badge i {
+        font-size: 1.1rem !important;
+    }
+    
+    .status-badge span {
+        font-size: 0.85rem !important;
+    }
+    
+    .welcome-right {
+        align-items: center !important;
+    }
+.rocket-smoke {
+        width: 30px;
+        height: 50px;
+    }
+    
+    .rocket-smoke::before,
+    .rocket-smoke::after {
+        width: 6px;
+        height: 15px;
+    }
+    
+    /* Adjust blast-off animation for smaller screens */
+    @keyframes rocketBlastOff {
+        0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+        50% { transform: translateY(-60px) rotate(25deg) scale(1.25); opacity: 0.9; }
+        100% { transform: translateY(-300px) rotate(50deg) scale(1.5); opacity: 0; }
+    }}
+
+@media (max-width: 640px) {
+    .yam-welcome-banner {
+        padding: 1.75rem 1.5rem !important;
+        min-height: 120px !important;
+        border-radius: 24px !important;
+    }
+    
+    .yam-welcome-banner::before {
+        border-radius: 24px 24px 0 0 !important;
+    }
+    
+    .welcome-title {
+        font-size: 1.75rem !important;
+        gap: 0.75rem !important;
+    }
+    
+    .welcome-emoji {
+        font-size: 1.5rem !important;
+        margin-left: 0.75rem !important;
+    }
+    
+    .welcome-subtitle {
+        font-size: 1.1rem !important;
+    }
+    
+    .welcome-info {
+        gap: 1rem !important;
+        font-size: 0.85rem !important;
+        justify-content: center !important;
+    }
+    
+    .info-item {
+        padding: 0.625rem 1rem !important;
+        min-width: 120px !important;
+        min-height: 40px !important;
+        border-radius: 16px !important;
+    }
+    
+    .info-item i {
+        font-size: 1rem !important;
+    }
+    
+    .info-item span {
+        font-size: 0.8rem !important;
+    }
+    
+    .status-badge {
+        padding: 0.625rem 1rem !important;
+        font-size: 0.8rem !important;
+        min-height: 40px !important;
+        border-radius: 14px !important;
+    }
+    
+    .status-badge i {
+        font-size: 1rem !important;
+    }
+    
+    .status-badge span {
+        font-size: 0.75rem !important;
+}
+    
+    .rocket-smoke {
+        width: 25px;
+        height: 40px;
+    }
+    
+    .rocket-smoke::before,
+    .rocket-smoke::after {
+        width: 5px;
+        height: 12px;}
+}
+
+@media (max-width: 480px) {
+    .yam-welcome-banner {
+        padding: 1.5rem 1.25rem !important;
+        min-height: 100px !important;
+        border-radius: 20px !important;
+    }
+    
+    .yam-welcome-banner::before {
+        border-radius: 20px 20px 0 0 !important;
+    }
+    
+    .welcome-title {
+        font-size: 1.5rem !important;
+        gap: 0.625rem !important;
+    }
+    
+    .welcome-emoji {
+        font-size: 1.25rem !important;
+        margin-left: 0.625rem !important;
+    }
+    
+    .welcome-subtitle {
+        font-size: 1rem !important;
+    }
+    
+    .welcome-info {
+        gap: 0.875rem !important;
+        font-size: 0.8rem !important;
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+    
+    .info-item {
+        padding: 0.5rem 0.875rem !important;
+        min-width: 100px !important;
+        min-height: 35px !important;
+        border-radius: 14px !important;
+<<<<<<< HEAD
+=======
+    }
+    
+    .info-item i {
+        font-size: 0.9rem !important;
+    }
+    
+    .info-item span {
+        font-size: 0.75rem !important;
+    }
+    
+    .status-badge {
+        padding: 0.5rem 0.875rem !important;
+        font-size: 0.75rem !important;
+        min-height: 35px !important;
+        border-radius: 12px !important;
+    }
+    
+    .status-badge i {
+        font-size: 0.9rem !important;
+    }
+    
+    .status-badge span {
+        font-size: 0.7rem !important;
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    }
+    
+    .info-item i {
+        font-size: 0.9rem !important;
+    }
+    
+    .info-item span {
+        font-size: 0.75rem !important;
+    }
+    
+    .status-badge {
+        padding: 0.5rem 0.875rem !important;
+        font-size: 0.75rem !important;
+        min-height: 35px !important;
+        border-radius: 12px !important;
+    }
+    
+    .status-badge i {
+        font-size: 0.9rem !important;
+    }
+    
+    .status-badge span {
+        font-size: 0.7rem !important;
+}
+    
+    .rocket-smoke {
+        width: 20px;
+        height: 35px;
+    }
+    
+    .rocket-smoke::before,
+    .rocket-smoke::after {
+        width: 4px;
+        height: 10px;}
+}
+
+/* ENHANCED PERFORMANCE */
+.yam-welcome-banner {
+    will-change: transform, box-shadow !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+}
+
+.welcome-emoji {
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+}
+
+<<<<<<< HEAD
+.rocket-smoke {
+    will-change: opacity, transform !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+}
+
+/* ENHANCED ACCESSIBILITY */
+.yam-welcome-banner:focus-within {
+    outline: 2px solid #4a90e2 !important;
+    outline-offset: 2px !important;
+}.welcome-emoji {
+=======
+/* ENHANCED ACCESSIBILITY */
+.yam-welcome-banner:focus-within {
+    outline: 2px solid #5865f2 !important;
+    outline-offset: 2px !important;
+}
+
+.welcome-emoji {
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    /* Ensure emoji is accessible */
+    role: "img";
+    aria-label: "Rocket emoji";
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .welcome-emoji,
+    .rocket-smoke {
+        animation: none !important;
+        transition: none !important;
+    }
+    
+    .welcome-emoji:hover {
+        transform: none !important;
+    }}
+</style>
+
+<script>
+<<<<<<< HEAD
+// Enhanced Welcome Banner Script with Rocket Animationswindow.welcomeBanner = {
+=======
+// Enhanced Welcome Banner Script
+window.welcomeBanner = {
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    init() {
+        this.updateDateTime();
+        this.startDateTimeUpdate();
+        this.setupConnectionStatus();
+        this.setupRocketInteraction();
+<<<<<<< HEAD
+console.log('Welcome banner initialized with enhanced rocket animations');},
+=======
+        console.log('Welcome banner initialized');
+    },
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+    
+    updateDateTime() {
+        const now = new Date();
+        
+        // Update date
+        const dateElement = document.getElementById('currentDate');
+        if (dateElement) {
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            dateElement.textContent = now.toLocaleDateString('en-US', options);
+        }
+        
+        // Update time
+        const timeElement = document.getElementById('currentTime');
+        if (timeElement) {
+            const timeOptions = { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: true 
+            };
+            timeElement.textContent = now.toLocaleTimeString('en-US', timeOptions);
+        }
+    },
+    
+    startDateTimeUpdate() {
+        // Update time every second
+        setInterval(() => {
+            this.updateDateTime();
+        }, 1000);
+    },
+    
+    setupConnectionStatus() {
+        const statusElement = document.getElementById('connectionStatus');
+        if (statusElement) {
+            // Simulate connection status (in real implementation, this would check actual connection)
+            const isConnected = navigator.onLine;
+            
+            if (isConnected) {
+                statusElement.className = 'status-badge connected';
+                statusElement.innerHTML = '<i class="bi bi-wifi"></i><span>Connected</span>';
+            } else {
+                statusElement.className = 'status-badge disconnected';
+                statusElement.innerHTML = '<i class="bi bi-wifi-off"></i><span>Disconnected</span>';
+            }
+        }
+    },
+    
+    setupRocketInteraction() {
+        const rocket = document.querySelector('.welcome-emoji');
+<<<<<<< HEAD
+if (!rocket) return;
+        
+        let clickCount = 0;
+        const maxClicks = 3;
+        let isAnimating = false;
+        
+        rocket.addEventListener('click', () => {
+            if (isAnimating) return; // Prevent multiple animations
+            
+            clickCount++;
+            
+            if (clickCount >= maxClicks) {
+                isAnimating = true;
+                
+                // Trigger blast off animation
+                rocket.classList.add('blasting-off');
+                
+                // Remove blast off class after animation (2 seconds)
+                setTimeout(() => {
+                    rocket.classList.remove('blasting-off');
+                    rocket.classList.add('returning');
+                    
+                    // Remove returning class after animation (1.5 seconds)
+                    setTimeout(() => {
+                        rocket.classList.remove('returning');
+                        clickCount = 0; // Reset click count
+                        isAnimating = false;
+                        
+                        // Restore floating animation
+                        rocket.style.animation = 'rocketFloat 3s ease-in-out infinite';
+                        
+                        // Reset tooltip
+                        rocket.title = 'Click 3 times to blast off! 🚀';
+                    }, 1500);
+                }, 2000);
+            } else {
+                // Regular hover effect
+                rocket.style.animation = 'rocketHover 0.8s ease-in-out';
+                setTimeout(() => {
+                    if (!isAnimating) {
+                        rocket.style.animation = 'rocketFloat 3s ease-in-out infinite';
+                    }
+                }, 800);
+            }
+        });
+        
+        // Enhanced hover effects with smoke
+        rocket.addEventListener('mouseenter', () => {
+            if (!rocket.classList.contains('blasting-off') && !rocket.classList.contains('returning') && !isAnimating) {
+                const smoke = rocket.querySelector('.rocket-smoke');
+                if (smoke) {
+                    smoke.style.opacity = '1';
+                }
+            }
+        });
+        
+        rocket.addEventListener('mouseleave', () => {
+            if (!rocket.classList.contains('blasting-off') && !rocket.classList.contains('returning') && !isAnimating) {
+                const smoke = rocket.querySelector('.rocket-smoke');
+                if (smoke) {
+                    smoke.style.opacity = '0';
+                }
+            }
+        });
+        
+        // Add visual feedback for click count
+        rocket.addEventListener('click', () => {
+            if (clickCount < maxClicks) {
+                // Add a subtle pulse effect to show progress
+                rocket.style.animation = 'rocketPulse 0.3s ease-in-out';
+                setTimeout(() => {
+                    if (!isAnimating) {
+                        rocket.style.animation = 'rocketFloat 3s ease-in-out infinite';
+                    }
+                }, 300);
+                
+                // Update tooltip to show progress
+                const remainingClicks = maxClicks - clickCount;
+                if (remainingClicks > 1) {
+                    rocket.title = `Click ${remainingClicks} more times to blast off! 🚀`;
+                } else {
+                    rocket.title = `Click 1 more time to blast off! 🚀`;
+                }
+            }
+        });}
+=======
+        if (rocket) {
+            rocket.addEventListener('click', () => {
+                // Add a fun interaction when rocket is clicked
+                rocket.style.animation = 'rocketHover 0.8s ease-in-out';
+                setTimeout(() => {
+                    rocket.style.animation = 'rocketFloat 3s ease-in-out infinite';
+                }, 800);
+            });
+        }
+    }
+>>>>>>> 7520c16b5c914093307c30b16f1d98ae5c12e909
+};
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.welcomeBanner.init();
+    });
+} else {
+    window.welcomeBanner.init();
+}
+</script>
+{% endmacro %} 

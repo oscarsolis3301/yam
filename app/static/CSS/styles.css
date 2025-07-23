@@ -1,0 +1,75 @@
+/* --- Sidebar Styles (moved from sidebar.html) --- */
+.sidebar-fixed {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 3.5rem;
+    height: 100vh;
+    background: #181c23;
+    z-index: 9999999 !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: visible;
+    transition: transform 0.3s ease-in-out;
+    /* Ensure sidebar is never affected by other elements */
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.sidebar-fixed.collapsed {
+    transform: translateX(-100%);
+}
+
+.collapse-btn {
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #181c23;
+    border: 1px solid #333;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #fff;
+    z-index: 9999999;
+    transition: background-color 0.2s;
+}
+
+.collapse-btn:hover {
+    background: #23272f;
+}
+
+.collapse-btn i {
+    transition: transform 0.3s ease-in-out;
+}
+
+.sidebar-fixed.collapsed .collapse-btn i {
+    transform: rotate(180deg);
+}
+
+.test-toggle-btn {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 9999998;
+}
+
+.test-toggle-btn:hover {
+    background: #0056b3;
+}
+
+.dropdown-menu {
+    z-index: 9999999999 !important;
+} 

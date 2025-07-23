@@ -1,0 +1,456 @@
+{% macro render_yam_javascript() %}
+<!-- YAM Dashboard Enhanced JavaScript -->
+<script>
+// YAM Dashboard Enhanced Global State
+window.yamDashboardEnhanced = {
+    components: {},
+    layout: {
+        sidebarCollapsed: false,
+        overviewView: 'grid',
+        systemView: 'grid',
+        activityView: 'grid'
+    },
+    
+    init() {
+        this.setupEventListeners();
+        this.startDateTimeUpdates();
+        this.setupLayoutControls();
+        this.handleSidebarState();
+        this.initializeComponents();
+        console.log('YAM Dashboard Enhanced initialized with full-screen layout');
+    },
+    
+    setupEventListeners() {
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                this.refreshAllComponents();
+            }
+        });
+        
+        // Handle window focus
+        window.addEventListener('focus', () => {
+            this.refreshAllComponents();
+        });
+        
+        // Handle page unload
+        window.addEventListener('beforeunload', () => {
+            console.log('Page unloading - dashboard cleanup');
+        });
+        
+        // Handle sidebar state changes
+        document.addEventListener('sidebarCollapsed', (event) => {
+            this.handleSidebarStateChange(event.detail.collapsed);
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            this.handleResize();
+        });
+    },
+    
+    initializeComponents() {
+        // Initialize all components with proper error handling
+        const componentSelectors = [
+            '.yam-component-item',
+            '.yam-grid-item'
+        ];
+        
+        componentSelectors.forEach(selector => {
+            const components = document.querySelectorAll(selector);
+            components.forEach(component => {
+                this.initializeComponent(component);
+            });
+        });
+        
+        // Add loading states to empty components
+        this.addLoadingStates();
+    },
+    
+    initializeComponent(component) {
+        // Check if component has content
+        const hasContent = component.querySelector('.yam-data-content, .yam-scrollable-content')?.children.length > 0;
+        
+        if (!hasContent) {
+            this.addEmptyState(component);
+        }
+    },
+    
+    addEmptyState(component) {
+        const dataContent = component.querySelector('.yam-data-content') || component;
+        
+        if (!dataContent.querySelector('.yam-empty-state')) {
+            dataContent.innerHTML = `
+                <div class="yam-empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <h4>No Data Available</h4>
+                    <p>Data will appear here when available</p>
+                </div>
+            `;
+        }
+    },
+    
+    addLoadingStates() {
+        // Add loading states to components that might be loading
+        const components = document.querySelectorAll('.yam-component-item');
+        components.forEach(component => {
+            const dataContent = component.querySelector('.yam-data-content');
+            if (dataContent && !dataContent.children.length) {
+                dataContent.innerHTML = `
+                    <div class="loading-state">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        <span>Loading...</span>
+                    </div>
+                `;
+            }
+        });
+    },
+    
+    setupLayoutControls() {
+        // Overview controls
+        const refreshOverviewBtn = document.getElementById('refreshOverviewBtn');
+        const toggleOverviewBtn = document.getElementById('toggleOverviewBtn');
+        
+        if (refreshOverviewBtn) {
+            refreshOverviewBtn.addEventListener('click', () => {
+                this.refreshOverviewComponents();
+            });
+        }
+        
+        if (toggleOverviewBtn) {
+            toggleOverviewBtn.addEventListener('click', () => {
+                this.toggleOverviewView();
+            });
+        }
+        
+        // System controls
+        const refreshSystemBtn = document.getElementById('refreshSystemBtn');
+        const toggleSystemBtn = document.getElementById('toggleSystemBtn');
+        
+        if (refreshSystemBtn) {
+            refreshSystemBtn.addEventListener('click', () => {
+                this.refreshSystemComponents();
+            });
+        }
+        
+        if (toggleSystemBtn) {
+            toggleSystemBtn.addEventListener('click', () => {
+                this.toggleSystemView();
+            });
+        }
+        
+        // Activity controls
+        const refreshActivityBtn = document.getElementById('refreshActivityBtn');
+        const toggleActivityBtn = document.getElementById('toggleActivityBtn');
+        
+        if (refreshActivityBtn) {
+            refreshActivityBtn.addEventListener('click', () => {
+                this.refreshActivityComponents();
+            });
+        }
+        
+        if (toggleActivityBtn) {
+            toggleActivityBtn.addEventListener('click', () => {
+                this.toggleActivityView();
+            });
+        }
+    },
+    
+    handleSidebarState() {
+        const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        this.layout.sidebarCollapsed = sidebarCollapsed;
+        this.updateLayout();
+    },
+    
+    handleSidebarStateChange(collapsed) {
+        this.layout.sidebarCollapsed = collapsed;
+        this.updateLayout();
+    },
+    
+    updateLayout() {
+        const dashboardContent = document.querySelector('.yam-dashboard-content');
+        if (dashboardContent) {
+            if (this.layout.sidebarCollapsed) {
+                dashboardContent.style.marginLeft = '0';
+            } else {
+                dashboardContent.style.marginLeft = '3.5rem';
+            }
+        }
+    },
+    
+    handleResize() {
+        // Adjust layout based on screen size
+        const isMobile = window.innerWidth <= 768;
+        const dashboardContent = document.querySelector('.yam-dashboard-content');
+        
+        if (isMobile && dashboardContent) {
+            dashboardContent.style.marginLeft = '0';
+        } else if (!this.layout.sidebarCollapsed && dashboardContent) {
+            dashboardContent.style.marginLeft = '3.5rem';
+        }
+    },
+    
+    toggleOverviewView() {
+        this.layout.overviewView = this.layout.overviewView === 'grid' ? 'list' : 'grid';
+        const container = document.querySelector('.yam-full-width-section .yam-component-grid');
+        const toggleBtn = document.getElementById('toggleOverviewBtn');
+        
+        if (container) {
+            container.className = `yam-component-grid ${this.layout.overviewView}-view`;
+        }
+        
+        if (toggleBtn) {
+            if (this.layout.overviewView === 'list') {
+                toggleBtn.innerHTML = '<i class="bi bi-grid-3x3"></i>';
+                toggleBtn.title = 'Grid View';
+            } else {
+                toggleBtn.innerHTML = '<i class="bi bi-list"></i>';
+                toggleBtn.title = 'List View';
+            }
+        }
+    },
+    
+    toggleSystemView() {
+        this.layout.systemView = this.layout.systemView === 'grid' ? 'list' : 'grid';
+        const container = document.querySelectorAll('.yam-full-width-section .yam-component-grid')[1];
+        const toggleBtn = document.getElementById('toggleSystemBtn');
+        
+        if (container) {
+            container.className = `yam-component-grid ${this.layout.systemView}-view`;
+        }
+        
+        if (toggleBtn) {
+            if (this.layout.systemView === 'list') {
+                toggleBtn.innerHTML = '<i class="bi bi-grid-3x3"></i>';
+                toggleBtn.title = 'Grid View';
+            } else {
+                toggleBtn.innerHTML = '<i class="bi bi-list"></i>';
+                toggleBtn.title = 'List View';
+            }
+        }
+    },
+    
+    toggleActivityView() {
+        this.layout.activityView = this.layout.activityView === 'grid' ? 'list' : 'grid';
+        const container = document.querySelectorAll('.yam-full-width-section .yam-component-grid')[2];
+        const toggleBtn = document.getElementById('toggleActivityBtn');
+        
+        if (container) {
+            container.className = `yam-component-grid ${this.layout.activityView}-view`;
+        }
+        
+        if (toggleBtn) {
+            if (this.layout.activityView === 'list') {
+                toggleBtn.innerHTML = '<i class="bi bi-grid-3x3"></i>';
+                toggleBtn.title = 'Grid View';
+            } else {
+                toggleBtn.innerHTML = '<i class="bi bi-list"></i>';
+                toggleBtn.title = 'List View';
+            }
+        }
+    },
+    
+    startDateTimeUpdates() {
+        function updateDateTime() {
+            const now = new Date();
+            const dateElement = document.getElementById('currentDate');
+            const timeElement = document.getElementById('currentTime');
+            
+            if (dateElement) {
+                dateElement.textContent = now.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+            
+            if (timeElement) {
+                timeElement.textContent = now.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    timeZoneName: 'short'
+                });
+            }
+        }
+        
+        // Update time immediately and then every second
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    },
+    
+    refreshAllComponents() {
+        // Refresh all components that have refresh methods
+        const components = [
+            'quickStats',
+            'statusIndicator', 
+            'userQuickView',
+            'recentActivity',
+            'userPresenceMap',
+            'userAnalytics',
+            'systemMonitor',
+            'teamCollaboration'
+        ];
+        
+        components.forEach(componentName => {
+            if (window[componentName] && window[componentName].refresh) {
+                window[componentName].refresh();
+            }
+        });
+        
+        // Refresh empty states
+        this.refreshEmptyStates();
+    },
+    
+    refreshEmptyStates() {
+        const components = document.querySelectorAll('.yam-component-item');
+        components.forEach(component => {
+            const dataContent = component.querySelector('.yam-data-content');
+            if (dataContent && !dataContent.children.length) {
+                this.addEmptyState(component);
+            }
+        });
+    },
+    
+    refreshOverviewComponents() {
+        const components = ['userPresenceMap', 'userAnalytics', 'userActivityHeatmap', 'advancedUserStatus'];
+        components.forEach(componentName => {
+            if (window[componentName] && window[componentName].refresh) {
+                window[componentName].refresh();
+            }
+        });
+        this.showToast('Overview refreshed', 'success');
+    },
+    
+    refreshSystemComponents() {
+        const components = ['systemMonitor', 'systemHealthMonitor', 'teamPerformanceAnalytics', 'teamCollaboration'];
+        components.forEach(componentName => {
+            if (window[componentName] && window[componentName].refresh) {
+                window[componentName].refresh();
+            }
+        });
+        this.showToast('System components refreshed', 'success');
+    },
+    
+    refreshActivityComponents() {
+        const components = ['recentActivity', 'userActivityTracker', 'notifications', 'teamChat'];
+        components.forEach(componentName => {
+            if (window[componentName] && window[componentName].refresh) {
+                window[componentName].refresh();
+            }
+        });
+        this.showToast('Activity feed refreshed', 'success');
+    },
+    
+    showError(message) {
+        console.error('YAM Dashboard Enhanced Error:', message);
+        this.showToast(message, 'error');
+    },
+    
+    showToast(message, type = 'info') {
+        if (window.showToast) {
+            window.showToast(message, type);
+        } else {
+            // Fallback toast
+            const toast = document.createElement('div');
+            toast.className = `yam-toast-notification ${type}`;
+            toast.innerHTML = `
+                <div class="yam-toast-content">
+                    <i class="bi bi-${type === 'error' ? 'exclamation-triangle' : type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Show toast
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Hide and remove toast
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+    },
+    
+    registerComponent(name, component) {
+        this.components[name] = component;
+        console.log(`YAM Dashboard Enhanced: Registered component: ${name}`);
+    }
+};
+
+// Initialize YAM Dashboard Enhanced when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.yamDashboardEnhanced.init();
+});
+
+// Global utility functions
+window.showToast = function(message, type = 'info') {
+    // Simple toast notification system
+    const toast = document.createElement('div');
+    toast.className = `yam-toast-notification ${type}`;
+    toast.innerHTML = `
+        <div class="yam-toast-content">
+            <i class="bi bi-${type === 'error' ? 'exclamation-triangle' : type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Show toast
+    setTimeout(() => toast.classList.add('show'), 100);
+    
+    // Hide and remove toast
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => document.body.removeChild(toast), 300);
+    }, 3000);
+};
+</script>
+
+<!-- Outage banner dynamic padding for YAM -->
+<script>
+(function() {
+    function positionOutageBannerYAM() {
+        var outageBanner = document.getElementById('outageBanner');
+        var mainContent = document.querySelector('.yam-main-content');
+        if (outageBanner && mainContent) {
+            // Check if outage banner is visible and has content
+            const isVisible = outageBanner.style.display !== 'none' && 
+                             outageBanner.offsetHeight > 0 &&
+                             outageBanner.textContent.trim() !== 'Active Outage: Loading...' &&
+                             outageBanner.dataset.outageData !== undefined;
+            // Update main content padding
+            if (isVisible) {
+                mainContent.classList.add('with-outage-banner');
+            } else {
+                mainContent.classList.remove('with-outage-banner');
+            }
+        }
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', positionOutageBannerYAM);
+    } else {
+        positionOutageBannerYAM();
+    }
+    window.addEventListener('load', positionOutageBannerYAM);
+    window.addEventListener('resize', positionOutageBannerYAM);
+    // Watch for dynamic changes to the outage banner
+    const observer = new MutationObserver(positionOutageBannerYAM);
+    const outageBanner = document.getElementById('outageBanner');
+    if (outageBanner) {
+        observer.observe(outageBanner, {
+            attributes: true,
+            attributeFilter: ['style', 'class'],
+            childList: true,
+            subtree: true,
+            characterData: true
+        });
+    }
+    setInterval(positionOutageBannerYAM, 2000);
+})();
+</script>
+{% endmacro %} 

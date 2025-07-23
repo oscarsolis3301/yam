@@ -1,0 +1,56 @@
+{# Import required YAM components for activity section #}
+{% import 'components/yam/recent_activity.html' as yam_recent_activity %}
+{% import 'components/yam/user_activity_tracker.html' as yam_user_activity_tracker %}
+{% import 'components/yam/notifications.html' as yam_notifications %}
+{% import 'components/yam/team_chat.html' as yam_team_chat %}
+
+{% macro render_activity_section(current_user) %}
+<!-- Additional Row - Activity and Notifications -->
+<div class="yam-full-width-section">
+    <div class="yam-component-header">
+        <h3 class="yam-component-title">
+            <i class="bi bi-activity"></i>
+            Activity Feed & Notifications
+        </h3>
+        <div class="yam-component-controls">
+            <button class="yam-control-btn" id="refreshActivityBtn" title="Refresh">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+            <button class="yam-control-btn" id="toggleActivityBtn" title="Toggle View">
+                <i class="bi bi-grid-3x3"></i>
+            </button>
+        </div>
+    </div>
+    <div class="yam-scrollable-content">
+        <div class="yam-component-grid">
+            <!-- Recent Activity Component -->
+            <div class="yam-component-item">
+                <div class="yam-data-content">
+                    {{ yam_recent_activity.render_recent_activity(current_user) }}
+                </div>
+            </div>
+            
+            <!-- User Activity Tracker Component -->
+            <div class="yam-component-item">
+                <div class="yam-data-content">
+                    {{ yam_user_activity_tracker.render_user_activity_tracker(current_user) }}
+                </div>
+            </div>
+            
+            <!-- Notifications Component -->
+            <div class="yam-component-item">
+                <div class="yam-data-content">
+                    {{ yam_notifications.render_notifications(current_user) }}
+                </div>
+            </div>
+            
+            <!-- Team Chat Component -->
+            <div class="yam-component-item">
+                <div class="yam-data-content">
+                    {{ yam_team_chat.render_team_chat(current_user) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %} 

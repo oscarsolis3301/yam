@@ -1,0 +1,191 @@
+<!-- YAM Core Scripts - SIMPLIFIED AND ERROR FREE -->
+<script>
+// YAM Core - Simplified Version
+window.yamCore = {
+    // Simple performance monitoring
+    performance: {
+        startTime: performance.now(),
+        metrics: {},
+        
+        mark(name) {
+            this.metrics[name] = performance.now();
+        },
+        
+        measure(name, startMark, endMark) {
+            try {
+                const start = this.metrics[startMark] || this.startTime;
+                const end = this.metrics[endMark] || performance.now();
+                const duration = end - start;
+                console.log(`YAM Performance: ${name} took ${duration.toFixed(2)}ms`);
+                this.metrics[name] = duration;
+            } catch (e) {
+                console.warn(`YAM Performance: Could not measure ${name}`);
+            }
+        },
+        
+        getMetrics() {
+            return this.metrics;
+        }
+    },
+    
+    // Resource preloading
+    preload: {
+        critical: [
+            'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css',
+            'https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css'
+        ],
+        
+        async: [
+            'https://cdn.jsdelivr.net/npm/chart.js'
+        ],
+        
+        init() {
+            // Preload critical resources
+            this.critical.forEach(url => {
+                const link = document.createElement('link');
+                link.rel = 'preload';
+                link.as = url.includes('.css') ? 'style' : 'script';
+                link.href = url;
+                document.head.appendChild(link);
+            });
+            
+            // Preload async resources
+            this.async.forEach(url => {
+                const link = document.createElement('link');
+                link.rel = 'prefetch';
+                link.href = url;
+                document.head.appendChild(link);
+            });
+        }
+    },
+    
+    // Lazy loading optimization
+    lazyLoad: {
+        init() {
+            // Simple lazy loading setup
+            console.log('YAM Core: Lazy loading initialized');
+        }
+    },
+    
+    // Animation optimization
+    animations: {
+        init() {
+            // Simple animation setup
+            console.log('YAM Core: Animations initialized');
+        }
+    },
+    
+    // Error handling
+    errors: {
+        init() {
+            // Simple error handling setup
+            console.log('YAM Core: Error handling initialized');
+        },
+        
+        handleError(error, context) {
+            console.error(`YAM Core Error in ${context}:`, error);
+        }
+    },
+    
+    // Memory management
+    memory: {
+        cleanup() {
+            // Simple memory cleanup
+            if (window.gc) {
+                window.gc();
+            }
+        }
+    },
+    
+    // Network optimization
+    network: {
+        init() {
+            // Simple network optimization
+            console.log('YAM Core: Network optimization initialized');
+        }
+    },
+    
+    // Scroll optimization
+    scroll: {
+        init() {
+            // Simple scroll optimization
+            console.log('YAM Core: Scroll optimization initialized');
+        }
+    },
+    
+    // Modal optimization
+    modals: {
+        optimizeModalLoading() {
+            // Simple modal optimization
+            console.log('YAM Core: Modal optimization initialized');
+        }
+    },
+    
+    init() {
+        this.performance.mark('yam-core-init-start');
+        
+        // Initialize all subsystems
+        this.preload.init();
+        this.lazyLoad.init();
+        this.animations.init();
+        this.errors.init();
+        this.network.init();
+        this.scroll.init();
+        
+        // Setup performance monitoring
+        this.performance.mark('yam-core-init-end');
+        this.performance.measure('YAM Core Initialization', 'yam-core-init-start', 'yam-core-init-end');
+        
+        // Setup memory cleanup
+        setInterval(() => {
+            this.memory.cleanup();
+        }, 30000); // Clean up every 30 seconds
+        
+        console.log('YAM Core initialized successfully');
+    }
+};
+
+// Initialize YAM Core when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.yamCore.init();
+    });
+} else {
+    window.yamCore.init();
+}
+
+// Performance monitoring for page load
+window.addEventListener('load', () => {
+    window.yamCore.performance.mark('page-load-complete');
+    window.yamCore.performance.measure('Total Page Load Time', 'yam-core-init-start', 'page-load-complete');
+    
+    // Log performance metrics
+    const metrics = window.yamCore.performance.getMetrics();
+    console.log('YAM Performance Metrics:', metrics);
+});
+
+// Simple Service Worker registration
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+                console.log('YAM Service Worker registered:', registration);
+            })
+            .catch(error => {
+                console.log('YAM Service Worker registration failed:', error);
+            });
+    });
+}
+
+// Network condition optimization
+const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+if (connection) {
+    connection.addEventListener('change', () => {
+        const effectiveType = connection.effectiveType || 'unknown';
+        console.log(`YAM Core: Network type changed to ${effectiveType}`);
+    });
+}
+
+// Export for global access
+window.yamCore.performance = window.yamCore.performance;
+</script> 
