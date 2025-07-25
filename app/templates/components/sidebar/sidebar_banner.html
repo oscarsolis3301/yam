@@ -56,14 +56,15 @@
             </div>
         </div>
         
-        <!-- Banner Search Results Dropdown -->
-        <div id="bannerSearchResults" class="banner-search-results" role="listbox" aria-label="Search results">
-            <div id="bannerResultsContent"></div>
-        </div>
-        
-        <!-- Banner Search Suggestions Dropdown -->
-        <div id="bannerSearchSuggestions" class="banner-search-suggestions" role="listbox" aria-label="Search suggestions">
-            <div id="bannerSuggestionsContent"></div>
+        <!-- Unified Banner Search Dropdown (combines suggestions and results) -->
+        <div id="bannerSearchSuggestions" class="banner-search-suggestions" style="display: none;">
+            <div class="banner-suggestions-header">
+                <i class="bi bi-lightbulb"></i>
+                <span id="bannerSuggestionsTitle">Suggestions</span>
+            </div>
+            <div class="banner-suggestions-content" id="bannerSuggestionsContent">
+                <!-- Suggestions and results will be populated here -->
+            </div>
         </div>
     </div>
 </div> 

@@ -231,83 +231,7 @@
     height: 16px;
 }
 
-/* Banner Search Results Dropdown */
-.banner-search-results {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: rgba(35, 39, 47, 0.95);
-    backdrop-filter: blur(15px);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    max-height: 400px;
-    overflow-y: auto;
-    z-index: 10000000;
-    margin-top: 8px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
 
-.banner-search-results.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
-.banner-search-result-item {
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.banner-search-result-item:last-child {
-    border-bottom: none;
-}
-
-.banner-search-result-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.banner-search-result-icon {
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 14px;
-}
-
-.banner-search-result-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.banner-search-result-title {
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.banner-search-result-subtitle {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 12px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
 
 .banner-search-no-results {
     padding: 20px 16px;
@@ -327,7 +251,7 @@
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    max-height: 300px;
+    max-height: 400px;
     overflow-y: auto;
     z-index: 10000000;
     margin-top: 8px;
@@ -335,16 +259,38 @@
     visibility: hidden;
     transform: translateY(-10px);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Ensure dropdown is always on top */
+    pointer-events: auto;
 }
 
 .banner-search-suggestions.show {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+    /* Force visibility */
+    display: block !important;
+}
+
+.banner-suggestions-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.banner-suggestions-content {
+    max-height: 350px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .banner-search-suggestion-item {
-    padding: 10px 16px;
+    padding: 12px 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     cursor: pointer;
     transition: background-color 0.2s ease;
@@ -368,13 +314,13 @@
 }
 
 .banner-search-suggestion-icon {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: rgba(255, 255, 255, 0.7);
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .banner-search-suggestion-content {
@@ -390,6 +336,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1.3;
 }
 
 .banner-search-suggestion-subtitle {
@@ -398,6 +345,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1.2;
 }
 
 /* Suggestion categories styling */
@@ -909,5 +857,17 @@ body {
 
 .sticky-notes-widget.resizing {
   box-shadow: 0 0 0 2px #007bff;
+}
+
+/* Ensure banner search container has proper positioning */
+.banner-search-container {
+    position: relative;
+    z-index: 10000001;
+}
+
+/* Debug styles to make dropdowns more visible */
+.banner-search-suggestions.show {
+    border: 2px solid #007bff !important;
+    background: rgba(35, 39, 47, 0.98) !important;
 }
 </style> 
