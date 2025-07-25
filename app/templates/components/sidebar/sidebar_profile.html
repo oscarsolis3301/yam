@@ -1,0 +1,27 @@
+<div class="dropdown border-top mt-auto user-dropdown">
+  <a href="#" class="d-block link-body-emphasis text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false">
+
+    <div class="sidebar-profile-picture-wrapper">
+      <div class="sidebar-profile-picture-container">
+        <img 
+          src="{{ url_for('static', filename='uploads/profile_pictures/' + (current_user.profile_picture if current_user and current_user.profile_picture else 'boy.png')) }}"
+          alt="Profile Picture" 
+          class="sidebar-profile-picture"
+          onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/PFP/boy.png') }}'">
+      </div>
+      <span class="online-status-dot"></span>
+    </div>
+  </a>
+
+  <ul class="dropdown-menu text-small shadow">
+    <li><a class="dropdown-item" href="#" id="openStickyNotes">Notes</a></li>
+    <li><a class="dropdown-item" href="/settings">Settings</a></li>
+    <li><a class="dropdown-item" href="/profile">Profile</a></li>
+    {% if current_user and current_user.is_authenticated and current_user.is_admin %}
+    <li><a class="dropdown-item" href="/dashboard">Admin Dashboard</a></li>
+    <li><a class="dropdown-item" href="/admin/cache-management">Cache Management</a></li>
+    {% endif %}
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="/logout">Sign out</a></li>
+  </ul>
+</div> 

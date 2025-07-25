@@ -117,3 +117,9 @@ def spark_proxy():
     except Exception as e:
         logger.error(f"Unexpected error in spark proxy: {str(e)}")
         return jsonify({'error': 'Internal server error'}), 500 
+
+@bp.route('/test-search-fixed')
+@login_required
+def test_search_fixed():
+    """Test page for verifying search functionality."""
+    return render_template('test_search_fixed.html') 

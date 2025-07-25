@@ -1,0 +1,29 @@
+<div id="stickyNotesWidget" class="sticky-notes-widget" style="display:none; position:fixed; top:32px; right:32px; z-index:3000;">
+  <div class="sticky-header" id="stickyHeader">
+    <span>Sticky Notes</span>
+    <div class="sticky-actions">
+      <button class="sticky-btn" id="addNoteBtn" title="Add Note"><i class="bi bi-plus"></i></button>
+      <button class="sticky-btn" id="minimizeNotesBtn" title="Minimize/Maximize"><i class="bi bi-arrows-angle-expand"></i></button>
+      <button class="sticky-btn" id="closeNotesBtn" title="Close"><i class="bi bi-x"></i></button>
+    </div>
+  </div>
+  <div class="sticky-content" id="stickyContent">
+    <div id="notesList"></div>
+  </div>
+  <div id="stickyToast" class="sticky-toast"></div>
+</div>
+
+<script>
+const notesBtn = document.getElementById('openStickyNotes');
+if (notesBtn) {
+  notesBtn.onclick = function() {
+    document.getElementById('stickyNotesWidget').style.display = 'block';
+  };
+}
+const closeBtn = document.getElementById('closeNotesBtn');
+if (closeBtn) {
+  closeBtn.onclick = function() {
+    document.getElementById('stickyNotesWidget').style.display = 'none';
+  };
+}
+</script> 

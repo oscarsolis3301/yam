@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Test - Fixed</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #0d1117;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #161b22;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #30363d;
+        }
+        .test-section {
+            margin-bottom: 24px;
+            padding: 16px;
+            background: #21262d;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+        }
+        .test-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .test-button {
+            background: #238636;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+        .test-button:hover {
+            background: #2ea043;
+        }
+        .test-results {
+            margin-top: 16px;
+            padding: 12px;
+            background: #0d1117;
+            border-radius: 6px;
+            border: 1px solid #30363d;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .status.success {
+            background: #238636;
+            color: #ffffff;
+        }
+        .status.error {
+            background: #da3633;
+            color: #ffffff;
+        }
+        .status.warning {
+            background: #f0883e;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔍 Search Functionality Test - Fixed</h1>
+        <p>Testing the updated search functionality to ensure no 404 errors and proper real-time suggestions.</p>
+        
+        <div class="test-section">
+            <h3>Test 1: Universal Search API</h3>
+            <input type="text" id="universalSearchTest" class="test-input" placeholder="Enter search query...">
+            <button class="test-button" onclick="testUniversalSearch()">Test Universal Search</button>
+            <div id="universalSearchResults" class="test-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test 2: Clock ID Suggestions</h3>
+            <input type="text" id="clockIdTest" class="test-input" placeholder="Enter clock ID (1-5 digits)...">
+            <button class="test-button" onclick="testClockIdSuggestions()">Test Clock ID</button>
+            <div id="clockIdResults" class="test-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test 3: Unified Search</h3>
+            <input type="text" id="unifiedSearchTest" class="test-input" placeholder="Enter search query...">
+            <button class="test-button" onclick="testUnifiedSearch()">Test Unified Search</button>
+            <div id="unifiedSearchResults" class="test-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test 4: Real-time Suggestions</h3>
+            <input type="text" id="realtimeTest" class="test-input" placeholder="Type to test real-time suggestions...">
+            <div id="realtimeResults" class="test-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test 5: Fast/Slow Typing Test</h3>
+            <input type="text" id="typingTest" class="test-input" placeholder="Type fast or slow to test debouncing...">
+            <div id="typingResults" class="test-results"></div>
+        </div>
+    </div>
+
+    <script>
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const statusClass = type === 'error' ? 'error' : type === 'success' ? 'success' : 'warning';
+            element.innerHTML += `<div class="status ${statusClass}">[${timestamp}] ${message}</div>`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        async function testUniversalSearch() {
+            const query = document.getElementById('universalSearchTest').value;
+            const results = document.getElementById('universalSearchResults');
+            results.innerHTML = '';
+            
+            if (!query) {
+                log('universalSearchResults', 'Please enter a search query', 'error');
+                return;
+            }
+            
+            log('universalSearchResults', `Testing universal search for: "${query}"`);
+            
+            try {
+                const response = await fetch(`/api/universal-search/?q=${encodeURIComponent(query)}&limit=5`);
+                log('universalSearchResults', `Response status: ${response.status}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('universalSearchResults', `Success! Found ${data.results?.length || 0} results`);
+                    log('universalSearchResults', `Data: ${JSON.stringify(data, null, 2)}`);
+                } else {
+                    log('universalSearchResults', `Error: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                log('universalSearchResults', `Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testClockIdSuggestions() {
+            const query = document.getElementById('clockIdTest').value;
+            const results = document.getElementById('clockIdResults');
+            results.innerHTML = '';
+            
+            if (!query) {
+                log('clockIdResults', 'Please enter a clock ID', 'error');
+                return;
+            }
+            
+            log('clockIdResults', `Testing clock ID suggestions for: "${query}"`);
+            
+            try {
+                const response = await fetch(`/api/clock-id/suggestions?q=${encodeURIComponent(query)}`);
+                log('clockIdResults', `Response status: ${response.status}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('clockIdResults', `Success! Found ${data.suggestions?.length || 0} suggestions`);
+                    log('clockIdResults', `Data: ${JSON.stringify(data, null, 2)}`);
+                } else {
+                    log('clockIdResults', `Error: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                log('clockIdResults', `Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUnifiedSearch() {
+            const query = document.getElementById('unifiedSearchTest').value;
+            const results = document.getElementById('unifiedSearchResults');
+            results.innerHTML = '';
+            
+            if (!query) {
+                log('unifiedSearchResults', 'Please enter a search query', 'error');
+                return;
+            }
+            
+            log('unifiedSearchResults', `Testing unified search for: "${query}"`);
+            
+            try {
+                const response = await fetch(`/unified_search?q=${encodeURIComponent(query)}`);
+                log('unifiedSearchResults', `Response status: ${response.status}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('unifiedSearchResults', `Success! Found ${data.offices?.length || 0} offices, ${data.workstations?.length || 0} workstations`);
+                    log('unifiedSearchResults', `Data: ${JSON.stringify(data, null, 2)}`);
+                } else {
+                    log('unifiedSearchResults', `Error: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                log('unifiedSearchResults', `Network error: ${error.message}`, 'error');
+            }
+        }
+
+        // Real-time suggestions test
+        let realtimeTimeout;
+        document.getElementById('realtimeTest').addEventListener('input', function(e) {
+            clearTimeout(realtimeTimeout);
+            const query = e.target.value;
+            const results = document.getElementById('realtimeResults');
+            
+            if (!query) {
+                results.innerHTML = '';
+                return;
+            }
+            
+            realtimeTimeout = setTimeout(async () => {
+                log('realtimeResults', `Getting real-time suggestions for: "${query}"`);
+                
+                try {
+                    const response = await fetch(`/api/universal-search/suggestions?q=${encodeURIComponent(query)}&limit=3`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        log('realtimeResults', `Success! Found ${data.suggestions?.length || 0} suggestions`);
+                    } else {
+                        log('realtimeResults', `Error: ${response.status}`, 'error');
+                    }
+                } catch (error) {
+                    log('realtimeResults', `Network error: ${error.message}`, 'error');
+                }
+            }, 300); // 300ms debounce
+        });
+
+        // Fast/slow typing test
+        let typingTimeout;
+        document.getElementById('typingTest').addEventListener('input', function(e) {
+            clearTimeout(typingTimeout);
+            const query = e.target.value;
+            const results = document.getElementById('typingResults');
+            
+            if (!query) {
+                results.innerHTML = '';
+                return;
+            }
+            
+            log('typingResults', `Typing: "${query}" (length: ${query.length})`);
+            
+            // Test different debounce times based on query length
+            const debounceTime = query.length <= 3 ? 100 : 300;
+            
+            typingTimeout = setTimeout(async () => {
+                log('typingResults', `Debounced search after ${debounceTime}ms for: "${query}"`);
+                
+                try {
+                    const response = await fetch(`/api/universal-search/suggestions?q=${encodeURIComponent(query)}&limit=2`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        log('typingResults', `Success! Found ${data.suggestions?.length || 0} suggestions`);
+                    } else {
+                        log('typingResults', `Error: ${response.status}`, 'error');
+                    }
+                } catch (error) {
+                    log('typingResults', `Network error: ${error.message}`, 'error');
+                }
+            }, debounceTime);
+        });
+    </script>
+</body>
+</html> 

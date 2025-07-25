@@ -1,0 +1,165 @@
+<ul class="nav nav-pills nav-flush flex-column mb-auto text-center" style="margin: 0; padding: 0; gap: 0.5rem;">
+  <!-- Authentication detection element -->
+  {% if current_user and current_user.is_authenticated %}
+  <div class="user-info" data-user="{{ current_user.username if current_user and current_user.username else 'Unknown' }}" style="display: none;"></div>
+  {% endif %}
+  
+  <li style="position: relative;">
+    <a href="#" id="sidebarUniversalSearchToggle" class="nav-link py-2 rounded-0" title="Search" data-bs-toggle="tooltip" data-bs-placement="right">
+      <i class="bi bi-search" alt="Spark" style="font-size: 20px"></i>
+    </a>
+    <!-- Submenu for Unified -->
+    <div class="submenu-container">
+      <ul class="nav flex-column submenu">
+        <li class="nav-item">
+          <a href="/offices" class="nav-link py-1 rounded-pill {% if active_page == 'offices' %}active{% endif %}" title="Office" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="bi bi-building-fill" style="font-size: 16px;"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/workstations" class="nav-link py-1 rounded-pill {% if active_page == 'workstations' %}active{% endif %}" title="Workstation" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="bi bi-laptop-fill" style="font-size: 16px;"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/users" class="nav-link py-1 rounded-pill {% if active_page == 'users' %}active{% endif %}" title="User" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="bi bi-people-fill" style="font-size: 16px;"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </li>
+  <li>
+    <a href="/outages" class="nav-link py-2 rounded-0 {% if active_page == 'outages' %}active{% endif %}" title="Outage" data-bs-toggle="tooltip" data-bs-placement="right">
+      <i class="bi bi-exclamation-triangle-fill" style="font-size: 20px;"></i>
+    </a>
+  </li>
+  <li style="position: relative;">
+    <a href="/oralyzer/dashboard" class="nav-link py-2 rounded-0 {% if active_page == 'oralyzer_dashboard' %}active{% endif %}" title="Oralyzer Dashboard" data-bs-toggle="tooltip" data-bs-placement="right">
+      <i class="bi bi-layers-fill" style="font-size: 20px;"></i>
+    </a>
+    <!-- Submenu for Oralyzer -->
+    <div class="submenu-container">
+      <ul class="nav flex-column submenu">
+        <li class="nav-item">
+          <a href="/oralyzer" class="nav-link py-1 rounded-pill {% if active_page == 'oralyzer' %}active{% endif %}" title="Oralyzer" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="bi bi-speedometer2" style="font-size: 16px;"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/lab" class="nav-link py-1 rounded-pill {% if active_page == 'lab' %}active{% endif %}" title="Lab" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="bi-hospital" style="font-size: 16px;"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </li>
+  <li>
+    <a href="/notes" class="nav-link py-2 rounded-0 {% if active_page == 'workspace' %}active{% endif %}" title="Notes" data-bs-toggle="tooltip" data-bs-placement="right">
+      <i class="bi bi-journal-richtext" style="font-size: 20px;"></i>
+    </a>
+  </li>
+  <li>
+    <a href="/kb" class="nav-link py-2 rounded-0 {% if active_page == 'kb' %}active{% endif %}" title="Knowledge Base" data-bs-toggle="tooltip" data-bs-placement="right">
+      <i class="bi bi-book-fill" style="font-size: 20px;"></i>
+    </a>
+  </li>
+  <!-- <li>
+    <a href="/tracking" class="nav-link py-2 rounded-0 {% if active_page == 'tracking' %}active{% endif %}" title="Tracking" data-bs-toggle="tooltip" data-bs-placement="right">
+      <i class="bi bi-geo-fill" style="font-size: 20px;"></i>
+    </a>
+  </li> -->
+
+  <!-- <li>
+    <a href="/team" class="nav-link py-2 rounded-0 {% if active_page == 'team' %}active{% endif %}" title="Team Members" data-bs-toggle="tooltip" data-bs-placement="right">
+      <i class="bi bi-person-bounding-box" style="font-size: 20px;"></i>
+    </a>
+  </li> -->
+  <li>
+    <a href="/patterson" class="nav-link py-2 rounded-0 {% if active_page == 'patterson' %}active{% endif %}" title="Patterson Dispatch" data-bs-toggle="tooltip" data-bs-placement="right">
+      <i class="bi bi-tools" style="font-size: 20px;"></i>
+    </a>
+  </li>
+  <li>
+    <a href="/dameware" class="nav-link py-2 rounded-0 {% if active_page == 'dameware' %}active{% endif %}" title="Dameware Remote" data-bs-toggle="tooltip" data-bs-placement="right">
+      <i class="bi bi-display" style="font-size: 20px;"></i>
+    </a>
+  </li>
+  <li style="position: relative;">
+    <a href="/service-desk" class="nav-link py-2 rounded-0 {% if active_page == 'service_desk' %}active{% endif %}" title="Service Desk" data-bs-toggle="tooltip" data-bs-placement="right">
+      <i class="bi bi-headset" style="font-size: 20px;"></i>
+    </a>
+    <!-- Submenu for Service Desk -->
+    <div class="submenu-container">
+      <ul class="nav flex-column submenu">
+        <li class="nav-item">
+          <a href="/service-desk/dashboard" class="nav-link py-1 rounded-pill {% if active_page == 'service_desk_dashboard' %}active{% endif %}" title="Dashboard" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="bi bi-speedometer2" style="font-size: 16px;"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/service-desk/tickets" class="nav-link py-1 rounded-pill {% if active_page == 'service_desk_tickets' %}active{% endif %}" title="Tickets" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="bi bi-list-ul" style="font-size: 16px;"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/service-desk/knowledge-base" class="nav-link py-1 rounded-pill {% if active_page == 'service_desk_kb' %}active{% endif %}" title="Knowledge Base" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="bi bi-book" style="font-size: 16px;"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </li>
+
+  {% if current_user.is_authenticated and current_user.is_admin %}
+  <li>
+    <a href="/admin/clock-id-cache" class="nav-link py-2 rounded-0 {% if active_page == 'clock_id_cache' %}active{% endif %}" title="Clock ID Cache" data-bs-toggle="tooltip" data-bs-placement="right">
+      <i class="bi bi-database-check" style="font-size: 20px;"></i>
+    </a>
+  </li>
+  {% endif %}
+  <!-- ======================================================== -->
+  <!-- Jarvis AI Dashboard & Chat History                      -->
+  <!-- ======================================================== -->
+  {% if current_user.is_authenticated and current_user.role != 'user' %}
+  <li style="position: relative;">
+    <a href="/jarvis/dashboard" class="nav-link py-2 rounded-0 {% if active_page == 'jarvis' %}active{% endif %}" title="Jarvis" data-bs-toggle="tooltip" data-bs-placement="right">
+      <i class="bi bi-robot" style="font-size: 20px;"></i>
+    </a>
+    <!-- Submenu for Jarvis -->
+    <div class="submenu-container">
+      <ul class="nav flex-column submenu">
+        <li class="nav-item">
+          <a href="/admin/chat-history" class="nav-link py-1 rounded-pill {% if active_page == 'chat_history' %}active{% endif %}" title="Chat History" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="bi bi-clock-history" style="font-size: 16px;"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </li>
+  {% endif %}
+</ul>
+
+<!-- THE OFF CANVAS OUTAGE MENU -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasExampleLabel">Outages</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div>
+      Please select what you would like to see: all, current, previous, or the menu to create a new outage.
+    </div>
+    <div class="dropdown mt-3">
+      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
+        Select one
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <li><a class="dropdown-item" href="/all_outages">All</a></li> 
+        <li><a class="dropdown-item" href="/current_outages">Current</a></li>
+        <li><a class="dropdown-item" href="/previous_outages">Previous</a></li>
+        <li><a class="dropdown-item" href="/new_outage">Create New</a></li>
+      </ul>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,69 @@
+<!-- Dynamic Banner -->
+<div class="sidebar-banner">
+    <div class="sidebar-banner-text">
+        {% if active_page == 'home' %}Dashboard
+        {% elif active_page == 'offices' %}Offices
+        {% elif active_page == 'workstations' %}Workstations
+        {% elif active_page == 'users' %}Users
+        {% elif active_page == 'outages' %}Outages
+        {% elif active_page == 'oralyzer_dashboard' %}Oralyzer Dashboard
+        {% elif active_page == 'oralyzer' %}Oralyzer
+        {% elif active_page == 'lab' %}Lab
+        {% elif active_page == 'tracking' %}Tracking
+        {% elif active_page == 'kb' %}Knowledge Base
+        {% elif active_page == 'team' %}Team Members
+        {% elif active_page == 'patterson' %}Patterson Dispatch
+        {% elif active_page == 'dameware' %}Dameware Remote
+        {% elif active_page == 'service_desk' %}Service Desk
+        {% elif active_page == 'service_desk_dashboard' %}Service Desk Dashboard
+        {% elif active_page == 'workspace' %}Notes
+        {% elif active_page == 'jarvis' %}Jarvis
+        {% elif active_page == 'chat_history' %}Chat History
+        {% elif active_page == 'clock_id_cache' %}Clock ID Cache
+        {% else %}YAM
+        {% endif %}
+    </div>
+    
+    <!-- Banner Search Bar -->
+    <div class="banner-search-container">
+        <div class="banner-search-wrapper">
+            <div class="banner-search-input-group">
+                <div class="banner-search-icon">
+                    <i class="bi bi-search"></i>
+                </div>
+                <input 
+                    type="text" 
+                    id="bannerSearchInput" 
+                    class="banner-search-input" 
+                    placeholder="Search everything... (Ctrl+K)"
+                    autocomplete="off"
+                    spellcheck="false"
+                    aria-label="Search everything"
+                    title="Search everything - Press Ctrl+K for quick access"
+                >
+                <button id="bannerSearchClearBtn" class="banner-search-clear-btn" style="display: none;" aria-label="Clear search">
+                    <i class="bi bi-x"></i>
+                </button>
+                <div id="bannerSearchLoading" class="banner-search-loading" style="display: none;" aria-label="Searching...">
+                    <svg width="16" height="16" viewBox="0 0 40 40">
+                        <circle cx="20" cy="20" r="18" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.3"/>
+                        <path fill="#ffffff" fill-opacity="0.7">
+                            <animate attributeName="d" dur="1.2s" repeatCount="indefinite"
+                                values="M2,20 Q20,10 38,20 Q20,30 2,20 Z;M2,22 Q20,12 38,22 Q20,32 2,22 Z;M2,20 Q20,10 38,20 Q20,30 2,20 Z"/>
+                        </path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Banner Search Results Dropdown -->
+        <div id="bannerSearchResults" class="banner-search-results" role="listbox" aria-label="Search results">
+            <div id="bannerResultsContent"></div>
+        </div>
+        
+        <!-- Banner Search Suggestions Dropdown -->
+        <div id="bannerSearchSuggestions" class="banner-search-suggestions" role="listbox" aria-label="Search suggestions">
+            <div id="bannerSuggestionsContent"></div>
+        </div>
+    </div>
+</div> 

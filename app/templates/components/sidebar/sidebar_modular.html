@@ -1,0 +1,34 @@
+<html lang="en" data-bs-theme="dark">
+<head>
+  <title>
+    {% if active_page == 'home' %}Home
+    {% elif active_page == 'offices' %}Offices
+    {% elif active_page == 'workstations' %}Workstations
+    {% elif active_page == 'users' %}Users
+    {% elif active_page == 'outages' %}Outages
+    {% elif active_page == 'oralyzer_dashboard' %}Oralyzer Dashboard
+    {% elif active_page == 'oralyzer' %}Oralyzer
+    {% elif active_page == 'lab' %}Lab
+    {% elif active_page == 'tracking' %}Tracking
+    {% elif active_page == 'kb' %}Knowledge Base
+    {% elif active_page == 'team' %}Team Members
+    {% elif active_page == 'patterson' %}Patterson Dispatch
+    {% elif active_page == 'dameware' %}Dameware Remote
+    {% elif active_page == 'service_desk' %}Service Desk
+    {% elif active_page == 'service_desk_dashboard' %}Service Desk Dashboard
+    {% elif active_page == 'workspace' %}Notes
+    {% elif active_page == 'jarvis' %}Jarvis
+    {% elif active_page == 'chat_history' %}Chat History
+    {% elif active_page == 'clock_id_cache' %}Clock ID Cache
+    {% else %}YAM
+    {% endif %}
+  </title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body>
+
+{% include "components/sidebar/sidebar_styles.html" %}
+{% include "components/sidebar/sidebar_main.html" %}
+
+</body>
+</html> 

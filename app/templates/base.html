@@ -414,9 +414,25 @@
             /* Ensure sidebar is not affected */
             margin-left: 3.5rem !important;
         }
+        
+        /* Add spacing for the sidebar banner */
+        .main-content {
+            margin-left: 3.5rem !important;
+            padding-top: 80px !important; /* Height of sidebar banner */
+            transition: padding-top 0.2s;
+        }
+        
+        /* When outage banner is present, add extra padding */
+        .main-content.with-outage-banner {
+            padding-top: 170px !important; /* 80px (sidebar banner) + 90px (outage banner) */
+        }
         @media (max-width: 768px) {
             .main-content.with-outage-banner {
-                padding-top: 56px !important;
+                padding-top: 136px !important; /* 80px (sidebar banner) + 56px (outage banner) */
+            }
+            
+            .main-content {
+                padding-top: 80px !important; /* Height of sidebar banner */
             }
         }
         

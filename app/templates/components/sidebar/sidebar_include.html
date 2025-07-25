@@ -1,0 +1,34 @@
+<html lang="en" data-bs-theme="dark">
+{% include "components/sidebar/sidebar_head.html" %}
+<body>
+{% include "components/sidebar/sidebar_styles.html" %}
+{% include "components/sidebar/sidebar_banner.html" %}
+
+<div class="sidebar-fixed">
+  <button class="collapse-btn" id="sidebarCollapseBtn">
+    <i class="bi bi-chevron-left"></i>
+  </button>
+  
+  <!-- START SIDEBAR CONTENT ONLY -->
+  <div class="d-flex flex-column flex-shrink-0 bg-body-tertiary" style="width: 3.5rem; height: 100vh; margin: 0; padding: 0;">
+      {% include "components/sidebar/sidebar_logo.html" %}
+      
+      {% include "components/sidebar/sidebar_navigation.html" %}
+      
+      {% include "components/sidebar/sidebar_profile.html" %}
+  </div>
+  <!-- END SIDEBAR CONTENT -->
+</div>
+
+<div class="b-example-divider b-example-vr"></div>
+
+{% include "AI.html" %}
+
+{% include "components/sidebar/sticky_notes_widget.html" %}
+
+<!-- Include Universal Search Components for enhanced search functionality -->
+{% include "components/universal_search.html" %}
+
+{% include "components/sidebar/sidebar_scripts.html" %}
+</body>
+</html> 

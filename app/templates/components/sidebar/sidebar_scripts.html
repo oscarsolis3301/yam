@@ -1,0 +1,1153 @@
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', function () {
+            navLinks.forEach(nav => nav.classList.remove('active')); // Remove from all
+            this.classList.add('active'); // Add to clicked one
+        });
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.querySelector('.sidebar-fixed');
+    const collapseBtn = document.getElementById('sidebarCollapseBtn');
+    const testToggleBtn = document.getElementById('testToggleBtn');
+
+    // Function to ensure sidebar is always positioned correctly
+    function ensureSidebarPosition() {
+        if (sidebar) {
+            sidebar.style.position = 'fixed';
+            sidebar.style.top = '0';
+            sidebar.style.left = '0';
+            sidebar.style.zIndex = '9999999';
+            sidebar.style.margin = '0';
+            sidebar.style.padding = '0';
+        }
+    }
+
+    function toggleSidebar() {
+        const wasCollapsed = sidebar.classList.contains('collapsed');
+        sidebar.classList.toggle('collapsed');
+        
+        // Dispatch custom event with collapsed state
+        document.dispatchEvent(new CustomEvent('sidebarCollapsed', {
+            detail: {
+                collapsed: !wasCollapsed
+            }
+        }));
+
+        // Store the state in localStorage
+        localStorage.setItem('sidebarCollapsed', !wasCollapsed);
+    }
+
+    // Initialize sidebar state from localStorage
+    const savedState = localStorage.getItem('sidebarCollapsed');
+    if (savedState === 'true') {
+        sidebar.classList.add('collapsed');
+        document.dispatchEvent(new CustomEvent('sidebarCollapsed', {
+            detail: {
+                collapsed: true
+            }
+        }));
+    }
+
+    // Ensure sidebar position on load and periodically
+    ensureSidebarPosition();
+    setInterval(ensureSidebarPosition, 1000);
+
+    collapseBtn.addEventListener('click', toggleSidebar);
+    if (testToggleBtn) {
+        testToggleBtn.addEventListener('click', toggleSidebar);
+    }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const submenuLinks = document.querySelectorAll('.submenu .nav-link');
+    const submenuContainers = document.querySelectorAll('.submenu-container');
+
+    // Function to update active states
+    function updateActiveStates() {
+        // Normalize paths by removing trailing slash (except for root) so \
+        // that links like "/unified" match currentPath "/unified/" after Flask redirect.
+        const normalizePath = (p) => {
+            if (!p) return '';
+            return p.length > 1 && p.endsWith('/') ? p.slice(0, -1) : p;
+        };
+        const currentPath = normalizePath(window.location.pathname);
+        
+        // Update main nav links
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            const linkPath = normalizePath(link.getAttribute('href'));
+            if (linkPath === currentPath) {
+                link.classList.add('active');
+            }
+        });
+
+        // Update submenu links and containers
+        submenuLinks.forEach(link => {
+            link.classList.remove('active');
+            const linkPathSub = normalizePath(link.getAttribute('href'));
+            if (linkPathSub === currentPath) {
+                link.classList.add('active');
+                // Keep parent submenu open when a submenu item is active
+                const submenuContainer = link.closest('.submenu-container');
+                if (submenuContainer) {
+                    submenuContainer.classList.add('open');
+                }
+            }
+        });
+    }
+
+    // Handle submenu clicks
+    submenuLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            const submenuContainer = this.closest('.submenu-container');
+            if (submenuContainer) {
+                // Add open class to keep submenu visible
+                submenuContainer.classList.add('open');
+            }
+        });
+    });
+
+    // Handle main nav clicks
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Only handle clicks on main nav items (not submenu items)
+            if (!this.closest('.submenu')) {
+                navLinks.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            }
+        });
+    });
+
+    // Initial update
+    updateActiveStates();
+
+    // Update on navigation
+    window.addEventListener('popstate', updateActiveStates);
+});
+</script>
+
+<script>
+// --- Universal Search toggle via sidebar icon ---
+const searchToggle = document.getElementById('sidebarUniversalSearchToggle');
+if (searchToggle) {
+    const updateActiveVisual = (isActive) => {
+        if (isActive) {
+            searchToggle.classList.add('search-active');
+        } else {
+            searchToggle.classList.remove('search-active');
+        }
+    };
+
+    searchToggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (window.isUniversalSearchOpen && window.isUniversalSearchOpen()) {
+            window.closeUniversalSearchBar();
+            updateActiveVisual(false);
+        } else {
+            window.openUniversalSearchBar();
+            updateActiveVisual(true);
+        }
+    });
+
+    // Sync with other toggles (keyboard shortcut etc.)
+    window.addEventListener('universalSearchToggled', function (evt) {
+        updateActiveVisual(evt.detail === 'open');
+    });
+}
+</script>
+
+<!-- Banner Search Functionality -->
+<script>
+(function() {
+    'use strict';
+    
+    class BannerSearch {
+        constructor() {
+            this.searchInput = document.getElementById('bannerSearchInput');
+            this.clearBtn = document.getElementById('bannerSearchClearBtn');
+            this.loading = document.getElementById('bannerSearchLoading');
+            this.results = document.getElementById('bannerSearchResults');
+            this.resultsContent = document.getElementById('bannerResultsContent');
+            this.suggestions = document.getElementById('bannerSearchSuggestions');
+            this.suggestionsContent = document.getElementById('bannerSuggestionsContent');
+            
+            this.searchTimeout = null;
+            this.suggestionsTimeout = null;
+            this.isSearching = false;
+            this.isGettingSuggestions = false;
+            this.selectedSuggestionIndex = -1;
+            this.currentSuggestions = [];
+            this.currentQuery = '';
+            this.currentSuggestionsController = null;
+            this.currentSearchController = null;
+            
+            // Caching for suggestions
+            this.suggestionCache = new Map();
+            this.cacheExpiry = 5 * 60 * 1000; // 5 minutes
+            
+            this.init();
+        }
+        
+        init() {
+            if (!this.searchInput) return;
+            
+            // Input event handling with proper debouncing
+            this.searchInput.addEventListener('input', (e) => {
+                this.handleInput(e.target.value);
+            });
+            
+            // Clear button
+            if (this.clearBtn) {
+                this.clearBtn.addEventListener('click', () => {
+                    this.clearSearch();
+                });
+            }
+            
+            // Keyboard navigation
+            this.searchInput.addEventListener('keydown', (e) => {
+                this.handleKeydown(e);
+            });
+            
+            // Click outside to close results
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.banner-search-container')) {
+                    this.hideAll();
+                }
+            });
+            
+            // Focus to show suggestions if there's a query
+            this.searchInput.addEventListener('focus', () => {
+                if (this.searchInput.value.trim()) {
+                    this.showSuggestions();
+                }
+            });
+            
+            // Blur to hide suggestions after a delay
+            this.searchInput.addEventListener('blur', () => {
+                setTimeout(() => {
+                    if (!this.suggestions?.matches(':hover')) {
+                        this.hideSuggestions();
+                    }
+                }, 150);
+            });
+        }
+        
+        handleInput(value) {
+            const query = value.trim();
+            this.currentQuery = query;
+            
+            // Show/hide clear button
+            if (this.clearBtn) {
+                this.clearBtn.style.display = query ? 'flex' : 'none';
+            }
+            
+            // Clear previous timeouts
+            if (this.searchTimeout) {
+                clearTimeout(this.searchTimeout);
+            }
+            if (this.suggestionsTimeout) {
+                clearTimeout(this.suggestionsTimeout);
+            }
+            
+            // Cancel any pending requests when input changes
+            if (this.currentSuggestionsController) {
+                this.currentSuggestionsController.abort();
+            }
+            if (this.currentSearchController) {
+                this.currentSearchController.abort();
+            }
+            
+            if (!query) {
+                this.hideAll();
+                return;
+            }
+            
+            // Always show basic suggestions immediately for any query
+            this.showBasicSuggestions(query);
+            
+            // Get suggestions immediately for short queries (1-3 characters)
+            if (query.length <= 3) {
+                this.getSuggestions(query);
+            } else {
+                // Debounce suggestions for longer queries (200ms delay)
+                this.suggestionsTimeout = setTimeout(() => {
+                    this.getSuggestions(query);
+                }, 200);
+                
+                // Debounce search for longer queries (300ms delay)
+                this.searchTimeout = setTimeout(() => {
+                    this.performSearch(query);
+                }, 300);
+            }
+        }
+        
+        showBasicSuggestions(query) {
+            // Always show some basic suggestions immediately
+            const basicSuggestions = this.createHelpfulSuggestions(query);
+            this.displaySuggestions(basicSuggestions);
+        }
+        
+        async getSuggestions(query) {
+            if (this.isGettingSuggestions) return;
+            
+            // Cancel any pending suggestions request
+            if (this.currentSuggestionsController) {
+                this.currentSuggestionsController.abort();
+            }
+            
+            // Create new abort controller for this suggestions request
+            this.currentSuggestionsController = new AbortController();
+            
+            this.isGettingSuggestions = true;
+            
+            try {
+                // Use the universal search API for suggestions and results
+                const [suggestionsResponse, unifiedResponse] = await Promise.all([
+                    fetch(`/api/universal-search/suggestions?q=${encodeURIComponent(query)}&limit=5`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Cache-Control': 'max-age=60'
+                        },
+                        signal: this.currentSuggestionsController.signal
+                    }).catch(() => null),
+                    
+                    fetch(`/unified_search?q=${encodeURIComponent(query)}&limit=8`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Cache-Control': 'max-age=60'
+                        },
+                        signal: this.currentSuggestionsController.signal
+                    }).catch(() => null)
+                ]);
+                
+                let textSuggestions = [];
+                if (suggestionsResponse && suggestionsResponse.ok) {
+                    const suggestionsData = await suggestionsResponse.json();
+                    textSuggestions = suggestionsData.suggestions || [];
+                }
+                
+                let officeData = [];
+                let workstationData = [];
+                
+                if (unifiedResponse && unifiedResponse.ok) {
+                    const unifiedData = await unifiedResponse.json();
+                    officeData = unifiedData.offices || [];
+                    workstationData = unifiedData.workstations || [];
+                }
+                
+                let clockSuggestions = [];
+                let patternSuggestions = [];
+                
+                // Enhanced pattern recognition for clock IDs (1-5 digits)
+                if (/^\d{1,5}$/.test(query.trim())) {
+                    const padded = query.trim().padStart(5, '0');
+                    
+                    // Use the Clock ID cache API for fast lookups
+                    let cachedUser = null;
+                    try {
+                        const cacheRes = await fetch(`/api/clock-id/suggestions?q=${encodeURIComponent(query.trim())}`);
+                        if (cacheRes.ok) {
+                            const response = await cacheRes.json();
+                            if (response.success && response.suggestions.length > 0) {
+                                const suggestion = response.suggestions[0];
+                                if (suggestion.type === 'clock_id') {
+                                    clockSuggestions.push({
+                                        text: suggestion.display_text,
+                                        icon: 'bi bi-person-circle',
+                                        subtitle: suggestion.subtitle,
+                                        type: 'clock_id',
+                                        data: { clock_id: suggestion.clock_id }
+                                    });
+                                    
+                                    clockSuggestions.push({
+                                        text: `View ${suggestion.full_name}'s full profile`,
+                                        icon: 'bi bi-person-badge',
+                                        subtitle: 'Complete user information',
+                                        type: 'clock_id',
+                                        data: { clock_id: suggestion.clock_id }
+                                    });
+                                } else if (suggestion.type === 'clock_id_not_found') {
+                                    clockSuggestions.push({
+                                        text: suggestion.display_text,
+                                        icon: 'bi bi-person-badge',
+                                        subtitle: suggestion.subtitle,
+                                        type: 'clock_id',
+                                        data: { clock_id: suggestion.clock_id }
+                                    });
+                                }
+                            } else {
+                                // No suggestions returned, show generic lookup
+                                clockSuggestions.push({
+                                    text: `Find user ${padded}`,
+                                    icon: 'bi bi-person-badge',
+                                    subtitle: 'Lookup user by Clock ID',
+                                    type: 'clock_id',
+                                    data: { clock_id: padded }
+                                });
+                            }
+                        } else {
+                            // API error, fallback to generic lookup
+                            clockSuggestions.push({
+                                text: `Find user ${padded}`,
+                                icon: 'bi bi-person-badge',
+                                subtitle: 'Lookup user by Clock ID',
+                                type: 'clock_id',
+                                data: { clock_id: padded }
+                            });
+                        }
+                    } catch (error) {
+                        console.warn('Clock ID cache lookup failed:', error);
+                        clockSuggestions.push({
+                            text: `Find user ${padded}`,
+                            icon: 'bi bi-person-badge',
+                            subtitle: 'Lookup user by Clock ID',
+                            type: 'clock_id',
+                            data: { clock_id: padded }
+                        });
+                    }
+                }
+                
+                // Pattern recognition for other types
+                if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(query.trim())) {
+                    patternSuggestions.push({
+                        text: `Search for IP ${query.trim()}`,
+                        icon: 'bi bi-hdd-network',
+                        subtitle: 'Find devices with this IP',
+                        type: 'ip_search',
+                        data: { ip: query.trim() }
+                    });
+                } else if (/^[0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}$/.test(query.trim())) {
+                    patternSuggestions.push({
+                        text: `Search for MAC ${query.trim()}`,
+                        icon: 'bi bi-hdd-network',
+                        subtitle: 'Find devices with this MAC address',
+                        type: 'mac_search',
+                        data: { mac: query.trim() }
+                    });
+                } else if (/^[A-Z]{2,3}-\d{4,6}$/i.test(query.trim())) {
+                    patternSuggestions.push({
+                        text: `Search for ticket ${query.trim().toUpperCase()}`,
+                        icon: 'bi bi-ticket-detailed',
+                        subtitle: 'Find ticket information',
+                        type: 'ticket_search',
+                        data: { ticket: query.trim().toUpperCase() }
+                    });
+                } else if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(query.trim())) {
+                    patternSuggestions.push({
+                        text: `Search for email ${query.trim()}`,
+                        icon: 'bi bi-envelope',
+                        subtitle: 'Find user by email address',
+                        type: 'email_search',
+                        data: { email: query.trim() }
+                    });
+                } else if (/^\d{3}-\d{3}-\d{4}$/.test(query.trim())) {
+                    patternSuggestions.push({
+                        text: `Search for phone ${query.trim()}`,
+                        icon: 'bi bi-telephone',
+                        subtitle: 'Find user by phone number',
+                        type: 'phone_search',
+                        data: { phone: query.trim() }
+                    });
+                }
+                
+                // Combine all suggestions
+                const allSuggestions = [
+                    ...clockSuggestions,
+                    ...patternSuggestions,
+                    ...textSuggestions
+                ];
+                
+                // Add office suggestions
+                if (officeData.length > 0) {
+                    officeData.slice(0, 3).forEach(office => {
+                        allSuggestions.push({
+                            text: office['Internal Name'] || office.name || 'Unknown Office',
+                            icon: 'bi bi-building',
+                            subtitle: office.Number ? `Office ${office.Number}` : 'Office',
+                            type: 'office',
+                            data: office
+                        });
+                    });
+                }
+                
+                // Add workstation suggestions
+                if (workstationData.length > 0) {
+                    workstationData.slice(0, 3).forEach(ws => {
+                        allSuggestions.push({
+                            text: ws.name || 'Unknown Workstation',
+                            icon: 'bi bi-laptop',
+                            subtitle: ws.user ? `User: ${ws.user}` : 'Workstation',
+                            type: 'workstation',
+                            data: ws
+                        });
+                    });
+                }
+                
+                // Always add helpful search options if we have few suggestions
+                if (allSuggestions.length < 3) {
+                    allSuggestions.push(...this.createHelpfulSuggestions(query));
+                }
+                
+                this.currentSuggestions = allSuggestions;
+                this.displaySuggestions(allSuggestions);
+                
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    return;
+                }
+                console.error('Suggestions error:', error);
+                // Show helpful suggestions even on error
+                this.displaySuggestions(this.createHelpfulSuggestions(query));
+            } finally {
+                this.isGettingSuggestions = false;
+            }
+        }
+        
+        async performSearch(query) {
+            if (this.isSearching) return;
+            
+            // Cancel any pending search request
+            if (this.currentSearchController) {
+                this.currentSearchController.abort();
+            }
+            
+            // Create new abort controller for this search request
+            this.currentSearchController = new AbortController();
+            
+            this.isSearching = true;
+            this.showLoading(true);
+            this.hideSuggestions();
+            
+            try {
+                // Use the universal search API
+                const response = await fetch(`/api/universal-search/?q=${encodeURIComponent(query)}&limit=8`, {
+                    signal: this.currentSearchController.signal
+                });
+                
+                if (!response.ok) throw new Error('Search failed');
+                
+                const data = await response.json();
+                let results = data.results || [];
+                
+                // If no results and it looks like a clock ID, try additional searches
+                if (results.length === 0 && /^\d{1,5}$/.test(query.trim())) {
+                    results = await this.performFallbackSearch(query);
+                }
+                
+                this.displayResults(results);
+                
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    return;
+                }
+                console.error('Search error:', error);
+                // Try fallback search on error
+                try {
+                    const fallbackResults = await this.performFallbackSearch(query);
+                    this.displayResults(fallbackResults);
+                } catch (fallbackError) {
+                    console.error('Fallback search also failed:', fallbackError);
+                    this.displayError('Search failed. Please try again.');
+                }
+            } finally {
+                this.isSearching = false;
+                this.showLoading(false);
+            }
+        }
+        
+        async performFallbackSearch(query) {
+            const results = [];
+            const searchTerm = query.trim();
+            
+            try {
+                // Use the unified search endpoint as fallback
+                const response = await fetch(`/unified_search?q=${encodeURIComponent(searchTerm)}&limit=8`, {
+                    signal: this.currentSearchController.signal
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Process office results
+                    if (data.offices && data.offices.length > 0) {
+                        data.offices.forEach(office => {
+                            results.push({
+                                title: office['Internal Name'] || office.name || 'Unknown Office',
+                                description: `Office • ${office.Location || 'Unknown location'}`,
+                                url: `/offices?search=${encodeURIComponent(searchTerm)}`,
+                                content_type: 'office',
+                                icon: 'bi-building-fill'
+                            });
+                        });
+                    }
+                    
+                    // Process workstation results
+                    if (data.workstations && data.workstations.length > 0) {
+                        data.workstations.forEach(ws => {
+                            results.push({
+                                title: ws.name || 'Unknown Workstation',
+                                description: `Workstation • ${ws.user || 'Unknown user'}`,
+                                url: `/workstations?search=${encodeURIComponent(searchTerm)}`,
+                                content_type: 'workstation',
+                                icon: 'bi-laptop-fill'
+                            });
+                        });
+                    }
+                }
+                
+                // Always provide helpful search options
+                if (results.length === 0) {
+                    results.push({
+                        title: `Search for "${searchTerm}"`,
+                        description: 'Universal search across all content',
+                        url: `/unified_search?q=${encodeURIComponent(searchTerm)}`,
+                        content_type: 'search',
+                        icon: 'bi-search'
+                    });
+                    
+                    results.push({
+                        title: `Find workstations containing "${searchTerm}"`,
+                        description: 'Search workstations database',
+                        url: `/workstations?search=${encodeURIComponent(searchTerm)}`,
+                        content_type: 'workstation',
+                        icon: 'bi-laptop'
+                    });
+                    
+                    results.push({
+                        title: `Find offices containing "${searchTerm}"`,
+                        description: 'Search offices database',
+                        url: `/offices?search=${encodeURIComponent(searchTerm)}`,
+                        content_type: 'office',
+                        icon: 'bi-building'
+                    });
+                    
+                    results.push({
+                        title: `Find notes containing "${searchTerm}"`,
+                        description: 'Search notes database',
+                        url: `/notes?search=${encodeURIComponent(searchTerm)}`,
+                        content_type: 'note',
+                        icon: 'bi-journal-text'
+                    });
+                }
+                
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    return [];
+                }
+                console.warn('Fallback search error:', error);
+            }
+            
+            return results;
+        }
+        
+        createHelpfulSuggestions(query) {
+            const searchTerm = query.trim();
+            const suggestions = [];
+            
+            // Always provide helpful search options
+            suggestions.push({
+                text: `Search for "${searchTerm}"`,
+                subtitle: 'Universal search across all content',
+                url: `/unified_search?q=${encodeURIComponent(searchTerm)}`,
+                icon: 'bi-search',
+                type: 'search'
+            });
+            
+            suggestions.push({
+                text: `Find users like "${searchTerm}"`,
+                subtitle: 'Search user database',
+                url: `/users?search=${encodeURIComponent(searchTerm)}`,
+                icon: 'bi-person-fill',
+                type: 'user_search'
+            });
+            
+            suggestions.push({
+                text: `Find workstations containing "${searchTerm}"`,
+                subtitle: 'Search workstations database',
+                url: `/workstations?search=${encodeURIComponent(searchTerm)}`,
+                icon: 'bi-laptop',
+                type: 'workstation_search'
+            });
+            
+            suggestions.push({
+                text: `Find offices containing "${searchTerm}"`,
+                subtitle: 'Search offices database',
+                url: `/offices?search=${encodeURIComponent(searchTerm)}`,
+                icon: 'bi-building',
+                type: 'office_search'
+            });
+            
+            suggestions.push({
+                text: `Find notes containing "${searchTerm}"`,
+                subtitle: 'Search notes database',
+                url: `/notes?search=${encodeURIComponent(searchTerm)}`,
+                icon: 'bi-journal-text',
+                type: 'note_search'
+            });
+            
+            suggestions.push({
+                text: `Find devices containing "${searchTerm}"`,
+                subtitle: 'Search devices database',
+                url: `/devices?search=${encodeURIComponent(searchTerm)}`,
+                icon: 'bi-hdd-network',
+                type: 'device_search'
+            });
+            
+            return suggestions;
+        }
+        
+        displaySuggestions(suggestions) {
+            if (!this.suggestionsContent) return;
+            
+            if (suggestions.length === 0) {
+                this.hideSuggestions();
+                return;
+            }
+            
+            this.suggestionsContent.innerHTML = '';
+            
+            suggestions.forEach((suggestion, index) => {
+                const item = document.createElement('div');
+                item.className = 'banner-search-suggestion-item';
+                item.innerHTML = `
+                    <div class="banner-search-suggestion-icon">
+                        <i class="${suggestion.icon}"></i>
+                    </div>
+                    <div class="banner-search-suggestion-content">
+                        <div class="banner-search-suggestion-text">${suggestion.text}</div>
+                        <div class="banner-search-suggestion-subtitle">${suggestion.subtitle || ''}</div>
+                    </div>
+                `;
+                
+                item.addEventListener('click', () => {
+                    this.handleSuggestionClick(suggestion);
+                });
+                
+                item.addEventListener('mouseenter', () => {
+                    this.selectedSuggestionIndex = index;
+                    this.updateSuggestionSelection();
+                });
+                
+                this.suggestionsContent.appendChild(item);
+            });
+            
+            this.showSuggestions();
+        }
+        
+        displayResults(results) {
+            if (!this.resultsContent) return;
+            
+            if (results.length === 0) {
+                this.resultsContent.innerHTML = `
+                    <div class="banner-search-no-results">
+                        <i class="bi bi-search"></i>
+                        <p>No results found</p>
+                        <small>Try a different search term</small>
+                    </div>
+                `;
+                this.showResults();
+                return;
+            }
+            
+            this.resultsContent.innerHTML = '';
+            
+            results.forEach(result => {
+                const item = document.createElement('div');
+                item.className = 'banner-search-result-item';
+                item.innerHTML = `
+                    <div class="banner-search-result-icon">
+                        <i class="${result.icon || 'bi bi-file-text'}"></i>
+                    </div>
+                    <div class="banner-search-result-content">
+                        <div class="banner-search-result-title">${result.title}</div>
+                        <div class="banner-search-result-description">${result.description}</div>
+                    </div>
+                `;
+                
+                item.addEventListener('click', () => {
+                    this.handleResultClick(result);
+                });
+                
+                this.resultsContent.appendChild(item);
+            });
+            
+            this.showResults();
+        }
+        
+        displayError(message) {
+            if (!this.resultsContent) return;
+            
+            this.resultsContent.innerHTML = `
+                <div class="banner-search-error">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <p>${message}</p>
+                </div>
+            `;
+            this.showResults();
+        }
+        
+        handleSuggestionClick(suggestion) {
+            if (suggestion.url) {
+                window.location.href = suggestion.url;
+            } else if (suggestion.type === 'clock_id') {
+                // Handle clock ID lookup
+                this.handleClockIdLookup(suggestion.data.clock_id);
+            } else {
+                // Default to universal search
+                window.location.href = `/unified_search?q=${encodeURIComponent(this.currentQuery)}`;
+            }
+        }
+        
+        handleResultClick(result) {
+            if (result.url) {
+                window.location.href = result.url;
+            } else {
+                window.location.href = `/unified_search?q=${encodeURIComponent(this.currentQuery)}`;
+            }
+        }
+        
+        handleClockIdLookup(clockId) {
+            // Open user modal or navigate to user page
+            if (window.showUserModal) {
+                window.showUserModal(clockId);
+            } else {
+                window.location.href = `/users?search=${encodeURIComponent(clockId)}`;
+            }
+        }
+        
+        updateSuggestionSelection() {
+            const items = this.suggestionsContent?.querySelectorAll('.banner-search-suggestion-item');
+            if (!items) return;
+            
+            items.forEach((item, index) => {
+                item.classList.toggle('selected', index === this.selectedSuggestionIndex);
+            });
+        }
+        
+        navigateSuggestions(direction) {
+            const items = this.suggestionsContent?.querySelectorAll('.banner-search-suggestion-item');
+            if (!items || items.length === 0) return;
+            
+            this.selectedSuggestionIndex += direction;
+            
+            if (this.selectedSuggestionIndex < 0) {
+                this.selectedSuggestionIndex = items.length - 1;
+            } else if (this.selectedSuggestionIndex >= items.length) {
+                this.selectedSuggestionIndex = 0;
+            }
+            
+            this.updateSuggestionSelection();
+            
+            // Scroll to selected item
+            const selectedItem = items[this.selectedSuggestionIndex];
+            if (selectedItem) {
+                selectedItem.scrollIntoView({ block: 'nearest' });
+            }
+        }
+        
+        showSuggestions() {
+            if (this.suggestions) {
+                this.suggestions.classList.add('show');
+            }
+        }
+        
+        hideSuggestions() {
+            if (this.suggestions) {
+                this.suggestions.classList.remove('show');
+            }
+            this.selectedSuggestionIndex = -1;
+        }
+        
+        showResults() {
+            if (this.results) {
+                this.results.classList.add('show');
+            }
+        }
+        
+        hideResults() {
+            if (this.results) {
+                this.results.classList.remove('show');
+            }
+        }
+        
+        hideAll() {
+            this.hideResults();
+            this.hideSuggestions();
+        }
+        
+        showLoading(show) {
+            if (this.loading) {
+                this.loading.style.display = show ? 'block' : 'none';
+            }
+        }
+        
+        clearSearch() {
+            this.searchInput.value = '';
+            this.hideAll();
+            if (this.clearBtn) {
+                this.clearBtn.style.display = 'none';
+            }
+            this.searchInput.focus();
+        }
+        
+        handleKeydown(e) {
+            if (e.key === 'Escape') {
+                this.hideAll();
+                this.searchInput.blur();
+            } else if (e.key === 'Enter') {
+                if (this.suggestions?.classList.contains('show')) {
+                    const selectedItem = this.suggestionsContent?.querySelector('.banner-search-suggestion-item.selected');
+                    if (selectedItem) {
+                        selectedItem.click();
+                    } else {
+                        const firstItem = this.suggestionsContent?.querySelector('.banner-search-suggestion-item');
+                        if (firstItem) {
+                            firstItem.click();
+                        }
+                    }
+                } else if (this.results?.classList.contains('show')) {
+                    const firstResult = this.resultsContent?.querySelector('.banner-search-result-item');
+                    if (firstResult) {
+                        firstResult.click();
+                    }
+                } else {
+                    this.performSearch(this.searchInput.value);
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                this.navigateSuggestions(1);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                this.navigateSuggestions(-1);
+            }
+        }
+    }
+    
+    // Initialize the banner search when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            new BannerSearch();
+        });
+    } else {
+        new BannerSearch();
+    }
+})();
+</script>
+
+<script>
+let notes = [];
+let isDraggingSticky = false;
+let stickyOffset = { x: 0, y: 0 };
+let stickyInitial = { x: 0, y: 0 };
+let resizing = false;
+let searchQuery = '';
+
+// --- Dragging ---
+function initStickyDrag() {
+  const widget = document.getElementById('stickyNotesWidget');
+  const header = document.getElementById('stickyHeader');
+  header.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.sticky-btn')) return;
+    isDraggingSticky = true;
+    const rect = widget.getBoundingClientRect();
+    stickyOffset.x = e.clientX - rect.left;
+    stickyOffset.y = e.clientY - rect.top;
+    document.body.style.userSelect = 'none';
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (!isDraggingSticky) return;
+    const x = e.clientX - stickyOffset.x;
+    const y = e.clientY - stickyOffset.y;
+    widget.style.left = x + 'px';
+    widget.style.top = y + 'px';
+    widget.style.right = 'auto';
+  });
+  document.addEventListener('mouseup', () => {
+    isDraggingSticky = false;
+    document.body.style.userSelect = '';
+  });
+}
+
+// --- Resizing ---
+document.getElementById('resizeNotesBtn').addEventListener('mousedown', function(e) {
+  resizing = true;
+  const widget = document.getElementById('stickyNotesWidget');
+  widget.classList.add('resizing');
+  let startX = e.clientX;
+  let startY = e.clientY;
+  let startWidth = widget.offsetWidth;
+  let startHeight = widget.offsetHeight;
+  function onMove(ev) {
+    widget.style.width = Math.max(260, startWidth + (ev.clientX - startX)) + 'px';
+    widget.style.height = Math.max(120, startHeight + (ev.clientY - startY)) + 'px';
+  }
+  function onUp() {
+    resizing = false;
+    widget.classList.remove('resizing');
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+  }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+});
+
+// --- Notes CRUD ---
+function fetchNotes() {
+  fetch('/api/notes')
+    .then(res => res.json())
+    .then(data => {
+      notes = data;
+      renderNotes();
+    });
+}
+function renderNotes() {
+  const notesList = document.getElementById('notesList');
+  notesList.innerHTML = '';
+  let filtered = notes.filter(note =>
+    note.title.toLowerCase().includes(searchQuery) || note.content.toLowerCase().includes(searchQuery)
+  );
+  if (!filtered.length) {
+    notesList.innerHTML = '<div style="color:#aaa;text-align:center;">No notes found.</div>';
+    return;
+  }
+  // Pinned notes first
+  filtered.sort((a, b) => (b.pinned || 0) - (a.pinned || 0));
+  filtered.forEach(note => {
+    const div = document.createElement('div');
+    div.className = 'sticky-note-item';
+    div.style.background = note.color || '#2c313a';
+    div.innerHTML = `
+      <div style="display:flex;align-items:center;gap:4px;">
+        <button class="sticky-note-pin${note.pinned ? ' pinned' : ''}" title="Pin" onclick="togglePin(${note.id})"><i class="bi bi-pin-angle-fill"></i></button>
+        <button class="sticky-note-collapse${note.collapsed ? ' collapsed' : ''}" title="Collapse" onclick="toggleCollapse(${note.id})"><i class="bi bi-chevron-${note.collapsed ? 'down' : 'up'}"></i></button>
+        <button class="sticky-note-color" title="Color" onclick="showColorPicker(this, ${note.id})"><i class="bi bi-palette"></i></button>
+        <button class="sticky-note-delete" title="Delete" onclick="deleteNote(${note.id})"><i class="bi bi-trash"></i></button>
+        <span style="flex:1;"></span>
+        <span id="autosave-${note.id}" style="font-size:0.9em;color:#8f8;opacity:0;transition:opacity 0.3s;">Saved</span>
+      </div>
+      <input class="sticky-note-title" value="${escapeHtml(note.title) || ''}" placeholder="Title..." onchange="updateNote(${note.id}, 'title', this.value)">
+      <div class="sticky-color-picker" id="colorPicker-${note.id}" style="display:none;"></div>
+      <div class="sticky-note-body" style="display:${note.collapsed ? 'none' : 'block'};">
+        <textarea class="sticky-note-content" placeholder="Write a note..." onchange="updateNote(${note.id}, 'content', this.value)">${escapeHtml(note.content)}</textarea>
+      </div>
+    `;
+    notesList.appendChild(div);
+  });
+}
+function escapeHtml(text) {
+  if (!text) return '';
+  return text.replace(/[&<>"]|'/g, function(m) {
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m];
+  });
+}
+function addNote() {
+  fetch('/api/notes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title: 'New Note', content: '', color: '#2c313a', pinned: false, collapsed: false })
+  })
+    .then(res => res.json())
+    .then(note => {
+      notes.push(note);
+      renderNotes();
+      showToast('Note created');
+    });
+}
+function updateNote(id, field, value) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  note[field] = value;
+  fetch(`/api/notes/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(note)
+  }).then(() => {
+    showAutoSave(id);
+  });
+}
+function deleteNote(id) {
+  if (!confirm('Delete this note?')) return;
+  fetch(`/api/notes/${id}`, { method: 'DELETE' })
+    .then(() => {
+      notes = notes.filter(n => n.id !== id);
+      renderNotes();
+      showToast('Note deleted');
+    });
+}
+function togglePin(id) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  note.pinned = !note.pinned;
+  updateNote(id, 'pinned', note.pinned);
+  renderNotes();
+}
+function toggleCollapse(id) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  note.collapsed = !note.collapsed;
+  updateNote(id, 'collapsed', note.collapsed);
+  renderNotes();
+}
+function showColorPicker(btn, id) {
+  const picker = document.getElementById(`colorPicker-${id}`);
+  if (!picker) return;
+  picker.innerHTML = '';
+  const colors = ['#2c313a','#ffd700','#ff6b6b','#6bcfff','#b2f296','#f8bbd0','#e1bee7','#d1c4e9','#c5cae9','#bbdefb','#b3e5fc','#b2ebf2','#b2dfdb','#c8e6c9','#dcedc8'];
+  colors.forEach(color => {
+    const dot = document.createElement('div');
+    dot.className = 'sticky-color-dot' + (notes.find(n => n.id === id).color === color ? ' selected' : '');
+    dot.style.background = color;
+    dot.onclick = () => {
+      updateNote(id, 'color', color);
+      picker.style.display = 'none';
+      renderNotes();
+    };
+    picker.appendChild(dot);
+  });
+  picker.style.display = picker.style.display === 'none' ? 'flex' : 'none';
+}
+function showAutoSave(id) {
+  const el = document.getElementById(`autosave-${id}`);
+  if (!el) return;
+  el.style.opacity = 1;
+  setTimeout(() => { el.style.opacity = 0; }, 1200);
+}
+function showToast(msg) {
+  const toast = document.getElementById('stickyToast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1800);
+}
+function filterNotes() {
+  searchQuery = document.getElementById('stickySearch').value.toLowerCase();
+  renderNotes();
+}
+// --- Minimize ---
+document.getElementById('minimizeNotesBtn').onclick = function() {
+  const widget = document.getElementById('stickyNotesWidget');
+  widget.classList.toggle('minimized');
+  if (!widget.classList.contains('minimized')) {
+    widget.style.height = '540px';
+    widget.style.minHeight = '180px';
+  }
+};
+// --- Add Note ---
+document.getElementById('addNoteBtn').onclick = addNote;
+// --- Init ---
+document.addEventListener('DOMContentLoaded', () => {
+  fetchNotes();
+  initStickyDrag();
+});
+</script> 

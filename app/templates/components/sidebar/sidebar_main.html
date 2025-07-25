@@ -1,0 +1,31 @@
+{% include "components/sidebar/sidebar_banner.html" %}
+
+<div class="sidebar-fixed">
+  <button class="collapse-btn" id="sidebarCollapseBtn">
+    <i class="bi bi-chevron-left"></i>
+  </button>
+  
+  <!-- START SIDEBAR CONTENT ONLY -->
+  <div class="d-flex flex-column flex-shrink-0 bg-body-tertiary" style="width: 3.5rem; height: 100vh; margin: 0; padding: 0;">
+      <!-- ANIMATED Y LOGO -->
+      <a href="/" class="d-block p-3 link-body-emphasis text-decoration-none" title="" data-bs-toggle="tooltip" data-bs-placement="right" style="margin: 0; padding: 0.75rem;">
+        <div class="logo-glow-wrapper">
+          <div class="main-logo">Y</div>
+        </div>  
+        <span class="visually-hidden">Icon-only</span>
+      </a>
+      
+      {% include "components/sidebar/sidebar_navigation.html" %}
+      
+      {% include "components/sidebar/sidebar_profile.html" %}
+  </div>
+  <!-- END SIDEBAR CONTENT -->
+</div>
+
+<div class="b-example-divider b-example-vr"></div>
+
+{% include "AI.html" %}
+
+{% include "components/sidebar/sticky_notes_widget.html" %}
+
+{% include "components/sidebar/sidebar_scripts.html" %} 
