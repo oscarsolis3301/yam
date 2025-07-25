@@ -1,20 +1,20 @@
 <!-- Modal Styles Component -->
 <style>
-/* Universal Search Detail Modal */
+/* Universal Search Detail Modal - Enhanced for Service Desk */
 .universal-search-detail-modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.5);
     z-index: 10000;
     display: flex;
     justify-content: center;
     align-items: center;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    transition: opacity 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    transition: opacity 0.3s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .universal-search-detail-content {
@@ -36,21 +36,22 @@
     flex-direction: column;
 }
 
-/* Legacy styles for backward compatibility */
+/* Enhanced modal styles for better service desk experience */
 .universal-search-detail-content:not(:has(.user-profile-modal)) {
-    background: #23272f;
-    border-radius: 1.5rem;
-    padding: 2rem;
-    width: 75vw;
-    height: 75vh;
-    max-width: 1200px;
-    min-width: 800px;
-    min-height: 600px;
-    overflow-y: auto;
-    box-shadow: 0 8px 48px rgba(0, 0, 0, 0.4);
+    background: #1a1a1a;
+    border-radius: 1rem;
+    padding: 0;
+    width: 95vw;
+    height: 95vh;
+    max-width: 1600px;
+    min-width: 1200px;
+    min-height: 700px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
     color: #fff;
     display: flex;
     flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Profile Actions */
@@ -303,6 +304,122 @@
     margin: 0;
     padding-left: 1.2rem;
     font-size: .85rem;
+}
+
+/* Enhanced visual hierarchy and modern styling */
+.mac-info-section {
+    transition: all 0.2s ease;
+}
+
+.mac-info-section:hover {
+    background: #333333;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Compact grid styling to prevent overflow */
+.mac-info-grid {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.mac-info-grid::-webkit-scrollbar {
+    width: 4px;
+}
+
+.mac-info-grid::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.mac-info-grid::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+}
+
+.mac-info-grid::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Ensure grid items don't overflow */
+.mac-info-item {
+    min-height: 0;
+    overflow: hidden;
+}
+
+.mac-info-label, .mac-info-value {
+    min-height: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mac-info-value a {
+    color: #60a5fa;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.mac-info-value a:hover {
+    color: #93c5fd;
+    text-decoration: underline;
+}
+
+.mac-info-value code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    font-size: 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Enhanced button styling for quick actions */
+.mac-action-btn[style*="width: auto"] {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.mac-action-btn[style*="width: auto"]:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Ensure modal fits perfectly without scrolling */
+.user-profile-modal {
+    display: flex;
+    flex-direction: column;
+    height: 95vh;
+    max-height: 95vh;
+    overflow: hidden;
+}
+
+.mac-modal-header {
+    flex-shrink: 0;
+    height: auto;
+    min-height: 80px;
+}
+
+.mac-modal-content {
+    flex: 1;
+    min-height: 0;
+    max-height: calc(95vh - 80px);
+    overflow: hidden;
+}
+
+.mac-info-section {
+    height: calc((95vh - 200px) / 3);
+    min-height: 0;
+    max-height: calc((95vh - 200px) / 3);
+}
+
+.mac-info-grid {
+    height: calc(100% - 40px);
+    min-height: 0;
+    max-height: calc(100% - 40px);
 }
 
 /* Responsive adjustments for legacy modals */

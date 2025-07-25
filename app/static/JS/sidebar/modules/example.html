@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modular Banner Search Example</title>
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Basic Styles -->
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        /* Banner Search Styles */
+        .banner-search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .banner-search-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .banner-search-input-wrapper:focus-within {
+            border-color: #007bff;
+            box-shadow: 0 4px 25px rgba(0, 123, 255, 0.2);
+        }
+        
+        #bannerSearchInput {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 16px 20px;
+            font-size: 16px;
+            background: transparent;
+            color: #333;
+        }
+        
+        #bannerSearchInput::placeholder {
+            color: #999;
+        }
+        
+        #bannerSearchClearBtn {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 8px;
+            margin-right: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: none;
+        }
+        
+        #bannerSearchClearBtn:hover {
+            background: #f0f0f0;
+            color: #666;
+        }
+        
+        #bannerSearchLoading {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            margin-top: 8px;
+            text-align: center;
+            color: #666;
+            display: none;
+            z-index: 1000;
+        }
+        
+        #bannerSearchResults {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+        }
+        
+        #bannerSearchResults.show {
+            display: block;
+        }
+        
+        #bannerSearchSuggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-top: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+        }
+        
+        #bannerSearchSuggestions.show {
+            display: block;
+        }
+        
+        .banner-search-result-item,
+        .banner-search-suggestion-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .banner-search-result-item:last-child,
+        .banner-search-suggestion-item:last-child {
+            border-bottom: none;
+        }
+        
+        .banner-search-result-item:hover,
+        .banner-search-suggestion-item:hover,
+        .banner-search-suggestion-item.selected {
+            background-color: #f8f9fa;
+        }
+        
+        .banner-search-result-icon,
+        .banner-search-suggestion-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .banner-search-result-content,
+        .banner-search-suggestion-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .banner-search-result-title,
+        .banner-search-suggestion-text {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .banner-search-result-description,
+        .banner-search-suggestion-subtitle {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .banner-search-no-results {
+            padding: 32px 16px;
+            text-align: center;
+            color: #666;
+        }
+        
+        .banner-search-no-results i {
+            font-size: 48px;
+            color: #ddd;
+            margin-bottom: 16px;
+            display: block;
+        }
+        
+        .banner-search-error {
+            padding: 16px;
+            text-align: center;
+            color: #dc3545;
+        }
+        
+        .banner-search-error i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        /* Instructions */
+        .instructions {
+            margin-top: 40px;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .instructions h3 {
+            color: #333;
+            margin-bottom: 16px;
+        }
+        
+        .instructions ul {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .code-example {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 12px;
+            margin: 8px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Modular Banner Search</h1>
+            <p>A fully modularized search component with all original functionality</p>
+        </div>
+        
+        <!-- Banner Search Container -->
+        <div class="banner-search-container">
+            <div class="banner-search-input-wrapper">
+                <input type="text" id="bannerSearchInput" placeholder="Search for users, tickets, offices, workstations...">
+                <button id="bannerSearchClearBtn" title="Clear search">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            
+            <div id="bannerSearchLoading">
+                <i class="bi bi-arrow-clockwise"></i> Loading...
+            </div>
+            
+            <div id="bannerSearchResults">
+                <div id="bannerResultsContent"></div>
+            </div>
+            
+            <div id="bannerSearchSuggestions">
+                <div id="bannerSuggestionsContent"></div>
+            </div>
+        </div>
+        
+        <!-- Instructions -->
+        <div class="instructions">
+            <h3>How to Use</h3>
+            <ul>
+                <li><strong>Clock IDs:</strong> Enter a 1-5 digit number (e.g., "12345") to find users</li>
+                <li><strong>IP Addresses:</strong> Enter an IP address (e.g., "192.168.1.1") to find devices</li>
+                <li><strong>MAC Addresses:</strong> Enter a MAC address (e.g., "00:11:22:33:44:55") to find devices</li>
+                <li><strong>Tickets:</strong> Enter a ticket number (e.g., "TK-2024-001") to find tickets</li>
+                <li><strong>Email Addresses:</strong> Enter an email (e.g., "user@company.com") to find users</li>
+                <li><strong>Phone Numbers:</strong> Enter a phone number (e.g., "555-123-4567") to find users</li>
+                <li><strong>General Search:</strong> Enter any text to search across all content</li>
+            </ul>
+            
+            <h3>Features</h3>
+            <ul>
+                <li>Instant pattern recognition and suggestions</li>
+                <li>User profile modals with detailed information</li>
+                <li>Ticket management with timeline view</li>
+                <li>Service desk actions (password reset, account unlock, etc.)</li>
+                <li>Keyboard navigation (arrow keys, enter, escape)</li>
+                <li>Responsive design for all screen sizes</li>
+            </ul>
+            
+            <h3>Implementation</h3>
+            <p>To implement this in your project, include the module files in this order:</p>
+            <div class="code-example">
+&lt;script src="modules/core.js"&gt;&lt;/script&gt;<br>
+&lt;script src="modules/suggestions.js"&gt;&lt;/script&gt;<br>
+&lt;script src="modules/results.js"&gt;&lt;/script&gt;<br>
+&lt;script src="modules/api.js"&gt;&lt;/script&gt;<br>
+&lt;script src="modules/user-profile.js"&gt;&lt;/script&gt;<br>
+&lt;script src="modules/ticket.js"&gt;&lt;/script&gt;<br>
+&lt;script src="banner_search_modular.js"&gt;&lt;/script&gt;
+            </div>
+        </div>
+    </div>
+    
+    <!-- Load Modules -->
+    <script src="core.js"></script>
+    <script src="suggestions.js"></script>
+    <script src="results.js"></script>
+    <script src="api.js"></script>
+    <script src="user-profile.js"></script>
+    <script src="ticket.js"></script>
+    <script src="../banner_search_modular.js"></script>
+</body>
+</html> 

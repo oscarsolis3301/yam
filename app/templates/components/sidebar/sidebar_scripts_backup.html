@@ -1,0 +1,2513 @@
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', function () {
+            navLinks.forEach(nav => nav.classList.remove('active')); // Remove from all
+            this.classList.add('active'); // Add to clicked one
+        });
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.querySelector('.sidebar-fixed');
+    const collapseBtn = document.getElementById('sidebarCollapseBtn');
+    const testToggleBtn = document.getElementById('testToggleBtn');
+
+    // Function to ensure sidebar is always positioned correctly
+    function ensureSidebarPosition() {
+        if (sidebar) {
+            sidebar.style.position = 'fixed';
+            sidebar.style.top = '0';
+            sidebar.style.left = '0';
+            sidebar.style.zIndex = '9999999';
+            sidebar.style.margin = '0';
+            sidebar.style.padding = '0';
+        }
+    }
+
+    function toggleSidebar() {
+        const wasCollapsed = sidebar.classList.contains('collapsed');
+        sidebar.classList.toggle('collapsed');
+        
+        // Dispatch custom event with collapsed state
+        document.dispatchEvent(new CustomEvent('sidebarCollapsed', {
+            detail: {
+                collapsed: !wasCollapsed
+            }
+        }));
+
+        // Store the state in localStorage
+        localStorage.setItem('sidebarCollapsed', !wasCollapsed);
+    }
+
+    // Initialize sidebar state from localStorage
+    const savedState = localStorage.getItem('sidebarCollapsed');
+    if (savedState === 'true') {
+        sidebar.classList.add('collapsed');
+        document.dispatchEvent(new CustomEvent('sidebarCollapsed', {
+            detail: {
+                collapsed: true
+            }
+        }));
+    }
+
+    // Ensure sidebar position on load and periodically
+    ensureSidebarPosition();
+    setInterval(ensureSidebarPosition, 1000);
+
+    collapseBtn.addEventListener('click', toggleSidebar);
+    if (testToggleBtn) {
+        testToggleBtn.addEventListener('click', toggleSidebar);
+    }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const submenuLinks = document.querySelectorAll('.submenu .nav-link');
+    const submenuContainers = document.querySelectorAll('.submenu-container');
+
+    // Function to update active states
+    function updateActiveStates() {
+        // Normalize paths by removing trailing slash (except for root) so \
+        // that links like "/unified" match currentPath "/unified/" after Flask redirect.
+        const normalizePath = (p) => {
+            if (!p) return '';
+            return p.length > 1 && p.endsWith('/') ? p.slice(0, -1) : p;
+        };
+        const currentPath = normalizePath(window.location.pathname);
+        
+        // Update main nav links
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            const linkPath = normalizePath(link.getAttribute('href'));
+            if (linkPath === currentPath) {
+                link.classList.add('active');
+            }
+        });
+
+        // Update submenu links and containers
+        submenuLinks.forEach(link => {
+            link.classList.remove('active');
+            const linkPathSub = normalizePath(link.getAttribute('href'));
+            if (linkPathSub === currentPath) {
+                link.classList.add('active');
+                // Keep parent submenu open when a submenu item is active
+                const submenuContainer = link.closest('.submenu-container');
+                if (submenuContainer) {
+                    submenuContainer.classList.add('open');
+                }
+            }
+        });
+    }
+
+    // Handle submenu clicks
+    submenuLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            const submenuContainer = this.closest('.submenu-container');
+            if (submenuContainer) {
+                // Add open class to keep submenu visible
+                submenuContainer.classList.add('open');
+            }
+        });
+    });
+
+    // Handle main nav clicks
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Only handle clicks on main nav items (not submenu items)
+            if (!this.closest('.submenu')) {
+                navLinks.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            }
+        });
+    });
+
+    // Initial update
+    updateActiveStates();
+
+    // Update on navigation
+    window.addEventListener('popstate', updateActiveStates);
+});
+</script>
+
+<script>
+// --- Universal Search toggle via sidebar icon ---
+const searchToggle = document.getElementById('sidebarUniversalSearchToggle');
+if (searchToggle) {
+    const updateActiveVisual = (isActive) => {
+        if (isActive) {
+            searchToggle.classList.add('search-active');
+        } else {
+            searchToggle.classList.remove('search-active');
+        }
+    };
+
+    searchToggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (window.isUniversalSearchOpen && window.isUniversalSearchOpen()) {
+            window.closeUniversalSearchBar();
+            updateActiveVisual(false);
+        } else {
+            window.openUniversalSearchBar();
+            updateActiveVisual(true);
+        }
+    });
+
+    // Sync with other toggles (keyboard shortcut etc.)
+    window.addEventListener('universalSearchToggled', function (evt) {
+        updateActiveVisual(evt.detail === 'open');
+    });
+}
+</script>
+
+<!-- Banner Search Functionality -->
+<script>
+(function() {
+    'use strict';
+    
+    class BannerSearch {
+        constructor() {
+            this.searchInput = document.getElementById('bannerSearchInput');
+            this.clearBtn = document.getElementById('bannerSearchClearBtn');
+            this.loading = document.getElementById('bannerSearchLoading');
+            this.results = document.getElementById('bannerSearchResults');
+            this.resultsContent = document.getElementById('bannerResultsContent');
+            this.suggestions = document.getElementById('bannerSearchSuggestions');
+            this.suggestionsContent = document.getElementById('bannerSuggestionsContent');
+            
+            this.searchTimeout = null;
+            this.suggestionsTimeout = null;
+            this.isSearching = false;
+            this.isGettingSuggestions = false;
+            this.selectedSuggestionIndex = -1;
+            this.currentSuggestions = [];
+            this.currentQuery = '';
+            this.currentSuggestionsController = null;
+            this.currentSearchController = null;
+            
+            // Caching for suggestions
+            this.suggestionCache = new Map();
+            this.cacheExpiry = 2 * 60 * 1000; // 2 minutes for faster cache refresh
+            this.lastQuery = '';
+            this.lastQueryTime = 0;
+            
+            this.init();
+        }
+        
+        init() {
+            if (!this.searchInput) return;
+            
+            // Input event handling with proper debouncing
+            this.searchInput.addEventListener('input', (e) => {
+                this.handleInput(e.target.value);
+            });
+            
+            // Clear button
+            if (this.clearBtn) {
+                this.clearBtn.addEventListener('click', () => {
+                    this.clearSearch();
+                });
+            }
+            
+            // Keyboard navigation
+            this.searchInput.addEventListener('keydown', (e) => {
+                this.handleKeydown(e);
+            });
+            
+            // Click outside to close results
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.banner-search-container')) {
+                    this.hideAll();
+                }
+            });
+            
+            // Focus to show suggestions if there's a query
+            this.searchInput.addEventListener('focus', () => {
+                if (this.searchInput.value.trim()) {
+                    this.showSuggestions();
+                }
+            });
+            
+            // Blur to hide suggestions after a delay
+            this.searchInput.addEventListener('blur', () => {
+                setTimeout(() => {
+                    if (!this.suggestions?.matches(':hover')) {
+                        this.hideSuggestions();
+                    }
+                }, 150);
+            });
+        }
+        
+        handleInput(value) {
+            const query = value.trim();
+            this.currentQuery = query;
+            
+            // Show/hide clear button immediately
+            if (this.clearBtn) {
+                this.clearBtn.style.display = query ? 'flex' : 'none';
+            }
+            
+            // Cancel any pending requests immediately when input changes
+            if (this.currentSuggestionsController) {
+                this.currentSuggestionsController.abort();
+            }
+            if (this.currentSearchController) {
+                this.currentSearchController.abort();
+            }
+            
+            if (!query) {
+                this.hideAll();
+                return;
+            }
+            
+            // Show instant pattern-based suggestions immediately (no delay)
+            this.showInstantSuggestions(query);
+            
+            // Check if this is a duplicate query to avoid unnecessary API calls
+            const now = Date.now();
+            const isDuplicateQuery = this.lastQuery === query && (now - this.lastQueryTime) < 1000; // 1 second threshold
+            
+            if (!isDuplicateQuery) {
+                this.lastQuery = query;
+                this.lastQueryTime = now;
+                
+                // For all query lengths, start API calls immediately with minimal debouncing
+                // Use a very short delay (30ms) to prevent excessive API calls during rapid typing
+                // but still provide near-instant feedback
+                const minimalDelay = 30;
+                
+                // Clear any existing timeouts
+                if (this.searchTimeout) {
+                    clearTimeout(this.searchTimeout);
+                }
+                if (this.suggestionsTimeout) {
+                    clearTimeout(this.suggestionsTimeout);
+                }
+                
+                // Start both suggestions and search with minimal delay
+                this.suggestionsTimeout = setTimeout(() => {
+                    this.getSuggestions(query);
+                }, minimalDelay);
+                
+                // Only perform full search for queries longer than 2 characters to reduce noise
+                if (query.length > 2) {
+                this.searchTimeout = setTimeout(() => {
+                    this.performSearch(query);
+                    }, minimalDelay + 15); // Slight stagger to prioritize suggestions
+                }
+            }
+        }
+        
+        showInstantSuggestions(query) {
+            // Show instant pattern-based suggestions immediately (no API calls)
+            const instantSuggestions = [];
+            
+            // Pattern recognition for immediate feedback
+            if (/^\d{1,5}$/.test(query.trim())) {
+                // Clock ID pattern - show immediate suggestion
+                const padded = query.trim().padStart(5, '0');
+                instantSuggestions.push({
+                    text: `Find user ${padded}`,
+                    icon: 'bi bi-person-badge',
+                    subtitle: 'View user profile',
+                    type: 'clock_id',
+                    data: { clock_id: padded }
+                });
+            } else if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(query.trim())) {
+                // IP address pattern
+                instantSuggestions.push({
+                    text: `Search for IP ${query.trim()}`,
+                    icon: 'bi bi-hdd-network',
+                    subtitle: 'Find devices with this IP',
+                    type: 'ip_search',
+                    data: { ip: query.trim() }
+                });
+            } else if (/^[0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}$/.test(query.trim())) {
+                // MAC address pattern
+                instantSuggestions.push({
+                    text: `Search for MAC ${query.trim()}`,
+                    icon: 'bi bi-hdd-network',
+                    subtitle: 'Find devices with this MAC address',
+                    type: 'mac_search',
+                    data: { mac: query.trim() }
+                });
+            } else if (/^[A-Z]{2,3}-\d{4,6}$/i.test(query.trim())) {
+                // Ticket pattern
+                instantSuggestions.push({
+                    text: `Search for ticket ${query.trim().toUpperCase()}`,
+                    icon: 'bi bi-ticket-detailed',
+                    subtitle: 'Find ticket information',
+                    type: 'ticket_search',
+                    data: { ticket: query.trim().toUpperCase() }
+                });
+            } else if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(query.trim())) {
+                // Email pattern
+                instantSuggestions.push({
+                    text: `Search for email ${query.trim()}`,
+                    icon: 'bi bi-envelope',
+                    subtitle: 'Find user by email address',
+                    type: 'email_search',
+                    data: { email: query.trim() }
+                });
+            } else if (/^\d{3}-\d{3}-\d{4}$/.test(query.trim())) {
+                // Phone pattern
+                instantSuggestions.push({
+                    text: `Search for phone ${query.trim()}`,
+                    icon: 'bi bi-telephone',
+                    subtitle: 'Find user by phone number',
+                    type: 'phone_search',
+                    data: { phone: query.trim() }
+                });
+            }
+            
+            // Always add helpful search options for any query
+            instantSuggestions.push({
+                text: `Search for "${query}"`,
+                subtitle: 'Universal search across all content',
+                url: `/unified_search?q=${encodeURIComponent(query)}`,
+                icon: 'bi-search',
+                type: 'search'
+            });
+            
+            // Show instant suggestions immediately
+            this.displaySuggestions(instantSuggestions);
+        }
+        
+        async getSuggestions(query) {
+            if (this.isGettingSuggestions) return;
+            
+            // Cancel any pending suggestions request
+            if (this.currentSuggestionsController) {
+                this.currentSuggestionsController.abort();
+            }
+            
+            // Create new abort controller for this suggestions request
+            this.currentSuggestionsController = new AbortController();
+            
+            this.isGettingSuggestions = true;
+            
+            try {
+                // Optimize API calls - use a single unified endpoint for better performance
+                // and reduce the number of concurrent requests
+                const unifiedResponse = await fetch(`/unified_search?q=${encodeURIComponent(query)}&limit=8`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Cache-Control': 'max-age=60'
+                        },
+                        signal: this.currentSuggestionsController.signal
+                }).catch(() => null);
+                
+                // For clock IDs, make a separate fast lookup call
+                let clockSuggestions = [];
+                if (/^\d{1,5}$/.test(query.trim())) {
+                    try {
+                        const cacheRes = await fetch(`/api/clock-id/suggestions?q=${encodeURIComponent(query.trim())}`, {
+                            signal: this.currentSuggestionsController.signal
+                        });
+                        if (cacheRes.ok) {
+                            const response = await cacheRes.json();
+                            if (response.success && response.suggestions.length > 0) {
+                                const suggestion = response.suggestions[0];
+                                if (suggestion.type === 'clock_id') {
+                                    // Show single clean suggestion for found user
+                                    clockSuggestions.push({
+                                        text: suggestion.display_text,
+                                        icon: 'bi bi-person-circle',
+                                        subtitle: 'View user profile',
+                                        type: 'clock_id',
+                                        data: { 
+                                            clock_id: suggestion.clock_id,
+                                            full_name: suggestion.full_name,
+                                            user_data: suggestion
+                                        }
+                                    });
+                                } else if (suggestion.type === 'clock_id_not_found') {
+                                    clockSuggestions.push({
+                                        text: suggestion.display_text,
+                                        icon: 'bi bi-person-badge',
+                                        subtitle: suggestion.subtitle,
+                                        type: 'clock_id',
+                                        data: { clock_id: suggestion.clock_id }
+                                    });
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        // Clock ID lookup failed, continue with other suggestions
+                        console.warn('Clock ID cache lookup failed:', error);
+                    }
+                }
+                
+                // Process unified search results
+                let officeData = [];
+                let workstationData = [];
+                
+                if (unifiedResponse && unifiedResponse.ok) {
+                    const unifiedData = await unifiedResponse.json();
+                    officeData = unifiedData.offices || [];
+                    workstationData = unifiedData.workstations || [];
+                }
+                
+                // Combine all suggestions
+                const allSuggestions = [
+                    ...clockSuggestions
+                ];
+                
+                // Add office suggestions
+                if (officeData.length > 0) {
+                    officeData.slice(0, 3).forEach(office => {
+                        allSuggestions.push({
+                            text: office['Internal Name'] || office.name || 'Unknown Office',
+                            icon: 'bi bi-building',
+                            subtitle: office.Number ? `Office ${office.Number}` : 'Office',
+                            type: 'office',
+                            data: office
+                        });
+                    });
+                }
+                
+                // Add workstation suggestions
+                if (workstationData.length > 0) {
+                    workstationData.slice(0, 3).forEach(ws => {
+                        allSuggestions.push({
+                            text: ws.name || 'Unknown Workstation',
+                            icon: 'bi bi-laptop',
+                            subtitle: ws.user ? `User: ${ws.user}` : 'Workstation',
+                            type: 'workstation',
+                            data: ws
+                        });
+                    });
+                }
+                
+                // Always add helpful search options if we have few suggestions
+                if (allSuggestions.length < 3) {
+                    allSuggestions.push(...this.createHelpfulSuggestions(query));
+                }
+                
+                this.currentSuggestions = allSuggestions;
+                this.displaySuggestions(allSuggestions);
+                
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    return;
+                }
+                console.error('Suggestions error:', error);
+                // Show helpful suggestions even on error
+                this.displaySuggestions(this.createHelpfulSuggestions(query));
+            } finally {
+                this.isGettingSuggestions = false;
+            }
+        }
+        
+        async performSearch(query) {
+            if (this.isSearching) return;
+            
+            // Cancel any pending search request
+            if (this.currentSearchController) {
+                this.currentSearchController.abort();
+            }
+            
+            // Create new abort controller for this search request
+            this.currentSearchController = new AbortController();
+            
+            this.isSearching = true;
+            this.showLoading(true);
+            this.hideSuggestions();
+            
+            try {
+                // Use the unified search endpoint for better performance
+                const response = await fetch(`/unified_search?q=${encodeURIComponent(query)}&limit=8`, {
+                    signal: this.currentSearchController.signal
+                });
+                
+                if (!response.ok) throw new Error('Search failed');
+                
+                const data = await response.json();
+                let results = [];
+                    
+                    // Process office results
+                    if (data.offices && data.offices.length > 0) {
+                        data.offices.forEach(office => {
+                            results.push({
+                                title: office['Internal Name'] || office.name || 'Unknown Office',
+                                description: `Office • ${office.Location || 'Unknown location'}`,
+                            url: `/offices?search=${encodeURIComponent(query)}`,
+                                content_type: 'office',
+                                icon: 'bi-building-fill'
+                            });
+                        });
+                    }
+                    
+                    // Process workstation results
+                    if (data.workstations && data.workstations.length > 0) {
+                        data.workstations.forEach(ws => {
+                            results.push({
+                                title: ws.name || 'Unknown Workstation',
+                                description: `Workstation • ${ws.user || 'Unknown user'}`,
+                            url: `/workstations?search=${encodeURIComponent(query)}`,
+                                content_type: 'workstation',
+                                icon: 'bi-laptop-fill'
+                            });
+                        });
+                    }
+                
+                // If no results, provide helpful search options
+                if (results.length === 0) {
+                    results = this.createHelpfulSearchResults(query);
+                }
+                
+                this.displayResults(results);
+                
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    return;
+                }
+                console.error('Search error:', error);
+                // Show helpful search options on error
+                this.displayResults(this.createHelpfulSearchResults(query));
+            } finally {
+                this.isSearching = false;
+                this.showLoading(false);
+            }
+        }
+        
+        createHelpfulSearchResults(query) {
+            const searchTerm = query.trim();
+            const results = [];
+                
+                // Always provide helpful search options
+                    results.push({
+                        title: `Search for "${searchTerm}"`,
+                        description: 'Universal search across all content',
+                        url: `/unified_search?q=${encodeURIComponent(searchTerm)}`,
+                        content_type: 'search',
+                        icon: 'bi-search'
+                    });
+            
+            results.push({
+                title: `Find users like "${searchTerm}"`,
+                description: 'Search user database',
+                url: `/users?search=${encodeURIComponent(searchTerm)}`,
+                content_type: 'user',
+                icon: 'bi-person-fill'
+            });
+                    
+                    results.push({
+                        title: `Find workstations containing "${searchTerm}"`,
+                        description: 'Search workstations database',
+                        url: `/workstations?search=${encodeURIComponent(searchTerm)}`,
+                        content_type: 'workstation',
+                        icon: 'bi-laptop'
+                    });
+                    
+                    results.push({
+                        title: `Find offices containing "${searchTerm}"`,
+                        description: 'Search offices database',
+                        url: `/offices?search=${encodeURIComponent(searchTerm)}`,
+                        content_type: 'office',
+                        icon: 'bi-building'
+                    });
+                    
+                    results.push({
+                        title: `Find notes containing "${searchTerm}"`,
+                        description: 'Search notes database',
+                        url: `/notes?search=${encodeURIComponent(searchTerm)}`,
+                        content_type: 'note',
+                        icon: 'bi-journal-text'
+                    });
+            
+            results.push({
+                title: `Find devices containing "${searchTerm}"`,
+                description: 'Search devices database',
+                url: `/devices?search=${encodeURIComponent(searchTerm)}`,
+                content_type: 'device',
+                icon: 'bi-hdd-network'
+            });
+            
+            return results;
+        }
+        
+        createHelpfulSuggestions(query) {
+            const searchTerm = query.trim();
+            const suggestions = [];
+            
+            // Always provide helpful search options
+            suggestions.push({
+                text: `Search for "${searchTerm}"`,
+                subtitle: 'Universal search across all content',
+                url: `/unified_search?q=${encodeURIComponent(searchTerm)}`,
+                icon: 'bi-search',
+                type: 'search'
+            });
+            
+            suggestions.push({
+                text: `Find users like "${searchTerm}"`,
+                subtitle: 'Search user database',
+                url: `/users?search=${encodeURIComponent(searchTerm)}`,
+                icon: 'bi-person-fill',
+                type: 'user_search'
+            });
+            
+            suggestions.push({
+                text: `Find workstations containing "${searchTerm}"`,
+                subtitle: 'Search workstations database',
+                url: `/workstations?search=${encodeURIComponent(searchTerm)}`,
+                icon: 'bi-laptop',
+                type: 'workstation_search'
+            });
+            
+            suggestions.push({
+                text: `Find offices containing "${searchTerm}"`,
+                subtitle: 'Search offices database',
+                url: `/offices?search=${encodeURIComponent(searchTerm)}`,
+                icon: 'bi-building',
+                type: 'office_search'
+            });
+            
+            suggestions.push({
+                text: `Find notes containing "${searchTerm}"`,
+                subtitle: 'Search notes database',
+                url: `/notes?search=${encodeURIComponent(searchTerm)}`,
+                icon: 'bi-journal-text',
+                type: 'note_search'
+            });
+            
+            suggestions.push({
+                text: `Find devices containing "${searchTerm}"`,
+                subtitle: 'Search devices database',
+                url: `/devices?search=${encodeURIComponent(searchTerm)}`,
+                icon: 'bi-hdd-network',
+                type: 'device_search'
+            });
+            
+            return suggestions;
+        }
+        
+        displaySuggestions(suggestions) {
+            if (!this.suggestionsContent) return;
+            
+            if (suggestions.length === 0) {
+                this.hideSuggestions();
+                return;
+            }
+            
+            this.suggestionsContent.innerHTML = '';
+            
+            suggestions.forEach((suggestion, index) => {
+                const item = document.createElement('div');
+                item.className = 'banner-search-suggestion-item';
+                item.innerHTML = `
+                    <div class="banner-search-suggestion-icon">
+                        <i class="${suggestion.icon}"></i>
+                    </div>
+                    <div class="banner-search-suggestion-content">
+                        <div class="banner-search-suggestion-text">${suggestion.text}</div>
+                        <div class="banner-search-suggestion-subtitle">${suggestion.subtitle || ''}</div>
+                    </div>
+                `;
+                
+                item.addEventListener('click', () => {
+                    this.handleSuggestionClick(suggestion);
+                });
+                
+                item.addEventListener('mouseenter', () => {
+                    this.selectedSuggestionIndex = index;
+                    this.updateSuggestionSelection();
+                });
+                
+                this.suggestionsContent.appendChild(item);
+            });
+            
+            this.showSuggestions();
+        }
+        
+        displayResults(results) {
+            if (!this.resultsContent) return;
+            
+            if (results.length === 0) {
+                this.resultsContent.innerHTML = `
+                    <div class="banner-search-no-results">
+                        <i class="bi bi-search"></i>
+                        <p>No results found</p>
+                        <small>Try a different search term</small>
+                    </div>
+                `;
+                this.showResults();
+                return;
+            }
+            
+            this.resultsContent.innerHTML = '';
+            
+            results.forEach(result => {
+                const item = document.createElement('div');
+                item.className = 'banner-search-result-item';
+                item.innerHTML = `
+                    <div class="banner-search-result-icon">
+                        <i class="${result.icon || 'bi bi-file-text'}"></i>
+                    </div>
+                    <div class="banner-search-result-content">
+                        <div class="banner-search-result-title">${result.title}</div>
+                        <div class="banner-search-result-description">${result.description}</div>
+                    </div>
+                `;
+                
+                item.addEventListener('click', () => {
+                    this.handleResultClick(result);
+                });
+                
+                this.resultsContent.appendChild(item);
+            });
+            
+            this.showResults();
+        }
+        
+        displayError(message) {
+            if (!this.resultsContent) return;
+            
+            this.resultsContent.innerHTML = `
+                <div class="banner-search-error">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <p>${message}</p>
+                </div>
+            `;
+            this.showResults();
+        }
+        
+        handleSuggestionClick(suggestion) {
+            // Hide suggestions dropdown immediately when any suggestion is clicked
+            this.hideSuggestions();
+            
+            if (suggestion.url) {
+                window.location.href = suggestion.url;
+            } else if (suggestion.type === 'clock_id') {
+                // Handle clock ID lookup with user data if available
+                this.handleClockIdLookup(suggestion.data.clock_id, suggestion.data.user_data);
+            } else {
+                // Default to universal search
+                window.location.href = `/unified_search?q=${encodeURIComponent(this.currentQuery)}`;
+            }
+        }
+        
+        handleResultClick(result) {
+            // Hide results dropdown immediately when any result is clicked
+            this.hideResults();
+            
+            if (result.url) {
+                window.location.href = result.url;
+            } else {
+                window.location.href = `/unified_search?q=${encodeURIComponent(this.currentQuery)}`;
+            }
+        }
+        
+        handleClockIdLookup(clockId, userData = null) {
+            // Hide suggestions dropdown when opening user profile modal
+            this.hideSuggestions();
+            this.hideResults();
+            
+            // Show beautiful user profile modal
+            this.showUserProfileModal(clockId, userData);
+        }
+        
+        showUserProfileModal(clockId, userData = null) {
+            // Create modal HTML with improved design
+            const modalHTML = `
+                <div id="userProfileModal" class="user-profile-modal-overlay">
+                    <div class="user-profile-modal">
+                        <div class="user-profile-modal-header">
+                            <h3><i class="bi bi-person-circle"></i> User Profile</h3>
+                        </div>
+                        <button class="user-profile-modal-close" onclick="this.closest('.user-profile-modal-overlay').remove()">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                        <div class="user-profile-modal-content">
+                            <div class="user-profile-loading">
+                                <div class="loading-spinner"></div>
+                                <p>Loading user information...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add modal to page
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Add click outside to close functionality
+            const modalOverlay = document.getElementById('userProfileModal');
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    modalOverlay.remove();
+                }
+            });
+            
+            // Add escape key to close functionality
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                    modalOverlay.remove();
+                    document.removeEventListener('keydown', handleEscape);
+                }
+            };
+            document.addEventListener('keydown', handleEscape);
+            
+            // Add improved modal styles if not already present
+            if (!document.getElementById('userProfileModalStyles')) {
+                const styles = `
+                    <style id="userProfileModalStyles">
+                        .user-profile-modal-overlay {
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background: rgba(0, 0, 0, 0.8);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            z-index: 9999999;
+                            backdrop-filter: blur(8px);
+                            animation: overlayFadeIn 0.2s ease-out;
+                        }
+                        
+                        @keyframes overlayFadeIn {
+                            from { opacity: 0; }
+                            to { opacity: 1; }
+                        }
+                        
+                        .user-profile-modal {
+                            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                            border-radius: 16px;
+                            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+                            width: 80%;
+                            max-width: 500px;
+                            max-height: 60vh;
+                            overflow: hidden;
+                            animation: modalBounceIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                            border: 1px solid rgba(255, 255, 255, 0.1);
+                            margin-top: 5vh;
+                            margin-bottom: 5vh;
+                        }
+                        
+                        @keyframes modalBounceIn {
+                            0% {
+                                opacity: 0;
+                                transform: scale(0.3) translateY(-50px);
+                            }
+                            50% {
+                                transform: scale(1.05) translateY(10px);
+                            }
+                            100% {
+                                opacity: 1;
+                                transform: scale(1) translateY(0);
+                            }
+                        }
+                        
+                        .user-profile-modal-header {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            padding: 16px 20px;
+                            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+                            backdrop-filter: blur(10px);
+                            position: relative;
+                        }
+                        
+                        .user-profile-modal-header h3 {
+                            margin: 0;
+                            color: #ffffff;
+                            font-size: 18px;
+                            font-weight: 600;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                        }
+                        
+                        .user-profile-modal-close {
+                            background: rgba(255, 255, 255, 0.1);
+                            border: none;
+                            color: #ffffff;
+                            font-size: 18px;
+                            cursor: pointer;
+                            padding: 8px;
+                            border-radius: 50%;
+                            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                            width: 32px;
+                            height: 32px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            position: absolute;
+                            top: 12px;
+                            right: 16px;
+                            z-index: 10;
+                        }
+                        
+                        .user-profile-modal-close:hover {
+                            background: rgba(255, 255, 255, 0.2);
+                            transform: rotate(90deg) scale(1.1);
+                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                        }
+                        
+                        .user-profile-modal-content {
+                            padding: 16px;
+                            max-height: calc(60vh - 50px);
+                            overflow-y: auto;
+                            scrollbar-width: thin;
+                            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+                            display: flex;
+                            flex-direction: column;
+                        }
+                        
+                        .user-profile-modal-content::-webkit-scrollbar {
+                            width: 6px;
+                        }
+                        
+                        .user-profile-modal-content::-webkit-scrollbar-track {
+                            background: transparent;
+                        }
+                        
+                        .user-profile-modal-content::-webkit-scrollbar-thumb {
+                            background: rgba(255, 255, 255, 0.2);
+                            border-radius: 3px;
+                        }
+                        
+                        .user-profile-loading {
+                            text-align: center;
+                            color: #ffffff;
+                            padding: 40px 20px;
+                        }
+                        
+                        .loading-spinner {
+                            width: 40px;
+                            height: 40px;
+                            border: 3px solid rgba(255, 255, 255, 0.1);
+                            border-top: 3px solid #00d4ff;
+                            border-radius: 50%;
+                            animation: spin 1s linear infinite;
+                            margin: 0 auto 16px;
+                        }
+                        
+                        @keyframes spin {
+                            from { transform: rotate(0deg); }
+                            to { transform: rotate(360deg); }
+                        }
+                        
+                        .user-profile-header {
+                            text-align: center;
+                            margin-bottom: 20px;
+                            padding-bottom: 16px;
+                            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                        }
+                        
+                        .user-profile-avatar {
+                            width: 80px;
+                            height: 80px;
+                            border-radius: 50%;
+                            margin: 0 auto 12px;
+                            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.1) 70%);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 28px;
+                            font-weight: 700;
+                            color: #ffffff;
+                            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+                            box-shadow: 
+                                0 0 0 2px rgba(255, 255, 255, 0.3),
+                                0 0 0 4px rgba(255, 255, 255, 0.1),
+                                0 8px 32px rgba(255, 255, 255, 0.2),
+                                0 0 60px rgba(255, 255, 255, 0.1);
+                            animation: avatarSiri 4s ease-in-out infinite;
+                            position: relative;
+                            overflow: hidden;
+                            font-family: 'Inter', 'Segoe UI', sans-serif;
+                            backdrop-filter: blur(10px);
+                        }
+                        
+                        .user-profile-avatar-text {
+                            position: relative;
+                            z-index: 10;
+                            font-weight: 700;
+                            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+                        }
+                        
+                        .user-profile-avatar-blobs {
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            border-radius: 50%;
+                            overflow: hidden;
+                        }
+                        
+                        .user-profile-avatar-blob {
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            width: 100%;
+                            height: 100%;
+                            animation: blob-rotate 25s infinite alternate ease-in-out;
+                            opacity: 0.8;
+                        }
+                        
+                        .user-profile-avatar-blob path {
+                            animation: blob-anim-1 5s infinite alternate cubic-bezier(0.45, 0.2, 0.55, 0.8);
+                            transform-origin: 50% 50%;
+                            transform: scale(0.8);
+                            filter: blur(0.5rem);
+                            d: path("M 100 600 q 0 -500, 500 -500 t 500 500 t -500 500 T 100 600 z");
+                        }
+                        
+                        .user-profile-avatar-blob.blob-1 path {
+                            fill: #ff6b9d;
+                            animation-name: blob-anim-1;
+                            animation-duration: 5s;
+                            d: path("M 100 600 q 0 -500, 500 -500 t 500 500 t -500 500 T 100 600 z");
+                        }
+                        
+                        .user-profile-avatar-blob.blob-2 {
+                            animation-duration: 18s;
+                            animation-direction: alternate-reverse;
+                            opacity: 0.8;
+                        }
+                        
+                        .user-profile-avatar-blob.blob-2 path {
+                            fill: #4ecdc4;
+                            animation-name: blob-anim-2;
+                            animation-duration: 7s;
+                            filter: blur(0.4rem);
+                            transform: scale(0.78);
+                            d: path("M 100 600 q -50 -400, 500 -500 t 450 550 t -500 500 T 100 600 z");
+                        }
+                        
+                        .user-profile-avatar-blob.blob-3 {
+                            animation-duration: 23s;
+                            opacity: 0.9;
+                        }
+                        
+                        .user-profile-avatar-blob.blob-3 path {
+                            fill: #45b7d1;
+                            animation-name: blob-anim-3;
+                            animation-duration: 6s;
+                            filter: blur(0.3rem);
+                            transform: scale(0.76);
+                            d: path("M 100 600 q 0 -400, 500 -500 t 400 500 t -500 500 T 100 600 z");
+                        }
+                        
+                        .user-profile-avatar-blob.blob-4 {
+                            animation-duration: 31s;
+                            animation-direction: alternate-reverse;
+                            opacity: 1;
+                        }
+                        
+                        .user-profile-avatar-blob.blob-4 path {
+                            fill: #96ceb4;
+                            animation-name: blob-anim-4;
+                            animation-duration: 10s;
+                            filter: blur(0.6rem);
+                            transform: scale(0.5);
+                            d: path("M 150 600 q 0 -600, 500 -500 t 500 550 t -500 500 T 150 600 z");
+                        }
+                        
+                        @keyframes blob-anim-1 {
+                            0% { d: path("M 100 600 q 0 -500, 500 -500 t 500 500 t -500 500 T 100 600 z"); }
+                            30% { d: path("M 100 600 q -50 -400, 500 -500 t 450 550 t -500 500 T 100 600 z"); }
+                            70% { d: path("M 100 600 q 0 -400, 500 -500 t 400 500 t -500 500 T 100 600 z"); }
+                            100% { d: path("M 150 600 q 0 -600, 500 -500 t 500 550 t -500 500 T 150 600 z"); }
+                        }
+                        
+                        @keyframes blob-anim-2 {
+                            0% { d: path("M 100 600 q 0 -400, 500 -500 t 400 500 t -500 500 T 100 600 z"); }
+                            40% { d: path("M 150 600 q 0 -600, 500 -500 t 500 550 t -500 500 T 150 600 z"); }
+                            80% { d: path("M 100 600 q -50 -400, 500 -500 t 450 550 t -500 500 T 100 600 z"); }
+                            100% { d: path("M 100 600 q 100 -600, 500 -500 t 400 500 t -500 500 T 100 600 z"); }
+                        }
+                        
+                        @keyframes blob-anim-3 {
+                            0% { d: path("M 100 600 q -50 -400, 500 -500 t 450 550 t -500 500 T 100 600 z"); }
+                            35% { d: path("M 150 600 q 0 -600, 500 -500 t 500 550 t -500 500 T 150 600 z"); }
+                            75% { d: path("M 100 600 q 100 -600, 500 -500 t 400 500 t -500 500 T 100 600 z"); }
+                            100% { d: path("M 100 600 q 0 -400, 500 -500 t 400 500 t -500 500 T 100 600 z"); }
+                        }
+                        
+                        @keyframes blob-anim-4 {
+                            0% { d: path("M 150 600 q 0 -600, 500 -500 t 500 550 t -500 500 T 150 600 z"); }
+                            30% { d: path("M 100 600 q 100 -600, 500 -500 t 400 500 t -500 500 T 100 600 z"); }
+                            70% { d: path("M 100 600 q -50 -400, 500 -500 t 450 550 t -500 500 T 100 600 z"); }
+                            100% { d: path("M 150 600 q 0 -600, 500 -500 t 500 550 t -500 500 T 150 600 z"); }
+                        }
+                        
+                        @keyframes blob-rotate {
+                            from { transform: translate(-50%, -50%) rotate(0deg); }
+                            to { transform: translate(-50%, -50%) rotate(360deg); }
+                        }
+                        
+                        .user-profile-avatar::before {
+                            content: '';
+                            position: absolute;
+                            top: -50%;
+                            left: -50%;
+                            width: 200%;
+                            height: 200%;
+                            background: conic-gradient(
+                                from 0deg,
+                                transparent 0deg,
+                                rgba(255, 255, 255, 0.1) 60deg,
+                                rgba(255, 255, 255, 0.3) 120deg,
+                                rgba(255, 255, 255, 0.1) 180deg,
+                                transparent 240deg,
+                                rgba(255, 255, 255, 0.05) 300deg,
+                                transparent 360deg
+                            );
+                            animation: avatarSiriRotate 6s linear infinite;
+                            border-radius: 50%;
+                        }
+                        
+                        .user-profile-avatar::after {
+                            content: '';
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
+                            border-radius: 50%;
+                            background: radial-gradient(
+                                circle at 40% 40%,
+                                rgba(255, 255, 255, 0.4) 0%,
+                                rgba(255, 255, 255, 0.1) 40%,
+                                transparent 70%
+                            );
+                            animation: avatarSiriPulse 3s ease-in-out infinite;
+                        }
+                        
+                        @keyframes avatarSiri {
+                            0%, 100% { 
+                                transform: scale(1);
+                                box-shadow: 
+                                    0 0 0 2px rgba(255, 255, 255, 0.3),
+                                    0 0 0 4px rgba(255, 255, 255, 0.1),
+                                    0 8px 32px rgba(255, 255, 255, 0.2),
+                                    0 0 60px rgba(255, 255, 255, 0.1);
+                            }
+                            50% { 
+                                transform: scale(1.02);
+                                box-shadow: 
+                                    0 0 0 3px rgba(255, 255, 255, 0.4),
+                                    0 0 0 6px rgba(255, 255, 255, 0.15),
+                                    0 12px 40px rgba(255, 255, 255, 0.3),
+                                    0 0 80px rgba(255, 255, 255, 0.15);
+                            }
+                        }
+                        
+                        @keyframes avatarSiriRotate {
+                            from { transform: rotate(0deg); }
+                            to { transform: rotate(360deg); }
+                        }
+                        
+                        @keyframes avatarSiriPulse {
+                            0%, 100% { 
+                                opacity: 0.4;
+                                transform: scale(1) rotate(0deg);
+                            }
+                            25% { 
+                                opacity: 0.7;
+                                transform: scale(1.05) rotate(90deg);
+                            }
+                            50% { 
+                                opacity: 0.9;
+                                transform: scale(1.1) rotate(180deg);
+                            }
+                            75% { 
+                                opacity: 0.6;
+                                transform: scale(1.05) rotate(270deg);
+                            }
+                        }
+                        
+                        .user-profile-name {
+                            font-size: 20px;
+                            font-weight: 700;
+                            color: #ffffff;
+                            margin-bottom: 4px;
+                            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                        }
+                        
+                        .user-profile-title {
+                            font-size: 13px;
+                            color: #b0b0b0;
+                            margin-bottom: 10px;
+                        }
+                        
+                        .user-profile-badges {
+                            display: flex;
+                            gap: 6px;
+                            justify-content: center;
+                            flex-wrap: wrap;
+                        }
+                        
+                        .user-profile-badge {
+                            padding: 4px 10px;
+                            border-radius: 16px;
+                            font-size: 11px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            animation: badgePulse 2s ease-in-out infinite;
+                        }
+                        
+                        @keyframes badgePulse {
+                            0%, 100% { transform: scale(1); }
+                            50% { transform: scale(1.05); }
+                        }
+                        
+                        .badge-active {
+                            background: linear-gradient(135deg, #28a745, #20c997);
+                            color: #ffffff;
+                            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+                        }
+                        
+                        .badge-locked {
+                            background: linear-gradient(135deg, #dc3545, #fd7e14);
+                            color: #ffffff;
+                            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+                        }
+                        
+                        .badge-disabled {
+                            background: linear-gradient(135deg, #6c757d, #495057);
+                            color: #ffffff;
+                            box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+                        }
+                        
+                        .badge-admin {
+                            background: linear-gradient(135deg, #007bff, #6610f2);
+                            color: #ffffff;
+                            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+                        }
+                        
+                        .badge-vip {
+                            background: linear-gradient(135deg, #ffc107, #fd7e14);
+                            color: #000000;
+                            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+                        }
+                        
+                        .user-profile-info {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                            gap: 14px;
+                            flex: 1;
+                            min-height: 0;
+                        }
+                        
+                        .user-profile-section-full-width {
+                            grid-column: 1 / -1;
+                            margin-top: 8px;
+                            display: flex;
+                            flex-direction: column;
+                            flex: 1;
+                            min-height: 0;
+                        }
+                        
+                        .user-profile-section {
+                            background: rgba(255, 255, 255, 0.05);
+                            border-radius: 10px;
+                            padding: 14px;
+                            border: 1px solid rgba(255, 255, 255, 0.1);
+                            backdrop-filter: blur(10px);
+                            transition: transform 0.3s ease, box-shadow 0.3s ease;
+                        }
+                        
+                        .user-profile-section:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+                        }
+                        
+                        .user-profile-section h4 {
+                            margin: 0 0 12px 0;
+                            color: #ffffff;
+                            font-size: 14px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            opacity: 0.9;
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                        }
+                        
+                        .user-profile-field {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            padding: 8px 0;
+                            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                        }
+                        
+                        .user-profile-field:last-child {
+                            border-bottom: none;
+                        }
+                        
+                        .user-profile-field-label {
+                            color: #b0b0b0;
+                            font-size: 13px;
+                            font-weight: 500;
+                        }
+                        
+                        .user-profile-field-value {
+                            color: #ffffff;
+                            font-size: 13px;
+                            font-weight: 600;
+                            text-align: right;
+                            max-width: 60%;
+                            word-break: break-word;
+                        }
+                        
+                        .user-profile-actions {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                            gap: 10px;
+                            margin-top: 20px;
+                        }
+                        
+                        .user-profile-btn {
+                            padding: 10px 14px;
+                            border: none;
+                            border-radius: 8px;
+                            font-size: 13px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                            text-decoration: none;
+                            text-align: center;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            gap: 6px;
+                            min-height: 40px;
+                            position: relative;
+                            overflow: hidden;
+                        }
+                        
+                        .user-profile-btn::before {
+                            content: '';
+                            position: absolute;
+                            top: 0;
+                            left: -100%;
+                            width: 100%;
+                            height: 100%;
+                            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                            transition: left 0.5s;
+                        }
+                        
+                        .user-profile-btn:hover::before {
+                            left: 100%;
+                        }
+                        
+                        .user-profile-btn-primary {
+                            background: linear-gradient(135deg, #007bff, #0056b3);
+                            color: #ffffff;
+                            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+                        }
+                        
+                        .user-profile-btn-primary:hover {
+                            background: linear-gradient(135deg, #0056b3, #004085);
+                            transform: translateY(-2px);
+                            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+                        }
+                        
+                        .user-profile-btn-success {
+                            background: linear-gradient(135deg, #28a745, #20c997);
+                            color: #ffffff;
+                            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+                        }
+                        
+                        .user-profile-btn-success:hover {
+                            background: linear-gradient(135deg, #20c997, #17a2b8);
+                            transform: translateY(-2px);
+                            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+                        }
+                        
+                        .user-profile-btn-warning {
+                            background: linear-gradient(135deg, #ffc107, #fd7e14);
+                            color: #000000;
+                            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+                        }
+                        
+                        .user-profile-btn-warning:hover {
+                            background: linear-gradient(135deg, #fd7e14, #e83e8c);
+                            transform: translateY(-2px);
+                            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+                        }
+                        
+                        .user-profile-btn-danger {
+                            background: linear-gradient(135deg, #dc3545, #e83e8c);
+                            color: #ffffff;
+                            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+                        }
+                        
+                        .user-profile-btn-danger:hover {
+                            background: linear-gradient(135deg, #e83e8c, #6f42c1);
+                            transform: translateY(-2px);
+                            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+                        }
+                        
+                        .user-profile-btn-secondary {
+                            background: linear-gradient(135deg, #6c757d, #495057);
+                            color: #ffffff;
+                            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+                        }
+                        
+                        .user-profile-btn-secondary:hover {
+                            background: linear-gradient(135deg, #495057, #343a40);
+                            transform: translateY(-2px);
+                            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+                        }
+                        
+                        .user-profile-error {
+                            text-align: center;
+                            color: #ff6b6b;
+                            padding: 40px 20px;
+                        }
+                        
+                        .user-profile-error i {
+                            font-size: 32px;
+                            margin-bottom: 16px;
+                        }
+                        
+                        .user-profile-status {
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 4px;
+                            padding: 3px 6px;
+                            border-radius: 10px;
+                            font-size: 11px;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                        }
+                        
+                        .status-active {
+                            background: rgba(40, 167, 69, 0.2);
+                            color: #28a745;
+                            border: 1px solid rgba(40, 167, 69, 0.3);
+                        }
+                        
+                        .status-locked {
+                            background: rgba(220, 53, 69, 0.2);
+                            color: #dc3545;
+                            border: 1px solid rgba(220, 53, 69, 0.3);
+                        }
+                        
+                        .status-disabled {
+                            background: rgba(108, 117, 125, 0.2);
+                            color: #6c757d;
+                            border: 1px solid rgba(108, 117, 125, 0.3);
+                        }
+                        
+                        .user-profile-actions-consolidated {
+                            display: flex;
+                            gap: 12px;
+                            margin-top: 16px;
+                            flex-wrap: wrap;
+                            justify-content: center;
+                            align-items: center;
+                            width: 100%;
+                        }
+                        
+                        .action-icon-btn {
+                            width: 64px;
+                            height: 64px;
+                            border: none;
+                            border-radius: 50%;
+                            background: rgba(255, 255, 255, 0.1);
+                            color: #ffffff;
+                            font-size: 22px;
+                            cursor: pointer;
+                            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            position: relative;
+                            backdrop-filter: blur(10px);
+                            border: 1px solid rgba(255, 255, 255, 0.2);
+                            flex-shrink: 0;
+                        }
+                        
+                        .action-icon-btn:hover {
+                            background: rgba(255, 255, 255, 0.2);
+                            transform: translateY(-2px) scale(1.1);
+                            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+                        }
+                        
+                        .action-icon-btn::before {
+                            content: attr(title);
+                            position: absolute;
+                            bottom: -40px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            background: rgba(0, 0, 0, 0.9);
+                            color: #ffffff;
+                            padding: 6px 10px;
+                            border-radius: 6px;
+                            font-size: 12px;
+                            font-weight: 500;
+                            white-space: nowrap;
+                            opacity: 0;
+                            visibility: hidden;
+                            transition: all 0.3s ease;
+                            z-index: 1000;
+                            pointer-events: none;
+                        }
+                        
+                        .action-icon-btn::after {
+                            content: '';
+                            position: absolute;
+                            bottom: -8px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            border: 4px solid transparent;
+                            border-bottom-color: rgba(0, 0, 0, 0.9);
+                            opacity: 0;
+                            visibility: hidden;
+                            transition: all 0.3s ease;
+                            pointer-events: none;
+                        }
+                        
+                        .action-icon-btn:hover::before,
+                        .action-icon-btn:hover::after {
+                            opacity: 1;
+                            visibility: visible;
+                        }
+                        
+                        .action-icon-btn:active {
+                            transform: translateY(0) scale(0.95);
+                        }
+                        
+                        .action-icon-btn:disabled {
+                            opacity: 0.5;
+                            cursor: not-allowed;
+                            transform: none;
+                        }
+                        
+                        .action-icon-btn:disabled:hover {
+                            transform: none;
+                            box-shadow: none;
+                        }
+                        
+                        .recent-tickets-list {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 8px;
+                            min-height: 200px;
+                            flex: 1;
+                        }
+                        
+                        .ticket-item {
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            padding: 8px 10px;
+                            background: rgba(255, 255, 255, 0.05);
+                            border-radius: 8px;
+                            border: 1px solid rgba(255, 255, 255, 0.1);
+                            transition: all 0.2s ease;
+                        }
+                        
+                        .ticket-item:hover {
+                            background: rgba(255, 255, 255, 0.08);
+                            transform: translateX(2px);
+                        }
+                        
+                        .ticket-icon {
+                            width: 28px;
+                            height: 28px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 12px;
+                            flex-shrink: 0;
+                        }
+                        
+                        .ticket-priority-high {
+                            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+                            color: #ffffff;
+                        }
+                        
+                        .ticket-priority-medium {
+                            background: linear-gradient(135deg, #ffa726, #ff9800);
+                            color: #ffffff;
+                        }
+                        
+                        .ticket-priority-low {
+                            background: linear-gradient(135deg, #66bb6a, #4caf50);
+                            color: #ffffff;
+                        }
+                        
+                        .ticket-content {
+                            flex: 1;
+                            min-width: 0;
+                        }
+                        
+                        .ticket-title {
+                            font-size: 13px;
+                            font-weight: 600;
+                            color: #ffffff;
+                            margin-bottom: 2px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+                        
+                        .ticket-meta {
+                            font-size: 11px;
+                            color: #b0b0b0;
+                        }
+                        
+                        .ticket-status {
+                            font-size: 11px;
+                            font-weight: 600;
+                            padding: 2px 6px;
+                            border-radius: 4px;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            flex-shrink: 0;
+                        }
+                        
+                        .ticket-status-open {
+                            background: rgba(255, 193, 7, 0.2);
+                            color: #ffc107;
+                            border: 1px solid rgba(255, 193, 7, 0.3);
+                        }
+                        
+                        .ticket-status-resolved {
+                            background: rgba(76, 175, 80, 0.2);
+                            color: #4caf50;
+                            border: 1px solid rgba(76, 175, 80, 0.3);
+                        }
+                        
+                        .ticket-status-closed {
+                            background: rgba(158, 158, 158, 0.2);
+                            color: #9e9e9e;
+                            border: 1px solid rgba(158, 158, 158, 0.3);
+                        }
+                        
+                        /* Responsive design for better fit */
+                        @media (max-width: 768px) {
+                            .user-profile-modal {
+                                width: 95%;
+                                max-height: 85vh;
+                                margin-top: 2vh;
+                                margin-bottom: 2vh;
+                            }
+                            
+                            .user-profile-modal-content {
+                                max-height: calc(85vh - 50px);
+                            }
+                            
+                            .user-profile-info {
+                                grid-template-columns: 1fr;
+                            }
+                            
+                            .user-profile-actions {
+                                grid-template-columns: repeat(2, 1fr);
+                            }
+                            
+                            .user-profile-actions-consolidated {
+                                gap: 8px;
+                            }
+                            
+                            .action-icon-btn {
+                                width: 56px;
+                                height: 56px;
+                                font-size: 20px;
+                            }
+                            
+                            .user-profile-avatar {
+                                width: 70px;
+                                height: 70px;
+                            }
+                            
+                            .user-profile-avatar-text {
+                                font-size: 24px;
+                            }
+                        }
+                        
+                        /* Ensure modal doesn't get covered by taskbar on smaller screens */
+                        @media (max-height: 600px) {
+                            .user-profile-modal {
+                                max-height: 90vh;
+                                margin-top: 1vh;
+                                margin-bottom: 1vh;
+                            }
+                            
+                            .user-profile-modal-content {
+                                max-height: calc(90vh - 50px);
+                            }
+                        }
+                    </style>
+                `;
+                document.head.insertAdjacentHTML('beforeend', styles);
+            }
+            
+            // Load user data immediately
+            this.loadUserProfileData(clockId, userData);
+        }
+        
+        async loadUserProfileData(clockId, userData = null) {
+            const modalContent = document.querySelector('.user-profile-modal-content');
+            
+            try {
+                let userInfo = userData;
+                
+                // Enhanced user lookup - try multiple sources to ensure any user can be found
+                if (!userInfo) {
+                    // First try the clock ID suggestions API
+                    try {
+                        const response = await fetch(`/api/clock-id/suggestions?q=${encodeURIComponent(clockId)}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success && data.suggestions.length > 0) {
+                                userInfo = data.suggestions[0];
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Clock ID API failed, trying fallback:', e);
+                    }
+                    
+                    // Fallback: try unified search if clock ID lookup fails
+                    if (!userInfo || userInfo.type !== 'clock_id') {
+                        try {
+                            const searchResponse = await fetch(`/unified_search?q=${encodeURIComponent(clockId)}&limit=1`);
+                            if (searchResponse.ok) {
+                                const searchData = await searchResponse.json();
+                                if (searchData.users && searchData.users.length > 0) {
+                                    userInfo = searchData.users[0];
+                                    userInfo.type = 'clock_id';
+                                }
+                            }
+                        } catch (e) {
+                            console.warn('Unified search fallback failed:', e);
+                        }
+                    }
+                    
+                    // Final fallback: create a basic user profile if no data found
+                    if (!userInfo) {
+                        userInfo = {
+                            type: 'clock_id',
+                            clock_id: clockId,
+                            full_name: `User ${clockId}`,
+                            status: 'Unknown',
+                            title: 'Employee',
+                            email: `${clockId}@company.com`,
+                            department: 'Unknown'
+                        };
+                    }
+                }
+                
+                // Generate initials for avatar with fallback
+                const fullName = userInfo.full_name || `User ${clockId}`;
+                const initials = fullName.split(' ').map(name => name.charAt(0)).join('').toUpperCase().slice(0, 2) || 'U';
+                
+                // Determine user status and badges
+                const status = userInfo.status || 'Active';
+                const isLocked = status.toLowerCase().includes('locked') || status.toLowerCase().includes('lockout');
+                const isDisabled = status.toLowerCase().includes('disabled') || status.toLowerCase().includes('inactive');
+                const isAdmin = userInfo.role === 'admin' || userInfo.department === 'IT' || userInfo.is_admin;
+                const isVip = userInfo.is_vip || userInfo.priority === 'high';
+                
+                // Generate badges
+                const badges = [];
+                if (status.toLowerCase().includes('active') && !isLocked && !isDisabled) {
+                    badges.push('<span class="user-profile-badge badge-active"><i class="bi bi-check-circle"></i> Active</span>');
+                }
+                if (isLocked) {
+                    badges.push('<span class="user-profile-badge badge-locked"><i class="bi bi-lock"></i> Locked</span>');
+                }
+                if (isDisabled) {
+                    badges.push('<span class="user-profile-badge badge-disabled"><i class="bi bi-x-circle"></i> Disabled</span>');
+                }
+                if (isAdmin) {
+                    badges.push('<span class="user-profile-badge badge-admin"><i class="bi bi-shield-check"></i> Admin</span>');
+                }
+                if (isVip) {
+                    badges.push('<span class="user-profile-badge badge-vip"><i class="bi bi-star"></i> VIP</span>');
+                }
+                
+                // Streamlined layout with consolidated actions and recent tickets
+                modalContent.innerHTML = `
+                    <div class="user-profile-header">
+                        <div class="user-profile-avatar">
+                            <div class="user-profile-avatar-blobs">
+                                <svg viewBox="0 0 1200 1200">
+                                    <g class="user-profile-avatar-blob blob-1">
+                                        <path />
+                                    </g>
+                                    <g class="user-profile-avatar-blob blob-2">
+                                        <path />
+                                    </g>
+                                    <g class="user-profile-avatar-blob blob-3">
+                                        <path />
+                                    </g>
+                                    <g class="user-profile-avatar-blob blob-4">
+                                        <path />
+                                    </g>
+                                </svg>
+                            </div>
+                            <span class="user-profile-avatar-text">${initials}</span>
+                        </div>
+                        <div class="user-profile-name">${fullName}</div>
+                        <div class="user-profile-title">${userInfo.title || userInfo.job_title || 'Employee'}</div>
+                        <div class="user-profile-badges">${badges.join('')}</div>
+                    </div>
+                    
+                    <div class="user-profile-info">
+                        <div class="user-profile-section">
+                            <h4><i class="bi bi-person"></i> Basic Info</h4>
+                            <div class="user-profile-field">
+                                <span class="user-profile-field-label">Clock ID</span>
+                                <span class="user-profile-field-value">${userInfo.clock_id || clockId}</span>
+                            </div>
+                            <div class="user-profile-field">
+                                <span class="user-profile-field-label">Status</span>
+                                <span class="user-profile-field-value">
+                                    <span class="user-profile-status ${isLocked ? 'status-locked' : isDisabled ? 'status-disabled' : 'status-active'}">
+                                        <i class="bi bi-${isLocked ? 'lock' : isDisabled ? 'x-circle' : 'check-circle'}"></i>
+                                        ${status}
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="user-profile-field">
+                                <span class="user-profile-field-label">Department</span>
+                                <span class="user-profile-field-value">${userInfo.department || 'N/A'}</span>
+                            </div>
+                            <div class="user-profile-field">
+                                <span class="user-profile-field-label">Location</span>
+                                <span class="user-profile-field-value">${userInfo.location || userInfo.office || 'N/A'}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="user-profile-section">
+                            <h4><i class="bi bi-envelope"></i> Contact</h4>
+                            <div class="user-profile-field">
+                                <span class="user-profile-field-label">Email</span>
+                                <span class="user-profile-field-value">${userInfo.email || 'N/A'}</span>
+                            </div>
+                            <div class="user-profile-field">
+                                <span class="user-profile-field-label">Phone</span>
+                                <span class="user-profile-field-value">${userInfo.phone || userInfo.phone_number || 'N/A'}</span>
+                            </div>
+                            <div class="user-profile-field">
+                                <span class="user-profile-field-label">Extension</span>
+                                <span class="user-profile-field-value">${userInfo.extension || 'N/A'}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="user-profile-section">
+                            <h4><i class="bi bi-tools"></i> Actions</h4>
+                            <div class="user-profile-actions-consolidated">
+                                <button class="action-icon-btn" onclick="window.createTicket('${clockId}')" title="Create Ticket">
+                                    <i class="bi bi-ticket"></i>
+                                </button>
+                                <button class="action-icon-btn" onclick="window.resetPassword('${clockId}')" title="Reset Password">
+                                    <i class="bi bi-key"></i>
+                                </button>
+                                <button class="action-icon-btn" onclick="window.viewHistory('${clockId}')" title="View History">
+                                    <i class="bi bi-clock-history"></i>
+                                </button>
+                                ${isLocked ? `<button class="action-icon-btn" onclick="window.unlockAccount('${clockId}')" title="Unlock Account">
+                                    <i class="bi bi-unlock"></i>
+                                </button>` : ''}
+                                ${isDisabled ? `<button class="action-icon-btn" onclick="window.enableAccount('${clockId}')" title="Enable Account">
+                                    <i class="bi bi-check-circle"></i>
+                                </button>` : ''}
+                                ${!isDisabled ? `<button class="action-icon-btn" onclick="window.disableAccount('${clockId}')" title="Disable Account">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>` : ''}
+                                <a href="/tickets?user=${encodeURIComponent(clockId)}" class="action-icon-btn" title="View Tickets">
+                                    <i class="bi bi-ticket-detailed"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="user-profile-section user-profile-section-full-width">
+                        <h4><i class="bi bi-clock-history"></i> Recent Tickets</h4>
+                                                    <div class="recent-tickets-list">
+                                <div class="ticket-item">
+                                    <div class="ticket-icon ticket-priority-high">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                    </div>
+                                    <div class="ticket-content">
+                                        <div class="ticket-title">Password Reset Request</div>
+                                        <div class="ticket-meta">#TK-2024-001 • 2 hours ago</div>
+                                    </div>
+                                    <div class="ticket-status ticket-status-open">Open</div>
+                                </div>
+                                <div class="ticket-item">
+                                    <div class="ticket-icon ticket-priority-medium">
+                                        <i class="bi bi-laptop"></i>
+                                    </div>
+                                    <div class="ticket-content">
+                                        <div class="ticket-title">Software Installation</div>
+                                        <div class="ticket-meta">#TK-2024-002 • 1 day ago</div>
+                                    </div>
+                                    <div class="ticket-status ticket-status-resolved">Resolved</div>
+                                </div>
+                                <div class="ticket-item">
+                                    <div class="ticket-icon ticket-priority-low">
+                                        <i class="bi bi-question-circle"></i>
+                                    </div>
+                                    <div class="ticket-content">
+                                        <div class="ticket-title">General Inquiry</div>
+                                        <div class="ticket-meta">#TK-2024-003 • 3 days ago</div>
+                                    </div>
+                                    <div class="ticket-status ticket-status-closed">Closed</div>
+                                </div>
+                                <div class="ticket-item">
+                                    <div class="ticket-icon ticket-priority-medium">
+                                        <i class="bi bi-printer"></i>
+                                    </div>
+                                    <div class="ticket-content">
+                                        <div class="ticket-title">Printer Configuration</div>
+                                        <div class="ticket-meta">#TK-2024-004 • 4 days ago</div>
+                                    </div>
+                                    <div class="ticket-status ticket-status-resolved">Resolved</div>
+                                </div>
+                                <div class="ticket-item">
+                                    <div class="ticket-icon ticket-priority-high">
+                                        <i class="bi bi-wifi"></i>
+                                    </div>
+                                    <div class="ticket-content">
+                                        <div class="ticket-title">Network Connectivity</div>
+                                        <div class="ticket-meta">#TK-2024-005 • 5 days ago</div>
+                                    </div>
+                                    <div class="ticket-status ticket-status-closed">Closed</div>
+                                </div>
+                                <div class="ticket-item">
+                                    <div class="ticket-icon ticket-priority-low">
+                                        <i class="bi bi-keyboard"></i>
+                                    </div>
+                                    <div class="ticket-content">
+                                        <div class="ticket-title">Hardware Replacement</div>
+                                        <div class="ticket-meta">#TK-2024-006 • 1 week ago</div>
+                                    </div>
+                                    <div class="ticket-status ticket-status-resolved">Resolved</div>
+                                </div>
+                                <div class="ticket-item">
+                                    <div class="ticket-icon ticket-priority-medium">
+                                        <i class="bi bi-shield-check"></i>
+                                    </div>
+                                    <div class="ticket-content">
+                                        <div class="ticket-title">Security Update</div>
+                                        <div class="ticket-meta">#TK-2024-007 • 1 week ago</div>
+                                    </div>
+                                    <div class="ticket-status ticket-status-closed">Closed</div>
+                                </div>
+                                <div class="ticket-item">
+                                    <div class="ticket-icon ticket-priority-low">
+                                        <i class="bi bi-headphones"></i>
+                                    </div>
+                                    <div class="ticket-content">
+                                        <div class="ticket-title">Audio Equipment</div>
+                                        <div class="ticket-meta">#TK-2024-008 • 2 weeks ago</div>
+                                    </div>
+                                    <div class="ticket-status ticket-status-resolved">Resolved</div>
+                                </div>
+                            </div>
+                    </div>
+                    </div>
+                `;
+                
+                // Add service desk action handlers
+                this.addServiceDeskHandlers(clockId, userInfo);
+                
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+                // Show a user-friendly error with the ability to still view basic info
+                modalContent.innerHTML = `
+                    <div class="user-profile-header">
+                        <div class="user-profile-avatar">
+                            <div class="user-profile-avatar-blobs">
+                                <svg viewBox="0 0 1200 1200">
+                                    <g class="user-profile-avatar-blob blob-1">
+                                        <path />
+                                    </g>
+                                    <g class="user-profile-avatar-blob blob-2">
+                                        <path />
+                                    </g>
+                                    <g class="user-profile-avatar-blob blob-3">
+                                        <path />
+                                    </g>
+                                    <g class="user-profile-avatar-blob blob-4">
+                                        <path />
+                                    </g>
+                                </svg>
+                            </div>
+                            <span class="user-profile-avatar-text">${clockId.slice(0, 2).toUpperCase()}</span>
+                        </div>
+                        <div class="user-profile-name">User ${clockId}</div>
+                        <div class="user-profile-title">Clock ID Lookup</div>
+                    </div>
+                    
+                    <div class="user-profile-info">
+                        <div class="user-profile-section">
+                            <h4><i class="bi bi-exclamation-triangle"></i> Information</h4>
+                            <div class="user-profile-field">
+                                <span class="user-profile-field-label">Clock ID</span>
+                                <span class="user-profile-field-value">${clockId}</span>
+                            </div>
+                            <div class="user-profile-field">
+                                <span class="user-profile-field-label">Status</span>
+                                <span class="user-profile-field-value">Unknown</span>
+                            </div>
+                        </div>
+                        
+                        <div class="user-profile-section">
+                            <h4><i class="bi bi-tools"></i> Actions</h4>
+                            <div class="user-profile-actions-consolidated">
+                                <a href="/users?search=${encodeURIComponent(clockId)}" class="action-icon-btn" title="Search User">
+                                    <i class="bi bi-search"></i>
+                                </a>
+                                <a href="/tickets/new?user=${encodeURIComponent(clockId)}" class="action-icon-btn" title="Create Ticket">
+                                    <i class="bi bi-ticket"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        addServiceDeskHandlers(clockId, userInfo) {
+            // Add service desk action handlers to the global scope
+            window.createTicket = (userId) => {
+                window.open(`/tickets/new?user=${encodeURIComponent(userId)}`, '_blank');
+            };
+            
+            window.unlockAccount = async (userId) => {
+                if (confirm('Are you sure you want to unlock this account?')) {
+                    try {
+                        const response = await fetch('/api/admin/unlock-account', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ user_id: userId })
+                        });
+                        
+                        if (response.ok) {
+                            alert('Account unlocked successfully!');
+                            // Refresh the modal to show updated status
+                            this.loadUserProfileData(clockId, userInfo);
+                        } else {
+                            alert('Failed to unlock account. Please try again.');
+                        }
+                    } catch (error) {
+                        console.error('Error unlocking account:', error);
+                        alert('Error unlocking account. Please try again.');
+                    }
+                }
+            };
+            
+            window.resetPassword = async (userId) => {
+                if (confirm('Are you sure you want to reset the password for this user?')) {
+                    try {
+                        const response = await fetch('/api/admin/reset-password', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ user_id: userId })
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            alert(`Password reset successfully! New password: ${data.new_password}`);
+                        } else {
+                            alert('Failed to reset password. Please try again.');
+                        }
+                    } catch (error) {
+                        console.error('Error resetting password:', error);
+                        alert('Error resetting password. Please try again.');
+                    }
+                }
+            };
+            
+            window.enableAccount = async (userId) => {
+                if (confirm('Are you sure you want to enable this account?')) {
+                    try {
+                        const response = await fetch('/api/admin/enable-account', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ user_id: userId })
+                        });
+                        
+                        if (response.ok) {
+                            alert('Account enabled successfully!');
+                            // Refresh the modal to show updated status
+                            this.loadUserProfileData(clockId, userInfo);
+                        } else {
+                            alert('Failed to enable account. Please try again.');
+                        }
+                    } catch (error) {
+                        console.error('Error enabling account:', error);
+                        alert('Error enabling account. Please try again.');
+                    }
+                }
+            };
+            
+            window.disableAccount = async (userId) => {
+                if (confirm('Are you sure you want to disable this account? This will prevent the user from logging in.')) {
+                    try {
+                        const response = await fetch('/api/admin/disable-account', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ user_id: userId })
+                        });
+                        
+                        if (response.ok) {
+                            alert('Account disabled successfully!');
+                            // Refresh the modal to show updated status
+                            this.loadUserProfileData(clockId, userInfo);
+                        } else {
+                            alert('Failed to disable account. Please try again.');
+                        }
+                    } catch (error) {
+                        console.error('Error disabling account:', error);
+                        alert('Error disabling account. Please try again.');
+                    }
+                }
+            };
+            
+            window.viewHistory = (userId) => {
+                window.open(`/admin/users/${userId}/history`, '_blank');
+            };
+        }
+        
+        updateSuggestionSelection() {
+            const items = this.suggestionsContent?.querySelectorAll('.banner-search-suggestion-item');
+            if (!items) return;
+            
+            items.forEach((item, index) => {
+                item.classList.toggle('selected', index === this.selectedSuggestionIndex);
+            });
+        }
+        
+        navigateSuggestions(direction) {
+            const items = this.suggestionsContent?.querySelectorAll('.banner-search-suggestion-item');
+            if (!items || items.length === 0) return;
+            
+            this.selectedSuggestionIndex += direction;
+            
+            if (this.selectedSuggestionIndex < 0) {
+                this.selectedSuggestionIndex = items.length - 1;
+            } else if (this.selectedSuggestionIndex >= items.length) {
+                this.selectedSuggestionIndex = 0;
+            }
+            
+            this.updateSuggestionSelection();
+            
+            // Scroll to selected item
+            const selectedItem = items[this.selectedSuggestionIndex];
+            if (selectedItem) {
+                selectedItem.scrollIntoView({ block: 'nearest' });
+            }
+        }
+        
+        showSuggestions() {
+            if (this.suggestions) {
+                this.suggestions.classList.add('show');
+            }
+        }
+        
+        hideSuggestions() {
+            if (this.suggestions) {
+                this.suggestions.classList.remove('show');
+            }
+            this.selectedSuggestionIndex = -1;
+        }
+        
+        showResults() {
+            if (this.results) {
+                this.results.classList.add('show');
+            }
+        }
+        
+        hideResults() {
+            if (this.results) {
+                this.results.classList.remove('show');
+            }
+        }
+        
+        hideAll() {
+            this.hideResults();
+            this.hideSuggestions();
+        }
+        
+        showLoading(show) {
+            if (this.loading) {
+                this.loading.style.display = show ? 'block' : 'none';
+            }
+        }
+        
+        clearSearch() {
+            this.searchInput.value = '';
+            this.hideAll();
+            if (this.clearBtn) {
+                this.clearBtn.style.display = 'none';
+            }
+            this.searchInput.focus();
+        }
+        
+        handleKeydown(e) {
+            if (e.key === 'Escape') {
+                this.hideAll();
+                this.searchInput.blur();
+            } else if (e.key === 'Enter') {
+                if (this.suggestions?.classList.contains('show')) {
+                    const selectedItem = this.suggestionsContent?.querySelector('.banner-search-suggestion-item.selected');
+                    if (selectedItem) {
+                        selectedItem.click();
+                    } else {
+                        const firstItem = this.suggestionsContent?.querySelector('.banner-search-suggestion-item');
+                        if (firstItem) {
+                            firstItem.click();
+                        }
+                    }
+                } else if (this.results?.classList.contains('show')) {
+                    const firstResult = this.resultsContent?.querySelector('.banner-search-result-item');
+                    if (firstResult) {
+                        firstResult.click();
+                    }
+                } else {
+                    this.performSearch(this.searchInput.value);
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                this.navigateSuggestions(1);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                this.navigateSuggestions(-1);
+            }
+        }
+    }
+    
+    // Initialize the banner search when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            new BannerSearch();
+        });
+    } else {
+        new BannerSearch();
+    }
+})();
+</script>
+
+<script>
+let notes = [];
+let isDraggingSticky = false;
+let stickyOffset = { x: 0, y: 0 };
+let stickyInitial = { x: 0, y: 0 };
+let resizing = false;
+let searchQuery = '';
+
+// --- Dragging ---
+function initStickyDrag() {
+  const widget = document.getElementById('stickyNotesWidget');
+  const header = document.getElementById('stickyHeader');
+  header.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.sticky-btn')) return;
+    isDraggingSticky = true;
+    const rect = widget.getBoundingClientRect();
+    stickyOffset.x = e.clientX - rect.left;
+    stickyOffset.y = e.clientY - rect.top;
+    document.body.style.userSelect = 'none';
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (!isDraggingSticky) return;
+    const x = e.clientX - stickyOffset.x;
+    const y = e.clientY - stickyOffset.y;
+    widget.style.left = x + 'px';
+    widget.style.top = y + 'px';
+    widget.style.right = 'auto';
+  });
+  document.addEventListener('mouseup', () => {
+    isDraggingSticky = false;
+    document.body.style.userSelect = '';
+  });
+}
+
+// --- Resizing ---
+document.getElementById('resizeNotesBtn').addEventListener('mousedown', function(e) {
+  resizing = true;
+  const widget = document.getElementById('stickyNotesWidget');
+  widget.classList.add('resizing');
+  let startX = e.clientX;
+  let startY = e.clientY;
+  let startWidth = widget.offsetWidth;
+  let startHeight = widget.offsetHeight;
+  function onMove(ev) {
+    widget.style.width = Math.max(260, startWidth + (ev.clientX - startX)) + 'px';
+    widget.style.height = Math.max(120, startHeight + (ev.clientY - startY)) + 'px';
+  }
+  function onUp() {
+    resizing = false;
+    widget.classList.remove('resizing');
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+  }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+});
+
+// --- Notes CRUD ---
+function fetchNotes() {
+  fetch('/api/notes')
+    .then(res => res.json())
+    .then(data => {
+      notes = data;
+      renderNotes();
+    });
+}
+function renderNotes() {
+  const notesList = document.getElementById('notesList');
+  notesList.innerHTML = '';
+  let filtered = notes.filter(note =>
+    note.title.toLowerCase().includes(searchQuery) || note.content.toLowerCase().includes(searchQuery)
+  );
+  if (!filtered.length) {
+    notesList.innerHTML = '<div style="color:#aaa;text-align:center;">No notes found.</div>';
+    return;
+  }
+  // Pinned notes first
+  filtered.sort((a, b) => (b.pinned || 0) - (a.pinned || 0));
+  filtered.forEach(note => {
+    const div = document.createElement('div');
+    div.className = 'sticky-note-item';
+    div.style.background = note.color || '#2c313a';
+    div.innerHTML = `
+      <div style="display:flex;align-items:center;gap:4px;">
+        <button class="sticky-note-pin${note.pinned ? ' pinned' : ''}" title="Pin" onclick="togglePin(${note.id})"><i class="bi bi-pin-angle-fill"></i></button>
+        <button class="sticky-note-collapse${note.collapsed ? ' collapsed' : ''}" title="Collapse" onclick="toggleCollapse(${note.id})"><i class="bi bi-chevron-${note.collapsed ? 'down' : 'up'}"></i></button>
+        <button class="sticky-note-color" title="Color" onclick="showColorPicker(this, ${note.id})"><i class="bi bi-palette"></i></button>
+        <button class="sticky-note-delete" title="Delete" onclick="deleteNote(${note.id})"><i class="bi bi-trash"></i></button>
+        <span style="flex:1;"></span>
+        <span id="autosave-${note.id}" style="font-size:0.9em;color:#8f8;opacity:0;transition:opacity 0.3s;">Saved</span>
+      </div>
+      <input class="sticky-note-title" value="${escapeHtml(note.title) || ''}" placeholder="Title..." onchange="updateNote(${note.id}, 'title', this.value)">
+      <div class="sticky-color-picker" id="colorPicker-${note.id}" style="display:none;"></div>
+      <div class="sticky-note-body" style="display:${note.collapsed ? 'none' : 'block'};">
+        <textarea class="sticky-note-content" placeholder="Write a note..." onchange="updateNote(${note.id}, 'content', this.value)">${escapeHtml(note.content)}</textarea>
+      </div>
+    `;
+    notesList.appendChild(div);
+  });
+}
+function escapeHtml(text) {
+  if (!text) return '';
+  return text.replace(/[&<>"]|'/g, function(m) {
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m];
+  });
+}
+function addNote() {
+  fetch('/api/notes', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title: 'New Note', content: '', color: '#2c313a', pinned: false, collapsed: false })
+  })
+    .then(res => res.json())
+    .then(note => {
+      notes.push(note);
+      renderNotes();
+      showToast('Note created');
+    });
+}
+function updateNote(id, field, value) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  note[field] = value;
+  fetch(`/api/notes/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(note)
+  }).then(() => {
+    showAutoSave(id);
+  });
+}
+function deleteNote(id) {
+  if (!confirm('Delete this note?')) return;
+  fetch(`/api/notes/${id}`, { method: 'DELETE' })
+    .then(() => {
+      notes = notes.filter(n => n.id !== id);
+      renderNotes();
+      showToast('Note deleted');
+    });
+}
+function togglePin(id) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  note.pinned = !note.pinned;
+  updateNote(id, 'pinned', note.pinned);
+  renderNotes();
+}
+function toggleCollapse(id) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  note.collapsed = !note.collapsed;
+  updateNote(id, 'collapsed', note.collapsed);
+  renderNotes();
+}
+function showColorPicker(btn, id) {
+  const picker = document.getElementById(`colorPicker-${id}`);
+  if (!picker) return;
+  picker.innerHTML = '';
+  const colors = ['#2c313a','#ffd700','#ff6b6b','#6bcfff','#b2f296','#f8bbd0','#e1bee7','#d1c4e9','#c5cae9','#bbdefb','#b3e5fc','#b2ebf2','#b2dfdb','#c8e6c9','#dcedc8'];
+  colors.forEach(color => {
+    const dot = document.createElement('div');
+    dot.className = 'sticky-color-dot' + (notes.find(n => n.id === id).color === color ? ' selected' : '');
+    dot.style.background = color;
+    dot.onclick = () => {
+      updateNote(id, 'color', color);
+      picker.style.display = 'none';
+      renderNotes();
+    };
+    picker.appendChild(dot);
+  });
+  picker.style.display = picker.style.display === 'none' ? 'flex' : 'none';
+}
+function showAutoSave(id) {
+  const el = document.getElementById(`autosave-${id}`);
+  if (!el) return;
+  el.style.opacity = 1;
+  setTimeout(() => { el.style.opacity = 0; }, 1200);
+}
+function showToast(msg) {
+  const toast = document.getElementById('stickyToast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1800);
+}
+function filterNotes() {
+  searchQuery = document.getElementById('stickySearch').value.toLowerCase();
+  renderNotes();
+}
+// --- Minimize ---
+document.getElementById('minimizeNotesBtn').onclick = function() {
+  const widget = document.getElementById('stickyNotesWidget');
+  widget.classList.toggle('minimized');
+  if (!widget.classList.contains('minimized')) {
+    widget.style.height = '540px';
+    widget.style.minHeight = '180px';
+  }
+};
+// --- Add Note ---
+document.getElementById('addNoteBtn').onclick = addNote;
+// --- Init ---
+document.addEventListener('DOMContentLoaded', () => {
+  fetchNotes();
+  initStickyDrag();
+});
+</script> 

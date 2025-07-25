@@ -1,0 +1,28 @@
+<!-- Modularized Sidebar Scripts -->
+<!-- This file includes all sidebar functionality split into separate modules -->
+
+<!-- Navigation Links Module -->
+<script src="{{ url_for('static', filename='templates/components/sidebar/scripts/navigation_links.js') }}"></script>
+
+<!-- Sidebar Collapse Module -->
+<script src="{{ url_for('static', filename='templates/components/sidebar/scripts/sidebar_collapse.js') }}"></script>
+
+<!-- Navigation Active States Module -->
+<script src="{{ url_for('static', filename='templates/components/sidebar/scripts/navigation_active_states.js') }}"></script>
+
+<!-- Universal Search Toggle Module -->
+<script src="{{ url_for('static', filename='templates/components/sidebar/scripts/universal_search_toggle.js') }}"></script>
+
+<!-- Banner Search Modules (Modularized) -->
+<!-- Load all modules in dependency order -->
+<script src="{{ url_for('static', filename='js/sidebar/modules/core.js') }}"></script>
+<script src="{{ url_for('static', filename='js/sidebar/modules/api.js') }}"></script>
+<script src="{{ url_for('static', filename='js/sidebar/modules/suggestions.js') }}"></script>
+<script src="{{ url_for('static', filename='js/sidebar/modules/results.js') }}"></script>
+<script src="{{ url_for('static', filename='js/sidebar/modules/user-profile.js') }}"></script>
+<script src="{{ url_for('static', filename='js/sidebar/modules/ticket.js') }}"></script>
+<!-- Main orchestrator file -->
+<script src="{{ url_for('static', filename='js/sidebar/banner_search_modular.js') }}"></script>
+
+<!-- Sticky Notes Module -->
+<script src="{{ url_for('static', filename='templates/components/sidebar/scripts/sticky_notes.js') }}"></script> 

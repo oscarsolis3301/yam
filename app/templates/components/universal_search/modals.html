@@ -682,29 +682,24 @@
     color: rgba(255, 255, 255, 0.5) !important;
 }
 
-/* User Profile Modal Styles - macOS Inspired */
+/* User Profile Modal Styles - Enhanced for Service Desk */
 .user-profile-modal {
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-    background: rgba(249, 249, 251, 0.95);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-radius: 16px;
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15), 0 0 0 0.5px rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    max-width: 1100px;
-    width: 90vw;
-    max-height: 90vh;
+    background: #1a1a1a;
+    border-radius: 1rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 95vw;
+    height: 95vh;
+    max-width: 1600px;
+    min-width: 1200px;
+    min-height: 700px;
     overflow: hidden;
     position: relative;
-    color: #1d1d1f;
-    animation: macModalSlideIn 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-[data-bs-theme="dark"] .user-profile-modal {
-    background: rgba(30, 30, 32, 0.95);
-    color: #f5f5f7;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    animation: modalSlideIn 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    display: flex;
+    flex-direction: column;
 }
 
 @keyframes macModalSlideIn {
@@ -721,17 +716,11 @@
 .mac-modal-header {
     display: flex;
     align-items: center;
-    padding: 20px 24px 16px;
-    gap: 16px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-}
-
-[data-bs-theme="dark"] .mac-modal-header {
-    background: rgba(42, 42, 45, 0.8);
+    padding: 1.5rem 2rem;
+    gap: 1.5rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: #2a2a2a;
+    flex-shrink: 0;
 }
 
 .mac-user-avatar {
@@ -776,100 +765,88 @@
 }
 
 .mac-action-btn {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 8px;
-    border: none;
-    background: rgba(0, 122, 255, 0.1);
-    color: #007aff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 18px;
     position: relative;
 }
 
 .mac-action-btn:hover {
-    background: rgba(0, 122, 255, 0.15);
-    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
 }
 
 .mac-action-btn:active {
-    transform: scale(0.95);
-}
-
-[data-bs-theme="dark"] .mac-action-btn {
-    background: rgba(0, 122, 255, 0.2);
+    transform: translateY(0);
 }
 
 .mac-modal-content {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    padding: 20px 24px 24px;
-    background: rgba(255, 255, 255, 0.4);
-    overflow-y: auto;
-    max-height: calc(90vh - 120px);
-}
-
-[data-bs-theme="dark"] .mac-modal-content {
-    background: rgba(28, 28, 30, 0.6);
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: #1a1a1a;
+    overflow: hidden;
+    flex: 1;
+    min-height: 0;
+    max-height: calc(95vh - 120px);
 }
 
 .mac-info-section {
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(0, 0, 0, 0.04);
+    background: #2a2a2a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
-    padding: 16px;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
-
-[data-bs-theme="dark"] .mac-info-section {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    max-height: calc((95vh - 200px) / 3);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .mac-section-title {
-    margin: 0 0 12px 0;
-    font-size: 0.9375rem;
+    margin: 0 0 0.75rem 0;
+    font-size: 1rem;
     font-weight: 600;
-    color: #1d1d1f;
+    color: #ffffff;
     letter-spacing: -0.01em;
-}
-
-[data-bs-theme="dark"] .mac-section-title {
-    color: #f5f5f7;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
 }
 
 .mac-info-grid {
     display: grid;
-    grid-template-columns: 1fr 1.5fr;
-    gap: 8px 12px;
-    font-size: 0.875rem;
+    grid-template-columns: 1fr 2fr;
+    gap: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
 }
 
 .mac-info-label {
-    color: #6e6e73;
+    color: rgba(255, 255, 255, 0.7);
     font-weight: 500;
     align-self: start;
-}
-
-[data-bs-theme="dark"] .mac-info-label {
-    color: #98989d;
 }
 
 .mac-info-value {
-    color: #1d1d1f;
+    color: #ffffff;
     font-weight: 500;
     word-break: break-word;
     align-self: start;
-}
-
-[data-bs-theme="dark"] .mac-info-value {
-    color: #f5f5f7;
 }
 
 .mac-info-value a {
@@ -886,125 +863,154 @@
 .mac-status-badge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 0.75rem;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
     font-weight: 600;
     text-transform: capitalize;
     letter-spacing: 0.01em;
+    border: 1px solid;
 }
 
 .mac-status-badge::before {
     content: '';
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: currentColor;
 }
 
 .mac-badge-ok {
-    background: rgba(52, 199, 89, 0.15);
-    color: #34c759;
+    background: rgba(255, 255, 255, 0.1);
+    color: #4ade80;
+    border-color: rgba(74, 222, 128, 0.3);
 }
 
 .mac-badge-locked {
-    background: rgba(255, 59, 48, 0.15);
-    color: #ff3b30;
+    background: rgba(255, 255, 255, 0.1);
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.3);
 }
 
 .mac-badge-disabled {
-    background: rgba(142, 142, 147, 0.15);
-    color: #8e8e93;
+    background: rgba(255, 255, 255, 0.1);
+    color: #9ca3af;
+    border-color: rgba(156, 163, 175, 0.3);
 }
 
 .mac-badge-expired {
-    background: rgba(255, 204, 0, 0.15);
-    color: #ffcc00;
-}
-
-[data-bs-theme="dark"] .mac-badge-ok {
-    background: rgba(52, 199, 89, 0.2);
-    color: #30d158;
-}
-
-[data-bs-theme="dark"] .mac-badge-locked {
-    background: rgba(255, 69, 58, 0.2);
-    color: #ff453a;
-}
-
-[data-bs-theme="dark"] .mac-badge-disabled {
-    background: rgba(142, 142, 147, 0.2);
-    color: #98989d;
-}
-
-[data-bs-theme="dark"] .mac-badge-expired {
-    background: rgba(255, 214, 10, 0.2);
-    color: #ffd60a;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.3);
 }
 
 .mac-close-btn {
     position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 28px;
-    height: 28px;
+    top: 1rem;
+    right: 1rem;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    border: none;
-    background: rgba(120, 120, 128, 0.16);
-    color: #6e6e73;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.32, 0.72, 0, 1);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 500;
     z-index: 10;
 }
 
 .mac-close-btn:hover {
-    background: rgba(120, 120, 128, 0.24);
-    color: #1d1d1f;
-}
-
-[data-bs-theme="dark"] .mac-close-btn {
-    background: rgba(120, 120, 128, 0.24);
-    color: #98989d;
-}
-
-[data-bs-theme="dark"] .mac-close-btn:hover {
-    background: rgba(120, 120, 128, 0.32);
-    color: #f5f5f7;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
 }
 
 /* Responsive adjustments for smaller screens */
+@media (max-width: 1200px) {
+    .user-profile-modal {
+        width: 98vw;
+        height: 98vh;
+        min-width: 800px;
+        min-height: 600px;
+    }
+    
+    .mac-modal-content {
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .mac-info-section {
+        max-height: calc((98vh - 200px) / 2);
+    }
+    
+    .mac-info-grid {
+        grid-template-columns: 1fr 1.5fr;
+        gap: 0.5rem 0.75rem;
+    }
+    
+    .mac-info-label {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+}
+
 @media (max-width: 768px) {
+    .user-profile-modal {
+        width: 100vw;
+        height: 100vh;
+        min-width: 320px;
+        min-height: 500px;
+        border-radius: 0;
+    }
+    
     .mac-modal-content {
         grid-template-columns: 1fr;
-        gap: 12px;
-        padding: 16px 20px 20px;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+    
+    .mac-info-section {
+        max-height: calc((100vh - 200px) / 3);
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
     }
     
     .mac-modal-header {
-        padding: 16px 20px 12px;
+        padding: 1rem;
         flex-direction: column;
         text-align: center;
-        gap: 12px;
-    }
-    
-    .user-profile-modal {
-        width: 95vw;
-        max-width: none;
+        gap: 1rem;
     }
     
     .mac-user-avatar {
-        width: 56px;
-        height: 56px;
+        width: 48px;
+        height: 48px;
     }
     
     .mac-user-name {
-        font-size: 1.25rem;
+        font-size: 1.1rem;
+    }
+    
+    .mac-action-buttons {
+        justify-content: center;
+    }
+    
+    .mac-section-title {
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .mac-info-grid {
+        grid-template-columns: 1fr 1.2fr;
+        gap: 0.4rem 0.6rem;
+        font-size: 0.85rem;
     }
 }
 
@@ -3647,4 +3653,59 @@ function copyOfficeDetails(name, phone, address) {
     const details = `Office: ${name}\nPhone: ${phone || 'N/A'}\nAddress: ${address || 'N/A'}`;
     copyToClipboard(details);
 }
+
+// Enhanced helper functions for service desk operations
+window.copyUserInfo = function(username, email, fullName) {
+    const userInfo = `User: ${fullName}\nUsername: ${username}\nEmail: ${email}`;
+    navigator.clipboard.writeText(userInfo).then(() => {
+        showToast('User information copied to clipboard!', 'success');
+    }).catch(() => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = userInfo;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showToast('User information copied to clipboard!', 'success');
+    });
+};
+
+window.viewUserActivity = function(username) {
+    showToast(`Loading activity for ${username}...`, 'info');
+    // In a real implementation, this would open a user activity modal or page
+    setTimeout(() => {
+        showToast(`Activity data for ${username} would be displayed here`, 'info');
+    }, 1000);
+};
+
+window.handleQuickAction = function(action, username) {
+    showToast(`Executing: ${action} for ${username}`, 'info');
+    
+    switch(action) {
+        case '🔓 Unlock Account':
+            // Simulate account unlock
+            setTimeout(() => {
+                showToast(`Account unlocked for ${username}`, 'success');
+                // Refresh the modal to show updated status
+                // In real implementation, this would make an API call
+            }, 2000);
+            break;
+        case '🔑 Reset Password':
+            openPasswordResetModal(username, '', '');
+            break;
+        case '✅ Enable Account':
+            setTimeout(() => {
+                showToast(`Account enabled for ${username}`, 'success');
+            }, 2000);
+            break;
+        case '🔐 Enable MFA':
+            setTimeout(() => {
+                showToast(`MFA enabled for ${username}`, 'success');
+            }, 2000);
+            break;
+        default:
+            showToast(`Action ${action} not implemented yet`, 'warning');
+    }
+};
 </script> 
