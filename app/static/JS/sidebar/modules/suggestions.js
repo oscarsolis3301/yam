@@ -138,14 +138,7 @@ class SuggestionsModule {
             });
         }
         
-        // Always add helpful search options for any query
-        instantSuggestions.push({
-            text: `Search for "${trimmedQuery}"`,
-            subtitle: 'Universal search across all content',
-            url: `/unified_search?q=${encodeURIComponent(trimmedQuery)}`,
-            icon: 'bi-search',
-            type: 'search'
-        });
+        // Removed generic 'Search for' fallback to keep only real or pattern-based suggestions
         
         // Show instant suggestions immediately
         this.displaySuggestions(instantSuggestions);
@@ -217,8 +210,18 @@ class SuggestionsModule {
                 }
             }
             
-            // Fetch from multiple endpoints simultaneously for comprehensive results
-            const [unifiedResponse, universalResponse, kbResponse, notesResponse] = await Promise.allSettled([
+            // Added universal-search text suggestions endpoint to mirror Universal Search component
+            const [suggestionsResponse, unifiedResponse, universalResponse, kbResponse, notesResponse] = await Promise.allSettled([
+                // Universal Search text suggestions (titles, intelligent patterns, etc.)
+                fetch(`/api/universal-search/suggestions?q=${encodeURIComponent(trimmedQuery)}&limit=8`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Cache-Control': 'max-age=60'
+                    },
+                    signal: this.currentSuggestionsController.signal
+                }),
+                
                 // Unified search for offices and workstations
                 fetch(`/unified_search?q=${encodeURIComponent(trimmedQuery)}&limit=8`, {
                     method: 'GET',
@@ -229,8 +232,8 @@ class SuggestionsModule {
                     signal: this.currentSuggestionsController.signal
                 }),
                 
-                // Universal search for KB articles, notes, and other content
-                fetch(`/universal-search?q=${encodeURIComponent(trimmedQuery)}&limit=5`, {
+                // Universal search full results (same as universalSearch.html uses)
+                fetch(`/api/universal-search?q=${encodeURIComponent(trimmedQuery)}&limit=8`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
@@ -250,7 +253,8 @@ class SuggestionsModule {
                 }),
                 
                 // Notes search for user notes
-                fetch(`/collab-notes/api/notes/search?q=${encodeURIComponent(trimmedQuery)}`, {
+                // Corrected path for collaborative notes search (blueprint prefix is /notes)
+                fetch(`/notes/api/notes/search?q=${encodeURIComponent(trimmedQuery)}`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
@@ -270,6 +274,13 @@ class SuggestionsModule {
                 workstationData = unifiedData.workstations || [];
             }
             
+            // Process universal-search text suggestions
+            let textSuggestions = [];
+            if (suggestionsResponse.status === 'fulfilled' && suggestionsResponse.value.ok) {
+                const suggestionsData = await suggestionsResponse.value.json();
+                textSuggestions = suggestionsData.suggestions || [];
+            }
+
             // Process universal search results (KB articles, notes, etc.)
             let universalResults = [];
             if (universalResponse.status === 'fulfilled' && universalResponse.value.ok) {
@@ -295,10 +306,24 @@ class SuggestionsModule {
             const allSuggestions = [
                 ...clockSuggestions
             ];
+
+            // Add text suggestions from universal search
+            if (textSuggestions.length > 0) {
+                textSuggestions.slice(0, 8).forEach(text => {
+                    allSuggestions.push({
+                        text: text,
+                        icon: 'bi bi-search',
+                        subtitle: 'Universal search suggestion',
+                        type: 'text_suggestion',
+                        data: { query: text },
+                        url: `/universal-search?q=${encodeURIComponent(text)}`
+                    });
+                });
+            }
             
             // Add office suggestions
             if (officeData.length > 0) {
-                officeData.slice(0, 3).forEach(office => {
+                officeData.slice(0, 5).forEach(office => {
                     allSuggestions.push({
                         text: office['Internal Name'] || office.name || 'Unknown Office',
                         icon: 'bi bi-building',
@@ -311,7 +336,7 @@ class SuggestionsModule {
             
             // Add workstation suggestions
             if (workstationData.length > 0) {
-                workstationData.slice(0, 3).forEach(ws => {
+                workstationData.slice(0, 5).forEach(ws => {
                     allSuggestions.push({
                         text: ws.name || 'Unknown Workstation',
                         icon: 'bi bi-laptop',
@@ -324,7 +349,7 @@ class SuggestionsModule {
             
             // Add knowledge base article suggestions
             if (kbArticles.length > 0) {
-                kbArticles.slice(0, 3).forEach(article => {
+                kbArticles.slice(0, 5).forEach(article => {
                     allSuggestions.push({
                         text: article.title || 'Unknown Article',
                         icon: 'bi bi-journal-text',
@@ -337,7 +362,7 @@ class SuggestionsModule {
             
             // Add notes suggestions
             if (notesData.length > 0) {
-                notesData.slice(0, 3).forEach(note => {
+                notesData.slice(0, 5).forEach(note => {
                     allSuggestions.push({
                         text: note.title || 'Unknown Note',
                         icon: 'bi bi-sticky',
@@ -348,26 +373,74 @@ class SuggestionsModule {
                 });
             }
             
-            // Add universal search results (KB articles, notes, etc.)
-            if (universalResults.length > 0) {
-                universalResults.slice(0, 3).forEach(result => {
-                    // Skip if we already have this type of result
-                    const existingType = allSuggestions.find(s => s.type === result.content_type);
-                    if (!existingType) {
-                        allSuggestions.push({
-                            text: result.title || 'Unknown Result',
-                            icon: this.getIconForContentType(result.content_type),
-                            subtitle: result.description ? result.description.substring(0, 50) + '...' : result.content_type,
-                            type: result.content_type,
-                            data: result
-                        });
-                    }
+            // Add user suggestions from unified search
+            if (unifiedResponse.status === 'fulfilled' && unifiedResponse.value.ok) {
+                 const unifiedData = await unifiedResponse.value.json();
+                 const usersData = unifiedData.users || [];
+                 if (usersData.length > 0) {
+                     usersData.slice(0, 5).forEach(user => {
+                         allSuggestions.push({
+                             text: user.name || 'Unknown User',
+                             icon: 'bi bi-person',
+                             subtitle: 'User',
+                             type: 'user',
+                             data: user
+                         });
+                     });
+                 }
+            }
+
+            // Add universal search results (any content type)
+             if (universalResults.length > 0) {
+                 universalResults.slice(0, 8).forEach(result => {
+                         allSuggestions.push({
+                             text: result.title || 'Unknown Result',
+                             icon: this.getIconForContentType(result.content_type),
+                             subtitle: result.description ? result.description.substring(0, 50) + '...' : result.content_type,
+                             type: result.content_type,
+                             data: result
+                         });
+                 });
+             }
+
+            // --- PRIORITIZATION: ensure clock ID suggestion is always first ---
+            // Detect suggestions that represent a specific user looked up by clock ID.
+            const isClockUser = (s) => {
+                if (s.type === 'clock_id') return true;
+                // Some APIs may label the result as a generic 'user' type while still including a clock_id.
+                return s.type === 'user' && s.data && (s.data.clock_id || s.data.clockId);
+            };
+
+            const prioritized = allSuggestions.filter(isClockUser);
+            const rest = allSuggestions.filter((s) => !isClockUser(s));
+ 
+            // Always prepend a generic fallback "Find User" action so the user can hit ENTER to force a lookup,
+            // no matter what was typed. If the query looks numeric we pad to 5-digits, otherwise keep as-is.
+            const fallbackClockId = /^\d{1,5}$/.test(trimmedQuery)
+                ? trimmedQuery.padStart(5, '0')
+                : trimmedQuery;
+
+            const fallbackExists = prioritized.some(
+                (s) => s.type === 'clock_id' && (s.data?.clock_id || '').toString() === fallbackClockId.toString()
+            );
+
+            if (!fallbackExists) {
+                prioritized.unshift({
+                    text: `FIND USER ${fallbackClockId}`,
+                    icon: 'bi bi-person-badge',
+                    subtitle: 'LOOKUP USER',
+                    type: 'clock_id',
+                    data: { clock_id: fallbackClockId }
                 });
             }
+
+            allSuggestions.length = 0;
+            allSuggestions.push(...prioritized, ...rest);
             
-            // Always add helpful search options if we have few suggestions
-            if (allSuggestions.length < 3) {
-                allSuggestions.push(...this.createHelpfulSuggestions(trimmedQuery));
+            // If no real suggestions, hide dropdown entirely instead of showing generic fallbacks
+            if (allSuggestions.length === 0) {
+                this.coreModule.hideSuggestions();
+                return;
             }
             
             // Cache the results
@@ -392,6 +465,8 @@ class SuggestionsModule {
     
     // Update suggestions in background without blocking UI
     async updateSuggestionsInBackground(query) {
+        // Only perform background clock-ID refresh for numeric queries (1-5 digits)
+        if (!/^\d{1,5}$/.test(query.trim())) return;
         try {
             const response = await fetch(`/api/clock-id/suggestions?q=${encodeURIComponent(query)}`);
             if (response.ok) {
@@ -429,14 +504,7 @@ class SuggestionsModule {
         const searchTerm = query.trim();
         const suggestions = [];
         
-        // Always provide helpful search options
-        suggestions.push({
-            text: `Search for "${searchTerm}"`,
-            subtitle: 'Universal search across all content',
-            url: `/unified_search?q=${encodeURIComponent(searchTerm)}`,
-            icon: 'bi-search',
-            type: 'search'
-        });
+        // Removed generic 'Search for' option
         
         suggestions.push({
             text: `Find users like "${searchTerm}"`,
@@ -539,39 +607,100 @@ class SuggestionsModule {
     
     displaySuggestions(suggestions) {
         if (!this.suggestionsContent) return;
-        
-        if (suggestions.length === 0) {
+        if (!Array.isArray(suggestions) || suggestions.length === 0) {
             this.coreModule.hideSuggestions();
             return;
         }
-        
+
+        // Clear previous contents
         this.suggestionsContent.innerHTML = '';
-        
-        suggestions.forEach((suggestion, index) => {
+
+        // Helper for creating suggestion element
+        const createItem = (suggestion, index) => {
             const item = document.createElement('div');
             item.className = 'banner-search-suggestion-item';
             item.innerHTML = `
-                <div class="banner-search-suggestion-icon">
-                    <i class="${suggestion.icon}"></i>
-                </div>
+                <div class="banner-search-suggestion-icon"><i class="${suggestion.icon}"></i></div>
                 <div class="banner-search-suggestion-content">
                     <div class="banner-search-suggestion-text">${suggestion.text}</div>
                     <div class="banner-search-suggestion-subtitle">${suggestion.subtitle || ''}</div>
-                </div>
-            `;
-            
+                </div>`;
+
             item.addEventListener('click', () => {
                 this.coreModule.handleSuggestionClick(suggestion);
             });
-            
+
             item.addEventListener('mouseenter', () => {
                 this.coreModule.selectedSuggestionIndex = index;
                 this.coreModule.updateSuggestionSelection();
             });
-            
-            this.suggestionsContent.appendChild(item);
+            return item;
+        };
+
+        // --- 1) RENDER QUICK-ACTIONS FIRST --------------------------------------------------
+        const quickActions = suggestions.filter((s) => s.type === 'clock_id');
+        let visualIndex = 0;
+
+        if (quickActions.length) {
+            const qaHeader = document.createElement('div');
+            qaHeader.className = 'banner-suggestion-category-header';
+            qaHeader.textContent = 'Quick actions';
+            this.suggestionsContent.appendChild(qaHeader);
+            quickActions.forEach((sugg) => {
+                this.suggestionsContent.appendChild(createItem(sugg, visualIndex++));
+            });
+        }
+
+        // --- 2) RENDER REMAINING GROUPS ------------------------------------------------------
+
+        const groupOrder = [
+            'text_suggestion', 'pattern', 'user', 'office', 'workstation', 'kb_article', 'note', 'device', 'search'
+        ];
+
+        const grouped = {};
+        suggestions.forEach((s) => {
+            if (s.type === 'clock_id') return; // already rendered
+            const key = s.type || 'other';
+            if (!grouped[key]) grouped[key] = [];
+            grouped[key].push(s);
         });
-        
+
+        groupOrder.forEach((type) => {
+            const items = grouped[type];
+            if (items && items.length) {
+                const header = document.createElement('div');
+                header.className = 'banner-suggestion-category-header';
+                header.textContent = {
+                    'text_suggestion': 'Suggestions',
+                    'pattern': 'Smart suggestions',
+                    'user': 'Users',
+                    'office': 'Offices',
+                    'workstation': 'Workstations',
+                    'kb_article': 'Knowledge Base',
+                    'note': 'Notes',
+                    'device': 'Devices',
+                    'search': 'Search'
+                }[type] || type;
+                this.suggestionsContent.appendChild(header);
+
+                items.forEach((sugg) => {
+                    this.suggestionsContent.appendChild(createItem(sugg, visualIndex++));
+                });
+            }
+        });
+
+        // Fallback if some types were not in predefined order
+        Object.keys(grouped).forEach((type) => {
+            if (groupOrder.includes(type)) return; // already handled
+            const header = document.createElement('div');
+            header.className = 'banner-suggestion-category-header';
+            header.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+            this.suggestionsContent.appendChild(header);
+            grouped[type].forEach((sugg) => {
+                this.suggestionsContent.appendChild(createItem(sugg, visualIndex++));
+            });
+        });
+
         this.coreModule.showSuggestions();
     }
     

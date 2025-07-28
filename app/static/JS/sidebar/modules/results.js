@@ -8,55 +8,67 @@ class ResultsModule {
     }
     
     displayResults(results) {
-        if (!this.resultsContent) return;
-        
-        if (results.length === 0) {
-            this.resultsContent.innerHTML = `
-                <div class="banner-search-no-results">
-                    <i class="bi bi-search"></i>
-                    <p>No results found</p>
-                    <small>Try a different search term</small>
-                </div>
-            `;
-            this.coreModule.showResults();
-            return;
-        }
-        
-        this.resultsContent.innerHTML = '';
-        
-        results.forEach(result => {
-            const item = document.createElement('div');
-            item.className = 'banner-search-result-item';
-            item.innerHTML = `
-                <div class="banner-search-result-icon">
-                    <i class="${result.icon || 'bi bi-file-text'}"></i>
-                </div>
-                <div class="banner-search-result-content">
-                    <div class="banner-search-result-title">${result.title}</div>
-                    <div class="banner-search-result-description">${result.description}</div>
-                </div>
-            `;
-            
-            item.addEventListener('click', () => {
-                this.coreModule.handleResultClick(result);
-            });
-            
-            this.resultsContent.appendChild(item);
+        // Convert results into the same shape used by SuggestionsModule
+        const convertedResults = (results || []).map((r) => ({
+            text: r.title,
+            icon: r.icon || 'bi bi-file-text',
+            subtitle: r.description || '',
+            type: r.content_type || 'result',
+            url: r.url,
+            data: r
+        }));
+
+        // Merge with any existing suggestions the SuggestionsModule is already holding
+        const current = this.coreModule.currentSuggestions || [];
+        const merged = [
+            // keep existing suggestions first so smart / quick-actions stay on top
+            ...current,
+            // add a divider category header only once if we have new results
+            ...(
+                convertedResults.length ? [{
+                    text: 'Search results',
+                    icon: 'bi bi-search',
+                    subtitle: 'Matches from all content',
+                    type: 'header'
+                }] : []
+            ),
+            ...convertedResults
+        ];
+
+        // De-duplicate by text to avoid showing identical entries twice
+        const seen = new Set();
+        const unique = merged.filter((s) => {
+            const key = (s.text || '').toLowerCase();
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
         });
-        
-        this.coreModule.showResults();
+
+        this.coreModule.currentSuggestions = unique;
+
+        if (this.coreModule.suggestionsModule) {
+            this.coreModule.suggestionsModule.displaySuggestions(unique);
+        }
+
+        // Ensure the suggestions dropdown is visible again (it may have been hidden before search ran)
+        this.coreModule.showSuggestions();
     }
     
     displayError(message) {
-        if (!this.resultsContent) return;
-        
-        this.resultsContent.innerHTML = `
-            <div class="banner-search-error">
-                <i class="bi bi-exclamation-triangle"></i>
-                <p>${message}</p>
-            </div>
-        `;
-        this.coreModule.showResults();
+        // Surface the error inside suggestions dropdown so the user still sees feedback
+        const current = this.coreModule.currentSuggestions || [];
+        const errorSuggestion = {
+            text: 'Error',
+            icon: 'bi bi-exclamation-triangle',
+            subtitle: message,
+            type: 'error'
+        };
+        const merged = [...current, errorSuggestion];
+        this.coreModule.currentSuggestions = merged;
+        if (this.coreModule.suggestionsModule) {
+            this.coreModule.suggestionsModule.displaySuggestions(merged);
+        }
+        this.coreModule.showSuggestions();
     }
 }
 
