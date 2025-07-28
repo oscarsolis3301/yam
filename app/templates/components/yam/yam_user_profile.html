@@ -1,5 +1,28 @@
 <!-- User Profile Sidebar -->
 <div class="sidebar-content">
+    <!-- Enhanced Quick Reminders Widget - Now Above Profile -->
+    <div class="widget reminder-widget-expanded">
+        <div class="widget-header">
+            <h3><i class="bi bi-bell-fill"></i> Quick Reminders</h3>
+            <div class="widget-header-actions">
+                <button class="widget-action-btn calendar-btn" onclick="openCalendarModal()" title="Open Calendar">
+                    <i class="bi bi-calendar3"></i>
+                </button>
+                <button class="widget-action-btn add-btn" onclick="openReminderModal()" title="Add New Reminder">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            </div>
+        </div>
+        <div class="widget-content expanded-content">
+            <div id="expandedRemindersList" class="reminders-list-expanded">
+                <div class="loading-reminders">
+                    <div class="loading-spinner"></div>
+                    <p>Loading reminders...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- User Profile Card -->
     <div class="card user-profile">
         <div class="profile-avatar" id="profileAvatar">
@@ -26,24 +49,6 @@
                     <i class="bi bi-clock-history"></i>
                     View All Activity
                 </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Reminders Widget -->
-    <div class="widget reminder-widget-sidebar">
-        <div class="widget-header">
-            <h3><i class="bi bi-bell-fill"></i> Quick Reminders</h3>
-            <button class="widget-action-btn" onclick="openReminderModal()">
-                <i class="bi bi-plus-lg"></i>
-            </button>
-        </div>
-        <div class="widget-content">
-            <div id="sidebarRemindersList" class="reminders-list-sidebar">
-                <div class="loading-reminders">
-                    <div class="loading-spinner"></div>
-                    <p>Loading reminders...</p>
-                </div>
             </div>
         </div>
     </div>
@@ -672,6 +677,298 @@
         min-width: auto;
     }
 }
+
+/* Enhanced Expanded Reminders Widget */
+.reminder-widget-expanded {
+    background: rgba(15, 15, 15, 0.95);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.reminder-widget-expanded:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.reminder-widget-expanded .widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.reminder-widget-expanded .widget-header h3 {
+    color: #ffffff;
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.widget-header-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.reminder-widget-expanded .widget-action-btn {
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    color: #00d4ff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+}
+
+.reminder-widget-expanded .widget-action-btn.calendar-btn {
+    background: rgba(52, 199, 89, 0.1);
+    border-color: rgba(52, 199, 89, 0.3);
+    color: #34c759;
+}
+
+.reminder-widget-expanded .widget-action-btn:hover {
+    transform: scale(1.1);
+}
+
+.reminder-widget-expanded .widget-action-btn:hover {
+    background: rgba(0, 212, 255, 0.2);
+    border-color: #00d4ff;
+}
+
+.reminder-widget-expanded .widget-action-btn.calendar-btn:hover {
+    background: rgba(52, 199, 89, 0.2);
+    border-color: #34c759;
+}
+
+.expanded-content {
+    padding: 1.5rem;
+    min-height: 250px;
+    max-height: 400px;
+    overflow: hidden;
+}
+
+.reminders-list-expanded {
+    max-height: 350px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.reminders-list-expanded::-webkit-scrollbar {
+    width: 6px;
+}
+
+.reminders-list-expanded::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.reminders-list-expanded::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.reminders-list-expanded::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.reminders-list-expanded .reminder-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s ease;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.reminders-list-expanded .reminder-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(3px);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.reminders-list-expanded .reminder-item:active {
+    transform: scale(0.98);
+}
+
+.reminders-list-expanded .reminder-item.urgent {
+    border-left: 4px solid #ff3b30;
+    background: rgba(255, 59, 48, 0.1);
+}
+
+.reminders-list-expanded .reminder-item.high {
+    border-left: 4px solid #ff9500;
+    background: rgba(255, 149, 0, 0.1);
+}
+
+.reminders-list-expanded .reminder-item.medium {
+    border-left: 4px solid #00d4ff;
+    background: rgba(0, 212, 255, 0.1);
+}
+
+.reminders-list-expanded .reminder-item.low {
+    border-left: 4px solid #34c759;
+    background: rgba(52, 199, 89, 0.1);
+}
+
+.reminders-list-expanded .reminder-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.reminders-list-expanded .reminder-item.urgent .reminder-icon {
+    background: rgba(255, 59, 48, 0.2);
+    color: #ff3b30;
+    border: 1px solid rgba(255, 59, 48, 0.3);
+}
+
+.reminders-list-expanded .reminder-item.high .reminder-icon {
+    background: rgba(255, 149, 0, 0.2);
+    color: #ff9500;
+    border: 1px solid rgba(255, 149, 0, 0.3);
+}
+
+.reminders-list-expanded .reminder-item.medium .reminder-icon {
+    background: rgba(0, 212, 255, 0.2);
+    color: #00d4ff;
+    border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+.reminders-list-expanded .reminder-item.low .reminder-icon {
+    background: rgba(52, 199, 89, 0.2);
+    color: #34c759;
+    border: 1px solid rgba(52, 199, 89, 0.3);
+}
+
+.reminders-list-expanded .reminder-content {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.reminders-list-expanded .reminder-title {
+    color: #ffffff;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    line-height: 1.3;
+    word-wrap: break-word;
+    overflow: visible;
+    white-space: normal;
+}
+
+.reminders-list-expanded .reminder-description {
+    color: #cccccc;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow: visible;
+    white-space: normal;
+    max-height: none;
+}
+
+.reminders-list-expanded .reminder-time {
+    color: #888888;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.reminders-list-expanded .reminder-actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-shrink: 0;
+    margin-top: 0.5rem;
+}
+
+.reminders-list-expanded .reminder-action-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
+.reminders-list-expanded .reminder-action-btn:hover {
+    background: rgba(0, 212, 255, 0.3);
+    color: #00d4ff;
+    transform: scale(1.1);
+}
+
+.reminders-list-expanded .no-reminders {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #888888;
+}
+
+.reminders-list-expanded .no-reminders i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+    color: #555555;
+}
+
+.reminders-list-expanded .no-reminders button {
+    margin-top: 1rem;
+    background: linear-gradient(135deg, #00d4ff, #0099cc);
+    border: none;
+    color: white;
+    padding: 0.8rem 1.2rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.reminders-list-expanded .no-reminders button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+}
 </style>
 
 <script>
@@ -768,5 +1065,118 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeActivityModal();
     }
+});
+
+// Expanded Reminders Functions
+function renderExpandedReminders() {
+    const expandedRemindersList = document.getElementById('expandedRemindersList');
+    
+    if (!expandedRemindersList) return;
+    
+    if (typeof reminders === 'undefined' || reminders.length === 0) {
+        expandedRemindersList.innerHTML = `
+            <div class="no-reminders">
+                <i class="bi bi-bell-slash"></i>
+                <p>No reminders set</p>
+                <button onclick="openReminderModal()">
+                    <i class="bi bi-plus-lg"></i> Add Your First Reminder
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    // Sort reminders by date/time
+    const sortedReminders = reminders.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+    
+    const remindersHTML = sortedReminders.map(reminder => {
+        const reminderDate = new Date(reminder.datetime);
+        const timeAgo = getTimeUntil(reminderDate);
+        const isOverdue = reminderDate < new Date();
+        
+        return `
+            <div class="reminder-item ${reminder.priority} ${isOverdue ? 'overdue' : ''}" 
+                 onclick="editReminderExpanded('${reminder.id}')"
+                 data-reminder-id="${reminder.id}">
+                <div class="reminder-icon">
+                    <i class="bi bi-bell-fill"></i>
+                </div>
+                <div class="reminder-content">
+                    <div class="reminder-title">${reminder.title}</div>
+                    ${reminder.description ? `<div class="reminder-description">${reminder.description}</div>` : ''}
+                    <div class="reminder-time">${formatDateTime(reminderDate)} ${isOverdue ? '(Overdue)' : `(${timeAgo})`}</div>
+                    <div class="reminder-actions" onclick="event.stopPropagation()">
+                        <button class="reminder-action-btn" onclick="completeReminder('${reminder.id}')" title="Mark Complete">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+                        <button class="reminder-action-btn" onclick="editReminderExpanded('${reminder.id}')" title="Edit">
+                            <i class="bi bi-pencil-fill"></i>
+                        </button>
+                        <button class="reminder-action-btn" onclick="deleteReminderExpanded('${reminder.id}')" title="Delete">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    expandedRemindersList.innerHTML = remindersHTML;
+}
+
+function editReminderExpanded(id) {
+    const reminder = reminders.find(r => r.id === id);
+    if (!reminder) return;
+    
+    // Populate form with reminder data
+    document.getElementById('reminderTitle').value = reminder.title;
+    document.getElementById('reminderDescription').value = reminder.description || '';
+    document.getElementById('reminderDate').value = new Date(reminder.datetime).toISOString().split('T')[0];
+    document.getElementById('reminderTime').value = new Date(reminder.datetime).toTimeString().slice(0, 5);
+    document.getElementById('reminderPriority').value = reminder.priority;
+    document.getElementById('reminderCategory').value = reminder.category || 'work';
+    
+    // Store the ID for updating
+    document.getElementById('reminderForm').setAttribute('data-editing-id', id);
+    
+    // Open modal
+    openReminderModal();
+}
+
+function deleteReminderExpanded(id) {
+    if (confirm('Are you sure you want to delete this reminder?')) {
+        if (typeof reminders !== 'undefined') {
+            const index = reminders.findIndex(r => r.id === id);
+            if (index > -1) {
+                reminders.splice(index, 1);
+                if (typeof saveReminders === 'function') {
+                    saveReminders();
+                }
+                renderExpandedReminders();
+                // Also update other reminder displays if they exist
+                if (typeof renderReminders === 'function') {
+                    renderReminders();
+                }
+                if (typeof renderSidebarReminders === 'function') {
+                    renderSidebarReminders();
+                }
+                showToast('Reminder deleted!', 'info');
+            }
+        }
+    }
+}
+
+// Override the existing renderSidebarReminders function to also update expanded view
+const originalRenderSidebarReminders = renderSidebarReminders;
+function renderSidebarReminders() {
+    if (originalRenderSidebarReminders) {
+        originalRenderSidebarReminders.call(this);
+    }
+    renderExpandedReminders();
+}
+
+// Initialize expanded reminders when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    renderExpandedReminders();
 });
 </script> 

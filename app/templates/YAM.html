@@ -8,15 +8,15 @@
     <!-- Welcome Header -->
     {% include 'components/yam/yam_welcome_header.html' %}
 
-    <!-- Main Dashboard Grid - FLIPPED LAYOUT -->
+    <!-- Main Dashboard Grid - Optimized Layout -->
     <div class="dashboard-grid">
-        <!-- Sidebar (now on the left) -->
+        <!-- Sidebar (left side) - Enhanced with Expanded Reminders -->
         <div class="sidebar">
-            <!-- User Profile -->
+            <!-- Enhanced User Profile with Expanded Reminders Above -->
             {% include 'components/yam/yam_user_profile.html' %}
         </div>
 
-        <!-- Main Content (now on the right) -->
+        <!-- Main Content (right side) - Optimized -->
         <div class="yam-main-content">
             <!-- Charts Grid - Side by Side Layout -->
             <div class="charts-grid">
@@ -27,7 +27,7 @@
                 {% include 'components/yam/yam_user_tickets_section.html' %}
             </div>
             
-            <!-- Dashboard Widgets (Reminders & Calendar) -->
+            <!-- Dashboard Widgets - Media Player replaces Calendar -->
             {% include 'components/yam/yam_dashboard_widgets.html' %}
         </div>
     </div>
@@ -49,4 +49,116 @@
 {% include 'components/yam/yam_outage_management_scripts.html' %}
 {% include 'components/yam/yam_widget_scripts.html' %}
 {% include 'components/yam/yam_user_tickets_scripts.html' %}
+
+<style>
+/* YAM Layout Enhancements - Optimized Flow */
+.dashboard-container {
+    gap: 0.8rem; /* Reduced gap for tighter layout */
+}
+
+.dashboard-grid {
+    gap: 0.8rem; /* Reduced gap */
+    min-height: auto; /* Remove fixed height */
+}
+
+.yam-main-content {
+    gap: 0.8rem; /* Reduced gap */
+    height: auto; /* Remove fixed height */
+}
+
+.charts-grid {
+    gap: 0.8rem; /* Reduced gap */
+    margin-bottom: 0.8rem; /* Reduced margin */
+}
+
+/* Responsive optimizations */
+@media (max-width: 1200px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 0.6rem;
+    }
+    
+    .sidebar {
+        order: -1; /* Keep reminders at top on mobile */
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+        gap: 0.6rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        gap: 0.5rem;
+        padding: 0.5rem;
+    }
+    
+    .dashboard-grid {
+        gap: 0.5rem;
+    }
+    
+    .yam-main-content {
+        gap: 0.5rem;
+    }
+    
+    .charts-grid {
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+}
+</style>
+
+<script>
+// Enhanced YAM Dashboard Initialization
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('YAM Dashboard Enhanced - Loaded');
+    
+    // Initialize all components
+    if (typeof loadReminders === 'function') {
+        loadReminders();
+    }
+    
+    if (typeof loadCalendarEvents === 'function') {
+        loadCalendarEvents();
+    }
+    
+    if (typeof renderCalendar === 'function') {
+        renderCalendar();
+    }
+    
+    if (typeof renderExpandedReminders === 'function') {
+        renderExpandedReminders();
+    }
+    
+    // Add smooth scroll behavior
+    document.documentElement.style.scrollBehavior = 'smooth';
+    
+    // Show welcome message
+    setTimeout(() => {
+        if (typeof showToast === 'function') {
+            showToast('Welcome to your enhanced YAM Dashboard!', 'success');
+        }
+    }, 1000);
+});
+
+// Enhanced calendar modal opening from reminders widget
+function openCalendarModal() {
+    const modal = document.getElementById('calendarModal');
+    if (modal) {
+        modal.classList.add('show');
+        // Ensure calendar is rendered when modal opens
+        if (typeof renderCalendar === 'function') {
+            renderCalendar();
+        }
+    }
+}
+
+function closeCalendarModal() {
+    const modal = document.getElementById('calendarModal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
+}
+</script>
 {% endblock %}
