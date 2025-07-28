@@ -34,7 +34,7 @@ class SuggestionsModule {
             { text: '👥 Search Users', icon: 'bi bi-person', subtitle: 'Find people & profiles', type: 'text' },
             { text: '🏢 Search Offices', icon: 'bi bi-building', subtitle: 'Find office locations', type: 'text' },
             { text: '💻 Search Workstations', icon: 'bi bi-laptop', subtitle: 'Find devices & computers', type: 'text' },
-            { text: '📚 Search Knowledge Base', icon: 'bi bi-journal-text', subtitle: 'Find guides & articles', type: 'text' },
+            { text: '📚 Search KB', icon: 'bi bi-journal-text', subtitle: 'Find guides & articles', type: 'text' },
             { text: '⚠️ Check Outages', icon: 'bi bi-exclamation-triangle', subtitle: 'System status & alerts', type: 'text' }
         ];
     }
@@ -265,15 +265,6 @@ class SuggestionsModule {
                                     text: suggestion.display_text,
                                     icon: 'bi bi-person-circle',
                                     subtitle: suggestion.subtitle,
-                                    type: 'clock_id',
-                                    data: { clock_id: suggestion.clock_id }
-                                });
-                                
-                                // Add secondary option for full profile
-                                suggestions.clockSuggestions.push({
-                                    text: `View ${suggestion.full_name}'s full profile`,
-                                    icon: 'bi bi-person-badge',
-                                    subtitle: 'Complete user information',
                                     type: 'clock_id',
                                     data: { clock_id: suggestion.clock_id }
                                 });
@@ -519,14 +510,14 @@ class SuggestionsModule {
                     displayText = displayText.replace('FIND USER', '👤 Find User');
                 } else if (displayText.includes('View') && displayText.includes('full profile')) {
                     displayText = displayText.replace('View ', '📋 View ');
-                    displaySubtitle = 'Complete user profile & details';
+                    displaySubtitle = 'User profile & details';
                 } else if (displayText.includes('Find user')) {
                     displayText = displayText.replace('Find user', '🔍 Find User');
-                    displaySubtitle = 'Lookup user by Clock ID';
+                    displaySubtitle = 'Lookup by Clock ID';
                 }
                 
                 html += `
-                    <div class="suggestion-item" onclick="window.bannerSearchInstance.selectSuggestion('${suggestion.text}', '${suggestion.type}', ${JSON.stringify(suggestion.data)})">
+                    <div class="suggestion-item" onclick="window.handleSuggestionClick('${suggestion.text}', '${suggestion.type}', ${JSON.stringify(suggestion.data)})">
                         <div class="suggestion-icon">
                             <i class="${suggestion.icon}"></i>
                         </div>
@@ -559,7 +550,7 @@ class SuggestionsModule {
                 }
                 
                 html += `
-                    <div class="suggestion-item" onclick="window.bannerSearchInstance.selectSuggestion('${office.text}', '${office.type}', ${JSON.stringify(office.data)})">
+                    <div class="suggestion-item" onclick="window.handleSuggestionClick('${office.text}', '${office.type}', ${JSON.stringify(office.data)})">
                         <div class="suggestion-icon">
                             <i class="${office.icon}"></i>
                         </div>
@@ -592,7 +583,7 @@ class SuggestionsModule {
                 }
                 
                 html += `
-                    <div class="suggestion-item" onclick="window.bannerSearchInstance.selectSuggestion('${ws.text}', '${ws.type}', ${JSON.stringify(ws.data)})">
+                    <div class="suggestion-item" onclick="window.handleSuggestionClick('${ws.text}', '${ws.type}', ${JSON.stringify(ws.data)})">
                         <div class="suggestion-icon">
                             <i class="${ws.icon}"></i>
                         </div>
@@ -629,7 +620,7 @@ class SuggestionsModule {
                 }
                 
                 html += `
-                    <div class="suggestion-item" onclick="window.bannerSearchInstance.selectSuggestion('${suggestion}', 'text')">
+                    <div class="suggestion-item" onclick="window.handleSuggestionClick('${suggestion}', 'text')">
                         <div class="suggestion-icon">
                             <i class="bi bi-clock-history"></i>
                         </div>
@@ -670,7 +661,7 @@ class SuggestionsModule {
                 }
                 
                 html += `
-                    <div class="suggestion-item" onclick="window.bannerSearchInstance.selectSuggestion('${suggestion.text}', '${suggestion.type}')">
+                    <div class="suggestion-item" onclick="window.handleSuggestionClick('${suggestion.text}', '${suggestion.type}')">
                         <div class="suggestion-icon">
                             <i class="${suggestion.icon}"></i>
                         </div>
@@ -703,7 +694,7 @@ class SuggestionsModule {
                 }
                 
                 html += `
-                    <div class="suggestion-item" onclick="window.bannerSearchInstance.selectSuggestion('${result.text}', '${result.type}', ${JSON.stringify(result.data)})">
+                    <div class="suggestion-item" onclick="window.handleSuggestionClick('${result.text}', '${result.type}', ${JSON.stringify(result.data)})">
                         <div class="suggestion-icon">
                             <i class="${result.icon}"></i>
                         </div>
@@ -724,13 +715,13 @@ class SuggestionsModule {
         if (hasSuggestions && this.coreModule.currentQuery && this.coreModule.currentQuery.trim()) {
             html += `
                 <div class="suggestion-category">
-                    <div class="suggestion-item suggestion-viewall" onclick="window.bannerSearchInstance.selectSuggestion('view_all', 'view_all')">
+                    <div class="suggestion-item suggestion-viewall" onclick="window.handleSuggestionClick('view_all', 'view_all')">
                         <div class="suggestion-icon">
                             <i class="bi bi-search"></i>
                         </div>
                         <div class="suggestion-content">
-                            <div class="suggestion-text">🔍 View All Results for "${this.coreModule.currentQuery}"</div>
-                            <div class="suggestion-subtitle">Complete search results & more options</div>
+                            <div class="suggestion-text">🔍 Search All</div>
+                            <div class="suggestion-subtitle">Complete results & options</div>
                         </div>
                         <div class="suggestion-action">
                             <i class="bi bi-arrow-right"></i>
@@ -751,45 +742,69 @@ class SuggestionsModule {
     
     // Handle suggestion selection
     selectSuggestion(suggestion, type = 'text', data = {}) {
-        console.log('selectSuggestion called:', { suggestion, type, data });
+        console.log('SuggestionsModule.selectSuggestion called:', { suggestion, type, data });
         
-        if (type === 'view_all') {
-            this.viewAllResults();
-            return;
-        }
-        
-        if (type === 'clock_id') {
-            const cid = (data.clock_id || suggestion).toString().replace(/\D/g, '').padStart(5, '0');
-            console.log('Clock ID lookup:', cid);
-            if (cid) {
-                this.lookupClockId(cid);
+        try {
+            if (type === 'view_all') {
+                this.viewAllResults();
+                return;
             }
-            return;
-        } else if (type === 'office' && data) {
-            // Show office detail modal
-            console.log('Office detail:', data);
-            if (window.showBannerSearchDetail) {
-                window.showBannerSearchDetail('office', data['Internal Name'] || data.name || suggestion);
+            
+            if (type === 'clock_id') {
+                console.log('Handling clock_id suggestion:', { suggestion, data });
+                const cid = (data.clock_id || suggestion).toString().replace(/\D/g, '').padStart(5, '0');
+                console.log('Extracted clock ID:', cid);
+                
+                if (cid) {
+                    // Use the new sidebar modal for instant display
+                    if (typeof window.showSidebarUserModal === 'function') {
+                        console.log('Calling window.showSidebarUserModal with clockId:', cid);
+                        window.showSidebarUserModal(cid, data.user_data);
+                    } else {
+                        console.error('window.showSidebarUserModal not available, falling back to lookupClockId');
+                        this.lookupClockId(cid);
+                    }
+                } else {
+                    console.error('Invalid clock ID extracted:', { suggestion, data });
+                }
+                return;
+            } else if (type === 'office' && data) {
+                // Show office detail modal
+                console.log('Office detail:', data);
+                if (window.showBannerSearchDetail) {
+                    window.showBannerSearchDetail('office', data['Internal Name'] || data.name || suggestion);
+                }
+                return;
+            } else if (type === 'workstation' && data) {
+                // Show workstation detail modal
+                console.log('Workstation detail:', data);
+                if (window.showBannerSearchDetail) {
+                    window.showBannerSearchDetail('workstation', data.name || suggestion);
+                }
+                return;
+            } else if (type === 'result' && data && data.url) {
+                // Handle search results with URLs
+                console.log('Search result:', data);
+                window.location.href = data.url;
+                return;
+            } else {
+                // Handle text-based suggestions
+                console.log('Text-based suggestion:', suggestion);
+                this.coreModule.searchInput.value = suggestion;
+                this.coreModule.currentQuery = suggestion;
+                this.coreModule.performSearch(suggestion);
             }
-            return;
-        } else if (type === 'workstation' && data) {
-            // Show workstation detail modal
-            console.log('Workstation detail:', data);
-            if (window.showBannerSearchDetail) {
-                window.showBannerSearchDetail('workstation', data.name || suggestion);
+        } catch (error) {
+            console.error('Error in selectSuggestion:', error);
+            // Fallback: try to show a simple alert or redirect
+            if (type === 'clock_id') {
+                console.log('Fallback handling for clock_id error');
+                const cid = (data.clock_id || suggestion).toString().replace(/\D/g, '').padStart(5, '0');
+                if (cid) {
+                    console.log('Redirecting to clock ID lookup page:', cid);
+                    window.location.href = `/api/clock-id/lookup/${cid}`;
+                }
             }
-            return;
-        } else if (type === 'result' && data && data.url) {
-            // Handle search results with URLs
-            console.log('Search result:', data);
-            window.location.href = data.url;
-            return;
-        } else {
-            // Handle text-based suggestions
-            console.log('Text-based suggestion:', suggestion);
-            this.coreModule.searchInput.value = suggestion;
-            this.coreModule.currentQuery = suggestion;
-            this.coreModule.performSearch(suggestion);
         }
     }
 
@@ -821,7 +836,9 @@ class SuggestionsModule {
                         personalisedMessage = personalized[Math.floor(Math.random() * personalized.length)];
                         
                         // Show the cached user data immediately
-                        if (window.showClockIdUserModal) {
+                        if (window.showSidebarUserModal) {
+                            window.showSidebarUserModal(normalizedId, cached.user);
+                        } else if (window.showClockIdUserModal) {
                             window.showClockIdUserModal(cached.user);
                         }
                         return;
@@ -842,7 +859,9 @@ class SuggestionsModule {
                 if (fallbackRes.ok) {
                     const data = await fallbackRes.json();
                     if (data.success && data.user) {
-                        if (window.showClockIdUserModal) {
+                        if (window.showSidebarUserModal) {
+                            window.showSidebarUserModal(normalizedId, data.user);
+                        } else if (window.showClockIdUserModal) {
                             window.showClockIdUserModal(data.user);
                         } else {
                             // Fallback if modal function doesn't exist
@@ -923,4 +942,70 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = SuggestionsModule;
 } else {
     window.SuggestionsModule = SuggestionsModule;
+}
+
+// Global function to handle suggestion clicks directly
+window.handleSuggestionClick = function(suggestion, type, data) {
+    console.log('Global handleSuggestionClick called:', { suggestion, type, data });
+    
+    try {
+        if (type === 'clock_id') {
+            console.log('Handling clock_id suggestion:', { suggestion, data });
+            const cid = (data.clock_id || suggestion).toString().replace(/\D/g, '').padStart(5, '0');
+            console.log('Extracted clock ID:', cid);
+            
+            if (cid) {
+                // Set interaction context to validate this is a legitimate user click
+                window.userInteractionContext = true;
+                window.lastSuggestionClickTime = Date.now();
+                
+                if (typeof window.showSidebarUserModal === 'function') {
+                    console.log('Calling window.showSidebarUserModal with clockId:', cid);
+                    window.showSidebarUserModal(cid, data.user_data);
+                } else {
+                    console.error('showSidebarUserModal not available, redirecting to lookup page');
+                    window.location.href = `/api/clock-id/lookup/${cid}`;
+                }
+            } else {
+                console.error('Invalid clock ID extracted:', { suggestion, data });
+            }
+        } else if (type === 'view_all') {
+            if (window.bannerSearchInstance && window.bannerSearchInstance.viewAllResults) {
+                window.bannerSearchInstance.viewAllResults();
+            } else {
+                window.location.href = `/unified_search?q=${encodeURIComponent(suggestion)}`;
+            }
+        } else if (data && data.url) {
+            window.location.href = data.url;
+        } else {
+            // Default to universal search
+            window.location.href = `/unified_search?q=${encodeURIComponent(suggestion)}`;
+        }
+    } catch (error) {
+        console.error('Error in handleSuggestionClick:', error);
+        // Fallback: redirect to universal search
+        window.location.href = `/unified_search?q=${encodeURIComponent(suggestion)}`;
+    }
+};
+
+// Ensure the banner search instance is available globally
+window.ensureBannerSearchInstance = function() {
+    if (!window.bannerSearchInstance) {
+        console.log('Creating fallback banner search instance...');
+        window.bannerSearchInstance = {
+            selectSuggestion: window.handleSuggestionClick,
+            viewAllResults: function() {
+                const query = document.getElementById('bannerSearchInput')?.value || '';
+                window.location.href = `/unified_search?q=${encodeURIComponent(query)}`;
+            }
+        };
+    }
+    return window.bannerSearchInstance;
+};
+
+// Auto-initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', window.ensureBannerSearchInstance);
+} else {
+    window.ensureBannerSearchInstance();
 } 

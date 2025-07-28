@@ -99,6 +99,21 @@ if exist "app\sessions" (
     echo [SUCCESS] App sessions directory cleared
 )
 
+REM Clear any session files in the root directory
+if exist "*.session" (
+    echo [INFO] Removing session files from root directory...
+    del "*.session" >nul 2>&1
+    echo [SUCCESS] Root session files cleared
+)
+
+REM Clear any Flask session files
+if exist "flask_session" (
+    echo [INFO] Removing Flask session directory...
+    rmdir /s /q "flask_session" >nul 2>&1
+    mkdir "flask_session" >nul 2>&1
+    echo [SUCCESS] Flask session directory cleared
+)
+
 REM Clear any shutdown markers
 if exist "server_shutdown_marker.txt" (
     echo [INFO] Removing server shutdown marker...

@@ -1,0 +1,482 @@
+<!-- Sidebar User Profile Modal Component -->
+<div id="sidebarUserModal" class="sidebar-user-modal-overlay" style="display: none !important;">
+    <div class="sidebar-user-modal">
+        <div class="sidebar-user-modal-header">
+            <div class="sidebar-user-modal-avatar">
+                <div class="sidebar-user-avatar-placeholder">
+                    <i class="bi bi-person-circle"></i>
+                </div>
+            </div>
+            <button class="sidebar-user-modal-close" onclick="closeSidebarUserModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-user-modal-content">
+            <div class="sidebar-user-loading">
+                <div class="sidebar-loading-spinner"></div>
+                <p>Loading user information...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Enhanced Sidebar User Profile Modal Functions with better debugging and safeguards
+window.showSidebarUserModal = function(clockId, userData = null) {
+    // Validation: Only show modal if called with a valid clock ID from user interaction
+    if (!clockId || clockId === 'undefined' || clockId === 'null') {
+        console.warn('🚫 showSidebarUserModal called without valid clockId, ignoring:', clockId);
+        return;
+    }
+    
+    // Validation: Ensure this is called from a user interaction, not automatic
+    if (!window.userInteractionContext) {
+        console.warn('🚫 Modal called without user interaction context, this might be automatic - ignoring');
+        // Add a small delay and check if this was a legitimate call
+        setTimeout(() => {
+            if (window.lastSuggestionClickTime && (Date.now() - window.lastSuggestionClickTime) < 2000) {
+                console.log('✅ Late validation passed, showing modal...');
+                showModalInternal(clockId, userData);
+            }
+        }, 100);
+        return;
+    }
+    
+    showModalInternal(clockId, userData);
+};
+
+// Internal function to actually show the modal
+function showModalInternal(clockId, userData = null) {
+    console.log('🚀 showSidebarUserModal called with:', { clockId, userData });
+    
+    const modal = document.getElementById('sidebarUserModal');
+    if (!modal) {
+        console.error('❌ Sidebar user modal not found');
+        alert('Error: User modal not found. Please refresh the page.');
+        return;
+    }
+    
+    console.log('✅ Modal element found, showing modal...');
+    
+    // Force modal to be visible with maximum priority
+    modal.style.cssText = `
+        display: flex !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: rgba(0, 0, 0, 0.85) !important;
+        z-index: 2147483647 !important;
+        align-items: center !important;
+        justify-content: center !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    `;
+    
+    console.log('📱 Modal CSS applied, should be visible now');
+    
+    // Load user data
+    loadSidebarUserData(clockId, userData);
+    
+    // Add click outside to close (remove previous listeners first)
+    const handleOutsideClick = function(e) {
+        if (e.target === modal) {
+            console.log('🖱️ Clicked outside modal, closing...');
+            closeSidebarUserModal();
+        }
+    };
+    
+    // Remove any existing listeners
+    modal.removeEventListener('click', modal._outsideClickHandler);
+    modal._outsideClickHandler = handleOutsideClick;
+    modal.addEventListener('click', handleOutsideClick);
+    
+    // Add escape key to close (remove previous listeners first)
+    const handleEscapeKey = function(e) {
+        if (e.key === 'Escape') {
+            console.log('⌨️ Escape key pressed, closing modal...');
+            closeSidebarUserModal();
+        }
+    };
+    
+    // Remove any existing listeners
+    document.removeEventListener('keydown', modal._escapeKeyHandler);
+    modal._escapeKeyHandler = handleEscapeKey;
+    document.addEventListener('keydown', handleEscapeKey);
+    
+    console.log('🎉 Modal should now be visible and interactive');
+    
+    // Focus trap for accessibility
+    const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (focusableElements.length > 0) {
+        focusableElements[0].focus();
+    }
+}
+
+window.closeSidebarUserModal = function() {
+    console.log('🔴 Closing sidebar user modal...');
+    const modal = document.getElementById('sidebarUserModal');
+    if (modal) {
+        // Force hide with important declarations
+        modal.style.cssText = 'display: none !important;';
+        
+        // Clean up event listeners
+        if (modal._outsideClickHandler) {
+            modal.removeEventListener('click', modal._outsideClickHandler);
+            modal._outsideClickHandler = null;
+        }
+        if (modal._escapeKeyHandler) {
+            document.removeEventListener('keydown', modal._escapeKeyHandler);
+            modal._escapeKeyHandler = null;
+        }
+        
+        // Clear interaction context
+        window.userInteractionContext = false;
+        window.lastSuggestionClickTime = null;
+        
+        console.log('✅ Modal closed and cleaned up');
+    }
+};
+
+async function loadSidebarUserData(clockId, userData = null) {
+    console.log('📊 Loading user data for clock ID:', clockId);
+    const modalContent = document.querySelector('.sidebar-user-modal-content');
+    if (!modalContent) {
+        console.error('❌ Modal content element not found');
+        return;
+    }
+    
+    try {
+        let userInfo = userData;
+        
+        // If no user data provided, fetch from API
+        if (!userInfo) {
+            console.log('🔍 No user data provided, fetching from API...');
+            const normalizedId = clockId.toString().replace(/^0+/, '') || clockId;
+            console.log('🔢 Normalized clock ID:', normalizedId);
+            
+            const response = await fetch(`/api/clock-id/lookup/${normalizedId}`);
+            console.log('📡 API Response status:', response.status);
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log('📋 API Response data:', data);
+                if (data.success && data.user) {
+                    userInfo = data.user;
+                    console.log('✅ User data loaded from API');
+                } else {
+                    throw new Error(data.error || 'User not found in API response');
+                }
+            } else {
+                throw new Error(`API request failed with status: ${response.status}`);
+            }
+        } else {
+            console.log('✅ Using provided user data');
+        }
+        
+        // Create user profile HTML
+        console.log('🎨 Creating user profile HTML...');
+        const profileHTML = createSidebarUserProfileHTML(userInfo);
+        modalContent.innerHTML = profileHTML;
+        
+        // Add event listeners for action buttons
+        addSidebarUserModalEventListeners(userInfo);
+        
+        console.log('🎉 User profile rendered successfully');
+        
+    } catch (error) {
+        console.error('❌ Error loading user profile:', error);
+        modalContent.innerHTML = `
+            <div class="sidebar-user-error" style="padding: 40px; text-align: center; color: #ffffff;">
+                <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: #ff6b6b; margin-bottom: 20px;"></i>
+                <h4 style="color: #ffffff; margin-bottom: 16px;">Error Loading Profile</h4>
+                <p style="color: #cccccc; margin-bottom: 24px;">${error.message || 'Failed to load user information'}</p>
+                <div class="sidebar-user-actions">
+                    <button class="sidebar-action-btn" onclick="closeSidebarUserModal()" style="
+                        background: #6c757d;
+                        color: white;
+                        border: none;
+                        padding: 12px 24px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        transition: background 0.2s ease;
+                    " onmouseover="this.style.background='#5a6268'" onmouseout="this.style.background='#6c757d'">
+                        <i class="bi bi-x-circle"></i>
+                        Close
+                    </button>
+                    <button onclick="location.reload()" style="
+                        background: #007bff;
+                        color: white;
+                        border: none;
+                        padding: 12px 24px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        margin-left: 12px;
+                        transition: background 0.2s ease;
+                    " onmouseover="this.style.background='#0056b3'" onmouseout="this.style.background='#007bff'">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Retry
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function createSidebarUserProfileHTML(user) {
+    const avatarUrl = user.profile_picture ? 
+        `/static/uploads/profile_pictures/${user.profile_picture}` : 
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(user.full_name || user.username)}&background=random&bold=true&size=120`;
+    
+    const locked = user.locked_out === true;
+    const disabled = (user.account_status || '').toString().toLowerCase().includes('disabled');
+    const pwdExpired = user.password_expired === true;
+    
+    const getStatusBadge = (status, type) => {
+        const statusClass = status ? 'sidebar-status-badge-error' : 'sidebar-status-badge-success';
+        const statusText = status ? (type === 'lock' ? 'Locked' : 'Expired') : (type === 'lock' ? 'Unlocked' : 'Valid');
+        return `<span class="sidebar-status-badge ${statusClass}">${statusText}</span>`;
+    };
+    
+    const accountStatus = disabled ? 
+        '<span class="sidebar-status-badge sidebar-status-badge-error">Disabled</span>' : 
+        '<span class="sidebar-status-badge sidebar-status-badge-success">Enabled</span>';
+    
+    const lockStatus = getStatusBadge(locked, 'lock');
+    const passwordStatus = getStatusBadge(pwdExpired, 'password');
+    
+    // Calculate time since password reset
+    function getPasswordResetTimeAgo(dateString) {
+        if (!dateString || dateString === 'N/A') return 'N/A';
+        try {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            if (diffDays === 0) return 'Today';
+            if (diffDays === 1) return '1 day ago';
+            return `${diffDays} days ago`;
+        } catch (e) {
+            return 'N/A';
+        }
+    }
+    
+    const passwordResetDisplay = user.password_last_reset && user.password_last_reset !== 'N/A' 
+        ? `${user.password_last_reset} (${getPasswordResetTimeAgo(user.password_last_reset)})`
+        : 'N/A';
+    
+    return `
+        <div class="sidebar-user-profile">
+            <div class="sidebar-user-header">
+                <img src="${avatarUrl}" alt="Avatar" class="sidebar-user-avatar" />
+                <div class="sidebar-user-info">
+                    <h3 class="sidebar-user-name">${user.full_name || user.username}</h3>
+                    <p class="sidebar-user-role">${user.role || user.title || 'User'}</p>
+                    <p class="sidebar-user-clock-id">Clock ID: ${user.clock_id || 'N/A'}</p>
+                </div>
+            </div>
+            
+            <div class="sidebar-user-sections">
+                <div class="sidebar-user-section">
+                    <h4 class="sidebar-section-title">
+                        <i class="bi bi-person-lines-fill"></i>
+                        Contact Information
+                    </h4>
+                    <div class="sidebar-info-grid">
+                        <div class="sidebar-info-item">
+                            <span class="sidebar-info-label">Email</span>
+                            <span class="sidebar-info-value">
+                                <a href="mailto:${user.email}" class="sidebar-link">${user.email || 'N/A'}</a>
+                            </span>
+                        </div>
+                        ${user.phone ? `
+                        <div class="sidebar-info-item">
+                            <span class="sidebar-info-label">Phone</span>
+                            <span class="sidebar-info-value">
+                                <a href="tel:${user.phone}" class="sidebar-link">${user.phone}</a>
+                            </span>
+                        </div>
+                        ` : ''}
+                        ${user.department ? `
+                        <div class="sidebar-info-item">
+                            <span class="sidebar-info-label">Department</span>
+                            <span class="sidebar-info-value">${user.department}</span>
+                        </div>
+                        ` : ''}
+                        ${user.title ? `
+                        <div class="sidebar-info-item">
+                            <span class="sidebar-info-label">Job Title</span>
+                            <span class="sidebar-info-value">${user.title}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                <div class="sidebar-user-section">
+                    <h4 class="sidebar-section-title">
+                        <i class="bi bi-shield-check"></i>
+                        Account Status
+                    </h4>
+                    <div class="sidebar-info-grid">
+                        <div class="sidebar-info-item">
+                            <span class="sidebar-info-label">Account</span>
+                            <span class="sidebar-info-value">${accountStatus}</span>
+                        </div>
+                        <div class="sidebar-info-item">
+                            <span class="sidebar-info-label">Lock Status</span>
+                            <span class="sidebar-info-value">${lockStatus}</span>
+                        </div>
+                        <div class="sidebar-info-item">
+                            <span class="sidebar-info-label">Password</span>
+                            <span class="sidebar-info-value">${passwordStatus}</span>
+                        </div>
+                        <div class="sidebar-info-item">
+                            <span class="sidebar-info-label">Bad Logon Count</span>
+                            <span class="sidebar-info-value">${user.bad_logon_count || '0'}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-user-section">
+                    <h4 class="sidebar-section-title">
+                        <i class="bi bi-key-fill"></i>
+                        Password Information
+                    </h4>
+                    <div class="sidebar-info-grid">
+                        <div class="sidebar-info-item">
+                            <span class="sidebar-info-label">Last Reset</span>
+                            <span class="sidebar-info-value">${passwordResetDisplay}</span>
+                        </div>
+                        ${user.password_expiration_date ? `
+                        <div class="sidebar-info-item">
+                            <span class="sidebar-info-label">Expires</span>
+                            <span class="sidebar-info-value">${user.password_expiration_date}</span>
+                        </div>
+                        ` : ''}
+                        ${user.mfa_status ? `
+                        <div class="sidebar-info-item">
+                            <span class="sidebar-info-label">MFA Status</span>
+                            <span class="sidebar-info-value">${user.mfa_status}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+                
+                ${user.epic_status || user.epic_block || user.email_license || user.immutable_id ? `
+                <div class="sidebar-user-section">
+                    <h4 class="sidebar-section-title">
+                        <i class="bi bi-info-circle-fill"></i>
+                        Additional Information
+                    </h4>
+                    <div class="sidebar-info-grid">
+                        ${user.epic_status ? `
+                        <div class="sidebar-info-item">
+                            <span class="sidebar-info-label">Epic Status</span>
+                            <span class="sidebar-info-value">${user.epic_status}</span>
+                        </div>
+                        ` : ''}
+                        ${user.epic_block ? `
+                        <div class="sidebar-info-item">
+                            <span class="sidebar-info-label">Epic Block</span>
+                            <span class="sidebar-info-value">${user.epic_block}</span>
+                        </div>
+                        ` : ''}
+                        ${user.email_license ? `
+                        <div class="sidebar-info-item">
+                            <span class="sidebar-info-label">Email License</span>
+                            <span class="sidebar-info-value">${user.email_license}</span>
+                        </div>
+                        ` : ''}
+                        ${user.immutable_id ? `
+                        <div class="sidebar-info-item">
+                            <span class="sidebar-info-label">Immutable ID</span>
+                            <span class="sidebar-info-value sidebar-monospace">${user.immutable_id}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+            
+            <div class="sidebar-user-actions">
+                <button class="sidebar-action-btn sidebar-action-primary" onclick="createTicketForUser('${user.username}', '${user.email}', '${user.full_name || user.username}')">
+                    <i class="bi bi-ticket-detailed"></i>
+                    Create Ticket
+                </button>
+                <button class="sidebar-action-btn sidebar-action-warning" onclick="resetPasswordForUser('${user.username}', '${user.email}', '${user.full_name || user.username}')">
+                    <i class="bi bi-key"></i>
+                    Reset Password
+                </button>
+                <button class="sidebar-action-btn sidebar-action-secondary" onclick="viewUserDetails('${user.username}')">
+                    <i class="bi bi-person-gear"></i>
+                    View Details
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function addSidebarUserModalEventListeners(user) {
+    // Event listeners will be added here if needed
+    console.log('User modal event listeners added for:', user.username);
+}
+
+// Service Desk Action Functions
+window.createTicketForUser = function(username, email, fullName) {
+    // Create ticket functionality
+    console.log('Creating ticket for:', { username, email, fullName });
+    
+    // You can implement ticket creation logic here
+    // For now, we'll show a simple alert
+    alert(`Creating ticket for ${fullName} (${username})`);
+    
+    // Close modal after action
+    closeSidebarUserModal();
+};
+
+window.resetPasswordForUser = function(username, email, fullName) {
+    // Password reset functionality
+    console.log('Resetting password for:', { username, email, fullName });
+    
+    // You can implement password reset logic here
+    // For now, we'll show a simple alert
+    alert(`Resetting password for ${fullName} (${username})`);
+    
+    // Close modal after action
+    closeSidebarUserModal();
+};
+
+window.viewUserDetails = function(username) {
+    // View detailed user information
+    console.log('Viewing details for:', username);
+    
+    // Navigate to user details page or open detailed modal
+    window.open(`/users?search=${encodeURIComponent(username)}`, '_blank');
+    
+    // Close modal after action
+    closeSidebarUserModal();
+};
+
+// Initialize modal state and interaction context on page load
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🏁 Initializing sidebar user modal...');
+    
+    // Ensure modal is hidden on page load
+    const modal = document.getElementById('sidebarUserModal');
+    if (modal) {
+        modal.style.cssText = 'display: none !important;';
+        console.log('✅ Modal ensured to be hidden on page load');
+    }
+    
+    // Clear any interaction context
+    window.userInteractionContext = false;
+    window.lastSuggestionClickTime = null;
+    
+    console.log('🎯 Modal initialization complete');
+});
+</script> 

@@ -13,8 +13,13 @@ class UserProfileModule {
         this.coreModule.hideSuggestions();
         this.coreModule.hideResults();
         
-        // Show beautiful user profile modal
-        this.showUserProfileModal(clockId, userData);
+        // Use the existing sidebar user modal
+        if (window.showSidebarUserModal) {
+            window.showSidebarUserModal(clockId, userData);
+        } else {
+            // Fallback to creating a new modal if sidebar modal is not available
+            this.showUserProfileModal(clockId, userData);
+        }
     }
     
     showUserProfileModal(clockId, userData = null) {

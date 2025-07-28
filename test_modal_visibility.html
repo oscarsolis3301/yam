@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Visibility Test</title>
+    <style>
+        /* Modal CSS from the actual application */
+        .sidebar-user-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .sidebar-user-modal {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .sidebar-user-modal-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .sidebar-user-modal-avatar {
+            margin-right: 15px;
+        }
+
+        .sidebar-user-avatar-placeholder {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #666;
+        }
+
+        .sidebar-user-modal-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #666;
+            padding: 5px;
+        }
+
+        .sidebar-user-modal-close:hover {
+            color: #333;
+        }
+
+        .sidebar-user-modal-content {
+            padding: 20px;
+        }
+
+        .sidebar-user-loading {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .sidebar-loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Test page styles */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Modal Visibility Test</h1>
+        
+        <h3>Test Buttons</h3>
+        <button class="test-button" onclick="testModalShow()">Show Modal</button>
+        <button class="test-button" onclick="testModalHide()">Hide Modal</button>
+        <button class="test-button" onclick="testModalFunction()">Test Modal Function</button>
+        <button class="test-button" onclick="checkModalElement()">Check Modal Element</button>
+        
+        <h3>Test Results</h3>
+        <div id="results"></div>
+    </div>
+
+    <!-- Modal HTML -->
+    <div id="sidebarUserModal" class="sidebar-user-modal-overlay">
+        <div class="sidebar-user-modal">
+            <div class="sidebar-user-modal-header">
+                <div class="sidebar-user-modal-avatar">
+                    <div class="sidebar-user-avatar-placeholder">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                </div>
+                <button class="sidebar-user-modal-close" onclick="closeSidebarUserModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            
+            <div class="sidebar-user-modal-content">
+                <div class="sidebar-user-loading">
+                    <div class="sidebar-loading-spinner"></div>
+                    <p>Loading user information...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.style.cssText = `
+                padding: 10px;
+                margin: 5px 0;
+                border-radius: 4px;
+                background: ${type === 'error' ? '#f8d7da' : type === 'success' ? '#d4edda' : '#d1ecf1'};
+                color: ${type === 'error' ? '#721c24' : type === 'success' ? '#155724' : '#0c5460'};
+                border: 1px solid ${type === 'error' ? '#f5c6cb' : type === 'success' ? '#c3e6cb' : '#bee5eb'};
+            `;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        function testModalShow() {
+            const modal = document.getElementById('sidebarUserModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                addResult('Modal should now be visible', 'success');
+            } else {
+                addResult('Modal element not found', 'error');
+            }
+        }
+
+        function testModalHide() {
+            const modal = document.getElementById('sidebarUserModal');
+            if (modal) {
+                modal.style.display = 'none';
+                addResult('Modal should now be hidden', 'success');
+            } else {
+                addResult('Modal element not found', 'error');
+            }
+        }
+
+        function testModalFunction() {
+            if (typeof window.showSidebarUserModal === 'function') {
+                window.showSidebarUserModal('12345');
+                addResult('Modal function called successfully', 'success');
+            } else {
+                addResult('Modal function not available', 'error');
+            }
+        }
+
+        function checkModalElement() {
+            const modal = document.getElementById('sidebarUserModal');
+            if (modal) {
+                const computedStyle = window.getComputedStyle(modal);
+                addResult(`Modal element found. Display: ${computedStyle.display}, Z-index: ${computedStyle.zIndex}`, 'info');
+            } else {
+                addResult('Modal element not found', 'error');
+            }
+        }
+
+        // Modal functions
+        window.showSidebarUserModal = function(clockId, userData = null) {
+            console.log('showSidebarUserModal called with:', { clockId, userData });
+            
+            const modal = document.getElementById('sidebarUserModal');
+            if (!modal) {
+                console.error('Sidebar user modal not found');
+                addResult('Modal element not found', 'error');
+                return;
+            }
+            
+            console.log('Modal element found, showing modal...');
+            
+            // Show modal immediately
+            modal.style.display = 'flex';
+            
+            // Add click outside to close
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeSidebarUserModal();
+                }
+            });
+            
+            // Add escape key to close
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeSidebarUserModal();
+                }
+            });
+            
+            console.log('Modal should now be visible');
+            addResult(`Modal opened for Clock ID: ${clockId}`, 'success');
+        };
+
+        window.closeSidebarUserModal = function() {
+            const modal = document.getElementById('sidebarUserModal');
+            if (modal) {
+                modal.style.display = 'none';
+                addResult('Modal closed', 'info');
+            }
+        };
+
+        // Auto-check on page load
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                checkModalElement();
+            }, 100);
+        });
+    </script>
+</body>
+</html> 

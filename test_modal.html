@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Modal Functionality Test</h1>
+        
+        <div class="test-section">
+            <h3>Test 1: Direct Modal Call</h3>
+            <p>Test if the sidebar user modal can be called directly:</p>
+            <button class="test-button" onclick="testDirectModal()">Test Direct Modal (Clock ID: 12345)</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test 2: Banner Search Simulation</h3>
+            <p>Simulate clicking on a user suggestion from banner search:</p>
+            <button class="test-button" onclick="testBannerSearchClick()">Simulate Banner Search Click</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test 3: Check Modal Availability</h3>
+            <p>Check if the modal functions are available:</p>
+            <button class="test-button" onclick="checkModalAvailability()">Check Modal Functions</button>
+            <div id="availability-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test 4: API Test</h3>
+            <p>Test the clock ID API directly:</p>
+            <button class="test-button" onclick="testAPI()">Test Clock ID API</button>
+            <div id="api-result"></div>
+        </div>
+    </div>
+
+    <script>
+        function testDirectModal() {
+            console.log('Testing direct modal call...');
+            if (window.showSidebarUserModal) {
+                console.log('showSidebarUserModal function found, calling it...');
+                window.showSidebarUserModal('12345');
+            } else {
+                console.error('showSidebarUserModal function not found');
+                alert('showSidebarUserModal function not found!');
+            }
+        }
+        
+        function testBannerSearchClick() {
+            console.log('Simulating banner search click...');
+            
+            // Simulate a suggestion object like what would be passed from banner search
+            const suggestion = {
+                text: "John Doe (12345)",
+                icon: "bi bi-person-circle",
+                subtitle: "View user profile",
+                type: "clock_id",
+                data: { 
+                    clock_id: "12345",
+                    user_data: {
+                        clock_id: "12345",
+                        full_name: "John Doe",
+                        username: "johndoe",
+                        email: "john.doe@company.com"
+                    }
+                }
+            };
+            
+            // Simulate the handleSuggestionClick function
+            if (window.bannerSearchInstance && window.bannerSearchInstance.handleSuggestionClick) {
+                window.bannerSearchInstance.handleSuggestionClick(suggestion);
+            } else {
+                console.log('Banner search instance not found, trying direct modal call...');
+                if (window.showSidebarUserModal) {
+                    window.showSidebarUserModal('12345', suggestion.data.user_data);
+                } else {
+                    alert('Neither banner search instance nor modal function found!');
+                }
+            }
+        }
+        
+        function checkModalAvailability() {
+            const result = document.getElementById('availability-result');
+            const checks = [];
+            
+            checks.push(`showSidebarUserModal: ${typeof window.showSidebarUserModal}`);
+            checks.push(`closeSidebarUserModal: ${typeof window.closeSidebarUserModal}`);
+            checks.push(`sidebarUserModal element: ${document.getElementById('sidebarUserModal') ? 'Found' : 'Not found'}`);
+            checks.push(`bannerSearchInstance: ${typeof window.bannerSearchInstance}`);
+            
+            result.innerHTML = '<pre>' + checks.join('\n') + '</pre>';
+            console.log('Modal availability check:', checks);
+        }
+        
+        async function testAPI() {
+            const result = document.getElementById('api-result');
+            result.innerHTML = 'Testing API...';
+            
+            try {
+                const response = await fetch('/api/clock-id/suggestions?q=12345');
+                const data = await response.json();
+                result.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                console.log('API test result:', data);
+            } catch (error) {
+                result.innerHTML = '<pre>Error: ' + error.message + '</pre>';
+                console.error('API test error:', error);
+            }
+        }
+        
+        // Check availability on page load
+        window.addEventListener('load', function() {
+            console.log('Page loaded, checking modal availability...');
+            checkModalAvailability();
+        });
+    </script>
+</body>
+</html> 

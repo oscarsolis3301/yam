@@ -51,7 +51,7 @@ yam_app = Flask(__name__,
 yam_app.config['SECRET_KEY'] = 'server-key-2025'
 yam_app.config['JSON_AS_ASCII'] = False
 yam_app.config['SESSION_TYPE'] = 'filesystem'
-yam_app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)  # 30 minutes as requested
+yam_app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=2)  # 2 hours for better stability
 yam_app.config['SESSION_FILE_THRESHOLD'] = 1000
 yam_app.config['SESSION_REFRESH_EACH_REQUEST'] = True
 yam_app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -84,8 +84,56 @@ from app.models import User
 
 yam_app.config.from_object(Config)
 
-# Override session lifetime to 2 hours for better stability
-yam_app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=2)
+# Ensure session lifetime is set correctly
+if yam_app.config.get('PERMANENT_SESSION_LIFETIME') != timedelta(hours=2):
+    yam_app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=2)
+
+# Add debug route for session testing
+@yam_app.route('/debug/session')
+def debug_session():
+    """Debug route to check session state."""
+    return jsonify({
+        'session_data': dict(session),
+        'user_authenticated': current_user.is_authenticated if current_user else False,
+        'user_id': current_user.get_id() if current_user and current_user.is_authenticated else None,
+        'session_permanent': session.permanent,
+        'session_modified': session.modified,
+        'session_lifetime': str(yam_app.config.get('PERMANENT_SESSION_LIFETIME')),
+        'session_dir': yam_app.config.get('SESSION_FILE_DIR'),
+        'server_startup_time': yam_app.config.get('SERVER_STARTUP_TIME').isoformat() if yam_app.config.get('SERVER_STARTUP_TIME') else None
+    })
+
+# Add test login route
+@yam_app.route('/test-login')
+def test_login():
+    """Test route to simulate login and check redirect."""
+    try:
+        from flask_login import login_user
+        from app.models import User
+        
+        # Find admin user
+        user = User.query.filter_by(username='admin').first()
+        if not user:
+            return jsonify({'error': 'Admin user not found'}), 404
+        
+        # Login user
+        login_user(user, remember=True)
+        
+        # Hydrate session
+        session.permanent = True
+        session['user_id'] = user.id
+        session['username'] = user.username
+        session['last_activity'] = datetime.utcnow().isoformat()
+        session.modified = True
+        
+        return jsonify({
+            'success': True,
+            'user': user.username,
+            'session_data': dict(session),
+            'redirect_url': url_for('main.index')
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # Initialize extensions
 db.init_app(yam_app)
@@ -357,9 +405,9 @@ def check_session_health():
         if isinstance(last_activity, str):
             last_activity = datetime.fromisoformat(last_activity.replace('Z', '+00:00'))
         
-        # Check if session is within 30 minutes (as requested)
+        # Check if session is within 2 hours
         time_diff = datetime.utcnow() - last_activity
-        if time_diff > timedelta(minutes=30):
+        if time_diff > timedelta(hours=2):
             logger.warning(f"Session expired for user {session.get('user_id')}")
             return False
         
@@ -409,7 +457,7 @@ def cleanup_stale_sessions():
                 try:
                     # Check file modification time
                     file_mtime = datetime.fromtimestamp(session_file.stat().st_mtime)
-                    if current_time - file_mtime > timedelta(minutes=30):
+                    if current_time - file_mtime > timedelta(hours=2):
                         session_file.unlink()
                         logger.debug(f"Cleaned up stale session file: {session_file.name}")
                 except Exception as e:
@@ -810,6 +858,10 @@ def service_worker():
 def before_request_handler():
     """Handle session management before each request."""
     try:
+        # Skip session checks for login-related routes to prevent redirect loops
+        if request.endpoint in ['auth.login', 'static'] or request.path.startswith('/static/'):
+            return
+        
         # Check if server has restarted (session created before server startup)
         if session.get('user_id'):
             session_startup_time = session.get('server_startup_time')

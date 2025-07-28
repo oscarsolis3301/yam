@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Modal Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: #1a1a1a;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            padding: 20px;
+        }
+        
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 30px;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+        }
+        
+        .suggestion-item {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .suggestion-item:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateX(5px);
+        }
+        
+        .suggestion-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .suggestion-content {
+            flex: 1;
+        }
+        
+        .suggestion-text {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .suggestion-subtitle {
+            color: #ccc;
+            font-size: 14px;
+        }
+        
+        /* Sidebar User Modal Styles */
+        .sidebar-user-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 99999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .sidebar-user-modal {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .sidebar-user-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 24px 0 24px;
+            position: relative;
+        }
+
+        .sidebar-user-modal-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-user-avatar-placeholder {
+            color: white;
+            font-size: 2rem;
+        }
+
+        .sidebar-user-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0, 0, 0, 0.1);
+            color: #666;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-user-modal-close:hover {
+            background: rgba(0, 0, 0, 0.2);
+            color: #333;
+            transform: scale(1.1);
+        }
+
+        .sidebar-user-modal-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 24px 24px 24px;
+        }
+
+        .sidebar-user-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .sidebar-loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: sidebar-spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes sidebar-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .sidebar-user-loading p {
+            color: #666;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .sidebar-user-profile {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .sidebar-user-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-user-info {
+            flex: 1;
+        }
+
+        .sidebar-user-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin: 0 0 4px 0;
+            line-height: 1.2;
+        }
+
+        .sidebar-user-role {
+            font-size: 1rem;
+            color: #666;
+            margin: 0 0 4px 0;
+            font-weight: 500;
+        }
+
+        .sidebar-user-clock-id {
+            font-size: 0.9rem;
+            color: #888;
+            margin: 0;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+
+        .sidebar-user-actions {
+            display: flex;
+            gap: 12px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1><i class="bi bi-person-circle"></i> Simple Modal Test</h1>
+        <p>This page tests the user lookup modal functionality.</p>
+        
+        <h3>Test Buttons</h3>
+        <button class="test-button" onclick="testDirectModal()">
+            <i class="bi bi-person-circle"></i> Test Direct Modal
+        </button>
+        
+        <button class="test-button" onclick="testGlobalFunction()">
+            <i class="bi bi-gear"></i> Test Global Function
+        </button>
+        
+        <h3>Mock Banner Search Suggestions</h3>
+        <p>Click on these suggestions to test the modal functionality:</p>
+        
+        <div class="suggestion-item" onclick="testSuggestionClick('John Doe (12345)', 'clock_id', { clock_id: '12345', user_data: { clock_id: '12345', full_name: 'John Doe', username: 'johndoe', email: 'john.doe@company.com' } })">
+            <div class="suggestion-icon">
+                <i class="bi bi-person-circle"></i>
+            </div>
+            <div class="suggestion-content">
+                <div class="suggestion-text">John Doe (12345)</div>
+                <div class="suggestion-subtitle">View user profile</div>
+            </div>
+        </div>
+        
+        <div class="suggestion-item" onclick="testSuggestionClick('Jane Smith (67890)', 'clock_id', { clock_id: '67890', user_data: { clock_id: '67890', full_name: 'Jane Smith', username: 'janesmith', email: 'jane.smith@company.com' } })">
+            <div class="suggestion-icon">
+                <i class="bi bi-person-circle"></i>
+            </div>
+            <div class="suggestion-content">
+                <div class="suggestion-text">Jane Smith (67890)</div>
+                <div class="suggestion-subtitle">View user profile</div>
+            </div>
+        </div>
+        
+        <div class="suggestion-item" onclick="testSuggestionClick('Bob Wilson (11111)', 'clock_id', { clock_id: '11111' })">
+            <div class="suggestion-icon">
+                <i class="bi bi-person-badge"></i>
+            </div>
+            <div class="suggestion-content">
+                <div class="suggestion-text">Bob Wilson (11111)</div>
+                <div class="suggestion-subtitle">Find user by Clock ID</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include the sidebar user modal -->
+    <div id="sidebarUserModal" class="sidebar-user-modal-overlay" style="display: none;">
+        <div class="sidebar-user-modal">
+            <div class="sidebar-user-modal-header">
+                <div class="sidebar-user-modal-avatar">
+                    <div class="sidebar-user-avatar-placeholder">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                </div>
+                <button class="sidebar-user-modal-close" onclick="closeSidebarUserModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            
+            <div class="sidebar-user-modal-content">
+                <div class="sidebar-user-loading">
+                    <div class="sidebar-loading-spinner"></div>
+                    <p>Loading user information...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test functions
+        function testDirectModal() {
+            console.log('Testing direct modal call...');
+            if (window.showSidebarUserModal) {
+                window.showSidebarUserModal('12345');
+                console.log('Direct modal call successful');
+            } else {
+                console.error('showSidebarUserModal function not found');
+                alert('showSidebarUserModal function not found!');
+            }
+        }
+
+        function testGlobalFunction() {
+            console.log('Testing global function availability...');
+            if (typeof window.handleSuggestionClick === 'function') {
+                console.log('Global function is available');
+                alert('Global function is available!');
+            } else {
+                console.error('Global function is NOT available');
+                alert('Global function is NOT available!');
+            }
+        }
+
+        function testSuggestionClick(suggestion, type, data) {
+            console.log(`Testing suggestion click: ${suggestion} (${type})`);
+            
+            if (window.handleSuggestionClick) {
+                try {
+                    window.handleSuggestionClick(suggestion, type, data);
+                    console.log(`Suggestion click handled: ${suggestion}`);
+                } catch (error) {
+                    console.error(`Error handling suggestion click: ${error.message}`);
+                    alert(`Error: ${error.message}`);
+                }
+            } else {
+                console.error('handleSuggestionClick function not available');
+                alert('handleSuggestionClick function not available!');
+            }
+        }
+
+        // Modal functions
+        window.showSidebarUserModal = function(clockId, userData = null) {
+            console.log(`showSidebarUserModal called with: ${clockId}`);
+            
+            const modal = document.getElementById('sidebarUserModal');
+            if (!modal) {
+                console.error('Modal element not found');
+                alert('Modal element not found!');
+                return;
+            }
+            
+            modal.style.display = 'flex';
+            
+            // Simulate loading user data
+            setTimeout(() => {
+                const modalContent = document.querySelector('.sidebar-user-modal-content');
+                if (modalContent) {
+                    modalContent.innerHTML = `
+                        <div class="sidebar-user-profile">
+                            <div class="sidebar-user-header">
+                                <div class="sidebar-user-info">
+                                    <h3 class="sidebar-user-name">Test User (${clockId})</h3>
+                                    <p class="sidebar-user-role">Test Role</p>
+                                    <p class="sidebar-user-clock-id">Clock ID: ${clockId}</p>
+                                </div>
+                            </div>
+                            <div class="sidebar-user-actions">
+                                <button class="test-button" onclick="closeSidebarUserModal()">Close</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }, 1000);
+            
+            console.log(`Modal opened for Clock ID: ${clockId}`);
+        };
+
+        window.closeSidebarUserModal = function() {
+            const modal = document.getElementById('sidebarUserModal');
+            if (modal) {
+                modal.style.display = 'none';
+                console.log('Modal closed');
+            }
+        };
+
+        // Global function to handle suggestion clicks
+        window.handleSuggestionClick = function(suggestion, type, data) {
+            console.log('Global handleSuggestionClick called:', { suggestion, type, data });
+            
+            try {
+                if (type === 'clock_id') {
+                    console.log('Handling clock_id suggestion:', { suggestion, data });
+                    const cid = (data.clock_id || suggestion).toString().replace(/\D/g, '').padStart(5, '0');
+                    console.log('Extracted clock ID:', cid);
+                    
+                    if (cid) {
+                        if (typeof window.showSidebarUserModal === 'function') {
+                            console.log('Calling window.showSidebarUserModal with clockId:', cid);
+                            window.showSidebarUserModal(cid, data.user_data);
+                        } else {
+                            console.error('showSidebarUserModal not available');
+                            alert('Modal function not available!');
+                        }
+                    } else {
+                        console.error('Invalid clock ID extracted:', { suggestion, data });
+                        alert('Invalid clock ID!');
+                    }
+                } else {
+                    console.log('Non-clock_id suggestion, redirecting to search');
+                    window.location.href = `/unified_search?q=${encodeURIComponent(suggestion)}`;
+                }
+            } catch (error) {
+                console.error('Error in handleSuggestionClick:', error);
+                alert(`Error: ${error.message}`);
+            }
+        };
+
+        // Auto-test on page load
+        window.addEventListener('load', function() {
+            console.log('Page loaded, checking functions...');
+            setTimeout(() => {
+                testGlobalFunction();
+            }, 500);
+        });
+    </script>
+</body>
+</html> 

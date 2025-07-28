@@ -176,9 +176,21 @@ def login():
                 
                 print(f"Final session data before redirect: {dict(session)}")
                 print(f"Redirecting to: {next_page}")
+                print(f"Current user authenticated: {current_user.is_authenticated}")
+                print(f"Current user ID: {current_user.get_id() if current_user.is_authenticated else 'None'}")
                 
                 # Force session to be saved
                 session.modified = True
+                
+                # Add a small delay to ensure session is saved
+                import time
+                time.sleep(0.1)
+                
+                # Force session to be saved again
+                session.modified = True
+                
+                print(f"About to redirect to: {next_page}")
+                print(f"Session data at redirect: {dict(session)}")
                 
                 return redirect(next_page)
             else:
@@ -193,7 +205,25 @@ def login():
 
     # GET request - show login form
     print(f"Showing login form")
-    return render_template('login.html', year=datetime.utcnow().year)
+    try:
+        return render_template('login.html', year=datetime.utcnow().year)
+    except Exception as template_error:
+        print(f"Template error: {template_error}")
+        # Fallback to simple HTML if template fails
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head><title>Login</title></head>
+        <body>
+            <h1>Login</h1>
+            <form method="POST" action="{url_for('auth.login')}">
+                <input type="text" name="email" placeholder="Email or Username" required><br>
+                <input type="password" name="password" placeholder="Password" required><br>
+                <button type="submit">Login</button>
+            </form>
+        </body>
+        </html>
+        """
 
 @bp.route('/logout')
 @login_required

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suggestion Click Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .suggestion-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .suggestion-item:hover {
+            background-color: #f8f9fa;
+        }
+        .suggestion-icon {
+            margin-right: 12px;
+            font-size: 18px;
+        }
+        .suggestion-content {
+            flex: 1;
+        }
+        .suggestion-text {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .suggestion-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        .suggestion-action {
+            margin-left: 12px;
+            color: #007bff;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Suggestion Click Test</h1>
+        
+        <div id="status-container"></div>
+        
+        <h3>Test Suggestions</h3>
+        <p>Click on any suggestion below to test the modal functionality:</p>
+        
+        <div id="suggestions-container">
+            <!-- Suggestions will be generated here -->
+        </div>
+        
+        <h3>Console Log</h3>
+        <div id="log" class="log"></div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+
+        function addStatus(message, type = 'success') {
+            const container = document.getElementById('status-container');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            container.appendChild(statusDiv);
+        }
+
+        // Mock banner search instance
+        window.bannerSearchInstance = {
+            selectSuggestion: function(suggestion, type, data) {
+                log(`selectSuggestion called with:`);
+                log(`  suggestion: ${suggestion}`);
+                log(`  type: ${type}`);
+                log(`  data: ${JSON.stringify(data)}`);
+                
+                if (type === 'clock_id') {
+                    const cid = (data.clock_id || suggestion).toString().replace(/\D/g, '').padStart(5, '0');
+                    log(`Clock ID lookup: ${cid}`);
+                    if (cid) {
+                        if (window.showSidebarUserModal) {
+                            log('Calling window.showSidebarUserModal...');
+                            window.showSidebarUserModal(cid);
+                            addStatus('Modal should be displayed', 'success');
+                        } else {
+                            log('window.showSidebarUserModal not available');
+                            addStatus('Modal function not available', 'error');
+                        }
+                    }
+                }
+            }
+        };
+
+        // Mock modal function
+        window.showSidebarUserModal = function(clockId, userData = null) {
+            log(`showSidebarUserModal called with clockId: ${clockId}`);
+            addStatus(`Modal opened for Clock ID: ${clockId}`, 'success');
+            
+            // Create a simple modal for testing
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; padding: 20px; border-radius: 8px; max-width: 400px;">
+                    <h3>User Profile Modal</h3>
+                    <p>Clock ID: ${clockId}</p>
+                    <p>This is a test modal. In the real application, user data would be displayed here.</p>
+                    <button onclick="this.parentElement.parentElement.remove()" style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Close</button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Close on background click
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        };
+
+        // Generate test suggestions
+        function generateTestSuggestions() {
+            const container = document.getElementById('suggestions-container');
+            
+            const suggestions = [
+                {
+                    text: 'John Doe (12345)',
+                    type: 'clock_id',
+                    data: { clock_id: '12345' },
+                    icon: 'bi bi-person-circle',
+                    subtitle: 'Clock ID: 12345'
+                },
+                {
+                    text: 'Jane Smith (67890)',
+                    type: 'clock_id',
+                    data: { clock_id: '67890' },
+                    icon: 'bi bi-person-circle',
+                    subtitle: 'Clock ID: 67890'
+                },
+                {
+                    text: 'Bob Johnson (11111)',
+                    type: 'clock_id',
+                    data: { clock_id: '11111' },
+                    icon: 'bi bi-person-circle',
+                    subtitle: 'Clock ID: 11111'
+                }
+            ];
+            
+            suggestions.forEach(suggestion => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerHTML = `
+                    <div class="suggestion-icon">
+                        <i class="${suggestion.icon}"></i>
+                    </div>
+                    <div class="suggestion-content">
+                        <div class="suggestion-text">${suggestion.text}</div>
+                        <div class="suggestion-subtitle">${suggestion.subtitle}</div>
+                    </div>
+                    <div class="suggestion-action">
+                        <i class="bi bi-arrow-right"></i>
+                    </div>
+                `;
+                
+                // Add click handler
+                item.addEventListener('click', function() {
+                    log(`Suggestion clicked: ${suggestion.text}`);
+                    window.bannerSearchInstance.selectSuggestion(suggestion.text, suggestion.type, suggestion.data);
+                });
+                
+                container.appendChild(item);
+            });
+        }
+
+        // Test the exact onclick string from the user's example
+        function testExactOnclick() {
+            log('=== Testing Exact Onclick String ===');
+            
+            const testData = { clock_id: "12345" };
+            const jsonString = JSON.stringify(testData);
+            log(`JSON.stringify result: ${jsonString}`);
+            
+            // Test the exact onclick call
+            try {
+                log('Testing exact onclick call...');
+                window.bannerSearchInstance.selectSuggestion('John Doe (12345)', 'clock_id', testData);
+                log('✓ Exact onclick call successful');
+            } catch (error) {
+                log(`✗ Error in exact onclick call: ${error.message}`);
+                addStatus(`Error in onclick call: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', function() {
+            log('Page loaded, initializing test...');
+            generateTestSuggestions();
+            testExactOnclick();
+        });
+    </script>
+</body>
+</html> 

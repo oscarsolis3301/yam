@@ -23,6 +23,9 @@
             // Expose instance globally for suggestions to use
             window.bannerSearchInstance = this;
             
+            // Ensure selectSuggestion is available globally as a fallback
+            this.ensureGlobalMethods();
+            
             console.log('Modular Banner Search: Initialization complete');
         }
         
@@ -55,10 +58,52 @@
             this.coreModule.setAPIModule(this.apiModule);
         }
         
+        ensureGlobalMethods() {
+            // Ensure selectSuggestion is available globally as a fallback
+            if (!window.selectSuggestion) {
+                window.selectSuggestion = (suggestion, type = 'text', data = {}) => {
+                    console.log('Global selectSuggestion called:', { suggestion, type, data });
+                    this.selectSuggestion(suggestion, type, data);
+                };
+            }
+        }
+        
         // Delegate suggestion selection to suggestions module
         selectSuggestion(suggestion, type = 'text', data = {}) {
-            if (this.suggestionsModule) {
-                this.suggestionsModule.selectSuggestion(suggestion, type, data);
+            console.log('ModularBannerSearch.selectSuggestion called:', { suggestion, type, data });
+            
+            try {
+                if (this.suggestionsModule && typeof this.suggestionsModule.selectSuggestion === 'function') {
+                    console.log('Delegating to suggestionsModule.selectSuggestion');
+                    this.suggestionsModule.selectSuggestion(suggestion, type, data);
+                } else {
+                    console.error('suggestionsModule not available or selectSuggestion method missing');
+                    // Fallback: handle clock_id directly
+                    if (type === 'clock_id') {
+                        this.handleClockIdFallback(suggestion, data);
+                    }
+                }
+            } catch (error) {
+                console.error('Error in selectSuggestion:', error);
+                // Fallback: handle clock_id directly
+                if (type === 'clock_id') {
+                    this.handleClockIdFallback(suggestion, data);
+                }
+            }
+        }
+        
+        handleClockIdFallback(suggestion, data) {
+            console.log('Handling clock_id fallback:', { suggestion, data });
+            const cid = (data.clock_id || suggestion).toString().replace(/\D/g, '').padStart(5, '0');
+            if (cid) {
+                if (typeof window.showSidebarUserModal === 'function') {
+                    console.log('Calling window.showSidebarUserModal with clockId:', cid);
+                    window.showSidebarUserModal(cid, data.user_data);
+                } else {
+                    console.error('showSidebarUserModal not available');
+                    // Last resort: redirect to user lookup page
+                    window.location.href = `/api/clock-id/lookup/${cid}`;
+                }
             }
         }
     }

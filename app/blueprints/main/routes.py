@@ -81,6 +81,9 @@ def index():
             session['redirect_loop_protection'] = 0
             if current_app.debug:
                 print(f"User authenticated - resetting redirect loop protection")
+                print(f"User ID: {current_user.id}")
+                print(f"Username: {current_user.username}")
+                print(f"Session user_id: {session.get('user_id')}")
             
             # User is authenticated - show main page
             if client_type == 'yam_client':
