@@ -6,9 +6,11 @@
 <style>
     .flip-card {
         perspective: 1000px;
-        width: 19rem;
+        width: 100%;
+        max-width: 19rem;
         height: 300px;
         margin-bottom: 1rem;
+        overflow: hidden;
     }
 
     .flip-card-inner {
@@ -172,15 +174,19 @@
     .page-container {
         height: 100vh;
         overflow-y: auto;
+        overflow-x: hidden;
         padding-bottom: 60px;
-        margin-left: 140px;
-        width: calc(100% - 140px);
+        margin-left: 0;
+        width: 100%;
+        max-width: calc(100vw - 3.5rem - 2rem);
     }
 
     .content-wrapper {
         padding: 1.2rem;
         padding-top: 0;
         margin-top: 0;
+        max-width: 100%;
+        overflow-x: hidden;
     }
 
     /* Outage banner styles are now handled by the component */
@@ -272,9 +278,25 @@
         transition: width 0.3s ease;
     }
 
-    .duration-progress-bar.resolved {
-        background: #198754;
-    }
+            .duration-progress-bar.resolved {
+            background: #198754;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .page-container {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+            }
+            
+            .content-wrapper {
+                padding: 0.5rem !important;
+            }
+            
+            .flip-card {
+                max-width: 100% !important;
+            }
+        }
 </style>
 {% endblock %}
 
@@ -303,7 +325,7 @@
         </div>
 
         <!-- Outages Grid -->
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-1" id="outagesList" data-user-role="{{ current_user.role }}" style="margin-left:0;margin-right:0;">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-1" id="outagesList" data-user-role="{{ current_user.role }}" style="margin-left:0;margin-right:0;max-width:100%;overflow-x:hidden;">
             <!-- Outages will be dynamically loaded here -->
         </div>
     </div>

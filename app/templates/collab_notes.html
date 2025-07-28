@@ -38,7 +38,7 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    overflow-x: hidden; /* Prevent horizontal scrollbar */
     color: var(--dark-text);
   }
   
@@ -46,10 +46,12 @@
     display: flex;
     height: 100vh;
     background: var(--dark-bg);
-    margin-left: 3.5rem; /* Account for fixed sidebar */
+    margin-left: 0; /* Remove redundant margin - base.html handles sidebar spacing */
     position: relative; /* Ensure proper positioning */
     z-index: 10; /* Higher z-index than main content */
-    width: calc(100vw - 3.5rem); /* Ensure proper width */
+    width: 100%; /* Use full available width */
+    max-width: calc(100vw - 3.5rem - 2rem); /* Account for sidebar and padding */
+    overflow-x: hidden; /* Prevent horizontal scrollbar */
   }
   
   /* === Sidebar === */
@@ -675,6 +677,8 @@
     .workspace-wrapper {
       flex-direction: column;
       margin-left: 0;
+      max-width: 100%;
+      padding: 0 0.5rem;
     }
     
     .notes-sidebar {
@@ -865,6 +869,10 @@
   /* Remove vertical gap above content ONLY on collab-notes page */
   .main-content {
     margin-top: 3px !important;
+    margin-left: 0 !important; /* Ensure no extra left margin */
+    padding-left: 1rem !important; /* Consistent padding */
+    max-width: calc(100vw - 3.5rem - 2rem) !important; /* Respect sidebar space */
+    overflow-x: hidden !important; /* Prevent horizontal scrollbar */
   }
 
   /* === Tooltip Utility (for lock and share with users) === */
