@@ -117,7 +117,10 @@ class CoreSearch {
         }
         
         // Show instant pattern-based suggestions immediately (no delay)
-        this.suggestionsModule.showInstantSuggestions(query);
+        // But skip for numeric queries (clock IDs) to avoid interference
+        if (this.suggestionsModule && !/^\d{1,5}$/.test(query)) {
+            this.suggestionsModule.showInstantSuggestions(query);
+        }
         
         // Check if this is a duplicate query to avoid unnecessary API calls
         const now = Date.now();
@@ -135,11 +138,14 @@ class CoreSearch {
                 clearTimeout(this.suggestionsTimeout);
             }
             
-            // Start suggestions immediately without any delay
-            this.suggestionsModule.getSuggestions(query);
+            // Start suggestions immediately without any delay (like Universal Search)
+            if (this.suggestionsModule) {
+                this.suggestionsModule.getSuggestions(query);
+            }
             
-            // Only perform full search for queries longer than 2 characters to reduce noise
-            if (query.length > 2) {
+            // Only perform full search for non-numeric queries longer than 2 characters
+            // Numeric queries (clock IDs) should only show suggestions, not perform full search
+            if (query.length > 2 && !/^\d{1,5}$/.test(query)) {
                 // Minimal delay for search to prioritize suggestions
                 this.searchTimeout = setTimeout(() => {
                     this.performSearch(query);
@@ -161,7 +167,7 @@ class CoreSearch {
         
         this.isSearching = true;
         this.showLoading(true);
-        this.hideSuggestions();
+        // Don't hide suggestions - let the results module handle the display
         
         try {
             const results = await this.apiModule.performSearch(query, this.currentSearchController.signal);
@@ -171,9 +177,10 @@ class CoreSearch {
                 return;
             }
             console.error('Search error:', error);
-            // Show helpful search options on error
-            const helpfulResults = this.suggestionsModule.createHelpfulSearchResults(query);
-            this.resultsModule.displayResults(helpfulResults);
+            // Show error message in suggestions area
+            if (this.suggestionsModule) {
+                this.suggestionsModule.displayError('Search failed. Please try again.');
+            }
         } finally {
             this.isSearching = false;
             this.showLoading(false);
@@ -185,17 +192,9 @@ class CoreSearch {
         // Hide suggestions dropdown immediately when any suggestion is clicked
         this.hideSuggestions();
         
-        if (suggestion.url) {
-            console.log('Core Search Module: Navigating to URL:', suggestion.url);
-            window.location.href = suggestion.url;
-        } else if (suggestion.type === 'clock_id') {
-            console.log('Core Search Module: Handling clock ID lookup for:', suggestion.data.clock_id);
-            // Handle clock ID lookup with user data if available
-            this.userProfileModule.handleClockIdLookup(suggestion.data.clock_id, suggestion.data.user_data);
-        } else {
-            console.log('Core Search Module: Defaulting to universal search');
-            // Default to universal search
-            window.location.href = `/unified_search?q=${encodeURIComponent(this.currentQuery)}`;
+        // Delegate to suggestions module for handling
+        if (this.suggestionsModule) {
+            this.suggestionsModule.selectSuggestion(suggestion.text, suggestion.type, suggestion.data);
         }
     }
     

@@ -1,4 +1,4 @@
-// Suggestions Module
+// Suggestions Module - Completely revamped to match Universal Search behavior
 // Handles instant suggestions, pattern recognition, and suggestion display
 
 class SuggestionsModule {
@@ -10,6 +10,97 @@ class SuggestionsModule {
         this.lastQuery = '';
         this.lastQueryTime = 0;
         this.suggestionCache = new Map(); // Cache for instant suggestions
+        this.cacheExpiry = 5 * 60 * 1000; // 5 minutes
+        
+        // Pre-loaded common suggestions
+        this.commonSuggestions = [];
+        this.preloadedData = {
+            offices: [],
+            workstations: [],
+            recentSearches: []
+        };
+        
+        this.init();
+        this.preloadCommonData();
+    }
+    
+    init() {
+        // Generate common smart suggestions
+        this.generateCommonSuggestions();
+    }
+    
+    generateCommonSuggestions() {
+        this.commonSuggestions = [
+            { text: '👥 Search Users', icon: 'bi bi-person', subtitle: 'Find people & profiles', type: 'text' },
+            { text: '🏢 Search Offices', icon: 'bi bi-building', subtitle: 'Find office locations', type: 'text' },
+            { text: '💻 Search Workstations', icon: 'bi bi-laptop', subtitle: 'Find devices & computers', type: 'text' },
+            { text: '📚 Search Knowledge Base', icon: 'bi bi-journal-text', subtitle: 'Find guides & articles', type: 'text' },
+            { text: '⚠️ Check Outages', icon: 'bi bi-exclamation-triangle', subtitle: 'System status & alerts', type: 'text' }
+        ];
+    }
+    
+    // Pre-load common data for instant suggestions
+    async preloadCommonData() {
+        try {
+            // Load recent searches from localStorage
+            const recentSearches = JSON.parse(localStorage.getItem('bannerSearchRecent') || '[]');
+            this.preloadedData.recentSearches = recentSearches.slice(0, 10);
+
+            // Pre-load some common office data (async, non-blocking)
+            this.preloadOfficesAndWorkstations();
+        } catch (error) {
+            console.warn('Error preloading data:', error);
+        }
+    }
+
+    async preloadOfficesAndWorkstations() {
+        try {
+            // Pre-load a small set of common offices/workstations for instant suggestions
+            const response = await fetch('/unified_search?q=&limit=20', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Cache-Control': 'max-age=300' // 5 minute cache
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                this.preloadedData.offices = data.offices || [];
+                this.preloadedData.workstations = data.workstations || [];
+            }
+        } catch (error) {
+            console.warn('Error preloading offices/workstations:', error);
+        }
+    }
+    
+    // Cache management
+    getCachedSuggestions(query) {
+        const cached = this.suggestionCache.get(query.toLowerCase());
+        if (cached && (Date.now() - cached.timestamp) < this.cacheExpiry) {
+            return cached.data;
+        }
+        return null;
+    }
+
+    setCachedSuggestions(query, data) {
+        this.suggestionCache.set(query.toLowerCase(), {
+            data: data,
+            timestamp: Date.now()
+        });
+    }
+
+    // Save recent searches
+    saveRecentSearch(query) {
+        if (!query || query.length < 2) return;
+        
+        let recent = JSON.parse(localStorage.getItem('bannerSearchRecent') || '[]');
+        recent = recent.filter(item => item.toLowerCase() !== query.toLowerCase());
+        recent.unshift(query);
+        recent = recent.slice(0, 10); // Keep only 10 recent searches
+        
+        localStorage.setItem('bannerSearchRecent', JSON.stringify(recent));
+        this.preloadedData.recentSearches = recent;
     }
     
     showInstantSuggestions(query) {
@@ -22,25 +113,25 @@ class SuggestionsModule {
             // Clock ID pattern - show immediate suggestion with better formatting
             const padded = trimmedQuery.padStart(5, '0');
             instantSuggestions.push({
-                text: `FIND USER ${padded}`,
+                text: `👤 Find User ${padded}`,
                 icon: 'bi bi-person-badge',
-                subtitle: 'LOOKUP USER BY CLOCK ID',
+                subtitle: 'Lookup user by Clock ID',
                 type: 'clock_id',
                 data: { clock_id: padded }
             });
         } else if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(trimmedQuery)) {
             // IP address pattern
             instantSuggestions.push({
-                text: `Search for IP ${trimmedQuery}`,
+                text: `🌐 Search for IP ${trimmedQuery}`,
                 icon: 'bi bi-hdd-network',
-                subtitle: 'Find devices with this IP',
+                subtitle: 'Find devices with this IP address',
                 type: 'ip_search',
                 data: { ip: trimmedQuery }
             });
         } else if (/^[0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}[:-][0-9A-Fa-f]{2}$/.test(trimmedQuery)) {
             // MAC address pattern
             instantSuggestions.push({
-                text: `Search for MAC ${trimmedQuery}`,
+                text: `🔗 Search for MAC ${trimmedQuery}`,
                 icon: 'bi bi-hdd-network',
                 subtitle: 'Find devices with this MAC address',
                 type: 'mac_search',
@@ -49,16 +140,16 @@ class SuggestionsModule {
         } else if (/^[A-Z]{2,3}-\d{4,6}$/i.test(trimmedQuery)) {
             // Ticket pattern
             instantSuggestions.push({
-                text: `Search for ticket ${trimmedQuery.toUpperCase()}`,
+                text: `🎫 Search for ticket ${trimmedQuery.toUpperCase()}`,
                 icon: 'bi bi-ticket-detailed',
-                subtitle: 'Find ticket information',
+                subtitle: 'Find ticket information & details',
                 type: 'ticket_search',
                 data: { ticket: trimmedQuery.toUpperCase() }
             });
         } else if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedQuery)) {
             // Email pattern
             instantSuggestions.push({
-                text: `Search for email ${trimmedQuery}`,
+                text: `📧 Search for email ${trimmedQuery}`,
                 icon: 'bi bi-envelope',
                 subtitle: 'Find user by email address',
                 type: 'email_search',
@@ -67,31 +158,11 @@ class SuggestionsModule {
         } else if (/^\d{3}-\d{3}-\d{4}$/.test(trimmedQuery)) {
             // Phone pattern
             instantSuggestions.push({
-                text: `Search for phone ${trimmedQuery}`,
+                text: `📞 Search for phone ${trimmedQuery}`,
                 icon: 'bi bi-telephone',
                 subtitle: 'Find user by phone number',
                 type: 'phone_search',
                 data: { phone: trimmedQuery }
-            });
-        } else if (/^\d{1,2}$/.test(trimmedQuery)) {
-            // Partial clock ID (1-2 digits) - show immediate suggestion
-            const padded = trimmedQuery.padStart(5, '0');
-            instantSuggestions.push({
-                text: `FIND USER ${padded}`,
-                icon: 'bi bi-person-badge',
-                subtitle: 'LOOKUP USER BY CLOCK ID',
-                type: 'clock_id',
-                data: { clock_id: padded }
-            });
-        } else if (/^\d{3,4}$/.test(trimmedQuery)) {
-            // Partial clock ID (3-4 digits) - show immediate suggestion
-            const padded = trimmedQuery.padStart(5, '0');
-            instantSuggestions.push({
-                text: `FIND USER ${padded}`,
-                icon: 'bi bi-person-badge',
-                subtitle: 'LOOKUP USER BY CLOCK ID',
-                type: 'clock_id',
-                data: { clock_id: padded }
             });
         }
         
@@ -100,7 +171,7 @@ class SuggestionsModule {
             // Workstation pattern (computer names often start with letters and contain numbers)
             if (/^[A-Za-z]/.test(trimmedQuery) && /[A-Za-z0-9]/.test(trimmedQuery)) {
                 instantSuggestions.push({
-                    text: `Find workstation "${trimmedQuery}"`,
+                    text: `💻 Find workstation "${trimmedQuery}"`,
                     icon: 'bi bi-laptop',
                     subtitle: 'Search workstations database',
                     type: 'workstation_search',
@@ -111,7 +182,7 @@ class SuggestionsModule {
             // Office pattern (office names often contain letters and may have numbers)
             if (/^[A-Za-z]/.test(trimmedQuery)) {
                 instantSuggestions.push({
-                    text: `Find office "${trimmedQuery}"`,
+                    text: `🏢 Find office "${trimmedQuery}"`,
                     icon: 'bi bi-building',
                     subtitle: 'Search offices database',
                     type: 'office_search',
@@ -121,7 +192,7 @@ class SuggestionsModule {
             
             // Knowledge base pattern (any text query)
             instantSuggestions.push({
-                text: `Search KB for "${trimmedQuery}"`,
+                text: `📚 Search KB for "${trimmedQuery}"`,
                 icon: 'bi bi-journal-text',
                 subtitle: 'Search knowledge base articles',
                 type: 'kb_search',
@@ -130,337 +201,261 @@ class SuggestionsModule {
             
             // Notes pattern (any text query)
             instantSuggestions.push({
-                text: `Search notes for "${trimmedQuery}"`,
+                text: `📝 Search notes for "${trimmedQuery}"`,
                 icon: 'bi bi-sticky',
-                subtitle: 'Search user notes',
+                subtitle: 'Search user notes & documentation',
                 type: 'note_search',
                 data: { query: trimmedQuery }
             });
         }
         
-        // Removed generic 'Search for' fallback to keep only real or pattern-based suggestions
-        
         // Show instant suggestions immediately
-        this.displaySuggestions(instantSuggestions);
+        this.displaySuggestions({
+            clockSuggestions: [],
+            offices: [],
+            workstations: [],
+            textSuggestions: instantSuggestions,
+            commonSuggestions: []
+        });
         
         // Store in cache for instant access
-        this.suggestionCache.set(trimmedQuery, instantSuggestions);
+        this.suggestionCache.set(trimmedQuery, {
+            clockSuggestions: [],
+            offices: [],
+            workstations: [],
+            textSuggestions: instantSuggestions,
+            commonSuggestions: []
+        });
     }
     
     async getSuggestions(query) {
-        const trimmedQuery = query.trim();
-        
-        // Check if we already have cached suggestions for this exact query
-        if (this.suggestionCache.has(trimmedQuery)) {
-            const cachedSuggestions = this.suggestionCache.get(trimmedQuery);
-            // Update with fresh data in background
-            this.updateSuggestionsInBackground(trimmedQuery);
+        if (!query || query.length < 1) {
+            this.displaySuggestions({
+                textSuggestions: [],
+                offices: [],
+                workstations: [],
+                clockSuggestions: []
+            });
             return;
         }
-        
-        // Cancel any pending suggestions request
-        if (this.currentSuggestionsController) {
-            this.currentSuggestionsController.abort();
-        }
-        
-        // Create new abort controller for this suggestions request
-        this.currentSuggestionsController = new AbortController();
-        
-        this.isGettingSuggestions = true;
-        
+
+        const suggestions = {
+            textSuggestions: [],
+            offices: [],
+            workstations: [],
+            clockSuggestions: []
+        };
+
         try {
-            // For clock IDs, make a separate fast lookup call
-            let clockSuggestions = [];
-            if (/^\d{1,5}$/.test(trimmedQuery)) {
+            // Check if query is a numeric Clock ID (1-5 digits)
+            if (/^\d{1,5}$/.test(query.trim())) {
+                const padded = query.trim().padStart(5, '0');
+                
+                // Use the new Clock ID cache API for fast lookups
+                let cachedUser = null;
                 try {
-                    const cacheRes = await fetch(`/api/clock-id/suggestions?q=${encodeURIComponent(trimmedQuery)}`, {
-                        signal: this.currentSuggestionsController.signal
-                    });
+                    const cacheRes = await fetch(`/api/clock-id/suggestions?q=${encodeURIComponent(query.trim())}`);
                     if (cacheRes.ok) {
                         const response = await cacheRes.json();
                         if (response.success && response.suggestions.length > 0) {
+                            // Use the first suggestion (most relevant)
                             const suggestion = response.suggestions[0];
                             if (suggestion.type === 'clock_id') {
-                                // Show single clean suggestion for found user
-                                clockSuggestions.push({
+                                suggestions.clockSuggestions.push({
                                     text: suggestion.display_text,
                                     icon: 'bi bi-person-circle',
-                                    subtitle: 'View user profile',
+                                    subtitle: suggestion.subtitle,
                                     type: 'clock_id',
-                                    data: { 
-                                        clock_id: suggestion.clock_id,
-                                        full_name: suggestion.full_name,
-                                        user_data: suggestion
-                                    }
+                                    data: { clock_id: suggestion.clock_id }
+                                });
+                                
+                                // Add secondary option for full profile
+                                suggestions.clockSuggestions.push({
+                                    text: `View ${suggestion.full_name}'s full profile`,
+                                    icon: 'bi bi-person-badge',
+                                    subtitle: 'Complete user information',
+                                    type: 'clock_id',
+                                    data: { clock_id: suggestion.clock_id }
                                 });
                             } else if (suggestion.type === 'clock_id_not_found') {
-                                clockSuggestions.push({
+                                suggestions.clockSuggestions.push({
                                     text: suggestion.display_text,
                                     icon: 'bi bi-person-badge',
                                     subtitle: suggestion.subtitle,
                                     type: 'clock_id',
-                                    data: { clock_id: suggestion.clock_id }
+                                    data: { clock_id: padded }
                                 });
                             }
                         }
                     }
                 } catch (error) {
-                    // Clock ID lookup failed, continue with other suggestions
                     console.warn('Clock ID cache lookup failed:', error);
                 }
-            }
-            
-            // Added universal-search text suggestions endpoint to mirror Universal Search component
-            const [suggestionsResponse, unifiedResponse, universalResponse, kbResponse, notesResponse] = await Promise.allSettled([
-                // Universal Search text suggestions (titles, intelligent patterns, etc.)
-                fetch(`/api/universal-search/suggestions?q=${encodeURIComponent(trimmedQuery)}&limit=8`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Cache-Control': 'max-age=60'
-                    },
-                    signal: this.currentSuggestionsController.signal
-                }),
-                
-                // Unified search for offices and workstations
-                fetch(`/unified_search?q=${encodeURIComponent(trimmedQuery)}&limit=8`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Cache-Control': 'max-age=60'
-                    },
-                    signal: this.currentSuggestionsController.signal
-                }),
-                
-                // Universal search full results (same as universalSearch.html uses)
-                fetch(`/api/universal-search?q=${encodeURIComponent(trimmedQuery)}&limit=8`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Cache-Control': 'max-age=60'
-                    },
-                    signal: this.currentSuggestionsController.signal
-                }),
-                
-                // KB API for knowledge base articles
-                fetch(`/api/kb?q=${encodeURIComponent(trimmedQuery)}&per_page=5`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Cache-Control': 'max-age=60'
-                    },
-                    signal: this.currentSuggestionsController.signal
-                }),
-                
-                // Notes search for user notes
-                // Corrected path for collaborative notes search (blueprint prefix is /notes)
-                fetch(`/notes/api/notes/search?q=${encodeURIComponent(trimmedQuery)}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Cache-Control': 'max-age=60'
-                    },
-                    signal: this.currentSuggestionsController.signal
-                })
-            ]);
-            
-            // Process unified search results (offices and workstations)
-            let officeData = [];
-            let workstationData = [];
-            
-            if (unifiedResponse.status === 'fulfilled' && unifiedResponse.value.ok) {
-                const unifiedData = await unifiedResponse.value.json();
-                officeData = unifiedData.offices || [];
-                workstationData = unifiedData.workstations || [];
-            }
-            
-            // Process universal-search text suggestions
-            let textSuggestions = [];
-            if (suggestionsResponse.status === 'fulfilled' && suggestionsResponse.value.ok) {
-                const suggestionsData = await suggestionsResponse.value.json();
-                textSuggestions = suggestionsData.suggestions || [];
-            }
 
-            // Process universal search results (KB articles, notes, etc.)
-            let universalResults = [];
-            if (universalResponse.status === 'fulfilled' && universalResponse.value.ok) {
-                const universalData = await universalResponse.value.json();
-                universalResults = universalData.results || [];
-            }
-            
-            // Process KB API results
-            let kbArticles = [];
-            if (kbResponse.status === 'fulfilled' && kbResponse.value.ok) {
-                const kbData = await kbResponse.value.json();
-                kbArticles = kbData.articles || [];
-            }
-            
-            // Process notes search results
-            let notesData = [];
-            if (notesResponse.status === 'fulfilled' && notesResponse.value.ok) {
-                const notesResponseData = await notesResponse.value.json();
-                notesData = Array.isArray(notesResponseData) ? notesResponseData : [];
-            }
-            
-            // Combine all suggestions
-            const allSuggestions = [
-                ...clockSuggestions
-            ];
-
-            // Add text suggestions from universal search
-            if (textSuggestions.length > 0) {
-                textSuggestions.slice(0, 8).forEach(text => {
-                    allSuggestions.push({
-                        text: text,
-                        icon: 'bi bi-search',
-                        subtitle: 'Universal search suggestion',
-                        type: 'text_suggestion',
-                        data: { query: text },
-                        url: `/universal-search?q=${encodeURIComponent(text)}`
+                // If no cache results, show generic clock ID suggestion
+                if (suggestions.clockSuggestions.length === 0) {
+                    suggestions.clockSuggestions.push({
+                        text: `👤 Find User ${padded}`,
+                        icon: 'bi bi-person-badge',
+                        subtitle: 'Lookup user by Clock ID',
+                        type: 'clock_id',
+                        data: { clock_id: padded }
                     });
-                });
-            }
-            
-            // Add office suggestions
-            if (officeData.length > 0) {
-                officeData.slice(0, 5).forEach(office => {
-                    allSuggestions.push({
-                        text: office['Internal Name'] || office.name || 'Unknown Office',
-                        icon: 'bi bi-building',
-                        subtitle: office.Number ? `Office ${office.Number}` : 'Office',
-                        type: 'office',
-                        data: office
-                    });
-                });
-            }
-            
-            // Add workstation suggestions
-            if (workstationData.length > 0) {
-                workstationData.slice(0, 5).forEach(ws => {
-                    allSuggestions.push({
-                        text: ws.name || 'Unknown Workstation',
-                        icon: 'bi bi-laptop',
-                        subtitle: ws.user ? `User: ${ws.user}` : 'Workstation',
-                        type: 'workstation',
-                        data: ws
-                    });
-                });
-            }
-            
-            // Add knowledge base article suggestions
-            if (kbArticles.length > 0) {
-                kbArticles.slice(0, 5).forEach(article => {
-                    allSuggestions.push({
-                        text: article.title || 'Unknown Article',
-                        icon: 'bi bi-journal-text',
-                        subtitle: article.description ? article.description.substring(0, 50) + '...' : 'Knowledge Base Article',
-                        type: 'kb_article',
-                        data: article
-                    });
-                });
-            }
-            
-            // Add notes suggestions
-            if (notesData.length > 0) {
-                notesData.slice(0, 5).forEach(note => {
-                    allSuggestions.push({
-                        text: note.title || 'Unknown Note',
-                        icon: 'bi bi-sticky',
-                        subtitle: note.content ? note.content.substring(0, 50) + '...' : 'User Note',
-                        type: 'note',
-                        data: note
-                    });
-                });
-            }
-            
-            // Add user suggestions from unified search
-            if (unifiedResponse.status === 'fulfilled' && unifiedResponse.value.ok) {
-                 const unifiedData = await unifiedResponse.value.json();
-                 const usersData = unifiedData.users || [];
-                 if (usersData.length > 0) {
-                     usersData.slice(0, 5).forEach(user => {
-                         allSuggestions.push({
-                             text: user.name || 'Unknown User',
-                             icon: 'bi bi-person',
-                             subtitle: 'User',
-                             type: 'user',
-                             data: user
-                         });
-                     });
-                 }
+                }
+            } else {
+                // For non-numeric queries, get regular suggestions
+                const [universalRes, clockRes] = await Promise.allSettled([
+                    fetch(`/api/universal-search/suggestions?q=${encodeURIComponent(query)}&limit=5`),
+                    fetch(`/api/clock-id/suggestions?q=${encodeURIComponent(query)}`)
+                ]);
+
+                // Process universal search suggestions
+                if (universalRes.status === 'fulfilled' && universalRes.value.ok) {
+                    const universalData = await universalRes.value.json();
+                    if (universalData.success) {
+                        // Add offices
+                        if (universalData.offices && universalData.offices.length > 0) {
+                            suggestions.offices = universalData.offices.slice(0, 3).map(office => ({
+                                text: `🏢 ${office['Internal Name'] || office.name || 'Unknown Office'}`,
+                                icon: 'bi bi-building',
+                                subtitle: office.Number ? `Office ${office.Number}` : 'Office Location',
+                                type: 'office',
+                                data: office
+                            }));
+                        }
+
+                        // Add workstations
+                        if (universalData.workstations && universalData.workstations.length > 0) {
+                            suggestions.workstations = universalData.workstations.slice(0, 3).map(ws => ({
+                                text: `💻 ${ws.name || 'Unknown Workstation'}`,
+                                icon: 'bi bi-laptop',
+                                subtitle: ws.user ? `User: ${ws.user}` : 'Workstation Device',
+                                type: 'workstation',
+                                data: ws
+                            }));
+                        }
+                    }
+                }
+
+                // Process clock ID suggestions
+                if (clockRes.status === 'fulfilled' && clockRes.value.ok) {
+                    const clockData = await clockRes.value.json();
+                    if (clockData.success && clockData.suggestions.length > 0) {
+                        suggestions.clockSuggestions = clockData.suggestions.slice(0, 3).map(suggestion => ({
+                            text: suggestion.display_text.includes('👤') ? suggestion.display_text : `👤 ${suggestion.display_text}`,
+                            icon: 'bi bi-person-circle',
+                            subtitle: suggestion.subtitle,
+                            type: 'clock_id',
+                            data: { clock_id: suggestion.clock_id }
+                        }));
+                    }
+                }
             }
 
-            // Add universal search results (any content type)
-             if (universalResults.length > 0) {
-                 universalResults.slice(0, 8).forEach(result => {
-                         allSuggestions.push({
-                             text: result.title || 'Unknown Result',
-                             icon: this.getIconForContentType(result.content_type),
-                             subtitle: result.description ? result.description.substring(0, 50) + '...' : result.content_type,
-                             type: result.content_type,
-                             data: result
-                         });
-                 });
-             }
-
-            // --- PRIORITIZATION: ensure clock ID suggestion is always first ---
-            // Detect suggestions that represent a specific user looked up by clock ID.
-            const isClockUser = (s) => {
-                if (s.type === 'clock_id') return true;
-                // Some APIs may label the result as a generic 'user' type while still including a clock_id.
-                return s.type === 'user' && s.data && (s.data.clock_id || s.data.clockId);
-            };
-
-            const prioritized = allSuggestions.filter(isClockUser);
-            const rest = allSuggestions.filter((s) => !isClockUser(s));
- 
-            // Always prepend a generic fallback "Find User" action so the user can hit ENTER to force a lookup,
-            // no matter what was typed. If the query looks numeric we pad to 5-digits, otherwise keep as-is.
-            const fallbackClockId = /^\d{1,5}$/.test(trimmedQuery)
-                ? trimmedQuery.padStart(5, '0')
-                : trimmedQuery;
-
-            const fallbackExists = prioritized.some(
-                (s) => s.type === 'clock_id' && (s.data?.clock_id || '').toString() === fallbackClockId.toString()
-            );
-
-            if (!fallbackExists) {
-                prioritized.unshift({
-                    text: `FIND USER ${fallbackClockId}`,
-                    icon: 'bi bi-person-badge',
-                    subtitle: 'LOOKUP USER',
-                    type: 'clock_id',
-                    data: { clock_id: fallbackClockId }
-                });
-            }
-
-            allSuggestions.length = 0;
-            allSuggestions.push(...prioritized, ...rest);
+            // Cache the suggestions
+            this.setCachedSuggestions(query, suggestions);
             
-            // If no real suggestions, hide dropdown entirely instead of showing generic fallbacks
-            if (allSuggestions.length === 0) {
-                this.coreModule.hideSuggestions();
-                return;
-            }
-            
-            // Cache the results
-            this.suggestionCache.set(trimmedQuery, allSuggestions);
-            
-            this.coreModule.currentSuggestions = allSuggestions;
-            this.displaySuggestions(allSuggestions);
-            
+            // Display the suggestions
+            this.displaySuggestions(suggestions);
+
         } catch (error) {
-            if (error.name === 'AbortError') {
-                return;
-            }
-            console.error('Suggestions error:', error);
-            // Show helpful suggestions even on error
-            const helpfulSuggestions = this.createHelpfulSuggestions(trimmedQuery);
-            this.suggestionCache.set(trimmedQuery, helpfulSuggestions);
-            this.displaySuggestions(helpfulSuggestions);
-        } finally {
-            this.isGettingSuggestions = false;
+            console.error('Error getting suggestions:', error);
+            // Show partial suggestions on error
+            this.displayPartialSuggestions(query);
         }
+    }
+    
+    // Display partial suggestions immediately from cached/preloaded data
+    displayPartialSuggestions(query) {
+        const lowerQuery = query.toLowerCase();
+        const suggestions = {
+            clockSuggestions: [],
+            offices: [],
+            workstations: [],
+            textSuggestions: [],
+            commonSuggestions: []
+        };
+
+        // Add recent searches that match
+        suggestions.textSuggestions = this.preloadedData.recentSearches
+            .filter(search => search.toLowerCase().includes(lowerQuery))
+            .slice(0, 3)
+            .map(search => {
+                let displayText = search;
+                if (search.includes('Search for')) {
+                    displayText = search.replace('Search for', '🔍 Search for');
+                } else if (search.includes('Find')) {
+                    displayText = search.replace('Find', '🔍 Find');
+                }
+                return displayText;
+            });
+
+        // Add matching preloaded offices
+        suggestions.offices = this.preloadedData.offices
+            .filter(office => 
+                (office['Internal Name'] || '').toLowerCase().includes(lowerQuery) ||
+                (office.Number || '').toString().includes(query)
+            )
+            .slice(0, 3)
+            .map(office => ({
+                text: `🏢 ${office['Internal Name'] || office.name || 'Unknown Office'}`,
+                icon: 'bi bi-building',
+                subtitle: office.Number ? `Office ${office.Number}` : 'Office Location',
+                type: 'office',
+                data: office
+            }));
+
+        // Add matching preloaded workstations
+        suggestions.workstations = this.preloadedData.workstations
+            .filter(ws => 
+                (ws.name || '').toLowerCase().includes(lowerQuery) ||
+                (ws.user || '').toLowerCase().includes(lowerQuery)
+            )
+            .slice(0, 3)
+            .map(ws => ({
+                text: `💻 ${ws.name || 'Unknown Workstation'}`,
+                icon: 'bi bi-laptop',
+                subtitle: ws.user ? `User: ${ws.user}` : 'Workstation Device',
+                type: 'workstation',
+                data: ws
+            }));
+
+        // Generate clock ID suggestions instantly for numeric queries
+        if (/^\d+$/.test(query.trim())) {
+            const padded = query.trim().padStart(5, '0');
+            const originalQuery = query.trim();
+            
+            suggestions.clockSuggestions = [
+                {
+                    text: `👤 Find User ${padded}`,
+                    icon: 'bi bi-person',
+                    subtitle: 'Lookup user by Clock ID',
+                    type: 'clock_id',
+                    data: { clock_id: padded }
+                },
+                {
+                    text: `💻 Search for workstation matching ${originalQuery}`,
+                    icon: 'bi bi-laptop',
+                    subtitle: 'Device search',
+                    type: 'text'
+                },
+                {
+                    text: `🏢 Search for office number ${originalQuery}`,
+                    icon: 'bi bi-building',
+                    subtitle: 'Office search',
+                    type: 'text'
+                }
+            ];
+        }
+
+        // Add common suggestions if query is short
+        if (query.length <= 2) {
+            suggestions.commonSuggestions = this.commonSuggestions
+                .filter(s => s.text.toLowerCase().includes(lowerQuery))
+                .slice(0, 3);
+        }
+
+        this.displaySuggestions(suggestions);
     }
     
     // Update suggestions in background without blocking UI
@@ -473,25 +468,27 @@ class SuggestionsModule {
                 const data = await response.json();
                 if (data.success && data.suggestions.length > 0) {
                     // Update the cached suggestions with fresh data
-                    const currentSuggestions = this.suggestionCache.get(query) || [];
-                    const updatedSuggestions = currentSuggestions.map(suggestion => {
-                        if (suggestion.type === 'clock_id') {
-                            const freshSuggestion = data.suggestions[0];
-                            return {
-                                ...suggestion,
-                                text: freshSuggestion.display_text,
-                                data: { 
-                                    clock_id: freshSuggestion.clock_id,
-                                    full_name: freshSuggestion.full_name,
-                                    user_data: freshSuggestion
-                                }
-                            };
-                        }
-                        return suggestion;
-                    });
+                    const currentSuggestions = this.getCachedSuggestions(query) || {
+                        clockSuggestions: [],
+                        offices: [],
+                        workstations: [],
+                        textSuggestions: [],
+                        commonSuggestions: []
+                    };
                     
-                    this.suggestionCache.set(query, updatedSuggestions);
-                    this.displaySuggestions(updatedSuggestions);
+                    const freshSuggestion = data.suggestions[0];
+                    if (freshSuggestion.type === 'clock_id') {
+                        currentSuggestions.clockSuggestions = [{
+                            text: freshSuggestion.display_text.includes('👤') ? freshSuggestion.display_text : `👤 ${freshSuggestion.display_text}`,
+                            icon: 'bi bi-person-circle',
+                            subtitle: freshSuggestion.subtitle,
+                            type: 'clock_id',
+                            data: { clock_id: freshSuggestion.clock_id }
+                        }];
+                    }
+                    
+                    this.setCachedSuggestions(query, currentSuggestions);
+                    this.displaySuggestions(currentSuggestions);
                 }
             }
         } catch (error) {
@@ -500,208 +497,398 @@ class SuggestionsModule {
         }
     }
     
-    createHelpfulSuggestions(query) {
-        const searchTerm = query.trim();
-        const suggestions = [];
-        
-        // Removed generic 'Search for' option
-        
-        suggestions.push({
-            text: `Find users like "${searchTerm}"`,
-            subtitle: 'Search user database',
-            url: `/users?search=${encodeURIComponent(searchTerm)}`,
-            icon: 'bi-person-fill',
-            type: 'user_search'
-        });
-        
-        suggestions.push({
-            text: `Find workstations containing "${searchTerm}"`,
-            subtitle: 'Search workstations database',
-            url: `/workstations?search=${encodeURIComponent(searchTerm)}`,
-            icon: 'bi-laptop',
-            type: 'workstation_search'
-        });
-        
-        suggestions.push({
-            text: `Find offices containing "${searchTerm}"`,
-            subtitle: 'Search offices database',
-            url: `/offices?search=${encodeURIComponent(searchTerm)}`,
-            icon: 'bi-building',
-            type: 'office_search'
-        });
-        
-        suggestions.push({
-            text: `Find notes containing "${searchTerm}"`,
-            subtitle: 'Search notes database',
-            url: `/notes?search=${encodeURIComponent(searchTerm)}`,
-            icon: 'bi-journal-text',
-            type: 'note_search'
-        });
-        
-        suggestions.push({
-            text: `Find devices containing "${searchTerm}"`,
-            subtitle: 'Search devices database',
-            url: `/devices?search=${encodeURIComponent(searchTerm)}`,
-            icon: 'bi-hdd-network',
-            type: 'device_search'
-        });
-        
-        return suggestions;
-    }
-    
-    createHelpfulSearchResults(query) {
-        const searchTerm = query.trim();
-        const results = [];
-            
-        // Always provide helpful search options
-        results.push({
-            title: `Search for "${searchTerm}"`,
-            description: 'Universal search across all content',
-            url: `/unified_search?q=${encodeURIComponent(searchTerm)}`,
-            content_type: 'search',
-            icon: 'bi-search'
-        });
-        
-        results.push({
-            title: `Find users like "${searchTerm}"`,
-            description: 'Search user database',
-            url: `/users?search=${encodeURIComponent(searchTerm)}`,
-            content_type: 'user',
-            icon: 'bi-person-fill'
-        });
-                
-        results.push({
-            title: `Find workstations containing "${searchTerm}"`,
-            description: 'Search workstations database',
-            url: `/workstations?search=${encodeURIComponent(searchTerm)}`,
-            content_type: 'workstation',
-            icon: 'bi-laptop'
-        });
-                
-        results.push({
-            title: `Find offices containing "${searchTerm}"`,
-            description: 'Search offices database',
-            url: `/offices?search=${encodeURIComponent(searchTerm)}`,
-            content_type: 'office',
-            icon: 'bi-building'
-        });
-                
-        results.push({
-            title: `Find notes containing "${searchTerm}"`,
-            description: 'Search notes database',
-            url: `/notes?search=${encodeURIComponent(searchTerm)}`,
-            content_type: 'note',
-            icon: 'bi-journal-text'
-        });
-        
-        results.push({
-            title: `Find devices containing "${searchTerm}"`,
-            description: 'Search devices database',
-            url: `/devices?search=${encodeURIComponent(searchTerm)}`,
-            content_type: 'device',
-            icon: 'bi-hdd-network'
-        });
-        
-        return results;
-    }
-    
-    displaySuggestions(suggestions) {
+    displaySuggestions(allSuggestions) {
         if (!this.suggestionsContent) return;
-        if (!Array.isArray(suggestions) || suggestions.length === 0) {
+
+        let html = '';
+        let hasSuggestions = false;
+
+        // Clock ID suggestions (highest priority)
+        if (allSuggestions.clockSuggestions && allSuggestions.clockSuggestions.length > 0) {
+            hasSuggestions = true;
+            html += '<div class="suggestion-category">';
+            html += '<div class="category-title">🔍 User Lookups</div>';
+            
+            allSuggestions.clockSuggestions.forEach(suggestion => {
+                // Clean and format the text for better readability
+                let displayText = suggestion.text;
+                let displaySubtitle = suggestion.subtitle;
+                
+                // Enhance text formatting
+                if (displayText.includes('FIND USER')) {
+                    displayText = displayText.replace('FIND USER', '👤 Find User');
+                } else if (displayText.includes('View') && displayText.includes('full profile')) {
+                    displayText = displayText.replace('View ', '📋 View ');
+                    displaySubtitle = 'Complete user profile & details';
+                } else if (displayText.includes('Find user')) {
+                    displayText = displayText.replace('Find user', '🔍 Find User');
+                    displaySubtitle = 'Lookup user by Clock ID';
+                }
+                
+                html += `
+                    <div class="suggestion-item" onclick="window.bannerSearchInstance.selectSuggestion('${suggestion.text}', '${suggestion.type}', ${JSON.stringify(suggestion.data)})">
+                        <div class="suggestion-icon">
+                            <i class="${suggestion.icon}"></i>
+                        </div>
+                        <div class="suggestion-content">
+                            <div class="suggestion-text">${displayText}</div>
+                            <div class="suggestion-subtitle">${displaySubtitle}</div>
+                        </div>
+                        <div class="suggestion-action">
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+
+        // Office suggestions
+        if (allSuggestions.offices && allSuggestions.offices.length > 0) {
+            hasSuggestions = true;
+            html += '<div class="suggestion-category">';
+            html += '<div class="category-title">🏢 Office Locations</div>';
+            
+            allSuggestions.offices.forEach(office => {
+                let displayText = office.text;
+                let displaySubtitle = office.subtitle;
+                
+                // Enhance office text formatting
+                if (displayText.includes('Office')) {
+                    displayText = displayText.replace('Office', '🏢 Office');
+                }
+                
+                html += `
+                    <div class="suggestion-item" onclick="window.bannerSearchInstance.selectSuggestion('${office.text}', '${office.type}', ${JSON.stringify(office.data)})">
+                        <div class="suggestion-icon">
+                            <i class="${office.icon}"></i>
+                        </div>
+                        <div class="suggestion-content">
+                            <div class="suggestion-text">${displayText}</div>
+                            <div class="suggestion-subtitle">${displaySubtitle}</div>
+                        </div>
+                        <div class="suggestion-action">
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+
+        // Workstation suggestions
+        if (allSuggestions.workstations && allSuggestions.workstations.length > 0) {
+            hasSuggestions = true;
+            html += '<div class="suggestion-category">';
+            html += '<div class="category-title">💻 Workstations</div>';
+            
+            allSuggestions.workstations.forEach(ws => {
+                let displayText = ws.text;
+                let displaySubtitle = ws.subtitle;
+                
+                // Enhance workstation text formatting
+                if (displayText.includes('Workstation')) {
+                    displayText = displayText.replace('Workstation', '💻 Workstation');
+                }
+                
+                html += `
+                    <div class="suggestion-item" onclick="window.bannerSearchInstance.selectSuggestion('${ws.text}', '${ws.type}', ${JSON.stringify(ws.data)})">
+                        <div class="suggestion-icon">
+                            <i class="${ws.icon}"></i>
+                        </div>
+                        <div class="suggestion-content">
+                            <div class="suggestion-text">${displayText}</div>
+                            <div class="suggestion-subtitle">${displaySubtitle}</div>
+                        </div>
+                        <div class="suggestion-action">
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+
+        // Text suggestions (recent searches, etc.)
+        if (allSuggestions.textSuggestions && allSuggestions.textSuggestions.length > 0) {
+            hasSuggestions = true;
+            html += '<div class="suggestion-category">';
+            html += '<div class="category-title">⏰ Recent Searches</div>';
+            
+            allSuggestions.textSuggestions.forEach(suggestion => {
+                let displayText = suggestion;
+                
+                // Enhance recent search text formatting
+                if (typeof suggestion === 'string') {
+                    // For string suggestions, add appropriate icons
+                    if (suggestion.includes('Search for')) {
+                        displayText = suggestion.replace('Search for', '🔍 Search for');
+                    } else if (suggestion.includes('Find')) {
+                        displayText = suggestion.replace('Find', '🔍 Find');
+                    }
+                }
+                
+                html += `
+                    <div class="suggestion-item" onclick="window.bannerSearchInstance.selectSuggestion('${suggestion}', 'text')">
+                        <div class="suggestion-icon">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <div class="suggestion-content">
+                            <div class="suggestion-text">${displayText}</div>
+                            <div class="suggestion-subtitle">Recent search</div>
+                        </div>
+                        <div class="suggestion-action">
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+
+        // Common suggestions for short queries
+        if (allSuggestions.commonSuggestions && allSuggestions.commonSuggestions.length > 0) {
+            hasSuggestions = true;
+            html += '<div class="suggestion-category">';
+            html += '<div class="category-title">⚡ Quick Actions</div>';
+            
+            allSuggestions.commonSuggestions.forEach(suggestion => {
+                let displayText = suggestion.text;
+                let displaySubtitle = suggestion.subtitle;
+                
+                // Enhance quick action text formatting
+                if (displayText.includes('Search users')) {
+                    displayText = displayText.replace('Search users', '👥 Search Users');
+                } else if (displayText.includes('Search offices')) {
+                    displayText = displayText.replace('Search offices', '🏢 Search Offices');
+                } else if (displayText.includes('Search workstations')) {
+                    displayText = displayText.replace('Search workstations', '💻 Search Workstations');
+                } else if (displayText.includes('Search knowledge base')) {
+                    displayText = displayText.replace('Search knowledge base', '📚 Search Knowledge Base');
+                } else if (displayText.includes('Check outages')) {
+                    displayText = displayText.replace('Check outages', '⚠️ Check Outages');
+                }
+                
+                html += `
+                    <div class="suggestion-item" onclick="window.bannerSearchInstance.selectSuggestion('${suggestion.text}', '${suggestion.type}')">
+                        <div class="suggestion-icon">
+                            <i class="${suggestion.icon}"></i>
+                        </div>
+                        <div class="suggestion-content">
+                            <div class="suggestion-text">${displayText}</div>
+                            <div class="suggestion-subtitle">${displaySubtitle}</div>
+                        </div>
+                        <div class="suggestion-action">
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+
+        // Search results
+        if (allSuggestions.searchResults && allSuggestions.searchResults.length > 0) {
+            hasSuggestions = true;
+            html += '<div class="suggestion-category">';
+            html += '<div class="category-title">🔍 Search Results</div>';
+            
+            allSuggestions.searchResults.forEach(result => {
+                let displayText = result.text;
+                let displaySubtitle = result.subtitle;
+                
+                // Enhance search result text formatting
+                if (displayText.includes('Search for')) {
+                    displayText = displayText.replace('Search for', '🔍 Search for');
+                }
+                
+                html += `
+                    <div class="suggestion-item" onclick="window.bannerSearchInstance.selectSuggestion('${result.text}', '${result.type}', ${JSON.stringify(result.data)})">
+                        <div class="suggestion-icon">
+                            <i class="${result.icon}"></i>
+                        </div>
+                        <div class="suggestion-content">
+                            <div class="suggestion-text">${displayText}</div>
+                            <div class="suggestion-subtitle">${displaySubtitle}</div>
+                        </div>
+                        <div class="suggestion-action">
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+
+        // View all results option
+        if (hasSuggestions && this.coreModule.currentQuery && this.coreModule.currentQuery.trim()) {
+            html += `
+                <div class="suggestion-category">
+                    <div class="suggestion-item suggestion-viewall" onclick="window.bannerSearchInstance.selectSuggestion('view_all', 'view_all')">
+                        <div class="suggestion-icon">
+                            <i class="bi bi-search"></i>
+                        </div>
+                        <div class="suggestion-content">
+                            <div class="suggestion-text">🔍 View All Results for "${this.coreModule.currentQuery}"</div>
+                            <div class="suggestion-subtitle">Complete search results & more options</div>
+                        </div>
+                        <div class="suggestion-action">
+                            <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        this.suggestionsContent.innerHTML = html;
+        
+        if (hasSuggestions) {
+            this.coreModule.showSuggestions();
+        } else {
             this.coreModule.hideSuggestions();
+        }
+    }
+    
+    // Handle suggestion selection
+    selectSuggestion(suggestion, type = 'text', data = {}) {
+        console.log('selectSuggestion called:', { suggestion, type, data });
+        
+        if (type === 'view_all') {
+            this.viewAllResults();
             return;
         }
-
-        // Clear previous contents
-        this.suggestionsContent.innerHTML = '';
-
-        // Helper for creating suggestion element
-        const createItem = (suggestion, index) => {
-            const item = document.createElement('div');
-            item.className = 'banner-search-suggestion-item';
-            item.innerHTML = `
-                <div class="banner-search-suggestion-icon"><i class="${suggestion.icon}"></i></div>
-                <div class="banner-search-suggestion-content">
-                    <div class="banner-search-suggestion-text">${suggestion.text}</div>
-                    <div class="banner-search-suggestion-subtitle">${suggestion.subtitle || ''}</div>
-                </div>`;
-
-            item.addEventListener('click', () => {
-                this.coreModule.handleSuggestionClick(suggestion);
-            });
-
-            item.addEventListener('mouseenter', () => {
-                this.coreModule.selectedSuggestionIndex = index;
-                this.coreModule.updateSuggestionSelection();
-            });
-            return item;
-        };
-
-        // --- 1) RENDER QUICK-ACTIONS FIRST --------------------------------------------------
-        const quickActions = suggestions.filter((s) => s.type === 'clock_id');
-        let visualIndex = 0;
-
-        if (quickActions.length) {
-            const qaHeader = document.createElement('div');
-            qaHeader.className = 'banner-suggestion-category-header';
-            qaHeader.textContent = 'Quick actions';
-            this.suggestionsContent.appendChild(qaHeader);
-            quickActions.forEach((sugg) => {
-                this.suggestionsContent.appendChild(createItem(sugg, visualIndex++));
-            });
-        }
-
-        // --- 2) RENDER REMAINING GROUPS ------------------------------------------------------
-
-        const groupOrder = [
-            'text_suggestion', 'pattern', 'user', 'office', 'workstation', 'kb_article', 'note', 'device', 'search'
-        ];
-
-        const grouped = {};
-        suggestions.forEach((s) => {
-            if (s.type === 'clock_id') return; // already rendered
-            const key = s.type || 'other';
-            if (!grouped[key]) grouped[key] = [];
-            grouped[key].push(s);
-        });
-
-        groupOrder.forEach((type) => {
-            const items = grouped[type];
-            if (items && items.length) {
-                const header = document.createElement('div');
-                header.className = 'banner-suggestion-category-header';
-                header.textContent = {
-                    'text_suggestion': 'Suggestions',
-                    'pattern': 'Smart suggestions',
-                    'user': 'Users',
-                    'office': 'Offices',
-                    'workstation': 'Workstations',
-                    'kb_article': 'Knowledge Base',
-                    'note': 'Notes',
-                    'device': 'Devices',
-                    'search': 'Search'
-                }[type] || type;
-                this.suggestionsContent.appendChild(header);
-
-                items.forEach((sugg) => {
-                    this.suggestionsContent.appendChild(createItem(sugg, visualIndex++));
-                });
+        
+        if (type === 'clock_id') {
+            const cid = (data.clock_id || suggestion).toString().replace(/\D/g, '').padStart(5, '0');
+            console.log('Clock ID lookup:', cid);
+            if (cid) {
+                this.lookupClockId(cid);
             }
-        });
+            return;
+        } else if (type === 'office' && data) {
+            // Show office detail modal
+            console.log('Office detail:', data);
+            if (window.showBannerSearchDetail) {
+                window.showBannerSearchDetail('office', data['Internal Name'] || data.name || suggestion);
+            }
+            return;
+        } else if (type === 'workstation' && data) {
+            // Show workstation detail modal
+            console.log('Workstation detail:', data);
+            if (window.showBannerSearchDetail) {
+                window.showBannerSearchDetail('workstation', data.name || suggestion);
+            }
+            return;
+        } else if (type === 'result' && data && data.url) {
+            // Handle search results with URLs
+            console.log('Search result:', data);
+            window.location.href = data.url;
+            return;
+        } else {
+            // Handle text-based suggestions
+            console.log('Text-based suggestion:', suggestion);
+            this.coreModule.searchInput.value = suggestion;
+            this.coreModule.currentQuery = suggestion;
+            this.coreModule.performSearch(suggestion);
+        }
+    }
 
-        // Fallback if some types were not in predefined order
-        Object.keys(grouped).forEach((type) => {
-            if (groupOrder.includes(type)) return; // already handled
-            const header = document.createElement('div');
-            header.className = 'banner-suggestion-category-header';
-            header.textContent = type.charAt(0).toUpperCase() + type.slice(1);
-            this.suggestionsContent.appendChild(header);
-            grouped[type].forEach((sugg) => {
-                this.suggestionsContent.appendChild(createItem(sugg, visualIndex++));
-            });
-        });
+    // Clock ID lookup functionality
+    async lookupClockId(clockId) {
+        try {
+            // Normalize clock ID (remove leading zeros)
+            const normalizedId = clockId.replace(/^0+/, '');
+            
+            // Show loading with personalized message
+            const genericPhrases = [
+                'Obtaining user profile…',
+                'Searching for user account…',
+                'Fetching account information…'
+            ];
+            let personalisedMessage = genericPhrases[Math.floor(Math.random() * genericPhrases.length)];
+            
+            // Try to get personalized message from cache first
+            try {
+                const cacheRes = await fetch(`/api/clock-id/lookup/${normalizedId}`);
+                if (cacheRes.ok) {
+                    const cached = await cacheRes.json();
+                    if (cached.success && cached.user && cached.user.first_name) {
+                        const personalized = [
+                            `Fetching ${cached.user.first_name}'s account information…`,
+                            `Grabbing ${cached.user.first_name}'s credentials…`,
+                            `Preparing ${cached.user.first_name}'s profile…`
+                        ];
+                        personalisedMessage = personalized[Math.floor(Math.random() * personalized.length)];
+                        
+                        // Show the cached user data immediately
+                        if (window.showClockIdUserModal) {
+                            window.showClockIdUserModal(cached.user);
+                        }
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.warn('Cache lookup failed, trying fallback:', error);
+            }
+            
+            // If cache lookup failed or user not found, try fallback to PowerShell
+            try {
+                // Try fallback to PowerShell lookup
+                const fallbackRes = await fetch(`/api/clock-id/fallback/${normalizedId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (fallbackRes.ok) {
+                    const data = await fallbackRes.json();
+                    if (data.success && data.user) {
+                        if (window.showClockIdUserModal) {
+                            window.showClockIdUserModal(data.user);
+                        } else {
+                            // Fallback if modal function doesn't exist
+                            this.displayError(`User found: ${data.user.full_name} (${data.user.username})`);
+                        }
+                        return;
+                    } else {
+                        this.displayError(data.error || `No user found for Clock ID ${clockId}`);
+                        return;
+                    }
+                }
+            } catch (fallbackError) {
+                console.warn('Fallback lookup failed:', fallbackError);
+            }
+            
+            // If both cache and fallback failed, show error
+            this.displayError(`No user found for Clock ID ${clockId}`);
+            
+        } catch (err) {
+            console.error('Clock ID lookup error:', err);
+            this.displayError('Clock ID lookup failed.');
+        }
+    }
 
-        this.coreModule.showSuggestions();
+    // Display error message
+    displayError(message) {
+        if (this.suggestionsContent) {
+            this.suggestionsContent.innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: #dc3545;">
+                    <i class="bi bi-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <h4>Error</h4>
+                    <p>${message}</p>
+                </div>
+            `;
+            this.coreModule.showSuggestions();
+        }
+    }
+    
+    viewAllResults() {
+        if (this.coreModule.currentQuery) {
+            // Save to recent searches
+            this.saveRecentSearch(this.coreModule.currentQuery);
+            
+            const params = new URLSearchParams({ q: this.coreModule.currentQuery });
+            window.location.href = `/universal-search?${params}`;
+        }
     }
     
     // Clear cache when needed

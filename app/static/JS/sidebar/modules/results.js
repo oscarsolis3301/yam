@@ -8,7 +8,7 @@ class ResultsModule {
     }
     
     displayResults(results) {
-        // Convert results into the same shape used by SuggestionsModule
+        // Convert results into the new suggestions structure format
         const convertedResults = (results || []).map((r) => ({
             text: r.title,
             icon: r.icon || 'bi bi-file-text',
@@ -18,39 +18,31 @@ class ResultsModule {
             data: r
         }));
 
-        // Merge with any existing suggestions the SuggestionsModule is already holding
-        const current = this.coreModule.currentSuggestions || [];
-        const merged = [
-            // keep existing suggestions first so smart / quick-actions stay on top
-            ...current,
-            // add a divider category header only once if we have new results
-            ...(
-                convertedResults.length ? [{
-                    text: 'Search results',
-                    icon: 'bi bi-search',
-                    subtitle: 'Matches from all content',
-                    type: 'header'
-                }] : []
-            ),
-            ...convertedResults
-        ];
+        // Get current suggestions structure
+        const currentSuggestions = this.coreModule.suggestionsModule?.getCachedSuggestions(this.coreModule.currentQuery) || {
+            clockSuggestions: [],
+            offices: [],
+            workstations: [],
+            textSuggestions: [],
+            commonSuggestions: []
+        };
 
-        // De-duplicate by text to avoid showing identical entries twice
-        const seen = new Set();
-        const unique = merged.filter((s) => {
-            const key = (s.text || '').toLowerCase();
-            if (seen.has(key)) return false;
-            seen.add(key);
-            return true;
-        });
+        // Create new suggestions structure with search results
+        const newSuggestions = {
+            clockSuggestions: currentSuggestions.clockSuggestions || [],
+            offices: currentSuggestions.offices || [],
+            workstations: currentSuggestions.workstations || [],
+            textSuggestions: currentSuggestions.textSuggestions || [],
+            commonSuggestions: currentSuggestions.commonSuggestions || [],
+            searchResults: convertedResults
+        };
 
-        this.coreModule.currentSuggestions = unique;
-
+        // Display the updated suggestions
         if (this.coreModule.suggestionsModule) {
-            this.coreModule.suggestionsModule.displaySuggestions(unique);
+            this.coreModule.suggestionsModule.displaySuggestions(newSuggestions);
         }
 
-        // Ensure the suggestions dropdown is visible again (it may have been hidden before search ran)
+        // Ensure the suggestions dropdown is visible
         this.coreModule.showSuggestions();
     }
     

@@ -20,6 +20,9 @@
             // Set up module references
             this.setupModuleReferences();
             
+            // Expose instance globally for suggestions to use
+            window.bannerSearchInstance = this;
+            
             console.log('Modular Banner Search: Initialization complete');
         }
         
@@ -50,6 +53,13 @@
             this.coreModule.setUserProfileModule(this.userProfileModule);
             this.coreModule.setTicketModule(this.ticketModule);
             this.coreModule.setAPIModule(this.apiModule);
+        }
+        
+        // Delegate suggestion selection to suggestions module
+        selectSuggestion(suggestion, type = 'text', data = {}) {
+            if (this.suggestionsModule) {
+                this.suggestionsModule.selectSuggestion(suggestion, type, data);
+            }
         }
     }
     
