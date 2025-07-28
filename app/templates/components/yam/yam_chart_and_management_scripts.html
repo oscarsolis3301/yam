@@ -1,0 +1,223 @@
+<script>
+// Chart update function
+function updateOutageChart(outages, period, customStart = null, customEnd = null) {
+    // Check if chart is initialized
+    if (!outageChart) {
+        console.warn('Outage chart not initialized yet');
+        return;
+    }
+
+    const now = new Date();
+    const labels = [];
+    const data = [];
+    
+    let periodHours, intervalHours, format, startDate, endDate;
+    
+    if (period === 'custom' && customStart && customEnd) {
+        startDate = new Date(customStart);
+        endDate = new Date(customEnd);
+        const totalHours = (endDate - startDate) / (1000 * 60 * 60);
+        
+        if (totalHours <= 24) {
+            intervalHours = 1;
+            format = { hour: 'numeric', minute: '2-digit' };
+        } else if (totalHours <= 168) { // 7 days
+            intervalHours = 6;
+            format = { day: 'numeric', hour: 'numeric' };
+        } else {
+            intervalHours = 24;
+            format = { day: 'numeric', month: 'short' };
+        }
+    } else {
+        switch(period) {
+            case '3d':
+                periodHours = 3 * 24;
+                intervalHours = 6;
+                format = { day: 'numeric', hour: 'numeric' };
+                break;
+            case '7d':
+                periodHours = 7 * 24;
+                intervalHours = 12;
+                format = { day: 'numeric', hour: 'numeric' };
+                break;
+            case '14d':
+                periodHours = 14 * 24;
+                intervalHours = 24;
+                format = { day: 'numeric', month: 'short' };
+                break;
+            case '30d':
+                periodHours = 30 * 24;
+                intervalHours = 24;
+                format = { day: 'numeric', month: 'short' };
+                break;
+            default: // 7d
+                periodHours = 7 * 24;
+                intervalHours = 12;
+                format = { day: 'numeric', hour: 'numeric' };
+        }
+        startDate = new Date(now.getTime() - (periodHours * 60 * 60 * 1000));
+        endDate = now;
+    }
+    
+    // Generate labels and data points
+    const totalHours = (endDate - startDate) / (1000 * 60 * 60);
+    const numPoints = Math.ceil(totalHours / intervalHours);
+    
+    for (let i = 0; i <= numPoints; i++) {
+        const time = new Date(startDate.getTime() + (i * intervalHours * 60 * 60 * 1000));
+        if (time > endDate) break;
+        
+        labels.push(time.toLocaleString('en-US', format));
+        
+        const periodStart = new Date(time.getTime() - (intervalHours * 60 * 60 * 1000));
+        const periodEnd = time;
+        
+        // Count outages that were active during this period
+        const outagesInPeriod = outages.filter(outage => {
+            const outageStart = new Date(outage.start_time);
+            const outageEnd = outage.end_time ? new Date(outage.end_time) : now;
+            
+            // Check if outage overlaps with this time period
+            return outageStart < periodEnd && outageEnd > periodStart;
+        });
+        
+        data.push(outagesInPeriod.length);
+    }
+    
+    // Update chart data
+    outageChart.data.labels = labels;
+    outageChart.data.datasets[0].data = data;
+    outageChart.update('active');
+    
+    console.log('Outage chart updated with', outages.length, 'outages for period', period);
+}
+
+// Outage management functions
+function resetOutageForm() {
+    const form = document.getElementById('outageForm');
+    form.reset();
+    form.dataset.mode = 'create';
+    form.dataset.outageId = '';
+    
+    // Set default start time to now
+    const now = new Date();
+    const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    document.getElementById('outageStartTime').value = localDateTime;
+    
+    // Update form title and button
+    document.querySelector('.outage-form h4').textContent = 'Add New Outage';
+    document.querySelector('#outageForm button[type="submit"]').textContent = 'Add Outage';
+    
+    // Add visual feedback
+    const submitBtn = document.querySelector('#outageForm button[type="submit"]');
+    submitBtn.style.background = 'linear-gradient(135deg, #ff3b30, #ff2d55)';
+    submitBtn.style.transform = 'scale(1)';
+}
+
+// Real-time update functions
+let realTimeInterval;
+
+function startRealTimeUpdates() {
+    // Update every 10 seconds when modal is open
+    realTimeInterval = setInterval(() => {
+        loadOutagesForManagement();
+    }, 10000);
+}
+
+function stopRealTimeUpdates() {
+    if (realTimeInterval) {
+        clearInterval(realTimeInterval);
+        realTimeInterval = null;
+    }
+}
+
+// Handle form submission
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('outageForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const submitBtn = document.querySelector('#outageForm button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        
+        // Show loading state
+        submitBtn.textContent = 'Processing...';
+        submitBtn.style.background = 'linear-gradient(135deg, #8e8e93, #636366)';
+        submitBtn.style.cursor = 'not-allowed';
+        
+        const formData = {
+            title: document.getElementById('outageTitle').value.trim(),
+            description: document.getElementById('outageDescription').value.trim(),
+            start_time: document.getElementById('outageStartTime').value,
+            end_time: document.getElementById('outageEndTime').value,
+            status: document.getElementById('outageStatus').value,
+            affected_systems: document.getElementById('affectedSystems')?.value?.trim() || '',
+            ticket_id: document.getElementById('outageTicket')?.value?.trim() || ''
+        };
+
+        if (!formData.title || !formData.description) {
+            showNotification('Please fill in all required fields', 'error');
+            resetSubmitButton(submitBtn, originalText);
+            return;
+        }
+
+        const mode = this.dataset.mode || 'create';
+        const outageId = this.dataset.outageId;
+
+        if (mode === 'create') {
+            createOutage(formData, submitBtn, originalText);
+        } else if (mode === 'update') {
+            updateOutage(outageId, formData, submitBtn, originalText);
+        }
+    });
+});
+
+function resetSubmitButton(btn, text) {
+    btn.textContent = text;
+    btn.style.background = 'linear-gradient(135deg, #ff3b30, #ff2d55)';
+    btn.style.cursor = 'pointer';
+}
+
+function showNotification(message, type = 'success') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        color: white;
+        font-weight: 600;
+        z-index: 999999999;
+        transform: translateX(100%);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        max-width: 300px;
+    `;
+    
+    if (type === 'success') {
+        notification.style.background = 'linear-gradient(135deg, #34c759, #30d158)';
+    } else if (type === 'error') {
+        notification.style.background = 'linear-gradient(135deg, #ff3b30, #ff2d55)';
+    } else {
+        notification.style.background = 'linear-gradient(135deg, #007aff, #5856d6)';
+    }
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+</script> 

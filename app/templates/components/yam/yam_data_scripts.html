@@ -1,0 +1,456 @@
+<script>
+// Data loading functions
+const currentUserRole = '{{ current_user.role }}';
+function loadOutagesData(period = '7d', customStart = null, customEnd = null) {
+    console.log('Loading outages data for period:', period);
+    
+    fetch('/api/admin/outages?all=true')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(outages => {
+            console.log('Received outages data:', outages);
+            
+            // Ensure outages is an array
+            if (!Array.isArray(outages)) {
+                console.warn('Outages data is not an array:', outages);
+                outages = [];
+            }
+            
+            // Process outages data
+            const processedOutages = outages.map(outage => ({
+                ...outage,
+                start_time: new Date(outage.start_time).toISOString(),
+                end_time: outage.end_time ? new Date(outage.end_time).toISOString() : null
+            }));
+            
+            updateOutageStats(processedOutages);
+            updateCurrentOutages(processedOutages);
+            updateOutageChart(processedOutages, period, customStart, customEnd);
+        })
+        .catch(error => {
+            console.error('Error loading outages:', error);
+            document.getElementById('currentOutages').innerHTML = '<div class="no-data">Error loading outages: ' + error.message + '</div>';
+            
+            // Show empty chart on error
+            if (outageChart) {
+                outageChart.data.labels = [];
+                outageChart.data.datasets[0].data = [];
+                outageChart.update();
+            }
+        });
+}
+
+function loadUserActivity() {
+    // Fetch the full activity log for the current user then show the latest 5
+    fetch('/api/activity/all')
+        .then(response => response.json())
+        .then(result => {
+            const activities = (result.activities || []).slice(0, 5); // only latest 5 for sidebar widget
+            updateRecentActivity(activities);
+        })
+        .catch(error => {
+            console.error('Error loading activity:', error);
+            document.getElementById('recentActivity').innerHTML = '<div class="no-data">Error loading activity</div>';
+        });
+}
+
+function loadOutagesForManagement() {
+    fetch('/api/admin/outages?all=true')
+        .then(response => response.json())
+        .then(outages => {
+            updateOutagesList(outages);
+        })
+        .catch(error => {
+            console.error('Error loading outages for management:', error);
+            document.getElementById('currentOutagesList').innerHTML = '<div class="no-data">Error loading outages</div>';
+        });
+}
+
+// Update functions
+function updateOutageStats(outages) {
+    const activeOutages = outages.filter(o => o.status === 'active');
+    const resolvedOutages = outages.filter(o => o.status === 'resolved');
+    
+    // Update active outages count
+    const activeElement = document.getElementById('activeOutages');
+    if (activeElement) {
+        activeElement.textContent = activeOutages.length;
+        // Add visual indicator for active outages
+        if (activeOutages.length > 0) {
+            activeElement.style.color = '#dc3545';
+            activeElement.style.fontWeight = 'bold';
+        } else {
+            activeElement.style.color = '#28a745';
+            activeElement.style.fontWeight = 'normal';
+        }
+    }
+    
+    // Update total outages count
+    const totalElement = document.getElementById('totalOutages');
+    if (totalElement) {
+        totalElement.textContent = outages.length;
+    }
+    
+    // Calculate and update average duration
+    const avgElement = document.getElementById('avgDuration');
+    if (avgElement) {
+        if (resolvedOutages.length > 0) {
+            const totalDuration = resolvedOutages.reduce((sum, o) => {
+                if (!o.start_time || !o.end_time) return sum;
+                const start = new Date(o.start_time);
+                const end = new Date(o.end_time);
+                return sum + (end - start);
+            }, 0);
+            
+            const avgDuration = totalDuration / resolvedOutages.length;
+            const hours = Math.round(avgDuration / (1000 * 60 * 60));
+            const minutes = Math.round((avgDuration % (1000 * 60 * 60)) / (1000 * 60));
+            
+            if (hours > 0) {
+                avgElement.textContent = `${hours}h ${minutes}m`;
+            } else {
+                avgElement.textContent = `${minutes}m`;
+            }
+        } else {
+            avgElement.textContent = 'N/A';
+        }
+    }
+    
+    console.log('Updated outage stats:', {
+        active: activeOutages.length,
+        total: outages.length,
+        resolved: resolvedOutages.length
+    });
+}
+
+function updateCurrentOutages(outages) {
+    const activeOutages = outages.filter(o => o.status === 'active');
+    const container = document.getElementById('currentOutages');
+    
+    if (!container) {
+        console.warn('Current outages container not found');
+        return;
+    }
+    
+    if (activeOutages.length === 0) {
+        container.innerHTML = '<div class="no-data">No active outages</div>';
+        return;
+    }
+    
+    container.innerHTML = activeOutages.map(outage => {
+        const startTime = new Date(outage.start_time);
+        const timeDiff = new Date() - startTime;
+        const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+        
+        // Format start time
+        const startTimeFormatted = startTime.toLocaleString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        return `
+            <div class="outage-item" data-id="${outage.id}" style="
+                background: rgba(220, 53, 69, 0.1);
+                border: 1px solid rgba(220, 53, 69, 0.3);
+                border-radius: 8px;
+                padding: 12px;
+                margin-bottom: 8px;
+                transition: all 0.3s ease;
+            ">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                    <strong style="color: #dc3545; font-size: 14px;">${outage.title}</strong>
+                    <span style="
+                        background: #dc3545;
+                        color: white;
+                        padding: 2px 8px;
+                        border-radius: 12px;
+                        font-size: 10px;
+                        font-weight: bold;
+                    ">ACTIVE</span>
+                </div>
+                <div style="color: #ccc; font-size: 12px; margin-bottom: 6px;">${outage.description}</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #999;">
+                    <span>Started: ${startTimeFormatted}</span>
+                    <span style="color: #ff9999;">Duration: ${hours}h ${minutes}m</span>
+                </div>
+                ${outage.affected_systems ? `
+                    <div style="font-size: 11px; color: #999; margin-top: 4px;">
+                        <i class="bi bi-gear"></i> Affected: ${outage.affected_systems}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }).join('');
+    
+    // Attach click listeners to open detail modal
+    const outageItems = container.querySelectorAll('.outage-item');
+    outageItems.forEach((item, index) => {
+        item.style.cursor = 'pointer';
+        item.addEventListener('click', () => {
+            openOutageDetail(activeOutages[index]);
+        });
+    });
+    
+    console.log('Updated current outages display with', activeOutages.length, 'active outages');
+}
+
+function updateRecentActivity(activities) {
+    const container = document.getElementById('recentActivity');
+
+    // Filter activities for current user and limit to 5
+    const userActivities = activities.filter(a => a.user === '{{ current_user.username }}').slice(0, 5);
+
+    if (userActivities.length === 0) {
+        container.innerHTML = '<div class="no-data">No recent activity</div>';
+        return;
+    }
+
+    container.innerHTML = userActivities.map(activity => {
+        const time = new Date(activity.timestamp);
+        const timeAgo = getTimeAgo(time);
+        const icon = getActivityIcon(activity.action);
+
+        const description = formatActivityType(activity.action, activity.details);
+
+        return `
+            <div class="activity-item">
+                <div class="activity-icon">${icon}</div>
+                <div class="activity-content">
+                    <div class="activity-desc">${description}</div>
+                    <div class="activity-time">${timeAgo}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Utility functions
+function getActivityIcon(action) {
+    const icons = {
+        'page_view': 'bi-eye',
+        'search': 'bi-search',
+        'login': 'bi-box-arrow-in-right',
+        'logout': 'bi-box-arrow-left',
+        'outage_created': 'bi-exclamation-triangle',
+        'file_upload': 'bi-cloud-upload',
+        'file_download': 'bi-cloud-download',
+        'settings_changed': 'bi-gear'
+    };
+    const iconClass = icons[action] || 'bi-activity';
+    return `<i class="bi ${iconClass}"></i>`;
+}
+
+function formatActivityType(action, details = '') {
+    const baseMap = {
+        'page_view': 'Visited',
+        'search': 'Selected',
+        'login': 'Logged In',
+        'logout': 'Logged Out',
+        'outage_created': 'Created Outage',
+        'file_upload': 'Uploaded File',
+        'file_download': 'Downloaded File',
+        'settings_changed': 'Changed Settings'
+    };
+
+    let text = baseMap[action] || action.replace('_', ' ').toUpperCase();
+
+    // Add details for page views and searches to make the feed meaningful
+    if (action === 'page_view' && details) {
+        text = `${text} ${details}`;
+    } else if (action === 'search' && details) {
+        text = `${text} "${details}"`;
+    }
+
+    return text;
+}
+
+function getTimeAgo(date) {
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${diffDays}d ago`;
+}
+
+// Real-time update functionality
+let outageUpdateInterval;
+
+function startOutageUpdates() {
+    // Update outages every 10 seconds
+    outageUpdateInterval = setInterval(() => {
+        const activeBtn = document.querySelector('.time-btn.active');
+        if (activeBtn && activeBtn.id !== 'customDateBtn') {
+            loadOutagesData(activeBtn.dataset.period);
+        } else {
+            loadOutagesData('7d'); // Default to 7 days if no active button
+        }
+    }, 10000);
+    
+    console.log('Started real-time outage updates');
+}
+
+function stopOutageUpdates() {
+    if (outageUpdateInterval) {
+        clearInterval(outageUpdateInterval);
+        outageUpdateInterval = null;
+        console.log('Stopped real-time outage updates');
+    }
+}
+
+// Initialize real-time updates when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Initial activity fetch
+    loadUserActivity();
+
+    // Start outage polling after a short delay
+    setTimeout(startOutageUpdates, 2000);
+
+    // Live activity updates via Socket.IO
+    if (typeof window.yamSocketManager !== 'undefined' && window.yamSocketManager.socket) {
+        const sock = window.yamSocketManager.socket;
+
+        if (!sock._recentActivityBound) { // prevent double-binding
+            sock.on('activity_update', (payload) => {
+                try {
+                    if (!payload) return;
+                    const username = (typeof payload.user === 'string') ? payload.user : (payload.user && payload.user.name);
+                    if (username !== '{{ current_user.username }}') return; // only own events
+                    // Prepend new event and redraw list (keep max 5)
+                    const container = document.getElementById('recentActivity');
+                    if (!container) return;
+
+                    const latest = {
+                        id: payload.id,
+                        user: payload.user,
+                        action: payload.type || payload.action,
+                        details: payload.description || payload.details || '',
+                        timestamp: payload.timestamp || new Date().toISOString()
+                    };
+
+                    // Build existing cache from DOM if available
+                    const current = Array.from(container.querySelectorAll('.activity-item')).map(item => ({
+                        html: item.outerHTML
+                    }));
+
+                    // Render new item HTML using utility
+                    const icon = getActivityIcon(latest.action);
+                    const description = formatActivityType(latest.action, latest.details);
+                    const timeAgo = 'Just now';
+                    const newHtml = `
+                        <div class="activity-item">
+                            <div class="activity-icon">${icon}</div>
+                            <div class="activity-content">
+                                <div class="activity-desc">${description}</div>
+                                <div class="activity-time">${timeAgo}</div>
+                            </div>
+                        </div>`;
+
+                    // Insert new and trim
+                    container.insertAdjacentHTML('afterbegin', newHtml);
+                    const extra = container.querySelectorAll('.activity-item');
+                    extra.forEach((el, idx) => { if (idx > 4) el.remove(); });
+
+                } catch (e) { console.debug('activity_update handling failed', e); }
+            });
+            sock._recentActivityBound = true;
+        }
+    }
+
+    // Clean up on page unload
+    window.addEventListener('beforeunload', stopOutageUpdates);
+});
+
+// Socket.io integration for real-time updates (if available)
+if (typeof window.yamSocketManager !== 'undefined' && window.yamSocketManager.socket) {
+    const socket = window.yamSocketManager.socket;
+    
+    socket.on('outage_update', (data) => {
+        console.log('Received real-time outage update:', data);
+        // Refresh outages data immediately
+        const activeBtn = document.querySelector('.time-btn.active');
+        if (activeBtn && activeBtn.id !== 'customDateBtn') {
+            loadOutagesData(activeBtn.dataset.period);
+        } else {
+            loadOutagesData('7d');
+        }
+    });
+    
+    socket.on('new_outage', (data) => {
+        console.log('Received new outage notification:', data);
+        // Refresh outages data immediately
+        const activeBtn = document.querySelector('.time-btn.active');
+        if (activeBtn && activeBtn.id !== 'customDateBtn') {
+            loadOutagesData(activeBtn.dataset.period);
+        } else {
+            loadOutagesData('7d');
+        }
+    });
+}
+
+// Export functions for global access
+window.loadOutagesData = loadOutagesData;
+window.updateOutageChart = updateOutageChart;
+window.startOutageUpdates = startOutageUpdates;
+window.stopOutageUpdates = stopOutageUpdates;
+
+// Test function to verify chart functionality
+window.testOutageChart = function() {
+    console.log('Testing outage chart functionality...');
+    
+    // Test data
+    const testOutages = [
+        {
+            id: 1,
+            title: 'Test Outage 1',
+            description: 'This is a test outage',
+            start_time: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+            end_time: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(), // 12 hours ago
+            status: 'resolved',
+            affected_systems: 'Test System'
+        },
+        {
+            id: 2,
+            title: 'Test Outage 2',
+            description: 'This is another test outage',
+            start_time: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), // 6 hours ago
+            end_time: null,
+            status: 'active',
+            affected_systems: 'Test System 2'
+        }
+    ];
+    
+    console.log('Test outages data:', testOutages);
+    
+    // Update chart with test data
+    updateOutageStats(testOutages);
+    updateCurrentOutages(testOutages);
+    updateOutageChart(testOutages, '7d');
+    
+    console.log('Test completed. Check the chart and stats for test data.');
+};
+
+// Add a function to check chart status
+window.checkChartStatus = function() {
+    console.log('Chart status check:');
+    console.log('- outageChart variable:', typeof outageChart);
+    console.log('- Chart instance:', outageChart);
+    console.log('- Chart data:', outageChart ? outageChart.data : 'N/A');
+    console.log('- Chart options:', outageChart ? outageChart.options : 'N/A');
+    
+    const canvas = document.getElementById('outageChart');
+    console.log('- Canvas element:', canvas);
+    console.log('- Canvas context:', canvas ? canvas.getContext('2d') : 'N/A');
+};
+</script> 

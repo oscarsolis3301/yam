@@ -1,0 +1,273 @@
+<script>
+// Outage management list functions
+function updateOutagesList(outages) {
+    const container = document.getElementById('currentOutagesList');
+    container.innerHTML = ''; // Clear previous list
+
+    if (outages.length === 0) {
+        container.innerHTML = '<div class="no-data">No outages found.</div>';
+        return;
+    }
+
+    // Sort outages: active first, then by creation date
+    const sortedOutages = outages.sort((a, b) => {
+        if (a.status === 'active' && b.status !== 'active') return -1;
+        if (a.status !== 'active' && b.status === 'active') return 1;
+        return new Date(b.created_at) - new Date(a.created_at);
+    });
+
+    sortedOutages.forEach(outage => {
+        const statusClass = outage.status === 'active' ? 'active-outage' : 'resolved-outage';
+        const statusText = outage.status === 'active' ? 'Active' : 'Resolved';
+        const statusColor = outage.status === 'active' ? '#dc3545' : '#28a745';
+        
+        const startTime = new Date(outage.start_time).toLocaleString();
+        const endTime = outage.end_time ? new Date(outage.end_time).toLocaleString() : 'Ongoing';
+        const duration = outage.end_time ? 
+            Math.round((new Date(outage.end_time) - new Date(outage.start_time)) / (1000 * 60 * 60)) + 'h' : 
+            Math.round((new Date() - new Date(outage.start_time)) / (1000 * 60 * 60)) + 'h';
+
+        container.innerHTML += `
+            <div class="outage-item ${statusClass}">
+                <strong>${outage.title}</strong>
+                <small>${outage.description}</small>
+                <small style="color: ${statusColor};">
+                    <strong>${statusText}</strong> • Started: ${startTime} • Duration: ${duration}
+                </small>
+                ${outage.affected_systems ? `<small style="color: #999;">Systems: ${outage.affected_systems}</small>` : ''}
+                ${outage.ticket_id ? `<small style="color: #999;">Ticket: ${outage.ticket_id}</small>` : ''}
+                
+                <div class="outage-actions">
+                    <button class="edit-btn" data-id="${outage.id}" title="Edit Outage">✏️</button>
+                    ${outage.status === 'active' ? 
+                        `<button class="resolve-btn" data-id="${outage.id}" title="Resolve Outage">✅</button>` :
+                        `<button class="delete-btn" data-id="${outage.id}" title="Delete Outage">🗑️</button>`
+                    }
+                </div>
+            </div>
+        `;
+    });
+
+    // Add event listeners for action buttons
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const outageId = this.dataset.id;
+            fetchOutageDetails(outageId);
+        });
+    });
+
+    document.querySelectorAll('.resolve-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const outageId = this.dataset.id;
+            const outageTitle = this.closest('.outage-item').querySelector('strong').textContent;
+            
+            // Create custom confirmation dialog
+            if (confirm(`Are you sure you want to resolve "${outageTitle}"?`)) {
+                // Add loading state to button
+                const originalText = this.textContent;
+                this.textContent = '⏳';
+                this.style.background = 'rgba(52, 199, 89, 0.2)';
+                this.style.cursor = 'not-allowed';
+                
+                resolveOutage(outageId);
+                
+                // Reset button after a delay
+                setTimeout(() => {
+                    this.textContent = originalText;
+                    this.style.background = 'rgba(255, 255, 255, 0.08)';
+                    this.style.cursor = 'pointer';
+                }, 2000);
+            }
+        });
+    });
+
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const outageId = this.dataset.id;
+            const outageTitle = this.closest('.outage-item').querySelector('strong').textContent;
+            
+            // Create custom confirmation dialog
+            if (confirm(`Are you sure you want to delete "${outageTitle}"? This action cannot be undone.`)) {
+                // Add loading state to button
+                const originalText = this.textContent;
+                this.textContent = '⏳';
+                this.style.background = 'rgba(255, 59, 48, 0.2)';
+                this.style.cursor = 'not-allowed';
+                
+                deleteOutage(outageId);
+                
+                // Reset button after a delay
+                setTimeout(() => {
+                    this.textContent = originalText;
+                    this.style.background = 'rgba(255, 255, 255, 0.08)';
+                    this.style.cursor = 'pointer';
+                }, 2000);
+            }
+        });
+    });
+}
+
+// CRUD operations
+function fetchOutageDetails(outageId) {
+    fetch(`/api/admin/outages/${outageId}`)
+        .then(response => response.json())
+        .then(outage => {
+            // Populate form fields
+            document.getElementById('outageTitle').value = outage.title;
+            document.getElementById('outageDescription').value = outage.description;
+            document.getElementById('outageStatus').value = outage.status;
+            
+            // Handle datetime fields
+            const startTime = new Date(outage.start_time);
+            const localStartTime = new Date(startTime.getTime() - startTime.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            document.getElementById('outageStartTime').value = localStartTime;
+            
+            if (outage.end_time) {
+                const endTime = new Date(outage.end_time);
+                const localEndTime = new Date(endTime.getTime() - endTime.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+                document.getElementById('outageEndTime').value = localEndTime;
+            }
+            
+            // Set optional fields if they exist
+            if (document.getElementById('affectedSystems')) {
+                document.getElementById('affectedSystems').value = outage.affected_systems || '';
+            }
+            if (document.getElementById('outageTicket')) {
+                document.getElementById('outageTicket').value = outage.ticket_id || '';
+            }
+            
+            // Update form mode and ID
+            const form = document.getElementById('outageForm');
+            form.dataset.mode = 'update';
+            form.dataset.outageId = outageId;
+            
+            // Update form title and button
+            document.querySelector('.outage-form h4').textContent = 'Edit Outage';
+            document.querySelector('#outageForm button[type="submit"]').textContent = 'Update Outage';
+        })
+        .catch(error => {
+            console.error('Error fetching outage details:', error);
+            alert('Error fetching outage details. Please try again.');
+        });
+}
+
+function createOutage(formData, submitBtn, originalText) {
+    fetch('/api/admin/outages', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.id) {
+            showNotification('Outage created successfully!', 'success');
+            loadOutagesForManagement();
+            resetOutageForm();
+            // Also refresh the main dashboard
+            loadOutagesData();
+            
+            // Add success animation to button
+            submitBtn.style.background = 'linear-gradient(135deg, #34c759, #30d158)';
+            submitBtn.textContent = '✓ Created!';
+            setTimeout(() => {
+                resetSubmitButton(submitBtn, originalText);
+            }, 2000);
+        } else {
+            showNotification(data.error || 'Error creating outage', 'error');
+            resetSubmitButton(submitBtn, originalText);
+        }
+    })
+    .catch(error => {
+        console.error('Error creating outage:', error);
+        showNotification('Error creating outage. Please try again.', 'error');
+        resetSubmitButton(submitBtn, originalText);
+    });
+}
+
+function updateOutage(outageId, formData, submitBtn, originalText) {
+    fetch(`/api/admin/outages/${outageId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.id) {
+            showNotification('Outage updated successfully!', 'success');
+            loadOutagesForManagement();
+            resetOutageForm();
+            // Also refresh the main dashboard
+            loadOutagesData();
+            
+            // Add success animation to button
+            submitBtn.style.background = 'linear-gradient(135deg, #34c759, #30d158)';
+            submitBtn.textContent = '✓ Updated!';
+            setTimeout(() => {
+                resetSubmitButton(submitBtn, originalText);
+            }, 2000);
+        } else {
+            showNotification(data.error || 'Error updating outage', 'error');
+            resetSubmitButton(submitBtn, originalText);
+        }
+    })
+    .catch(error => {
+        console.error('Error updating outage:', error);
+        showNotification('Error updating outage. Please try again.', 'error');
+        resetSubmitButton(submitBtn, originalText);
+    });
+}
+
+function resolveOutage(outageId) {
+    fetch(`/api/admin/outages/${outageId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            status: 'resolved',
+            end_time: new Date().toISOString()
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.id) {
+            showNotification('Outage resolved successfully!', 'success');
+            loadOutagesForManagement();
+            // Also refresh the main dashboard
+            loadOutagesData();
+        } else {
+            showNotification(data.error || 'Error resolving outage', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error resolving outage:', error);
+        showNotification('Error resolving outage. Please try again.', 'error');
+    });
+}
+
+function deleteOutage(outageId) {
+    fetch(`/api/admin/outages/${outageId}`, {
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (response.ok) {
+            showNotification('Outage deleted successfully!', 'success');
+            loadOutagesForManagement();
+            // Also refresh the main dashboard
+            loadOutagesData();
+        } else {
+            return response.json().then(data => {
+                throw new Error(data.error || 'Error deleting outage');
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting outage:', error);
+        showNotification(error.message || 'Error deleting outage. Please try again.', 'error');
+    });
+}
+</script> 

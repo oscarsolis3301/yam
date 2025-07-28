@@ -1,0 +1,57 @@
+<!-- Outages Management Modal -->
+<div id="outagesManagementModal" class="custom-date-modal">
+    <div class="custom-date-content">
+        <div class="custom-date-header">
+            <h3 class="custom-date-title">Manage Outages</h3>
+            <button class="close-modal" onclick="closeOutagesManagementModal()">&times;</button>
+        </div>
+        <div class="outage-management-content">
+            <div class="outage-list">
+                <div class="outage-list-header">
+                    <h4>Current Outages</h4>
+                    <button class="new-outage-btn" onclick="resetOutageForm()">+ New Outage</button>
+                </div>
+                <div id="currentOutagesList">
+                    <div class="no-data">Loading outages...</div>
+                </div>
+            </div>
+            <div class="outage-form">
+                <h4>Add New Outage</h4>
+                <form id="outageForm">
+                    <div class="form-group">
+                        <label for="outageTitle">Title:</label>
+                        <input type="text" id="outageTitle" required placeholder="e.g., Network Outage, System Maintenance">
+                    </div>
+                    <div class="form-group">
+                        <label for="outageDescription">Description:</label>
+                        <textarea id="outageDescription" rows="3" required placeholder="Please provide details about the outage"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="outageStartTime">Start Time:</label>
+                        <input type="datetime-local" id="outageStartTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="outageEndTime">End Time (Optional):</label>
+                        <input type="datetime-local" id="outageEndTime">
+                    </div>
+                    <div class="form-group">
+                        <label for="outageStatus">Status:</label>
+                        <select id="outageStatus" required>
+                            <option value="active">Active</option>
+                            <option value="resolved">Resolved</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="affectedSystems">Affected Systems (Optional):</label>
+                        <input type="text" id="affectedSystems" placeholder="e.g., Email, VPN, CRM">
+                    </div>
+                    <div class="form-group">
+                        <label for="outageTicket">Ticket ID (Optional):</label>
+                        <input type="text" id="outageTicket" placeholder="e.g., INC12345">
+                    </div>
+                    <button type="submit" class="apply-custom-date">Add Outage</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> 

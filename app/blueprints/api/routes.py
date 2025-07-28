@@ -2867,3 +2867,41 @@ def get_user_profile(username):
             'error': 'Failed to get user profile',
             'message': str(e)
         }), 500
+
+@bp.route('/activity/all')
+@login_required
+def get_all_activity():
+    """Return the full activity history for the logged-in user (no hard limit)."""
+    try:
+        # Lazy import to avoid circular dependencies during blueprint registration
+        from app.models import Activity
+
+        # Fetch *all* activity rows for this user ordered by newest first
+        activities = (Activity.query
+                      .filter_by(user_id=current_user.id)
+                      .order_by(Activity.timestamp.desc())
+                      .all())
+
+        activity_list = [
+            {
+                'id': act.id,
+                'user': current_user.username,
+                'action': act.action,
+                'details': act.details,
+                'timestamp': act.timestamp.isoformat()
+            }
+            for act in activities
+        ]
+
+        return jsonify({
+            'activities': activity_list,
+            'total': len(activity_list),
+            'timestamp': datetime.utcnow().isoformat()
+        })
+
+    except Exception as exc:
+        logger.error("Error getting full activity list: %s", exc)
+        return jsonify({
+            'error': 'Failed to get full activity list',
+            'message': str(exc)
+        }), 500

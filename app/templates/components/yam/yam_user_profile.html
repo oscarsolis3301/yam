@@ -1,0 +1,23 @@
+<!-- User Profile Sidebar -->
+<div class="card user-profile">
+    <div class="profile-avatar" id="profileAvatar">
+        {% if current_user.profile_picture %}
+            <img src="{{ current_user.profile_picture }}" alt="Profile Picture" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <span style="display: none;">{{ current_user.username[0].upper() }}</span>
+        {% else %}
+            {{ current_user.username[0].upper() }}
+        {% endif %}
+    </div>
+    <div class="profile-name" id="profileName">{{ current_user.username.title() }}</div>
+    <div class="profile-role" id="profileRole">{{ current_user.role.title() if current_user.role else 'User' }}</div>
+    
+    <div class="recent-activity">
+        <h4 style="color: #ffffff; font-weight: 600; margin-bottom: 0.8rem; text-align: center;">Recent Activity</h4>
+        <div id="recentActivity">
+            <div class="no-data">Loading activity...</div>
+        </div>
+        <div style="text-align:center; margin-top:0.5rem;">
+            <a href="#" onclick="yamModals.openModal('recentActivityModal'); return false;" style="font-size:0.8rem; color:#0d6efd; text-decoration:none;">View All Activity</a>
+        </div>
+    </div>
+</div> 

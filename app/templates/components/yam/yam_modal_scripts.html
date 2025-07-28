@@ -1,0 +1,151 @@
+<script>
+// Custom date modal functions
+window.openCustomDateModal = function() {
+    const modal = document.getElementById('customDateModal');
+    modal.style.display = 'block';
+    modal.classList.add('show');
+    
+    // Set default dates (last 7 days)
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+    
+    document.getElementById('endDate').value = now.toISOString().slice(0, 16);
+    document.getElementById('startDate').value = sevenDaysAgo.toISOString().slice(0, 16);
+};
+
+window.closeCustomDateModal = function() {
+    const modal = document.getElementById('customDateModal');
+    modal.style.display = 'none';
+    modal.classList.remove('show');
+};
+
+window.applyCustomDate = function() {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    
+    if (!startDate || !endDate) {
+        alert('Please select both start and end dates');
+        return;
+    }
+    
+    if (new Date(startDate) >= new Date(endDate)) {
+        alert('Start date must be before end date');
+        return;
+    }
+    
+    // Update button states
+    document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('customDateBtn').classList.add('active');
+    
+    // Load data with custom date range
+    loadOutagesData('custom', startDate, endDate);
+    closeCustomDateModal();
+};
+
+// Outages Management Modal Functions
+window.openOutagesManagementModal = function() {
+    const modal = document.getElementById('outagesManagementModal');
+    modal.style.display = 'block';
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    
+    // Add entrance animation
+    const content = modal.querySelector('.custom-date-content');
+    content.style.transform = 'scale(0.9) translateY(20px)';
+    content.style.opacity = '0';
+    
+    setTimeout(() => {
+        content.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+        content.style.transform = 'scale(1) translateY(0)';
+        content.style.opacity = '1';
+    }, 10);
+    
+    loadOutagesForManagement();
+    resetOutageForm();
+    
+    // Start real-time updates
+    startRealTimeUpdates();
+}
+
+window.closeOutagesManagementModal = function() {
+    const modal = document.getElementById('outagesManagementModal');
+    const content = modal.querySelector('.custom-date-content');
+    
+    // Add exit animation
+    content.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    content.style.transform = 'scale(0.9) translateY(20px)';
+    content.style.opacity = '0';
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+        modal.classList.remove('show');
+        resetOutageForm();
+        stopRealTimeUpdates();
+        document.body.style.overflow = '';
+    }, 300);
+}
+
+// Outage Detail Modal
+window.openOutageDetail = function(outage) {
+    const modal = document.getElementById('outageDetailModal');
+    const content = modal.querySelector('.outage-detail-box');
+    if (!content) return;
+
+    // Build HTML for outage details
+    const start = new Date(outage.start_time).toLocaleString();
+    const end = outage.end_time ? new Date(outage.end_time).toLocaleString() : 'Ongoing';
+
+    let extraActions = '';
+    if (currentUserRole && currentUserRole.toLowerCase() !== 'user') {
+        extraActions = `
+            <div style="display:flex;gap:0.5rem; margin-top:1rem;">
+                <button class="resolve-btn btn btn-success btn-sm" style="flex:1;" onclick="resolveOutage('${outage.id}'); closeOutageDetailModal();">Resolve</button>
+                <button class="edit-btn btn btn-primary btn-sm" style="flex:1;" onclick="closeOutageDetailModal(); openOutagesManagementModal(); fetchOutageDetails('${outage.id}');">Edit</button>
+            </div>`;
+    }
+
+    content.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+            <h4 style="color:#ff3b30; margin:0;">${outage.title}</h4>
+            <button class="close-modal" onclick="closeOutageDetailModal()">&times;</button>
+        </div>
+        <p style="color:#ccc; font-size:0.9rem;">${outage.description}</p>
+        <small style="color:#999;">Start: ${start}</small><br/>
+        <small style="color:#999;">End: ${end}</small>
+        ${outage.affected_systems ? `<br/><small style="color:#999;">Systems: ${outage.affected_systems}</small>` : ''}
+        ${outage.ticket_id ? `<br/><small style="color:#999;">Ticket: ${outage.ticket_id}</small>` : ''}
+        ${extraActions}
+    `;
+
+    modal.style.display = 'block';
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+};
+
+window.closeOutageDetailModal = function() {
+    const modal = document.getElementById('outageDetailModal');
+    if (!modal) return;
+    modal.style.display = 'none';
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+};
+ 
+ // Close modal when clicking outside
+ window.onclick = function(event) {
+     const customDateModal = document.getElementById('customDateModal');
+     const outagesManagementModal = document.getElementById('outagesManagementModal');
+     const outageDetailModal = document.getElementById('outageDetailModal');
+     
+     if (event.target === customDateModal) {
+         closeCustomDateModal();
+     }
+     
+     if (event.target === outagesManagementModal) {
+         closeOutagesManagementModal();
+     }
+
+     if (event.target === outageDetailModal) {
+          closeOutageDetailModal();
+     }
+ };
+</script> 

@@ -35,7 +35,7 @@ window.recentActivity = {
     
     async loadActivities() {
         try {
-            const response = await fetch('/api/activity/recent');
+            const response = await fetch('/api/activity/all');
             if (response.ok) {
                 const data = await response.json();
                 this.activities = data.activities || [];

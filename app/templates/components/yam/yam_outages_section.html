@@ -1,0 +1,46 @@
+<!-- Outages Section -->
+<div class="outages-card">
+    <div class="card-header">
+        <h2 class="card-title">System Outages</h2>
+        <div class="time-controls">
+            <button class="time-btn" data-period="3d">3D</button>
+            <button class="time-btn active" data-period="7d">7D</button>
+            <button class="time-btn" data-period="14d">14D</button>
+            <button class="time-btn" data-period="30d">30D</button>
+            <button class="time-btn custom-date-btn" id="customDateBtn">Custom</button>
+        </div>
+    </div>
+    
+    <div class="outage-chart">
+        <canvas id="outageChart" class="chart-canvas"></canvas>
+    </div>
+    
+    <div class="outage-stats">
+        <div class="stat-item">
+            <div class="stat-number" id="activeOutages">-</div>
+            <div class="stat-label">Active</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="totalOutages">-</div>
+            <div class="stat-label">Total</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="avgDuration">-</div>
+            <div class="stat-label">Avg Duration</div>
+        </div>
+    </div>
+
+    <!-- Current Outages -->
+    <div class="outage-management">
+        <h3 style="color: #dc3545; margin-bottom: 0.8rem;">Current Outages</h3>
+        <div class="current-outages" id="currentOutages">
+            <div class="no-data">Loading outages...</div>
+        </div>
+        
+        {% if current_user.role in ['admin', 'manager', 'developer'] %}
+        <div class="admin-actions">
+            <button class="admin-btn" onclick="openOutagesManagementModal()">Manage Outages</button>
+        </div>
+        {% endif %}
+    </div>
+</div> 

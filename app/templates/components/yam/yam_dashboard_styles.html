@@ -1,0 +1,1078 @@
+<style>
+body {
+    background: #0a0a0a;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', Arial, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.dashboard-container {
+    padding: 0.5rem;
+    width: 100%;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.welcome-header {
+    text-align: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: rgba(20, 20, 20, 0.8);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.welcome-title {
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(45deg, #00d4ff, #0099cc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    min-height: calc(100vh - 160px);
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    height: 100%;
+}
+
+.yam-main-content {
+    height: 100%;
+}
+
+.card {
+    background: rgba(20, 20, 20, 0.8);
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    height: fit-content;
+}
+
+/* Outages container with proper padding and height */
+.outages-card {
+    background: rgba(20, 20, 20, 0.8);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #00d4ff;
+    margin: 0;
+}
+
+.time-controls {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.time-btn {
+    padding: 0.4rem 0.8rem;
+    background: rgba(40, 40, 40, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #e0e0e0;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.time-btn:hover, .time-btn.active {
+    background: rgba(220, 53, 69, 0.3);
+    border-color: #dc3545;
+    color: #fff;
+}
+
+.custom-date-btn {
+    background: rgba(0, 212, 255, 0.2) !important;
+    border-color: #00d4ff !important;
+}
+
+.custom-date-btn:hover, .custom-date-btn.active {
+    background: rgba(0, 212, 255, 0.4) !important;
+    border-color: #00d4ff !important;
+}
+
+.outage-chart {
+    height: 300px;
+    position: relative;
+    margin-bottom: 1.5rem;
+    flex-shrink: 0;
+}
+
+.chart-canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.outage-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-shrink: 0;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(40, 40, 40, 0.6);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #dc3545;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #999;
+}
+
+.outage-management {
+    margin-top: 1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.current-outages {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+    flex: 1;
+    margin-bottom: 1rem;
+}
+
+.outage-item {
+    padding: 0.8rem;
+    background: rgba(220, 53, 69, 0.1);
+    border-left: 3px solid #dc3545;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+.outage-item strong {
+    color: #ff6b7a;
+}
+
+.user-profile {
+    text-align: center;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    background: linear-gradient(45deg, #00d4ff, #0099cc);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.profile-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.profile-role {
+    font-size: 0.9rem;
+    color: #999;
+    margin-bottom: 1rem;
+}
+
+.recent-activity {
+    text-align: left;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.85rem;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(0, 212, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.8rem;
+    font-size: 0.7rem;
+    color: #00d4ff;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-time {
+    color: #666;
+    font-size: 0.7rem;
+}
+
+.directory-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.directory-item {
+    padding: 1.5rem;
+    background: rgba(40, 40, 40, 0.6);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    text-decoration: none;
+    color: #e0e0e0;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    text-align: left;
+    flex: 1;
+    min-width: 200px;
+    max-width: 300px;
+}
+
+.directory-item:hover {
+    background: rgba(60, 60, 60, 0.8);
+    transform: translateY(-2px);
+    color: #fff;
+    text-decoration: none;
+    border-color: rgba(0, 212, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.directory-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: rgba(0, 212, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+    color: #00d4ff;
+    border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.directory-content {
+    flex: 1;
+}
+
+.directory-name {
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+    color: #fff;
+}
+
+.directory-desc {
+    font-size: 0.75rem;
+    color: #999;
+    line-height: 1.3;
+}
+
+.no-data {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 2rem;
+}
+
+.admin-actions {
+    margin-top: auto;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.admin-btn {
+    background: linear-gradient(45deg, #dc3545, #c82333);
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.admin-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+/* Custom Date Modal */
+.custom-date-modal {
+    display: none;
+    position: fixed;
+    z-index: 99999999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+}
+
+.custom-date-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: modalFadeIn 0.3s ease-out;
+    z-index: 99999999;
+}
+
+/* Ensure modal is always on top of everything */
+#outagesManagementModal,
+#outagesManagementModal *,
+#customDateModal,
+#customDateModal * {
+    z-index: 99999999 !important;
+}
+
+/* Perfect centering for outages management modal */
+#outagesManagementModal.show {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 2vh !important;
+    animation: modalBackdropFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalBackdropFadeIn {
+    from {
+        backdrop-filter: blur(0px);
+        background: rgba(0, 0, 0, 0);
+    }
+    to {
+        backdrop-filter: blur(20px);
+        background: rgba(0, 0, 0, 0.7);
+    }
+}
+
+/* Ensure modal content fits perfectly in viewport */
+#outagesManagementModal .custom-date-content {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    height: auto !important;
+    max-height: 85vh !important;
+    overflow: hidden !important;
+}
+
+/* Make content areas scrollable if needed */
+#outagesManagementModal .outage-list {
+    overflow-y: auto !important;
+    flex: 1 !important;
+}
+
+#outagesManagementModal .outage-form {
+    overflow-y: auto !important;
+    flex: 1 !important;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.custom-date-content {
+    background: rgba(20, 20, 20, 0.95);
+    margin: 0;
+    padding: 1.5rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    z-index: 999999999;
+}
+
+/* Outages Management Modal - macOS Theme */
+#outagesManagementModal {
+    backdrop-filter: blur(20px);
+    background: rgba(0, 0, 0, 0.7);
+}
+
+#outagesManagementModal .custom-date-content {
+    max-width: 95vw;
+    width: 1200px;
+    max-height: 90vh;
+    height: auto;
+    overflow: hidden;
+    margin: 0;
+    position: relative;
+    z-index: 999999999;
+    transform: translateX(0);
+    background: rgba(28, 28, 30, 0.95);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(30px);
+}
+
+.outage-management-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 1rem;
+    max-height: 75vh;
+    padding: 0 1rem 1rem 1rem;
+}
+
+.outage-list, .outage-form {
+    background: rgba(44, 44, 46, 0.8);
+    padding: 1.5rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    z-index: 999999999;
+    backdrop-filter: blur(10px);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.outage-list h4, .outage-form h4 {
+    color: #ff3b30;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+.outage-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.outage-list-header h4 {
+    margin: 0;
+    color: #ff3b30;
+}
+
+.new-outage-btn {
+    background: linear-gradient(135deg, #ff3b30, #ff2d55);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 4px 12px rgba(255, 59, 48, 0.3),
+        0 2px 4px rgba(0, 0, 0, 0.2);
+    letter-spacing: -0.01em;
+}
+
+.new-outage-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 
+        0 8px 25px rgba(255, 59, 48, 0.4),
+        0 4px 8px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #ff2d55, #ff3b30);
+}
+
+.new-outage-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.outage-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.outage-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.outage-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.outage-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 59, 48, 0.3);
+    border-radius: 3px;
+}
+
+.outage-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 59, 48, 0.5);
+}
+
+.outage-item {
+    padding: 1rem;
+    margin-bottom: 0.8rem;
+    background: rgba(58, 58, 60, 0.9);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.outage-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 59, 48, 0.2);
+}
+
+.outage-item.active-outage {
+    border-left: 4px solid #ff3b30;
+    background: rgba(255, 59, 48, 0.08);
+    box-shadow: 0 2px 12px rgba(255, 59, 48, 0.1);
+}
+
+.outage-item.resolved-outage {
+    border-left: 4px solid #34c759;
+    background: rgba(52, 199, 89, 0.08);
+    box-shadow: 0 2px 12px rgba(52, 199, 89, 0.1);
+}
+
+.outage-item strong {
+    color: #ff3b30;
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.outage-item small {
+    color: #8e8e93;
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.outage-actions {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: flex;
+    gap: 0.4rem;
+}
+
+.outage-item .edit-btn,
+.outage-item .resolve-btn,
+.outage-item .delete-btn {
+    padding: 0.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.outage-item .edit-btn:hover {
+    background: rgba(0, 122, 255, 0.3);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+.outage-item .resolve-btn:hover {
+    background: rgba(52, 199, 89, 0.3);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);
+}
+
+.outage-item .delete-btn:hover {
+    background: rgba(255, 59, 48, 0.3);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+}
+
+.outage-item .edit-btn:active,
+.outage-item .resolve-btn:active,
+.outage-item .delete-btn:active {
+    transform: scale(0.95);
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.6rem;
+    color: #ff3b30;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    background: rgba(58, 58, 60, 0.9);
+    color: #ffffff;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #ff3b30;
+    box-shadow: 
+        0 0 0 3px rgba(255, 59, 48, 0.2),
+        0 4px 12px rgba(0, 0, 0, 0.3);
+    background: rgba(68, 68, 70, 0.95);
+    transform: translateY(-1px);
+}
+
+.form-group input:hover,
+.form-group textarea:hover,
+.form-group select:hover {
+    border-color: rgba(255, 59, 48, 0.3);
+    background: rgba(63, 63, 65, 0.95);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+}
+
+.form-group select {
+    cursor: pointer;
+}
+
+.form-group select option {
+    background: rgba(58, 58, 60, 0.95);
+    color: #ffffff;
+    padding: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .outage-management-content {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        max-height: 70vh;
+    }
+    
+    #outagesManagementModal .custom-date-content {
+        width: 95vw;
+        max-width: 95vw;
+        max-height: 90vh;
+        margin: 0;
+        border-radius: 16px;
+    }
+    
+    .outage-list-header {
+        flex-direction: column;
+        gap: 0.8rem;
+        align-items: stretch;
+    }
+    
+    .new-outage-btn {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1rem;
+    }
+    
+    .outage-actions {
+        position: static;
+        margin-top: 0.8rem;
+        justify-content: flex-end;
+        gap: 0.6rem;
+    }
+    
+    .outage-item .edit-btn,
+    .outage-item .resolve-btn,
+    .outage-item .delete-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+    
+    .custom-date-modal.show {
+        align-items: center;
+        padding: 2vh;
+    }
+    
+    .outage-list {
+        max-height: 250px;
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        padding: 1.2rem;
+        font-size: 1rem;
+    }
+}
+
+.custom-date-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.custom-date-title {
+    color: #ff3b30;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.close-modal {
+    color: #8e8e93;
+    font-size: 1.8rem;
+    font-weight: 300;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
+
+.close-modal:hover {
+    color: #ff3b30;
+    background: rgba(255, 59, 48, 0.1);
+    transform: scale(1.1);
+}
+
+.close-modal:active {
+    transform: scale(0.95);
+}
+
+.date-input-group {
+    margin-bottom: 1rem;
+}
+
+.date-input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #ccc;
+    font-size: 0.9rem;
+}
+
+.date-input-group input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    background: rgba(40, 40, 40, 0.8);
+    color: #e0e0e0;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+}
+
+.date-input-group input:focus {
+    outline: none;
+    border-color: #00d4ff;
+    box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+}
+
+.apply-custom-date {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #ff3b30, #ff2d55);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 4px 12px rgba(255, 59, 48, 0.3),
+        0 2px 4px rgba(0, 0, 0, 0.2);
+    letter-spacing: -0.01em;
+    margin-top: 0.5rem;
+}
+
+.apply-custom-date:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 
+        0 8px 25px rgba(255, 59, 48, 0.4),
+        0 4px 8px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #ff2d55, #ff3b30);
+}
+
+.apply-custom-date:active {
+    transform: translateY(0) scale(0.98);
+}
+
+@media (max-width: 1200px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar {
+        order: -1;
+    }
+    
+    .outages-card {
+        height: auto;
+        min-height: 600px;
+    }
+    
+    .user-profile {
+        height: auto;
+        min-height: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 0.4rem;
+    }
+    
+    .welcome-title {
+        font-size: 1.8rem;
+    }
+    
+    .time-controls {
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+    
+    .time-btn {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .directory-grid {
+        flex-direction: column;
+    }
+    
+    .directory-item {
+        min-width: auto;
+        max-width: none;
+    }
+    
+    .outage-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .outage-chart {
+        height: 250px;
+    }
+}
+
+/* ----- Adjustments (July 2025) ----- */
+.card-title {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+.welcome-title {
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background-clip: initial !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+/* Profile role badge styling */
+.profile-role {
+    display: inline-block !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    padding: 0.25rem 0.75rem !important;
+    border-radius: 9999px !important;
+    font-weight: 600 !important;
+    margin-bottom: 1rem !important;
+}
+
+/* Directory icon & icon colors */
+.directory-icon {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+.directory-icon, .directory-icon i {
+    color: #ffffff !important;
+}
+
+/* Activity icon text */
+.activity-icon {
+    color: #ffffff !important;
+}
+
+/* Make blue headers/text white inside recent activity */
+.recent-activity h4 {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+/* Manage Outages Modal tweaks */
+#outagesManagementModal .custom-date-content {
+    overflow-y: auto !important;
+}
+
+#outagesManagementModal h4,
+#outagesManagementModal .form-group label,
+#outagesManagementModal .outage-list-header h4,
+#outagesManagementModal .outage-item strong,
+#outagesManagementModal .outage-item small {
+    color: #ffffff !important;
+}
+
+/* Ensure status color indications stay distinct */
+#outagesManagementModal .outage-item small[style*="color:"] { color: inherit !important; }
+
+/* Directory names bold */
+.directory-name {
+    font-weight: 700 !important;
+}
+
+/* Card titles across dashboard bold */
+.card-header .card-title {
+    font-weight: 700 !important;
+}
+
+/* Outage Detail Modal Styles */
+#outageDetailModal .outage-detail-box {
+    background: rgba(28, 28, 30, 0.95); /* sleek dark */
+    width: 92%;
+    max-width: 520px;
+    max-height: 85vh;
+    overflow-y: auto;
+    border-radius: 18px;
+    padding: 1.75rem 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(25px);
+    animation: detailBoxFade 0.35s ease-out;
+}
+#outageDetailModal.show {
+    display: flex !important; /* ensure centering */
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 2vh !important; /* small padding for screens */
+}
+
+@keyframes detailBoxFade {
+    from { opacity: 0; transform: translateY(15px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+ 
+#outageDetailModal .close-modal {
+    color: #8e8e93;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+</style> 

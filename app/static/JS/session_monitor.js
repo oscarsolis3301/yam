@@ -17,6 +17,9 @@ if (typeof window.SessionMonitor !== 'undefined') {
             this.sessionCheckTimer = null;
             this.heartbeatTimer = null;
             this.lastActivity = Date.now();
+            // Track the last time we actually sent an /api/session/activity update
+            this._lastSessionUpdate = 0; // epoch ms
+            this._MIN_SESSION_UPDATE_INTERVAL = 3000; // 3 seconds
             this.warningThreshold = 300; // 5 minutes
             this.healthCheckInterval = 30000; // 30 seconds
             this.heartbeatInterval = 60000; // 1 minute
@@ -431,6 +434,12 @@ if (typeof window.SessionMonitor !== 'undefined') {
         }
 
         async updateActivity() {
+            // Throttle: avoid spamming the backend with activity pings
+            const now = Date.now();
+            if (now - this._lastSessionUpdate < this._MIN_SESSION_UPDATE_INTERVAL) {
+                return; // too soon since last POST
+            }
+
             try {
                 await this.queueRequest(async () => {
                     return fetch('/api/session/activity', {
@@ -443,6 +452,7 @@ if (typeof window.SessionMonitor !== 'undefined') {
                         signal: AbortSignal.timeout(5000) // 5 second timeout
                     });
                 });
+                this._lastSessionUpdate = Date.now();
             } catch (error) {
                 console.warn('Activity update failed:', error);
             }

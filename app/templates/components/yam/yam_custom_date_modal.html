@@ -1,0 +1,18 @@
+<!-- Custom Date Modal -->
+<div id="customDateModal" class="custom-date-modal">
+    <div class="custom-date-content">
+        <div class="custom-date-header">
+            <h3 class="custom-date-title">Select Custom Date Range</h3>
+            <button class="close-modal" onclick="closeCustomDateModal()">&times;</button>
+        </div>
+        <div class="date-input-group">
+            <label for="startDate">Start Date:</label>
+            <input type="datetime-local" id="startDate" required>
+        </div>
+        <div class="date-input-group">
+            <label for="endDate">End Date:</label>
+            <input type="datetime-local" id="endDate" required>
+        </div>
+        <button class="apply-custom-date" onclick="applyCustomDate()">Apply Date Range</button>
+    </div>
+</div> 

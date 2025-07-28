@@ -788,6 +788,48 @@ document.addEventListener('DOMContentLoaded', () => {
         window.CURRENT_USER_ID = parseInt('{{ current_user.id }}');
     </script>
     {% endif %}
+
+    <!-- Global User Activity Tracker -->
+    <script>
+    (function() {
+        // Avoid redefining if a page already provided its own implementation (e.g., dashboard_utilities)
+        if (window.trackUserActivity) return;
+
+        /**
+         * Send an activity event to the backend for persistence.
+         * @param {string} action - Short identifier such as "page_view", "search", etc.
+         * @param {string} details - Optional free-form details (e.g., URL, search term).
+         */
+        window.trackUserActivity = function(action, details = '') {
+            if (!action) return;
+            try {
+                fetch('/api/activity/track', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: action, details: details || window.location.pathname })
+                }).catch(() => {/* non-blocking */});
+            } catch (_) { /* swallow silently */ }
+        };
+
+        // Track the initial page view once DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            const pageLabel = (document.title ? document.title + ' ' : '') + '(' + window.location.pathname + ')';
+            trackUserActivity('page_view', pageLabel.trim());
+        });
+
+        // Track clicks on Universal Search result or suggestion items
+        document.addEventListener('click', function(evt) {
+            const searchContainer = document.getElementById('universalSearchContainer');
+            if (!searchContainer) return;
+            const item = evt.target.closest('.result-item');
+            if (item && searchContainer.contains(item)) {
+                // Attempt to extract a readable label for logging
+                let label = (item.textContent || '').trim().substring(0, 200);
+                trackUserActivity('search', label);
+            }
+        }, true);
+    })();
+    </script>
     
     <!-- Chat History Button Force Visibility -->
     <script>

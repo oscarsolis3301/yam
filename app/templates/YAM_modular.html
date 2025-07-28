@@ -1,85 +1,40 @@
 {% extends "base.html" %}
 
-{# Import YAM dashboard components #}
-{% import 'components/yam/yam_layout.html' as yam_layout %}
-{% import 'components/yam/welcome_banner.html' as yam_welcome %}
-{% import 'components/yam/quick_stats.html' as yam_quick_stats %}
-{% import 'components/yam/status_indicator.html' as yam_status_indicator %}
-{% import 'components/yam/user_quick_view.html' as yam_user_quick_view %}
-{% import 'components/yam/connection_status.html' as yam_connection_status %}
-{% import 'components/yam/daily_analytics.html' as yam_daily_analytics %}
-{% import 'components/yam/user_presence_map.html' as yam_user_presence_map %}
-{% import 'components/yam/user_analytics.html' as yam_user_analytics %}
-{% import 'components/yam/notifications.html' as yam_notifications %}
-{% import 'components/yam/team_chat.html' as yam_team_chat %}
-{% import 'components/yam/recent_activity.html' as yam_recent_activity %}
-{% import 'components/yam/system_monitor.html' as yam_system_monitor %}
-{% import 'components/yam/system_health_monitor.html' as yam_system_health_monitor %}
-{% import 'components/yam/team_performance_analytics.html' as yam_team_performance_analytics %}
-{% import 'components/yam/team_collaboration.html' as yam_team_collaboration %}
-{% import 'components/yam/user_activity_tracker.html' as yam_user_activity_tracker %}
-{% import 'components/yam/user_activity_heatmap.html' as yam_user_activity_heatmap %}
-{% import 'components/yam/advanced_user_status.html' as yam_advanced_user_status %}
-
-{# Import modular YAM components #}
-{% import 'components/yam/yam_head_meta.html' as yam_head_meta %}
-{% import 'components/yam/yam_core_styles.html' as yam_core_styles %}
-{% import 'components/yam/yam_welcome_styles.html' as yam_welcome_styles %}
-{% import 'components/yam/yam_grid_styles.html' as yam_grid_styles %}
-{% import 'components/yam/yam_card_styles.html' as yam_card_styles %}
-{% import 'components/yam/yam_analytics_styles.html' as yam_analytics_styles %}
-{% import 'components/yam/yam_modal_styles.html' as yam_modal_styles %}
-{% import 'components/yam/yam_responsive_styles.html' as yam_responsive_styles %}
-{% import 'components/yam/yam_content_main.html' as yam_content_main %}
-{% import 'components/yam/yam_modal_content.html' as yam_modal_content %}
-{% import 'components/yam/yam_utils_js.html' as yam_utils_js %}
-{% import 'components/yam/yam_dashboard_core_js.html' as yam_dashboard_core_js %}
-{% import 'components/yam/yam_initialization_js.html' as yam_initialization_js %}
-
-{% block head %}
-<!-- YAM Head Meta Tags and Preload Resources -->
-{{ yam_head_meta.render_yam_head_meta() }}
-
-<!-- YAM Layout Styles -->
-{{ yam_layout.render_yam_layout() }}
-
-<!-- YAM Core Layout Styles -->
-{{ yam_core_styles.render_yam_core_styles() }}
-
-<!-- YAM Welcome Banner Styles -->
-{{ yam_welcome_styles.render_yam_welcome_styles() }}
-
-<!-- YAM Grid Layout Styles -->
-{{ yam_grid_styles.render_yam_grid_styles() }}
-
-<!-- YAM Card and Component Styles -->
-{{ yam_card_styles.render_yam_card_styles() }}
-
-<!-- YAM Analytics Component Styles -->
-{{ yam_analytics_styles.render_yam_analytics_styles() }}
-
-<!-- YAM Modal System Styles -->
-{{ yam_modal_styles.render_yam_modal_styles() }}
-
-<!-- YAM Responsive Design Styles -->
-{{ yam_responsive_styles.render_yam_responsive_styles() }}
-{% endblock %}
-
 {% block content %}
-<!-- YAM Main Content Structure -->
-{{ yam_content_main.render_yam_content_main(name, current_user, yam_welcome, yam_daily_analytics, yam_quick_stats, yam_status_indicator, yam_user_quick_view, yam_connection_status) }}
+<!-- Include all styles -->
+{% include 'components/yam/yam_dashboard_styles.html' %}
 
-<!-- YAM Modal System Content -->
-{{ yam_modal_content.render_yam_modal_content(current_user, yam_status_indicator, yam_user_presence_map, yam_user_analytics, yam_user_activity_heatmap, yam_advanced_user_status, yam_system_monitor, yam_system_health_monitor, yam_team_performance_analytics, yam_team_collaboration, yam_recent_activity, yam_user_activity_tracker, yam_notifications, yam_team_chat) }}
-{% endblock %}
+<div class="dashboard-container">
+    <!-- Welcome Header -->
+    {% include 'components/yam/yam_welcome_header.html' %}
 
-{% block scripts %}
-<!-- YAM Utility JavaScript Functions -->
-{{ yam_utils_js.render_yam_utils_js() }}
+    <!-- Main Dashboard Grid - FLIPPED LAYOUT -->
+    <div class="dashboard-grid">
+        <!-- Sidebar (now on the left) -->
+        <div class="sidebar">
+            <!-- User Profile -->
+            {% include 'components/yam/yam_user_profile.html' %}
+        </div>
 
-<!-- YAM Dashboard Core JavaScript -->
-{{ yam_dashboard_core_js.render_yam_dashboard_core_js() }}
+        <!-- Main Content (now on the right) -->
+        <div class="yam-main-content">
+            <!-- Outages Section -->
+            {% include 'components/yam/yam_outages_section.html' %}
+        </div>
+    </div>
 
-<!-- YAM Dashboard Initialization and Cleanup JavaScript -->
-{{ yam_initialization_js.render_yam_initialization_js() }}
+    <!-- Navigation Directory -->
+    {% include 'components/yam/yam_navigation_directory.html' %}
+</div>
+
+<!-- Modals -->
+{% include 'components/yam/yam_custom_date_modal.html' %}
+{% include 'components/yam/yam_outages_management_modal.html' %}
+
+<!-- Include all JavaScript -->
+{% include 'components/yam/yam_core_scripts.html' %}
+{% include 'components/yam/yam_modal_scripts.html' %}
+{% include 'components/yam/yam_data_scripts.html' %}
+{% include 'components/yam/yam_chart_and_management_scripts.html' %}
+{% include 'components/yam/yam_outage_management_scripts.html' %}
 {% endblock %} 
