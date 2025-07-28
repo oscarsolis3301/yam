@@ -50,13 +50,36 @@ def hydrate_user_session(user):
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
-    # Add debugging information
-    print(f"Login route accessed - Method: {request.method}")
-    print(f"Current user authenticated: {current_user.is_authenticated}")
-    print(f"Session data: {dict(session)}")
+    # Add debugging information (reduced verbosity)
+    if current_app.debug:
+        print(f"Login route accessed - Method: {request.method}")
+        print(f"Current user authenticated: {current_user.is_authenticated}")
+        print(f"Session data: {dict(session)}")
     
     if current_user.is_authenticated:
-        print(f"User already authenticated, redirecting to main.index")
+        # Check if user is marked as offline in the database
+        # This prevents redirect loops when server restarts
+        if hasattr(current_user, 'is_online') and not current_user.is_online:
+            username = current_user.username if hasattr(current_user, 'username') else 'Unknown'
+            if current_app.debug:
+                print(f"User {username} is authenticated but marked offline - clearing session")
+            # Clear the session and force re-authentication
+            try:
+                from flask_login import logout_user
+                session.clear()
+                logout_user()
+                if current_app.debug:
+                    print(f"Session cleared for offline user {username}")
+                flash('Your session has expired. Please log in again.', 'info')
+                return render_template('login.html', year=datetime.utcnow().year)
+            except Exception as e:
+                current_app.logger.error(f"Error clearing session for offline user: {e}")
+                # Fallback: clear session and redirect
+                session.clear()
+                return redirect(url_for('auth.login'))
+        
+        if current_app.debug:
+            print(f"User already authenticated, redirecting to main.index")
         session.pop('redirect_loop_protection', None)
         return redirect(url_for('main.index'))
 
@@ -65,7 +88,8 @@ def login():
         login_id = (request.form.get('email') or '').strip()
         password = request.form.get('password')
         
-        print(f"Login attempt - login_id: {login_id}, password: {'***' if password else 'None'}")
+        if current_app.debug:
+            print(f"Login attempt - login_id: {login_id}, password: {'***' if password else 'None'}")
 
         # Validate input
         if not login_id:
@@ -87,18 +111,21 @@ def login():
             if not user:
                 user = User.query.filter(db.func.lower(User.username) == login_id_lower).first()
 
-            print(f"User found: {user.username if user else 'None'}")
+            if current_app.debug:
+                print(f"User found: {user.username if user else 'None'}")
 
             # Check if user exists and password is correct
             if user and user.check_password(password):
-                print(f"Password check passed for user: {user.username}")
+                if current_app.debug:
+                    print(f"Password check passed for user: {user.username}")
                 
                 # Check if user is active
                 if not user.is_active:
                     flash('Your account has been deactivated. Please contact an administrator.', 'danger')
                     return render_template('login.html', year=datetime.utcnow().year)
                 
-                print(f"Logging in user: {user.username}")
+                if current_app.debug:
+                    print(f"Logging in user: {user.username}")
                 
                 # IMPORTANT: Set session as permanent BEFORE login_user
                 session.permanent = True
@@ -107,12 +134,14 @@ def login():
                 login_user(user, remember=True)
                 
                 # Verify login was successful
-                print(f"After login_user - authenticated: {current_user.is_authenticated}")
-                print(f"After login_user - user_id: {current_user.get_id() if current_user.is_authenticated else 'None'}")
+                if current_app.debug:
+                    print(f"After login_user - authenticated: {current_user.is_authenticated}")
+                    print(f"After login_user - user_id: {current_user.get_id() if current_user.is_authenticated else 'None'}")
                 
                 # Hydrate session with user data
                 success = hydrate_user_session(user)
-                print(f"Session hydration result: {success}")
+                if current_app.debug:
+                    print(f"Session hydration result: {success}")
                 
                 # Clear any redirect loop protection
                 session.pop('redirect_loop_protection', None)

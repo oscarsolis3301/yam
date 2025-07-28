@@ -136,8 +136,18 @@ def is_session_healthy():
                 return False
             
             # Check if user has been marked offline in the database
+            # This is the critical fix for the redirect loop issue
             if current_user.is_authenticated and hasattr(current_user, 'is_online') and not current_user.is_online:
-                logger.warning(f"User {current_user.id} is authenticated but marked offline – forcing re-login")
+                user_id = current_user.id if hasattr(current_user, 'id') else 'Unknown'
+                logger.warning(f"User {user_id} is authenticated but marked offline – clearing session and forcing re-login")
+                # Clear the session immediately to prevent redirect loops
+                try:
+                    from flask_login import logout_user
+                    session.clear()
+                    logout_user()
+                    logger.info(f"Cleared session for offline user {user_id}")
+                except Exception as e:
+                    logger.error(f"Error clearing session for offline user {user_id}: {e}")
                 return False
             
             return True
@@ -188,9 +198,19 @@ def setup_auth_middleware(app):
             
             # Check session health for web routes
             if not is_session_healthy():
-                logger.warning(f"Unhealthy session for user {current_user.id} accessing {path}")
+                user_id = current_user.id if hasattr(current_user, 'id') else 'Unknown'
+                logger.warning(f"Unhealthy session for user {user_id} accessing {path}")
                 # Clear session and redirect to login
-                session.clear()
+                # Note: is_session_healthy() already clears the session if user is offline
+                # So we only need to clear here if it wasn't already cleared
+                if current_user.is_authenticated:
+                    try:
+                        from flask_login import logout_user
+                        session.clear()
+                        logout_user()
+                        logger.info(f"Cleared session for unhealthy session user {user_id}")
+                    except Exception as e:
+                        logger.error(f"Error clearing session: {e}")
                 return handle_unauthorized_access()
             
         except Exception as e:

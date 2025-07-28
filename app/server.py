@@ -111,9 +111,21 @@ def clear_all_sessions():
             try:
                 from app.services.user_presence import presence_service
                 presence_service.clear_all_users()
-                logger.info("All users marked as offline")
+                logger.info("All users marked as offline via presence service")
             except Exception as e:
                 logger.warning(f"Could not clear user presence: {e}")
+            
+            # Directly mark all users as offline in database
+            try:
+                from app.models import User
+                from extensions import db
+                
+                # Update all users to offline status
+                User.query.update({User.is_online: False})
+                db.session.commit()
+                logger.info("All users marked as offline in database")
+            except Exception as e:
+                logger.warning(f"Could not update database user status: {e}")
             
             # Clear any cached sessions
             if hasattr(yam_app, 'session_interface'):
@@ -122,6 +134,18 @@ def clear_all_sessions():
                     logger.info("Session interface cleared")
                 except Exception as e:
                     logger.warning(f"Could not clear session interface: {e}")
+            
+            # Clear any session cookies by setting them to expire
+            try:
+                from flask import make_response
+                response = make_response()
+                response.delete_cookie('session')
+                response.delete_cookie('yam_session')
+                response.delete_cookie('csrf_token')
+                response.delete_cookie('remember_token')
+                logger.info("Session cookies cleared")
+            except Exception as e:
+                logger.warning(f"Could not clear session cookies: {e}")
                     
     except Exception as e:
         logger.error(f"Error clearing sessions: {e}")
@@ -1499,7 +1523,7 @@ def register_all_blueprints(yam_app):
     yam_app.register_blueprint(clock_id_cache_bp)
     yam_app.register_blueprint(kb_shared_bp, url_prefix='/kb/shared')
     yam_app.register_blueprint(jarvis_bp, url_prefix='/jarvis')
-    yam_app.register_blueprint(outages_bp, url_prefix='/api/outages')
+    yam_app.register_blueprint(outages_bp)
     yam_app.register_blueprint(patterson_bp, url_prefix='/patterson')
     yam_app.register_blueprint(kb_bp, url_prefix='/kb')
     yam_app.register_blueprint(system_bp, url_prefix='/system')
@@ -2120,6 +2144,14 @@ if __name__ == '__main__':
         except Exception as e:
             print(f'[SHUTDOWN] Error clearing sessions: {e}')
         
+        # Create shutdown marker for next startup
+        try:
+            from app.utils.session_cleanup import create_shutdown_marker
+            create_shutdown_marker()
+            print('[SHUTDOWN] Shutdown marker created')
+        except Exception as e:
+            print(f'[SHUTDOWN] Error creating shutdown marker: {e}')
+        
         # Close database connections
         try:
             with yam_app.app_context():
@@ -2168,6 +2200,20 @@ if __name__ == '__main__':
     # Initialize presence service and socket handlers
     with yam_app.app_context():
         try:
+            # Check for shutdown marker and clear sessions if needed
+            try:
+                from app.utils.session_cleanup import check_shutdown_marker
+                if check_shutdown_marker():
+                    print('[STARTUP] Server shutdown marker detected - clearing all sessions')
+                    clear_all_sessions()
+                    print('[STARTUP] Sessions cleared due to server shutdown')
+                else:
+                    print('[STARTUP] No server shutdown detected - maintaining existing sessions')
+            except Exception as e:
+                print(f'[WARNING] Error checking shutdown marker: {e}')
+                # Clear sessions as fallback
+                clear_all_sessions()
+            
             # Clear any existing sessions on server startup
             print('[STARTUP] Clearing any existing sessions from previous server instance...')
             clear_all_sessions()

@@ -83,6 +83,32 @@ if %PORT_CLEARED%==0 (
 echo [INFO] Port 5000 status check complete
 echo.
 
+REM Clear any existing session files from previous server instances
+echo [INFO] Clearing session files from previous server instances...
+if exist "sessions" (
+    echo [INFO] Removing existing sessions directory...
+    rmdir /s /q "sessions" >nul 2>&1
+    mkdir "sessions" >nul 2>&1
+    echo [SUCCESS] Sessions directory cleared
+)
+
+if exist "app\sessions" (
+    echo [INFO] Removing existing app sessions directory...
+    rmdir /s /q "app\sessions" >nul 2>&1
+    mkdir "app\sessions" >nul 2>&1
+    echo [SUCCESS] App sessions directory cleared
+)
+
+REM Clear any shutdown markers
+if exist "server_shutdown_marker.txt" (
+    echo [INFO] Removing server shutdown marker...
+    del "server_shutdown_marker.txt" >nul 2>&1
+    echo [SUCCESS] Server shutdown marker removed
+)
+
+echo [INFO] Session cleanup completed
+echo.
+
 echo [INFO] Starting YAM server with network access and HOT RELOADING...
 echo [INFO] Server will be accessible from all devices on your network
 echo [INFO] Local access: http://127.0.0.1:5000
@@ -96,6 +122,7 @@ echo.
 echo [TIP] Press Ctrl+C to stop the server
 echo [TIP] HTML changes will reload automatically in browser
 echo [TIP] CSS/JS changes will reload automatically in browser
+echo [TIP] All user sessions will be cleared on server shutdown
 echo.
 
 REM Set environment variables for hot reloading
@@ -122,4 +149,6 @@ if /i "%USE_DEBUGGER_MODE%"=="y" (
 
 echo.
 echo [INFO] Server stopped
+echo [INFO] All user sessions have been cleared
+echo [INFO] Users will need to re-authenticate on next server start
 pause 

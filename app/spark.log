@@ -2246,3 +2246,41 @@
 2025-07-28 08:15:04,627 - spark - INFO - [socketio] DISCONNECT; user_id=1
 2025-07-28 08:15:04,628 - spark - INFO - [socketio] Successfully handled disconnect for user 1
 2025-07-28 08:15:04,628 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-28 08:17:49,855 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753715869539_v794eywgz
+2025-07-28 08:17:49,862 - spark - INFO - [socketio] marking user 1 online
+2025-07-28 08:17:49,876 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-28 08:17:50,175 - spark - INFO - Loaded 0 articles. Statuses: 
+2025-07-28 08:17:51,182 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=unknown
+2025-07-28 08:17:51,184 - spark - INFO - [socketio] marking user 1 online
+2025-07-28 08:17:51,191 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-28 08:17:51,515 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-28 08:17:51,515 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-28 08:17:51,517 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-28 08:17:51,519 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-28 08:17:57,383 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753715877075_krgvu9ar9
+2025-07-28 08:17:57,384 - spark - INFO - [socketio] marking user 1 online
+2025-07-28 08:17:57,392 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-28 08:19:28,927 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-28 08:19:28,928 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-28 08:19:30,600 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753715970511_pz7hww71q
+2025-07-28 08:19:30,601 - spark - INFO - [socketio] marking user 1 online
+2025-07-28 08:19:30,608 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-28 08:23:26,130 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-28 08:25:46,100 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753716345795_riyqy1nhl
+2025-07-28 08:25:46,101 - spark - INFO - [socketio] marking user 1 online
+2025-07-28 08:25:46,107 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-28 08:25:50,485 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-28 08:25:50,486 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-28 08:29:46,635 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-28 08:36:54,903 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-28 08:41:19,746 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-28 08:45:31,945 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-28 08:50:03,420 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-28 08:50:54,161 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753717853544_rjnkmp65f
+2025-07-28 08:50:54,165 - spark - INFO - [socketio] marking user 1 online
+2025-07-28 08:50:54,184 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-28 08:50:56,333 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-28 08:50:56,335 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-28 08:50:58,863 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753717858252_o2ysbio3c
+2025-07-28 08:50:58,865 - spark - INFO - [socketio] marking user 1 online
+2025-07-28 08:50:58,876 - spark - INFO - [socketio] Successfully connected user 1 (admin)

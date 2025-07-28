@@ -1,4 +1,4 @@
-from flask import render_template, request, jsonify, redirect, url_for, session
+from flask import render_template, request, jsonify, redirect, url_for, session, current_app
 from flask_login import login_required, current_user
 from . import bp
 from datetime import datetime
@@ -71,14 +71,16 @@ def index():
     try:
         from flask_login import current_user
         
-        print(f"Current user authenticated: {current_user.is_authenticated}")
-        if hasattr(current_user, 'username'):
-            print(f"Current user username: {current_user.username}")
+        if current_app.debug:
+            print(f"Current user authenticated: {current_user.is_authenticated}")
+            if hasattr(current_user, 'username'):
+                print(f"Current user username: {current_user.username}")
         
         if current_user.is_authenticated:
             # Reset redirect loop protection on successful authentication
             session['redirect_loop_protection'] = 0
-            print(f"User authenticated - resetting redirect loop protection")
+            if current_app.debug:
+                print(f"User authenticated - resetting redirect loop protection")
             
             # User is authenticated - show main page
             if client_type == 'yam_client':
@@ -87,7 +89,8 @@ def index():
                 email = current_user.email
                 name = user.split('.')[0].title() if '.' in user else user.title()
                 
-                print(f"Returning JSON response for YAM client")
+                if current_app.debug:
+                    print(f"Returning JSON response for YAM client")
                 return jsonify({
                     'status': 'authenticated',
                     'user': {
@@ -104,10 +107,11 @@ def index():
                 user = current_user.username
                 email = current_user.email
                 name = user.split('.')[0].title() if '.' in user else user.title()
-                print(f"*******************************")
-                print(f"**** {user.title()} has logged in. ({email}) ****")
-                print(f"*******************************")
-                print(f"Rendering YAM.html template for web browser (main dashboard)")
+                if current_app.debug:
+                    print(f"*******************************")
+                    print(f"**** {user.title()} has logged in. ({email}) ****")
+                    print(f"*******************************")
+                    print(f"Rendering YAM.html template for web browser (main dashboard)")
                 
                 # Mark user as online using presence service
                 try:
@@ -119,9 +123,11 @@ def index():
                         'login_method': 'web_login'
                     }
                     presence_service.mark_user_online(current_user.id, session_data)
-                    print(f"Marked user {current_user.id} as online via main route")
+                    if current_app.debug:
+                        print(f"Marked user {current_user.id} as online via main route")
                 except Exception as e:
-                    print(f"Error marking user online: {e}")
+                    if current_app.debug:
+                        print(f"Error marking user online: {e}")
                 
                 # Pass current_user for template imports/components
                 return render_template('YAM.html', user=user, user_email=email, name=name,
@@ -131,7 +137,8 @@ def index():
             # User is not authenticated, redirect to login page
             # Increment redirect loop protection counter
             session['redirect_loop_protection'] = redirect_loop_protection + 1
-            print(f"User not authenticated - redirecting to login (counter: {session['redirect_loop_protection']})")
+            if current_app.debug:
+                print(f"User not authenticated - redirecting to login (counter: {session['redirect_loop_protection']})")
             
             if client_type == 'yam_client':
                 return jsonify({
@@ -145,13 +152,15 @@ def index():
                 return redirect(url_for('auth.login'))
                 
     except Exception as e:
-        print(f"Error in root route: {e}")
-        import traceback
-        traceback.print_exc()
+        if current_app.debug:
+            print(f"Error in root route: {e}")
+            import traceback
+            traceback.print_exc()
         
         # Increment redirect loop protection counter
         session['redirect_loop_protection'] = redirect_loop_protection + 1
-        print(f"Exception occurred - redirecting to login (counter: {session['redirect_loop_protection']})")
+        if current_app.debug:
+            print(f"Exception occurred - redirecting to login (counter: {session['redirect_loop_protection']})")
         
         # Fallback to simple template instead of redirecting to login
         if client_type == 'yam_client':
