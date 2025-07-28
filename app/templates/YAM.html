@@ -18,8 +18,17 @@
 
         <!-- Main Content (now on the right) -->
         <div class="yam-main-content">
-            <!-- Outages Section -->
-            {% include 'components/yam/yam_outages_section.html' %}
+            <!-- Charts Grid - Side by Side Layout -->
+            <div class="charts-grid">
+                <!-- Outages Section -->
+                {% include 'components/yam/yam_outages_section.html' %}
+                
+                <!-- User Tickets Section -->
+                {% include 'components/yam/yam_user_tickets_section.html' %}
+            </div>
+            
+            <!-- Dashboard Widgets (Reminders & Calendar) -->
+            {% include 'components/yam/yam_dashboard_widgets.html' %}
         </div>
     </div>
 
@@ -38,4 +47,6 @@
 {% include 'components/yam/yam_data_scripts.html' %}
 {% include 'components/yam/yam_chart_and_management_scripts.html' %}
 {% include 'components/yam/yam_outage_management_scripts.html' %}
+{% include 'components/yam/yam_widget_scripts.html' %}
+{% include 'components/yam/yam_user_tickets_scripts.html' %}
 {% endblock %}

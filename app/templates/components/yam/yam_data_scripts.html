@@ -72,133 +72,93 @@ function loadOutagesForManagement() {
 
 // Update functions
 function updateOutageStats(outages) {
-    const activeOutages = outages.filter(o => o.status === 'active');
-    const resolvedOutages = outages.filter(o => o.status === 'resolved');
+    const now = new Date();
+    const activeOutages = outages.filter(outage => outage.status === 'active');
+    const totalOutages = outages.length;
     
     // Update active outages count
-    const activeElement = document.getElementById('activeOutages');
-    if (activeElement) {
-        activeElement.textContent = activeOutages.length;
-        // Add visual indicator for active outages
-        if (activeOutages.length > 0) {
-            activeElement.style.color = '#dc3545';
-            activeElement.style.fontWeight = 'bold';
-        } else {
-            activeElement.style.color = '#28a745';
-            activeElement.style.fontWeight = 'normal';
+    const activeOutagesElement = document.getElementById('activeOutages');
+    const activeOutagesStat = document.getElementById('activeOutagesStat');
+    
+    if (activeOutagesElement) {
+        activeOutagesElement.textContent = activeOutages.length;
+        
+        // Hide active outages stat if count is 0
+        if (activeOutagesStat) {
+            if (activeOutages.length === 0) {
+                activeOutagesStat.classList.add('hidden');
+            } else {
+                activeOutagesStat.classList.remove('hidden');
+            }
         }
     }
     
     // Update total outages count
-    const totalElement = document.getElementById('totalOutages');
-    if (totalElement) {
-        totalElement.textContent = outages.length;
+    const totalOutagesElement = document.getElementById('totalOutages');
+    if (totalOutagesElement) {
+        totalOutagesElement.textContent = totalOutages;
     }
     
-    // Calculate and update average duration
-    const avgElement = document.getElementById('avgDuration');
-    if (avgElement) {
-        if (resolvedOutages.length > 0) {
-            const totalDuration = resolvedOutages.reduce((sum, o) => {
-                if (!o.start_time || !o.end_time) return sum;
-                const start = new Date(o.start_time);
-                const end = new Date(o.end_time);
-                return sum + (end - start);
-            }, 0);
-            
-            const avgDuration = totalDuration / resolvedOutages.length;
-            const hours = Math.round(avgDuration / (1000 * 60 * 60));
-            const minutes = Math.round((avgDuration % (1000 * 60 * 60)) / (1000 * 60));
-            
-            if (hours > 0) {
-                avgElement.textContent = `${hours}h ${minutes}m`;
-            } else {
-                avgElement.textContent = `${minutes}m`;
-            }
-        } else {
-            avgElement.textContent = 'N/A';
-        }
-    }
-    
-    console.log('Updated outage stats:', {
-        active: activeOutages.length,
-        total: outages.length,
-        resolved: resolvedOutages.length
-    });
+    console.log('Updated outage stats - Active:', activeOutages.length, 'Total:', totalOutages);
 }
 
 function updateCurrentOutages(outages) {
-    const activeOutages = outages.filter(o => o.status === 'active');
-    const container = document.getElementById('currentOutages');
+    const currentOutagesContainer = document.getElementById('currentOutages');
+    const currentOutagesModalContent = document.getElementById('currentOutagesModalContent');
     
-    if (!container) {
-        console.warn('Current outages container not found');
-        return;
-    }
+    // Update both the hidden container and modal content
+    const containers = [currentOutagesContainer, currentOutagesModalContent];
     
-    if (activeOutages.length === 0) {
-        container.innerHTML = '<div class="no-data">No active outages</div>';
-        return;
-    }
-    
-    container.innerHTML = activeOutages.map(outage => {
-        const startTime = new Date(outage.start_time);
-        const timeDiff = new Date() - startTime;
-        const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    containers.forEach(container => {
+        if (!container) return;
         
-        // Format start time
-        const startTimeFormatted = startTime.toLocaleString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+        const activeOutages = outages.filter(outage => outage.status === 'active');
         
-        return `
-            <div class="outage-item" data-id="${outage.id}" style="
-                background: rgba(220, 53, 69, 0.1);
-                border: 1px solid rgba(220, 53, 69, 0.3);
-                border-radius: 8px;
-                padding: 12px;
-                margin-bottom: 8px;
-                transition: all 0.3s ease;
-            ">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                    <strong style="color: #dc3545; font-size: 14px;">${outage.title}</strong>
-                    <span style="
-                        background: #dc3545;
-                        color: white;
-                        padding: 2px 8px;
-                        border-radius: 12px;
-                        font-size: 10px;
-                        font-weight: bold;
-                    ">ACTIVE</span>
-                </div>
-                <div style="color: #ccc; font-size: 12px; margin-bottom: 6px;">${outage.description}</div>
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #999;">
-                    <span>Started: ${startTimeFormatted}</span>
-                    <span style="color: #ff9999;">Duration: ${hours}h ${minutes}m</span>
-                </div>
-                ${outage.affected_systems ? `
-                    <div style="font-size: 11px; color: #999; margin-top: 4px;">
-                        <i class="bi bi-gear"></i> Affected: ${outage.affected_systems}
+        if (activeOutages.length === 0) {
+            container.innerHTML = `
+                <div class="no-outages">
+                    <div class="no-outages-icon">
+                        <i class="bi bi-check-circle-fill"></i>
                     </div>
-                ` : ''}
-            </div>
-        `;
-    }).join('');
-    
-    // Attach click listeners to open detail modal
-    const outageItems = container.querySelectorAll('.outage-item');
-    outageItems.forEach((item, index) => {
-        item.style.cursor = 'pointer';
-        item.addEventListener('click', () => {
-            openOutageDetail(activeOutages[index]);
-        });
+                    <div class="no-outages-text">
+                        <h4>All Systems Operational</h4>
+                        <p>No active outages at this time</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+        
+        const outagesHTML = activeOutages.map(outage => {
+            const startTime = new Date(outage.start_time);
+            const duration = getDuration(startTime);
+            const severity = getSeverityLevel(outage.title, outage.description);
+            
+            return `
+                <div class="outage-item ${severity}" onclick="showOutageDetails('${outage.id}')">
+                    <div class="outage-header">
+                        <div class="outage-title">${outage.title}</div>
+                        <div class="outage-severity ${severity}">${severity.toUpperCase()}</div>
+                    </div>
+                    <div class="outage-description">${outage.description}</div>
+                    <div class="outage-meta">
+                        <span class="outage-time">
+                            <i class="bi bi-clock"></i>
+                            Started ${formatTimeAgo(startTime)} (${duration})
+                        </span>
+                        ${outage.affected_systems ? `
+                            <span class="outage-systems">
+                                <i class="bi bi-server"></i>
+                                ${outage.affected_systems}
+                            </span>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        container.innerHTML = outagesHTML;
     });
-    
-    console.log('Updated current outages display with', activeOutages.length, 'active outages');
 }
 
 function updateRecentActivity(activities) {
@@ -284,19 +244,110 @@ function getTimeAgo(date) {
     return `${diffDays}d ago`;
 }
 
+function getDuration(startTime) {
+    const now = new Date();
+    const diffMs = now - startTime;
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (diffHours > 0) {
+        return `${diffHours}h ${diffMinutes}m`;
+    } else {
+        return `${diffMinutes}m`;
+    }
+}
+
+function getSeverityLevel(title, description) {
+    const text = (title + ' ' + description).toLowerCase();
+    
+    if (text.includes('critical') || text.includes('emergency') || text.includes('down')) {
+        return 'critical';
+    } else if (text.includes('high') || text.includes('major')) {
+        return 'high';
+    } else if (text.includes('medium') || text.includes('minor')) {
+        return 'medium';
+    } else {
+        return 'low';
+    }
+}
+
+function formatTimeAgo(date) {
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays > 0) {
+        return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    } else if (diffHours > 0) {
+        return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    } else if (diffMinutes > 0) {
+        return `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''} ago`;
+    } else {
+        return 'Just now';
+    }
+}
+
+function filterOutages(severity) {
+    // This function can be enhanced to filter outages by severity
+    console.log('Filtering outages by severity:', severity);
+    // For now, just reload the data
+    loadOutagesData();
+}
+
+function showOutageDetails(outageId) {
+    // This function can be enhanced to show detailed outage information
+    console.log('Showing details for outage:', outageId);
+    // You can implement a modal or redirect to a detailed view
+}
+
+// Time period button functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const timeButtons = document.querySelectorAll('.outages-card .time-btn');
+    
+    timeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            timeButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Get the period and load data
+            const period = this.getAttribute('data-period');
+            if (period === 'custom') {
+                // Handle custom date selection
+                openCustomDateModal();
+            } else {
+                loadOutagesData(period);
+            }
+        });
+    });
+    
+    // Custom date button functionality
+    const customDateBtn = document.getElementById('customDateBtn');
+    if (customDateBtn) {
+        customDateBtn.addEventListener('click', function() {
+            openCustomDateModal();
+        });
+    }
+});
+
+function openCustomDateModal() {
+    // This function can be implemented to open a custom date selection modal
+    console.log('Opening custom date modal');
+    // You can implement a modal for date selection
+}
+
 // Real-time update functionality
 let outageUpdateInterval;
 
 function startOutageUpdates() {
-    // Update outages every 10 seconds
+    // Update outages every 30 seconds
     outageUpdateInterval = setInterval(() => {
-        const activeBtn = document.querySelector('.time-btn.active');
-        if (activeBtn && activeBtn.id !== 'customDateBtn') {
-            loadOutagesData(activeBtn.dataset.period);
-        } else {
-            loadOutagesData('7d'); // Default to 7 days if no active button
-        }
-    }, 10000);
+        loadOutagesData();
+    }, 30000);
     
     console.log('Started real-time outage updates');
 }
@@ -453,4 +504,40 @@ window.checkChartStatus = function() {
     console.log('- Canvas element:', canvas);
     console.log('- Canvas context:', canvas ? canvas.getContext('2d') : 'N/A');
 };
+
+// Modal functions for current outages
+function openCurrentOutagesModal() {
+    const modal = document.getElementById('currentOutagesModal');
+    if (modal) {
+        modal.classList.add('show');
+        // Refresh the data in the modal
+        if (typeof loadOutagesData === 'function') {
+            loadOutagesData();
+        }
+    }
+}
+
+function closeCurrentOutagesModal() {
+    const modal = document.getElementById('currentOutagesModal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('outage-modal')) {
+        e.target.classList.remove('show');
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const modal = document.querySelector('.outage-modal.show');
+        if (modal) {
+            modal.classList.remove('show');
+        }
+    }
+});
 </script> 

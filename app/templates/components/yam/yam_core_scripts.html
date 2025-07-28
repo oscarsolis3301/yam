@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load real data
     console.log('Loading initial outages data...');
     if (typeof loadOutagesData === 'function') {
-        loadOutagesData();
+        loadOutagesData('14d'); // Changed default from 7d to 14d
     } else {
         console.warn('loadOutagesData function not available');
     }

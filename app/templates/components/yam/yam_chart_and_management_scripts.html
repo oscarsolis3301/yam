@@ -20,40 +20,40 @@ function updateOutageChart(outages, period, customStart = null, customEnd = null
         
         if (totalHours <= 24) {
             intervalHours = 1;
-            format = { hour: 'numeric', minute: '2-digit' };
+            format = 'hour';
         } else if (totalHours <= 168) { // 7 days
             intervalHours = 6;
-            format = { day: 'numeric', hour: 'numeric' };
+            format = 'day';
         } else {
             intervalHours = 24;
-            format = { day: 'numeric', month: 'short' };
+            format = 'month';
         }
     } else {
         switch(period) {
             case '3d':
                 periodHours = 3 * 24;
                 intervalHours = 6;
-                format = { day: 'numeric', hour: 'numeric' };
+                format = 'day';
                 break;
             case '7d':
                 periodHours = 7 * 24;
                 intervalHours = 12;
-                format = { day: 'numeric', hour: 'numeric' };
+                format = 'day';
                 break;
             case '14d':
                 periodHours = 14 * 24;
                 intervalHours = 24;
-                format = { day: 'numeric', month: 'short' };
+                format = 'month';
                 break;
             case '30d':
                 periodHours = 30 * 24;
                 intervalHours = 24;
-                format = { day: 'numeric', month: 'short' };
+                format = 'month';
                 break;
             default: // 7d
                 periodHours = 7 * 24;
                 intervalHours = 12;
-                format = { day: 'numeric', hour: 'numeric' };
+                format = 'day';
         }
         startDate = new Date(now.getTime() - (periodHours * 60 * 60 * 1000));
         endDate = now;
@@ -67,7 +67,27 @@ function updateOutageChart(outages, period, customStart = null, customEnd = null
         const time = new Date(startDate.getTime() + (i * intervalHours * 60 * 60 * 1000));
         if (time > endDate) break;
         
-        labels.push(time.toLocaleString('en-US', format));
+        // Improved date formatting
+        let formattedLabel;
+        if (format === 'hour') {
+            formattedLabel = time.toLocaleString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true 
+            });
+        } else if (format === 'day') {
+            const day = time.getDate();
+            const suffix = getDaySuffix(day);
+            const month = time.toLocaleString('en-US', { month: 'short' });
+            formattedLabel = `${month} ${day}${suffix}`;
+        } else {
+            const day = time.getDate();
+            const suffix = getDaySuffix(day);
+            const month = time.toLocaleString('en-US', { month: 'short' });
+            formattedLabel = `${month} ${day}${suffix}`;
+        }
+        
+        labels.push(formattedLabel);
         
         const periodStart = new Date(time.getTime() - (intervalHours * 60 * 60 * 1000));
         const periodEnd = time;
@@ -87,9 +107,186 @@ function updateOutageChart(outages, period, customStart = null, customEnd = null
     // Update chart data
     outageChart.data.labels = labels;
     outageChart.data.datasets[0].data = data;
+    
+    // Update chart options to make dots clickable
+    outageChart.options.onClick = function(event, elements) {
+        if (elements.length > 0) {
+            const index = elements[0].index;
+            const value = data[index];
+            const label = labels[index];
+            
+            if (value > 0) {
+                // Show details for this time period
+                showOutageDetailsForPeriod(startDate, endDate, index, intervalHours, outages);
+            }
+        }
+    };
+    
+    // Update chart options to show tooltips on hover
+    outageChart.options.plugins.tooltip = {
+        callbacks: {
+            title: function(context) {
+                return context[0].label;
+            },
+            label: function(context) {
+                const value = context.parsed.y;
+                if (value === 0) {
+                    return 'No outages';
+                } else if (value === 1) {
+                    return `${value} outage`;
+                } else {
+                    return `${value} outages`;
+                }
+            }
+        }
+    };
+    
     outageChart.update('active');
     
     console.log('Outage chart updated with', outages.length, 'outages for period', period);
+}
+
+// Helper function to get day suffix (1st, 2nd, 3rd, etc.)
+function getDaySuffix(day) {
+    if (day >= 11 && day <= 13) {
+        return 'th';
+    }
+    switch (day % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+    }
+}
+
+// Function to show outage details for a specific time period
+function showOutageDetailsForPeriod(startDate, endDate, index, intervalHours, outages) {
+    const periodStart = new Date(startDate.getTime() + (index * intervalHours * 60 * 60 * 1000));
+    const periodEnd = new Date(periodStart.getTime() + (intervalHours * 60 * 60 * 1000));
+    
+    // Filter outages for this period
+    const periodOutages = outages.filter(outage => {
+        const outageStart = new Date(outage.start_time);
+        const outageEnd = outage.end_time ? new Date(outage.end_time) : new Date();
+        
+        return outageStart < periodEnd && outageEnd > periodStart;
+    });
+    
+    if (periodOutages.length > 0) {
+        // Create a temporary modal or tooltip to show outage details
+        showOutagePeriodModal(periodOutages, periodStart, periodEnd);
+    }
+}
+
+// Function to show outage period modal
+function showOutagePeriodModal(outages, startTime, endTime) {
+    const modal = document.createElement('div');
+    modal.className = 'outage-period-modal';
+    modal.innerHTML = `
+        <div class="outage-period-content">
+            <div class="outage-period-header">
+                <h3>Outages from ${startTime.toLocaleString()} to ${endTime.toLocaleString()}</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</button>
+            </div>
+            <div class="outage-period-list">
+                ${outages.map(outage => `
+                    <div class="outage-period-item">
+                        <div class="outage-title">${outage.title}</div>
+                        <div class="outage-description">${outage.description}</div>
+                        <div class="outage-time">${new Date(outage.start_time).toLocaleString()} - ${outage.end_time ? new Date(outage.end_time).toLocaleString() : 'Ongoing'}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    // Add styles
+    const style = document.createElement('style');
+    style.textContent = `
+        .outage-period-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+        }
+        .outage-period-content {
+            background: rgba(15, 15, 15, 0.95);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .outage-period-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .outage-period-header h3 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .outage-period-item {
+            background: rgba(25, 25, 25, 0.8);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .outage-title {
+            color: #dc3545;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .outage-description {
+            color: #cccccc;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .outage-time {
+            color: #888888;
+            font-size: 0.8rem;
+        }
+    `;
+    
+    document.head.appendChild(style);
+    document.body.appendChild(modal);
+    
+    // Close modal when clicking outside
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
 }
 
 // Outage management functions

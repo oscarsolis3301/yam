@@ -1,23 +1,772 @@
 <!-- User Profile Sidebar -->
-<div class="card user-profile">
-    <div class="profile-avatar" id="profileAvatar">
-        {% if current_user.profile_picture %}
-            <img src="{{ current_user.profile_picture }}" alt="Profile Picture" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-            <span style="display: none;">{{ current_user.username[0].upper() }}</span>
-        {% else %}
-            {{ current_user.username[0].upper() }}
-        {% endif %}
+<div class="sidebar-content">
+    <!-- User Profile Card -->
+    <div class="card user-profile">
+        <div class="profile-avatar" id="profileAvatar">
+            {% if current_user.profile_picture %}
+                <img src="{{ url_for('static', filename='uploads/profile_pictures/' + current_user.profile_picture) }}" 
+                     alt="Profile Picture" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                     class="profile-image">
+                <span class="profile-fallback" style="display: none;">{{ current_user.username[0].upper() }}</span>
+            {% else %}
+                <span class="profile-fallback">{{ current_user.username[0].upper() }}</span>
+            {% endif %}
+        </div>
+        <div class="profile-name" id="profileName">{{ current_user.username.title() }}</div>
+        <div class="profile-role" id="profileRole">{{ current_user.role.title() if current_user.role else 'User' }}</div>
+        
+        <div class="recent-activity">
+            <h4 style="color: #ffffff; font-weight: 600; margin-bottom: 0.8rem; text-align: center;">Recent Activity</h4>
+            <div id="recentActivity">
+                <div class="no-data">Loading activity...</div>
+            </div>
+            <div style="text-align:center; margin-top:0.5rem;">
+                <button onclick="openActivityModal()" class="view-all-activity-btn">
+                    <i class="bi bi-clock-history"></i>
+                    View All Activity
+                </button>
+            </div>
+        </div>
     </div>
-    <div class="profile-name" id="profileName">{{ current_user.username.title() }}</div>
-    <div class="profile-role" id="profileRole">{{ current_user.role.title() if current_user.role else 'User' }}</div>
+
+    <!-- Reminders Widget -->
+    <div class="widget reminder-widget-sidebar">
+        <div class="widget-header">
+            <h3><i class="bi bi-bell-fill"></i> Quick Reminders</h3>
+            <button class="widget-action-btn" onclick="openReminderModal()">
+                <i class="bi bi-plus-lg"></i>
+            </button>
+        </div>
+        <div class="widget-content">
+            <div id="sidebarRemindersList" class="reminders-list-sidebar">
+                <div class="loading-reminders">
+                    <div class="loading-spinner"></div>
+                    <p>Loading reminders...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Activity Modal -->
+<div id="activityModal" class="activity-modal">
+    <div class="activity-modal-content">
+        <div class="activity-modal-header">
+            <h3><i class="bi bi-clock-history"></i> Activity History</h3>
+            <button class="activity-modal-close" onclick="closeActivityModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="activity-modal-body">
+            <div class="activity-filters">
+                <select id="activityFilter" onchange="filterActivity(this.value)">
+                    <option value="all">All Activities</option>
+                    <option value="login">Logins</option>
+                    <option value="page_view">Page Views</option>
+                    <option value="search">Searches</option>
+                    <option value="file_upload">File Uploads</option>
+                    <option value="settings_changed">Settings Changes</option>
+                </select>
+                <div class="activity-search">
+                    <input type="text" id="activitySearch" placeholder="Search activities..." onkeyup="searchActivity(this.value)">
+                    <i class="bi bi-search"></i>
+                </div>
+            </div>
+            <div id="activityList" class="activity-list">
+                <div class="activity-loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading activity history...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Sidebar Content Layout */
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+/* Enhanced Profile Avatar */
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, #00d4ff, #0099cc);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 800;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.profile-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 32px rgba(0, 212, 255, 0.4);
+}
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.profile-fallback {
+    color: #ffffff;
+    font-size: 2.5rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* Sidebar Reminders Widget */
+.reminder-widget-sidebar {
+    background: rgba(15, 15, 15, 0.95);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    margin-top: 0;
+}
+
+.reminder-widget-sidebar:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.reminder-widget-sidebar .widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.reminder-widget-sidebar .widget-header h3 {
+    color: #ffffff;
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.reminder-widget-sidebar .widget-action-btn {
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    color: #00d4ff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+}
+
+.reminder-widget-sidebar .widget-action-btn:hover {
+    background: rgba(0, 212, 255, 0.2);
+    border-color: #00d4ff;
+    transform: scale(1.1);
+}
+
+.reminder-widget-sidebar .widget-content {
+    padding: 1.5rem;
+    min-height: 200px;
+}
+
+.reminders-list-sidebar {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.reminders-list-sidebar .reminder-item {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem;
+    margin-bottom: 0.6rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.reminders-list-sidebar .reminder-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(3px);
+}
+
+.reminders-list-sidebar .reminder-item.urgent {
+    border-left: 3px solid #ff3b30;
+    background: rgba(255, 59, 48, 0.1);
+}
+
+.reminders-list-sidebar .reminder-item.high {
+    border-left: 3px solid #ff9500;
+    background: rgba(255, 149, 0, 0.1);
+}
+
+.reminders-list-sidebar .reminder-item.medium {
+    border-left: 3px solid #00d4ff;
+    background: rgba(0, 212, 255, 0.1);
+}
+
+.reminders-list-sidebar .reminder-item.low {
+    border-left: 3px solid #34c759;
+    background: rgba(52, 199, 89, 0.1);
+}
+
+.reminders-list-sidebar .reminder-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.8rem;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.reminders-list-sidebar .reminder-item.urgent .reminder-icon {
+    background: rgba(255, 59, 48, 0.2);
+    color: #ff3b30;
+}
+
+.reminders-list-sidebar .reminder-item.high .reminder-icon {
+    background: rgba(255, 149, 0, 0.2);
+    color: #ff9500;
+}
+
+.reminders-list-sidebar .reminder-item.medium .reminder-icon {
+    background: rgba(0, 212, 255, 0.2);
+    color: #00d4ff;
+}
+
+.reminders-list-sidebar .reminder-item.low .reminder-icon {
+    background: rgba(52, 199, 89, 0.2);
+    color: #34c759;
+}
+
+.reminders-list-sidebar .reminder-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.reminders-list-sidebar .reminder-title {
+    color: #ffffff;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.reminders-list-sidebar .reminder-description {
+    color: #cccccc;
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.reminders-list-sidebar .reminder-time {
+    color: #888888;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.reminders-list-sidebar .no-reminders {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #888888;
+}
+
+.reminders-list-sidebar .no-reminders i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.reminders-list-sidebar .no-reminders button {
+    margin-top: 1rem;
+    background: linear-gradient(135deg, #00d4ff, #0099cc);
+    border: none;
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.reminders-list-sidebar .no-reminders button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+}
+
+/* View All Activity Button */
+.view-all-activity-btn {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 153, 204, 0.1));
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    color: #00d4ff;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.view-all-activity-btn:hover {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 153, 204, 0.2));
+    border-color: #00d4ff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2);
+}
+
+/* Activity Modal Styles */
+.activity-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(20px);
+    z-index: 999999999;
+    animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.activity-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.activity-modal-content {
+    background: rgba(15, 15, 15, 0.98);
+    border-radius: 24px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 85vh;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(30px);
+    overflow: hidden;
+    animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.activity-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.activity-modal-header h3 {
+    color: #ffffff;
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.activity-modal-close {
+    background: none;
+    border: none;
+    color: #888888;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.activity-modal-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+.activity-modal-body {
+    padding: 2rem;
+    max-height: calc(85vh - 100px);
+    overflow-y: auto;
+}
+
+.activity-filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.activity-filters select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: #ffffff;
+    padding: 0.8rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    min-width: 150px;
+}
+
+.activity-filters select:focus {
+    outline: none;
+    border-color: #00d4ff;
+    box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+}
+
+.activity-search {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+}
+
+.activity-search input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: #ffffff;
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+}
+
+.activity-search input:focus {
+    outline: none;
+    border-color: #00d4ff;
+    box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+}
+
+.activity-search i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888888;
+    font-size: 0.9rem;
+}
+
+.activity-list {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.activity-loading {
+    text-align: center;
+    padding: 3rem;
+    color: #888888;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top: 3px solid #00d4ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+.activity-item-modal {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    margin-bottom: 0.8rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s ease;
+}
+
+.activity-item-modal:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(4px);
+}
+
+.activity-icon-modal {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(0, 212, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1rem;
+    color: #00d4ff;
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    flex-shrink: 0;
+}
+
+.activity-content-modal {
+    flex: 1;
+}
+
+.activity-desc-modal {
+    color: #ffffff;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+}
+
+.activity-time-modal {
+    color: #888888;
+    font-size: 0.8rem;
+}
+
+.activity-meta-modal {
+    color: #cccccc;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar-content {
+        gap: 1rem;
+    }
     
-    <div class="recent-activity">
-        <h4 style="color: #ffffff; font-weight: 600; margin-bottom: 0.8rem; text-align: center;">Recent Activity</h4>
-        <div id="recentActivity">
-            <div class="no-data">Loading activity...</div>
-        </div>
-        <div style="text-align:center; margin-top:0.5rem;">
-            <a href="#" onclick="yamModals.openModal('recentActivityModal'); return false;" style="font-size:0.8rem; color:#0d6efd; text-decoration:none;">View All Activity</a>
-        </div>
-    </div>
-</div> 
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .reminder-widget-sidebar .widget-header {
+        padding: 1rem 1.2rem;
+    }
+    
+    .reminder-widget-sidebar .widget-header h3 {
+        font-size: 1rem;
+    }
+    
+    .reminder-widget-sidebar .widget-content {
+        padding: 1.2rem;
+        min-height: 180px;
+    }
+    
+    .reminders-list-sidebar {
+        max-height: 250px;
+    }
+    
+    .reminders-list-sidebar .reminder-item {
+        padding: 0.6rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .reminders-list-sidebar .reminder-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+        margin-right: 0.6rem;
+    }
+    
+    .reminders-list-sidebar .reminder-title {
+        font-size: 0.85rem;
+    }
+    
+    .reminders-list-sidebar .reminder-description {
+        font-size: 0.75rem;
+    }
+    
+    .reminders-list-sidebar .reminder-time {
+        font-size: 0.7rem;
+    }
+    
+    .activity-modal-content {
+        width: 95%;
+        max-height: 90vh;
+        margin: 1rem;
+    }
+    
+    .activity-modal-header {
+        padding: 1rem 1.5rem;
+    }
+    
+    .activity-modal-body {
+        padding: 1.5rem;
+    }
+    
+    .activity-filters {
+        flex-direction: column;
+    }
+    
+    .activity-search {
+        min-width: auto;
+    }
+}
+</style>
+
+<script>
+function openActivityModal() {
+    const modal = document.getElementById('activityModal');
+    modal.classList.add('show');
+    loadFullActivityHistory();
+}
+
+function closeActivityModal() {
+    const modal = document.getElementById('activityModal');
+    modal.classList.remove('show');
+}
+
+function loadFullActivityHistory() {
+    const activityList = document.getElementById('activityList');
+    
+    fetch('/api/activity/all')
+        .then(response => response.json())
+        .then(result => {
+            const activities = result.activities || [];
+            displayActivityHistory(activities);
+        })
+        .catch(error => {
+            console.error('Error loading activity history:', error);
+            activityList.innerHTML = '<div class="no-data">Error loading activity history</div>';
+        });
+}
+
+function displayActivityHistory(activities) {
+    const activityList = document.getElementById('activityList');
+    
+    if (activities.length === 0) {
+        activityList.innerHTML = '<div class="no-data">No activity history found</div>';
+        return;
+    }
+    
+    const activitiesHTML = activities.map(activity => {
+        const time = new Date(activity.timestamp);
+        const timeAgo = getTimeAgo(time);
+        const icon = getActivityIcon(activity.action);
+        const description = formatActivityType(activity.action, activity.details);
+        
+        return `
+            <div class="activity-item-modal" data-type="${activity.action}">
+                <div class="activity-icon-modal">${icon}</div>
+                <div class="activity-content-modal">
+                    <div class="activity-desc-modal">${description}</div>
+                    <div class="activity-time-modal">${timeAgo}</div>
+                    ${activity.details ? `<div class="activity-meta-modal">${activity.details}</div>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    activityList.innerHTML = activitiesHTML;
+}
+
+function filterActivity(type) {
+    const activityItems = document.querySelectorAll('.activity-item-modal');
+    
+    activityItems.forEach(item => {
+        if (type === 'all' || item.dataset.type === type) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function searchActivity(query) {
+    const activityItems = document.querySelectorAll('.activity-item-modal');
+    const searchTerm = query.toLowerCase();
+    
+    activityItems.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// Close modal when clicking outside
+document.getElementById('activityModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeActivityModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeActivityModal();
+    }
+});
+</script> 

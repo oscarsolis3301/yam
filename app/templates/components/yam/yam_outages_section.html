@@ -4,43 +4,705 @@
         <h2 class="card-title">System Outages</h2>
         <div class="time-controls">
             <button class="time-btn" data-period="3d">3D</button>
-            <button class="time-btn active" data-period="7d">7D</button>
-            <button class="time-btn" data-period="14d">14D</button>
+            <button class="time-btn" data-period="7d">7D</button>
+            <button class="time-btn active" data-period="14d">14D</button>
             <button class="time-btn" data-period="30d">30D</button>
             <button class="time-btn custom-date-btn" id="customDateBtn">Custom</button>
         </div>
     </div>
     
-    <div class="outage-chart">
+    <!-- Taller Chart Container -->
+    <div class="outage-chart enhanced">
         <canvas id="outageChart" class="chart-canvas"></canvas>
     </div>
     
+    <!-- Simplified Stats Grid - Removed Avg Duration and Uptime -->
     <div class="outage-stats">
-        <div class="stat-item">
-            <div class="stat-number" id="activeOutages">-</div>
-            <div class="stat-label">Active</div>
+        <div class="stat-item clickable" id="activeOutagesStat" onclick="openCurrentOutagesModal()">
+            <div class="stat-icon">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number" id="activeOutages">-</div>
+                <div class="stat-label">Active Outages</div>
+            </div>
         </div>
         <div class="stat-item">
-            <div class="stat-number" id="totalOutages">-</div>
-            <div class="stat-label">Total</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-number" id="avgDuration">-</div>
-            <div class="stat-label">Avg Duration</div>
+            <div class="stat-icon">
+                <i class="bi bi-graph-up"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number" id="totalOutages">-</div>
+                <div class="stat-label">Total This Period</div>
+            </div>
         </div>
     </div>
 
-    <!-- Current Outages -->
-    <div class="outage-management">
-        <h3 style="color: #dc3545; margin-bottom: 0.8rem;">Current Outages</h3>
-        <div class="current-outages" id="currentOutages">
+    <!-- Hidden Current Outages Section - Now in Modal -->
+    <div class="outage-management compact" style="display: none;">
+        <div class="outage-header">
+            <h3 style="color: #ffffff; margin-bottom: 0.5rem; font-weight: 600; font-size: 1rem;">Current Outages</h3>
+            <div class="outage-filters">
+                <select class="outage-filter" onchange="filterOutages(this.value)">
+                    <option value="all">All Severities</option>
+                    <option value="critical">Critical</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+            </div>
+        </div>
+        <div class="current-outages compact" id="currentOutages">
             <div class="no-data">Loading outages...</div>
         </div>
         
         {% if current_user.role in ['admin', 'manager', 'developer'] %}
         <div class="admin-actions">
-            <button class="admin-btn" onclick="openOutagesManagementModal()">Manage Outages</button>
+            <button class="admin-btn" onclick="openOutagesManagementModal()">
+                <i class="bi bi-gear-fill"></i>
+                Manage Outages
+            </button>
         </div>
         {% endif %}
     </div>
-</div> 
+</div>
+
+<!-- Current Outages Modal -->
+<div id="currentOutagesModal" class="outage-modal">
+    <div class="outage-modal-content">
+        <div class="outage-modal-header">
+            <h3><i class="bi bi-exclamation-triangle-fill"></i> Current Active Outages</h3>
+            <button class="outage-modal-close" onclick="closeCurrentOutagesModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="outage-modal-body">
+            <div class="outage-filters">
+                <select class="outage-filter" onchange="filterOutages(this.value)">
+                    <option value="all">All Severities</option>
+                    <option value="critical">Critical</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+            </div>
+            <div class="current-outages-modal" id="currentOutagesModalContent">
+                <div class="no-data">Loading outages...</div>
+            </div>
+            
+            {% if current_user.role in ['admin', 'manager', 'developer'] %}
+            <div class="admin-actions">
+                <button class="admin-btn" onclick="openOutagesManagementModal()">
+                    <i class="bi bi-gear-fill"></i>
+                    Manage Outages
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+/* Enhanced Outages Section Styles */
+.outage-chart.enhanced {
+    height: 400px; /* Increased from 350px to 400px */
+    margin-bottom: 1.5rem;
+    background: rgba(20, 20, 20, 0.5);
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.outage-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Changed from 4 to 2 columns */
+    gap: 1rem;
+    margin-bottom: 1rem; /* Reduced from 1.5rem */
+    flex-shrink: 0;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem;
+    background: rgba(25, 25, 25, 0.8);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+}
+
+.stat-item.clickable {
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-item.clickable::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(220, 53, 69, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.stat-item.clickable:hover::before {
+    left: 100%;
+}
+
+.stat-item.clickable:hover {
+    background: rgba(30, 30, 30, 0.9);
+    border-color: rgba(220, 53, 69, 0.3);
+    transform: translateY(-2px);
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(220, 53, 69, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    flex-shrink: 0;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #dc3545;
+    margin-bottom: 0.2rem;
+    text-shadow: 0 0 10px rgba(220, 53, 69, 0.3);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #cccccc;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Current Outages Modal Styles */
+.outage-modal {
+    display: none;
+    position: fixed;
+    z-index: 999999999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.3s ease;
+}
+
+.outage-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.outage-modal-content {
+    background: rgba(15, 15, 15, 0.95);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow: hidden;
+    animation: slideIn 0.3s ease;
+}
+
+.outage-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.outage-modal-header h3 {
+    color: #ffffff;
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.outage-modal-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    color: #ffffff;
+    padding: 0.5rem;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.outage-modal-close:hover {
+    background: rgba(220, 53, 69, 0.3);
+    border-color: #dc3545;
+    color: #dc3545;
+    transform: scale(1.1);
+}
+
+.outage-modal-body {
+    padding: 2rem;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.current-outages-modal {
+    margin-top: 1rem;
+}
+
+.outage-item {
+    background: rgba(25, 25, 25, 0.6);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 0.6rem; /* Reduced from 0.8rem */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.outage-item:hover {
+    background: rgba(30, 30, 30, 0.8);
+    border-color: rgba(220, 53, 69, 0.3);
+    transform: translateX(5px);
+}
+
+.outage-item.critical {
+    border-left: 4px solid #dc3545;
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.outage-item.high {
+    border-left: 4px solid #fd7e14;
+    background: rgba(253, 126, 20, 0.1);
+}
+
+.outage-item.medium {
+    border-left: 4px solid #ffc107;
+    background: rgba(255, 193, 7, 0.1);
+}
+
+.outage-item.low {
+    border-left: 4px solid #28a745;
+    background: rgba(40, 167, 69, 0.1);
+}
+
+.outage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.outage-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+}
+
+.outage-severity {
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.outage-severity.critical {
+    background: #dc3545;
+    color: white;
+}
+
+.outage-severity.high {
+    background: #fd7e14;
+    color: white;
+}
+
+.outage-severity.medium {
+    background: #ffc107;
+    color: #212529;
+}
+
+.outage-severity.low {
+    background: #28a745;
+    color: white;
+}
+
+.outage-description {
+    color: #cccccc;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.outage-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: #888888;
+}
+
+.outage-time,
+.outage-systems {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.outage-time i,
+.outage-systems i {
+    font-size: 0.8rem;
+}
+
+/* No outages state */
+.no-outages {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    text-align: center;
+    color: #888888;
+}
+
+.no-outages-icon {
+    font-size: 3rem;
+    color: #28a745;
+    margin-bottom: 1rem;
+}
+
+.no-outages-text h4 {
+    color: #28a745;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.no-outages-text p {
+    color: #888888;
+    margin: 0;
+}
+
+/* Compact outage management section - Fixed gap issues */
+.outage-management.compact {
+    margin-top: 0.5rem; /* Reduced from 1rem */
+}
+
+.outage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem; /* Reduced from 0.8rem */
+    padding-bottom: 0.3rem; /* Reduced from 0.5rem */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.outage-filters {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.outage-filter {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #ffffff;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+}
+
+.outage-filter option {
+    background: rgba(15, 15, 15, 0.95);
+    color: #ffffff;
+}
+
+/* Compact current outages list - Fixed margins */
+.current-outages.compact {
+    max-height: 180px; /* Reduced from 200px */
+    overflow-y: auto;
+    margin-bottom: 0.6rem; /* Reduced from 1rem */
+}
+
+/* Enhanced outage items */
+.outage-item {
+    background: rgba(25, 25, 25, 0.6);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 0.6rem; /* Reduced from 0.8rem */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.outage-item:hover {
+    background: rgba(30, 30, 30, 0.8);
+    border-color: rgba(220, 53, 69, 0.3);
+    transform: translateX(5px);
+}
+
+.outage-item.critical {
+    border-left: 4px solid #dc3545;
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.outage-item.high {
+    border-left: 4px solid #fd7e14;
+    background: rgba(253, 126, 20, 0.1);
+}
+
+.outage-item.medium {
+    border-left: 4px solid #ffc107;
+    background: rgba(255, 193, 7, 0.1);
+}
+
+.outage-item.low {
+    border-left: 4px solid #28a745;
+    background: rgba(40, 167, 69, 0.1);
+}
+
+.outage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.outage-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+}
+
+.outage-severity {
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.outage-severity.critical {
+    background: #dc3545;
+    color: white;
+}
+
+.outage-severity.high {
+    background: #fd7e14;
+    color: white;
+}
+
+.outage-severity.medium {
+    background: #ffc107;
+    color: #212529;
+}
+
+.outage-severity.low {
+    background: #28a745;
+    color: white;
+}
+
+.outage-description {
+    color: #cccccc;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.outage-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: #888888;
+}
+
+.outage-time,
+.outage-systems {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.outage-time i,
+.outage-systems i {
+    font-size: 0.8rem;
+}
+
+/* No outages state */
+.no-outages {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem; /* Reduced from 2rem */
+    text-align: center;
+    background: rgba(40, 167, 69, 0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(40, 167, 69, 0.2);
+}
+
+.no-outages-icon {
+    font-size: 2.5rem; /* Reduced from 3rem */
+    color: #28a745;
+    margin-bottom: 0.8rem; /* Reduced from 1rem */
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.no-outages-text h4 {
+    color: #28a745;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+}
+
+.no-outages-text p {
+    color: #888888;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Admin actions - Fixed to reduce gap */
+.admin-actions {
+    margin-top: 0; /* Removed auto margin that created gap */
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.admin-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    letter-spacing: 0.5px;
+    margin: 0 auto; /* Center the button */
+}
+
+.admin-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
+    background: linear-gradient(135deg, #c82333, #dc3545);
+}
+
+.admin-btn i {
+    font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .outage-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .outage-chart.enhanced {
+        height: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .outage-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .outage-header {
+        flex-direction: column;
+        gap: 0.8rem;
+        align-items: stretch;
+    }
+    
+    .outage-filters {
+        justify-content: center;
+    }
+    
+    .outage-chart.enhanced {
+        height: 250px;
+    }
+    
+    .current-outages.compact {
+        max-height: 120px; /* Reduced from 150px */
+    }
+    
+    .outage-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .outage-modal-content {
+        width: 95%;
+        margin: 1rem;
+    }
+    
+    .outage-modal-header {
+        padding: 1rem 1.5rem;
+    }
+    
+    .outage-modal-body {
+        padding: 1.5rem;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+</style> 

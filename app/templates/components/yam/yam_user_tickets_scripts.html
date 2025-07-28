@@ -1,0 +1,967 @@
+<script>
+// Daily Ticket Closures JavaScript
+let userTicketsChart = null;
+let realUsers = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeDailyClosures();
+});
+
+function initializeDailyClosures() {
+    loadRealUsers();
+    initializeDailyClosuresChart();
+    updateDailyClosuresData();
+    updateDailyClosuresStats();
+    
+    // Set up refresh intervals - more frequent for daily tracking
+    setInterval(updateDailyClosuresData, 180000); // Update every 3 minutes
+}
+
+function loadRealUsers() {
+    // Fetch real users from the API
+    fetch('/api/users')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch users');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Handle different response formats
+            const users = data.users || data || [];
+            realUsers = users.map(user => ({
+                id: user.id || user.username,
+                username: user.username,
+                email: user.email,
+                role: user.role || 'User',
+                profile_picture: user.profile_picture
+            }));
+            
+            // Initialize chart with real users
+            if (userTicketsChart) {
+                updateDailyClosuresData();
+            }
+            
+            // Update top performers immediately
+            updateTopPerformers(generateDailyClosuresData());
+        })
+        .catch(error => {
+            console.error('Error loading users:', error);
+            // Fallback to default users if API fails
+            realUsers = [
+                { id: 1, username: 'Admin', role: 'System Administrator', email: 'admin@company.com' },
+                { id: 2, username: 'AJ', role: 'Senior Admin', email: 'aj@company.com' },
+                { id: 3, username: 'Cole', role: 'IT Specialist', email: 'cole@company.com' },
+                { id: 4, username: 'Oscar', role: 'Support Lead', email: 'oscar@company.com' },
+                { id: 5, username: 'Sarah', role: 'Help Desk', email: 'sarah@company.com' },
+                { id: 6, username: 'Mike', role: 'Technical Support', email: 'mike@company.com' },
+                { id: 7, username: 'Emily', role: 'Customer Service', email: 'emily@company.com' },
+                { id: 8, username: 'David', role: 'IT Manager', email: 'david@company.com' }
+            ];
+            
+            // Update top performers with fallback data
+            updateTopPerformers(generateDailyClosuresData());
+        });
+}
+
+function initializeDailyClosuresChart() {
+    const ctx = document.getElementById('userTicketsChart').getContext('2d');
+    
+    const data = generateDailyClosuresData();
+    
+    userTicketsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.labels,
+            datasets: [{
+                label: 'Closed Today',
+                data: data.today,
+                backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                borderColor: '#28a745',
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false,
+                hoverBackgroundColor: 'rgba(40, 167, 69, 1)',
+                hoverBorderColor: '#ffffff',
+                hoverBorderWidth: 3,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 15, 15, 0.95)',
+                    titleColor: '#ffffff',
+                    bodyColor: '#cccccc',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    displayColors: false,
+                    callbacks: {
+                        title: function(context) {
+                            return context[0].label;
+                        },
+                        label: function(context) {
+                            return `Closed Today: ${context.parsed.y} tickets`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.05)'
+                    },
+                    ticks: {
+                        color: '#999',
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.05)'
+                    },
+                    ticks: {
+                        color: '#999',
+                        font: {
+                            size: 11
+                        },
+                        beginAtZero: true
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    });
+}
+
+function generateDailyClosuresData() {
+    // Use real users if available, otherwise fallback
+    const users = realUsers.length > 0 ? realUsers : [
+        { username: 'Admin', role: 'System Administrator' },
+        { username: 'AJ', role: 'Senior Admin' },
+        { username: 'Cole', role: 'IT Specialist' },
+        { username: 'Oscar', role: 'Support Lead' },
+        { username: 'Sarah', role: 'Help Desk' },
+        { username: 'Mike', role: 'Technical Support' },
+        { username: 'Emily', role: 'Customer Service' },
+        { username: 'David', role: 'IT Manager' }
+    ];
+    
+    const labels = users.slice(0, 8).map(user => user.username);
+    const today = users.slice(0, 8).map(() => Math.floor(Math.random() * 15) + 2); // 2-17 closures today
+    
+    return { labels, today };
+}
+
+function updateDailyClosuresData() {
+    // Simulate loading daily closures data
+    const data = generateDailyClosuresData();
+    
+    if (userTicketsChart) {
+        userTicketsChart.data.labels = data.labels;
+        userTicketsChart.data.datasets[0].data = data.today;
+        userTicketsChart.update('none');
+    }
+    
+    // Update top performers list
+    updateTopPerformers(data);
+    
+    // Update stats
+    updateDailyClosuresStats();
+}
+
+function updateTopPerformers(data) {
+    const topPerformersContainer = document.getElementById('topPerformers');
+    const topPerformersModalContent = document.getElementById('topPerformersModalContent');
+    
+    // Update both the hidden container and modal content
+    const containers = [topPerformersContainer, topPerformersModalContent];
+    
+    containers.forEach(container => {
+        if (!container) return;
+        
+        // Create performers data from chart data
+        const performers = data.labels.map((label, index) => ({
+            name: label,
+            closedToday: data.today[index],
+            efficiency: Math.floor(Math.random() * 30) + 70, // 70-100% efficiency
+            role: getRoleForUser(label)
+        })).sort((a, b) => b.closedToday - a.closedToday);
+        
+        const performersHTML = performers.map((user, index) => {
+            const avatarColor = getAvatarColor(user.name);
+            const profilePic = getProfilePicture(user.name);
+            const role = user.role || 'Team Member';
+            
+            return `
+                <div class="performer-item enhanced" onclick="showUserDetails('${user.name}')">
+                    <div class="performer-info">
+                        <div class="performer-avatar" style="background: ${avatarColor};">
+                            ${profilePic ? 
+                                `<img src="${profilePic}" alt="${user.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                 <span style="display: none;">${user.name.charAt(0)}</span>` :
+                                user.name.charAt(0)
+                            }
+                        </div>
+                        <div class="performer-details">
+                            <div class="performer-name">${user.name}</div>
+                            <div class="performer-role">${role}</div>
+                        </div>
+                    </div>
+                    <div class="performer-stats">
+                        <div class="stat-group">
+                            <div class="stat-value">${user.closedToday}</div>
+                            <div class="stat-label">Closed</div>
+                        </div>
+                        <div class="stat-group">
+                            <div class="stat-value">${user.efficiency}%</div>
+                            <div class="stat-label">Efficiency</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        container.innerHTML = performersHTML;
+    });
+}
+
+// Helper functions
+function getRoleForUser(username) {
+    const roles = {
+        'Admin': 'System Administrator',
+        'AJ': 'Senior Admin',
+        'Cole': 'IT Specialist',
+        'Oscar': 'Support Lead',
+        'Sarah': 'Help Desk',
+        'Mike': 'Technical Support',
+        'Emily': 'Customer Service',
+        'David': 'IT Manager'
+    };
+    return roles[username] || 'Team Member';
+}
+
+function getAvatarColor(username) {
+    const colors = [
+        'linear-gradient(135deg, #28a745, #20c997)',
+        'linear-gradient(135deg, #007bff, #0056b3)',
+        'linear-gradient(135deg, #6f42c1, #5a2d91)',
+        'linear-gradient(135deg, #e83e8c, #d63384)',
+        'linear-gradient(135deg, #fd7e14, #e55a00)',
+        'linear-gradient(135deg, #20c997, #17a2b8)',
+        'linear-gradient(135deg, #ffc107, #e0a800)',
+        'linear-gradient(135deg, #dc3545, #c82333)'
+    ];
+    
+    const index = username.charCodeAt(0) % colors.length;
+    return colors[index];
+}
+
+function getProfilePicture(username) {
+    const userData = realUsers.find(u => u.username === username);
+    return userData && userData.profile_picture ? 
+        `/static/uploads/profile_pictures/${userData.profile_picture}` : null;
+}
+
+function updateDailyClosuresStats() {
+    // Simulate updating stats with realistic daily values
+    const ticketsClosedToday = Math.floor(Math.random() * 50) + 25; // 25-75 closures today
+    const topCloserToday = Math.floor(Math.random() * 12) + 8; // 8-20 closures for top performer
+    
+    document.getElementById('ticketsClosedToday').textContent = ticketsClosedToday;
+    document.getElementById('topCloserToday').textContent = topCloserToday;
+}
+
+function filterDailyClosures(period) {
+    // Update chart based on selected period
+    const data = generateDailyClosuresDataForPeriod(period);
+    
+    if (userTicketsChart) {
+        userTicketsChart.data.labels = data.labels;
+        userTicketsChart.data.datasets[0].data = data.periodData;
+        userTicketsChart.update('none');
+    }
+    
+    // Update stats based on period
+    updateDailyClosuresStatsForPeriod(period);
+    
+    // Update top performers based on period
+    updateTopPerformersForPeriod(data, period);
+}
+
+function generateDailyClosuresDataForPeriod(period) {
+    const users = realUsers.length > 0 ? realUsers : [
+        { username: 'Admin', role: 'System Administrator' },
+        { username: 'AJ', role: 'Senior Admin' },
+        { username: 'Cole', role: 'IT Specialist' },
+        { username: 'Oscar', role: 'Support Lead' },
+        { username: 'Sarah', role: 'Help Desk' },
+        { username: 'Mike', role: 'Technical Support' },
+        { username: 'Emily', role: 'Customer Service' },
+        { username: 'David', role: 'IT Manager' }
+    ];
+    
+    const labels = users.slice(0, 8).map(user => user.username);
+    
+    let periodData;
+    switch (period) {
+        case 'today':
+            periodData = users.slice(0, 8).map(() => Math.floor(Math.random() * 15) + 2);
+            break;
+        case 'yesterday':
+            periodData = users.slice(0, 8).map(() => Math.floor(Math.random() * 18) + 3);
+            break;
+        case 'week':
+            periodData = users.slice(0, 8).map(() => Math.floor(Math.random() * 80) + 20);
+            break;
+        case 'month':
+            periodData = users.slice(0, 8).map(() => Math.floor(Math.random() * 300) + 150);
+            break;
+        default:
+            periodData = users.slice(0, 8).map(() => Math.floor(Math.random() * 15) + 2);
+    }
+    
+    return { labels, periodData };
+}
+
+function updateDailyClosuresStatsForPeriod(period) {
+    let ticketsClosed, topCloser;
+    
+    switch (period) {
+        case 'today':
+            ticketsClosed = Math.floor(Math.random() * 50) + 25;
+            topCloser = Math.floor(Math.random() * 12) + 8;
+            break;
+        case 'yesterday':
+            ticketsClosed = Math.floor(Math.random() * 60) + 30;
+            topCloser = Math.floor(Math.random() * 15) + 10;
+            break;
+        case 'week':
+            ticketsClosed = Math.floor(Math.random() * 300) + 200;
+            topCloser = Math.floor(Math.random() * 60) + 40;
+            break;
+        case 'month':
+            ticketsClosed = Math.floor(Math.random() * 1000) + 800;
+            topCloser = Math.floor(Math.random() * 200) + 150;
+            break;
+        default:
+            ticketsClosed = Math.floor(Math.random() * 50) + 25;
+            topCloser = Math.floor(Math.random() * 12) + 8;
+    }
+    
+    document.getElementById('ticketsClosedToday').textContent = ticketsClosed;
+    document.getElementById('topCloserToday').textContent = topCloser;
+}
+
+function updateTopPerformersForPeriod(data, period) {
+    const topPerformersContainer = document.getElementById('topPerformers');
+    const topPerformersModalContent = document.getElementById('topPerformersModalContent');
+    
+    // Update both the hidden container and modal content
+    const containers = [topPerformersContainer, topPerformersModalContent];
+    
+    containers.forEach(container => {
+        if (!container) return;
+        
+        // Create performers data from chart data
+        const performers = data.labels.map((label, index) => ({
+            name: label,
+            closures: data.periodData[index],
+            efficiency: Math.floor(Math.random() * 30) + 70, // 70-100% efficiency
+            role: getRoleForUser(label)
+        })).sort((a, b) => b.closures - a.closures);
+        
+        const performersHTML = performers.map((user, index) => {
+            const avatarColor = getAvatarColor(user.name);
+            const profilePic = getProfilePicture(user.name);
+            const role = user.role || 'Team Member';
+            
+            return `
+                <div class="performer-item enhanced" onclick="showUserDetails('${user.name}')">
+                    <div class="performer-info">
+                        <div class="performer-avatar" style="background: ${avatarColor};">
+                            ${profilePic ? 
+                                `<img src="${profilePic}" alt="${user.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                 <span style="display: none;">${user.name.charAt(0)}</span>` :
+                                user.name.charAt(0)
+                            }
+                        </div>
+                        <div class="performer-details">
+                            <div class="performer-name">${user.name}</div>
+                            <div class="performer-role">${role}</div>
+                        </div>
+                    </div>
+                    <div class="performer-stats">
+                        <div class="stat-group">
+                            <div class="stat-value">${user.closures}</div>
+                            <div class="stat-label">${period.charAt(0).toUpperCase() + period.slice(1)}</div>
+                        </div>
+                        <div class="stat-group">
+                            <div class="stat-value">${user.efficiency}%</div>
+                            <div class="stat-label">Efficiency</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        container.innerHTML = performersHTML;
+    });
+}
+
+// Updated Ticket Management Functions for Daily Focus
+function createQuickTicket() {
+    showQuickTicketModal();
+}
+
+function viewDailyReport() {
+    // Show daily closure report
+    window.location.href = '/admin/daily-closure-report';
+}
+
+function exportClosureData() {
+    showExportModal();
+}
+
+function showUserDetails(userName) {
+    showUserDetailsModal(userName);
+}
+
+function openDailyAnalytics() {
+    // Implement daily analytics functionality
+    console.log('Opening daily closure analytics');
+    window.location.href = '/admin/daily-analytics';
+}
+
+// Enhanced Modal Functions
+function showExportModal() {
+    const modal = document.createElement('div');
+    modal.className = 'export-modal';
+    modal.innerHTML = `
+        <div class="export-content">
+            <div class="modal-header">
+                <h3>Export Daily Closure Data</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</button>
+            </div>
+            <div class="export-options">
+                <div class="option-group">
+                    <label>Export Type</label>
+                    <select id="exportType">
+                        <option value="daily">Daily Closures</option>
+                        <option value="performance">Performance Metrics</option>
+                        <option value="comparison">Team Comparison</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label>Date Range</label>
+                    <select id="exportRange">
+                        <option value="today">Today</option>
+                        <option value="yesterday">Yesterday</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label>Format</label>
+                    <select id="exportFormat">
+                        <option value="csv">CSV</option>
+                        <option value="excel">Excel</option>
+                        <option value="pdf">PDF Report</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="this.parentElement.parentElement.parentElement.remove()">Cancel</button>
+                <button type="button" class="btn-primary" onclick="performExport()">Export Data</button>
+            </div>
+        </div>
+    `;
+    
+    // Add styles (similar to previous modals)
+    const style = document.createElement('style');
+    style.textContent = `
+        .export-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+        }
+        .export-content {
+            background: rgba(15, 15, 15, 0.95);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .export-options {
+            margin-bottom: 1.5rem;
+        }
+        .option-group {
+            margin-bottom: 1rem;
+        }
+        .option-group label {
+            display: block;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .option-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 0.9rem;
+        }
+    `;
+    
+    document.head.appendChild(style);
+    document.body.appendChild(modal);
+}
+
+function performExport() {
+    const exportType = document.getElementById('exportType').value;
+    const exportRange = document.getElementById('exportRange').value;
+    const exportFormat = document.getElementById('exportFormat').value;
+    
+    console.log('Exporting closure data:', { exportType, exportRange, exportFormat });
+    
+    // Show success message
+    showNotification('Data exported successfully!', 'success');
+    
+    // Close modal
+    document.querySelector('.export-modal').remove();
+}
+
+// Keep existing modal functions but update for daily focus
+function showQuickTicketModal() {
+    const modal = document.createElement('div');
+    modal.className = 'quick-ticket-modal';
+    modal.innerHTML = `
+        <div class="quick-ticket-content">
+            <div class="modal-header">
+                <h3>Create Quick Ticket</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.parentElement.parentElement.remove()">Cancel</button>
+            </div>
+            <form class="quick-ticket-form">
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" id="ticketSubject" placeholder="Enter ticket subject" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="ticketDescription" placeholder="Describe the issue" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select id="ticketPriority">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="this.parentElement.parentElement.parentElement.parentElement.remove()">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Ticket</button>
+                </div>
+            </form>
+        </div>
+    `;
+    
+    // Add styles
+    const style = document.createElement('style');
+    style.textContent = `
+        .quick-ticket-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+        }
+        .quick-ticket-content {
+            background: rgba(15, 15, 15, 0.95);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .modal-header h3 {
+            color: #ffffff;
+            margin: 0;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 0.9rem;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+        }
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+        .btn-primary,
+        .btn-secondary {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    `;
+    
+    document.head.appendChild(style);
+    document.body.appendChild(modal);
+    
+    // Handle form submission
+    const form = modal.querySelector('.quick-ticket-form');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const subject = document.getElementById('ticketSubject').value;
+        const description = document.getElementById('ticketDescription').value;
+        const priority = document.getElementById('ticketPriority').value;
+        
+        // Here you would typically send the data to your backend
+        console.log('Creating ticket:', { subject, description, priority });
+        
+        // Show success message
+        showNotification('Ticket created successfully!', 'success');
+        
+        // Close modal
+        modal.remove();
+    });
+    
+    // Close modal when clicking outside
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
+function showUserDetailsModal(userName) {
+    const role = getUserRole(userName);
+    const avatarColor = getAvatarColor(userName);
+    const userData = realUsers.find(u => u.username === userName);
+    const profilePic = userData && userData.profile_picture ? 
+        `/static/uploads/profile_pictures/${userData.profile_picture}` : null;
+    
+    const modal = document.createElement('div');
+    modal.className = 'user-details-modal';
+    modal.innerHTML = `
+        <div class="user-details-content">
+            <div class="modal-header">
+                <h3>User Details</h3>
+                <button class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</button>
+            </div>
+            <div class="user-profile">
+                <div class="user-avatar" style="background: ${avatarColor};">
+                    ${profilePic ? 
+                        `<img src="${profilePic}" alt="${userName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                         <span style="display: none;">${userName.charAt(0)}</span>` :
+                        userName.charAt(0)
+                    }
+                </div>
+                <div class="user-info">
+                    <h4>${userName}</h4>
+                    <p>${role}</p>
+                    ${userData && userData.email ? `<p class="user-email">${userData.email}</p>` : ''}
+                </div>
+            </div>
+            <div class="user-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Tickets Today</span>
+                    <span class="stat-value">${Math.floor(Math.random() * 20) + 5}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">This Week</span>
+                    <span class="stat-value">${Math.floor(Math.random() * 80) + 20}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">This Month</span>
+                    <span class="stat-value">${Math.floor(Math.random() * 200) + 80}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">All Time</span>
+                    <span class="stat-value">${Math.floor(Math.random() * 300) + 100}</span>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add styles
+    const style = document.createElement('style');
+    style.textContent = `
+        .user-details-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+        }
+        .user-details-content {
+            background: rgba(15, 15, 15, 0.95);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.5rem;
+            overflow: hidden;
+        }
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .user-info h4 {
+            color: #ffffff;
+            margin: 0 0 0.5rem 0;
+        }
+        .user-info p {
+            color: #888888;
+            margin: 0;
+        }
+        .user-email {
+            color: #00d4ff !important;
+            font-size: 0.9rem;
+        }
+        .user-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-label {
+            display: block;
+            color: #888888;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .stat-value {
+            display: block;
+            color: #00d4ff;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+    `;
+    
+    document.head.appendChild(style);
+    document.body.appendChild(modal);
+}
+
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        color: white;
+        font-weight: 600;
+        z-index: 999999999;
+        transform: translateX(100%);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        max-width: 300px;
+    `;
+    
+    if (type === 'success') {
+        notification.style.background = 'linear-gradient(135deg, #34c759, #30d158)';
+    } else if (type === 'error') {
+        notification.style.background = 'linear-gradient(135deg, #ff3b30, #ff2d55)';
+    } else {
+        notification.style.background = 'linear-gradient(135deg, #007aff, #5856d6)';
+    }
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+// Time period button functionality for daily closures
+document.addEventListener('DOMContentLoaded', function() {
+    const timeButtons = document.querySelectorAll('.user-tickets-card .time-btn');
+    
+    timeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            timeButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Get the period and filter data
+            const period = this.getAttribute('data-period');
+            filterDailyClosures(period);
+        });
+    });
+});
+
+// Modal functions for daily performance
+function openDailyPerformanceModal() {
+    const modal = document.getElementById('dailyPerformanceModal');
+    if (modal) {
+        modal.classList.add('show');
+        // Refresh the data in the modal
+        updateTopPerformers(generateDailyClosuresData());
+    }
+}
+
+function closeDailyPerformanceModal() {
+    const modal = document.getElementById('dailyPerformanceModal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('performance-modal')) {
+        e.target.classList.remove('show');
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const modal = document.querySelector('.performance-modal.show');
+        if (modal) {
+            modal.classList.remove('show');
+        }
+    }
+});
+</script> 

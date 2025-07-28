@@ -1,0 +1,174 @@
+<script>
+// Widget Scripts - Additional functionality for reminders and calendar
+
+// Initialize widgets when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize color picker default selection
+    const defaultColor = document.querySelector('.color-option[data-color="#00d4ff"]');
+    if (defaultColor) {
+        defaultColor.classList.add('selected');
+    }
+    
+    // Add some sample data for demonstration
+    addSampleData();
+});
+
+function addSampleData() {
+    // Add sample reminders if none exist
+    const savedReminders = localStorage.getItem('yam_reminders');
+    if (!savedReminders || JSON.parse(savedReminders).length === 0) {
+        const sampleReminders = [
+            {
+                id: 'sample1',
+                title: 'Team Meeting',
+                description: 'Weekly team sync meeting',
+                datetime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours from now
+                priority: 'medium',
+                category: 'meeting',
+                created: new Date().toISOString()
+            },
+            {
+                id: 'sample2',
+                title: 'System Maintenance',
+                description: 'Scheduled maintenance window',
+                datetime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
+                priority: 'high',
+                category: 'work',
+                created: new Date().toISOString()
+            }
+        ];
+        localStorage.setItem('yam_reminders', JSON.stringify(sampleReminders));
+    }
+    
+    // Add sample calendar events if none exist
+    const savedEvents = localStorage.getItem('yam_calendar_events');
+    if (!savedEvents || JSON.parse(savedEvents).length === 0) {
+        const sampleEvents = [
+            {
+                id: 'event1',
+                title: 'Client Meeting',
+                description: 'Meeting with new client',
+                startDate: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(),
+                endDate: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
+                color: '#00d4ff',
+                created: new Date().toISOString()
+            },
+            {
+                id: 'event2',
+                title: 'Project Deadline',
+                description: 'Submit final project deliverables',
+                startDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                color: '#ff6b6b',
+                created: new Date().toISOString()
+            }
+        ];
+        localStorage.setItem('yam_calendar_events', JSON.stringify(sampleEvents));
+    }
+}
+
+// Enhanced reminder notification with sound
+function showReminderNotification(reminder) {
+    showToast(`Reminder: ${reminder.title}`, 'warning');
+    
+    // Play notification sound if available
+    try {
+        const audio = new Audio('/static/sounds/notification.mp3');
+        audio.play().catch(e => console.log('Could not play notification sound:', e));
+    } catch (e) {
+        console.log('Audio not supported');
+    }
+    
+    // Show browser notification if supported
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('YAM Reminder', {
+            body: reminder.description || reminder.title,
+            icon: '/static/images/adapt-logo.svg',
+            badge: '/static/images/adapt-logo.svg',
+            tag: reminder.id,
+            requireInteraction: reminder.priority === 'urgent'
+        });
+    }
+}
+
+// Enhanced calendar event management
+function viewCalendarEvent(eventId) {
+    const event = calendarEvents.find(e => e.id === eventId);
+    if (!event) return;
+    
+    const modal = document.createElement('div');
+    modal.className = 'widget-modal show';
+    modal.innerHTML = `
+        <div class="widget-modal-content">
+            <div class="widget-modal-header">
+                <h3><i class="bi bi-calendar-day-fill"></i> Event Details</h3>
+                <button class="widget-modal-close" onclick="this.parentElement.parentElement.parentElement.remove()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="widget-modal-body">
+                <div class="event-details">
+                    <h4 style="color: ${event.color};">${event.title}</h4>
+                    ${event.description ? `<p style="color: #cccccc; margin: 1rem 0;">${event.description}</p>` : ''}
+                    <div class="event-time">
+                        <strong>Start:</strong> ${formatDateTime(new Date(event.startDate))}
+                    </div>
+                    <div class="event-time">
+                        <strong>End:</strong> ${formatDateTime(new Date(event.endDate))}
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn-secondary" onclick="editCalendarEvent('${event.id}')">Edit</button>
+                    <button class="btn-secondary" onclick="deleteCalendarEvent('${event.id}')">Delete</button>
+                    <button class="btn-primary" onclick="this.parentElement.parentElement.parentElement.parentElement.remove()">Close</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+function editCalendarEvent(eventId) {
+    const event = calendarEvents.find(e => e.id === eventId);
+    if (!event) return;
+    
+    // Populate form with event data
+    document.getElementById('eventTitle').value = event.title;
+    document.getElementById('eventDescription').value = event.description || '';
+    document.getElementById('eventStartDate').value = new Date(event.startDate).toISOString().split('T')[0];
+    document.getElementById('eventStartTime').value = new Date(event.startDate).toTimeString().slice(0, 5);
+    document.getElementById('eventEndDate').value = new Date(event.endDate).toISOString().split('T')[0];
+    document.getElementById('eventEndTime').value = new Date(event.endDate).toTimeString().slice(0, 5);
+    
+    // Select the correct color
+    document.querySelectorAll('.color-option').forEach(option => {
+        option.classList.remove('selected');
+        if (option.dataset.color === event.color) {
+            option.classList.add('selected');
+        }
+    });
+    
+    // Remove old event and open modal
+    calendarEvents = calendarEvents.filter(e => e.id !== eventId);
+    openCalendarModal();
+}
+
+function deleteCalendarEvent(eventId) {
+    if (confirm('Are you sure you want to delete this event?')) {
+        calendarEvents = calendarEvents.filter(e => e.id !== eventId);
+        saveCalendarEvents();
+        renderCalendar();
+        showToast('Event deleted!', 'info');
+        
+        // Close the modal
+        document.querySelector('.widget-modal.show').remove();
+    }
+}
+
+// Export functions for global access
+window.showReminderNotification = showReminderNotification;
+window.viewCalendarEvent = viewCalendarEvent;
+window.editCalendarEvent = editCalendarEvent;
+window.deleteCalendarEvent = deleteCalendarEvent;
+</script> 
