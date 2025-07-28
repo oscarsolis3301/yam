@@ -135,6 +135,11 @@ def is_session_healthy():
                 logger.warning(f"Session expired for user {session.get('user_id')}")
                 return False
             
+            # Check if user has been marked offline in the database
+            if current_user.is_authenticated and hasattr(current_user, 'is_online') and not current_user.is_online:
+                logger.warning(f"User {current_user.id} is authenticated but marked offline – forcing re-login")
+                return False
+            
             return True
         else:
             # User is not authenticated, session should not be healthy

@@ -12,18 +12,37 @@
   }
   
   /* Animated Y logo styles from login page */
-  .main-logo { 
+  {% if request.path == '/' %}
+  .main-logo {
     font-size: 2.7rem;
-    font-weight: 900; 
-    background: linear-gradient(45deg, #7289da, #43b581, #faa61a, #f04747); 
-    background-size: 400% 400%; 
-    -webkit-background-clip: text; 
-    -webkit-text-fill-color: transparent; 
-    background-clip: text; 
-    animation: gradientShift 3s ease-in-out infinite, logoGlow 2s ease-in-out infinite alternate; 
-    margin-bottom: 0; 
-    text-shadow: 0 0 40px rgba(114,137,218,0.5); 
+    font-weight: 900;
+    background: linear-gradient(45deg, #7289da, #43b581, #faa61a, #f04747);
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 8s ease-in-out infinite;
+    margin-bottom: 0;
     line-height: 1;
+  }
+  {% else %}
+  .main-logo {
+    font-size: 2.7rem;
+    font-weight: 900;
+    background: linear-gradient(45deg, #ffffff, #dcdcdc, #ffffff);
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: lightShift 6s ease-in-out infinite;
+    margin-bottom: 0;
+    line-height: 1;
+  }
+  {% endif %}
+  
+  @keyframes lightShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
   }
   @keyframes gradientShift { 
     0%,100% { background-position: 0% 50%; } 
