@@ -3060,3 +3060,11 @@
 2025-07-28 16:58:46,583 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753747126298_cb3fhrjbr
 2025-07-28 16:58:46,586 - spark - INFO - [socketio] marking user 1 online
 2025-07-28 16:58:46,595 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-28 21:38:01,088 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-28 21:38:09,072 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753763888856_ybf4zd0b0
+2025-07-28 21:38:09,072 - spark - INFO - [socketio] marking user 1 online
+2025-07-28 21:38:09,088 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-28 21:40:11,559 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-28 21:40:11,567 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-29 06:57:53,644 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753797473172_3ta8a2cnv
+2025-07-29 06:57:53,691 - spark - INFO - [socketio] marking user 1 online
