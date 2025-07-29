@@ -4,272 +4,563 @@
 
 {% block head %}
 <style>
+    :root {
+        --deep-black: #0a0a0a;
+        --dark-gray: #1a1a1a;
+        --medium-gray: #2a2a2a;
+        --light-gray: #3a3a3a;
+        --purple-primary: #8b5cf6;
+        --purple-secondary: #a855f7;
+        --purple-accent: #c084fc;
+        --text-primary: #ffffff;
+        --text-secondary: #e5e7eb;
+        --text-muted: #9ca3af;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --border-radius: 16px;
+        --border-radius-lg: 24px;
+        --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        --shadow-hover: 0 12px 48px rgba(0, 0, 0, 0.6);
+    }
+
+    body {
+        background: var(--deep-black);
+        color: var(--text-primary);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
     .freshworks-dashboard {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, var(--deep-black) 0%, #1a1a2e 50%, var(--deep-black) 100%);
         min-height: 100vh;
         padding: 2rem 0;
+        position: relative;
     }
-    
+
+    .freshworks-dashboard::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
     .dashboard-header {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 2rem;
+        background: rgba(26, 26, 26, 0.8);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: var(--border-radius-lg);
+        padding: 2.5rem;
         margin-bottom: 2rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
     }
-    
+
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--purple-primary), var(--purple-secondary), var(--purple-accent));
+    }
+
+    .dashboard-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--purple-primary), var(--purple-accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .dashboard-subtitle {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        font-weight: 400;
+    }
+
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 1.5rem;
         margin-bottom: 2rem;
     }
-    
+
     .stat-card {
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 15px;
-        padding: 1.5rem;
-        text-align: center;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-    }
-    
-    .stat-number {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: #667eea;
-        margin-bottom: 0.5rem;
-    }
-    
-    .stat-label {
-        color: #666;
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    
-    .mappings-container {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
+        background: rgba(26, 26, 26, 0.8);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: var(--border-radius-lg);
         padding: 2rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        box-shadow: var(--shadow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
     }
-    
-    .mappings-header {
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--purple-primary), var(--purple-secondary));
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-hover);
+        border-color: rgba(139, 92, 246, 0.4);
+    }
+
+    .stat-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--purple-primary), var(--purple-accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+        line-height: 1;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+
+    .main-container {
+        background: rgba(26, 26, 26, 0.8);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: var(--border-radius-lg);
+        padding: 2.5rem;
+        box-shadow: var(--shadow);
+        position: relative;
+    }
+
+    .main-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--purple-primary), var(--purple-secondary), var(--purple-accent));
+    }
+
+    .section-header {
         display: flex;
-        justify-content: between;
+        justify-content: space-between;
         align-items: center;
         margin-bottom: 2rem;
         flex-wrap: wrap;
         gap: 1rem;
     }
-    
-    .mappings-title {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #333;
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-primary);
         margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
     }
-    
+
+    .section-title i {
+        color: var(--purple-primary);
+        font-size: 1.5rem;
+    }
+
     .action-buttons {
         display: flex;
         gap: 1rem;
         flex-wrap: wrap;
     }
-    
+
     .btn-modern {
         border: none;
-        border-radius: 10px;
-        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        padding: 0.875rem 1.75rem;
         font-weight: 600;
-        transition: all 0.3s ease;
+        font-size: 0.95rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
     }
-    
+
+    .btn-modern::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-modern:hover::before {
+        left: 100%;
+    }
+
     .btn-primary-modern {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, var(--purple-primary), var(--purple-secondary));
         color: white;
+        box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
     }
-    
+
     .btn-success-modern {
-        background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+        background: linear-gradient(135deg, var(--success-color), #34d399);
         color: white;
+        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
     }
-    
+
     .btn-warning-modern {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        background: linear-gradient(135deg, var(--warning-color), #fbbf24);
         color: white;
+        box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
     }
-    
+
+    .btn-danger-modern {
+        background: linear-gradient(135deg, var(--danger-color), #f87171);
+        color: white;
+        box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+    }
+
     .btn-modern:hover {
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
         color: white;
     }
-    
-    .mappings-table {
-        background: white;
-        border-radius: 15px;
+
+    .btn-modern:active {
+        transform: translateY(0);
+    }
+
+    .users-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .user-card {
+        background: rgba(42, 42, 42, 0.6);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
         overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
-    
-    .table-modern {
-        margin: 0;
+
+    .user-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--purple-primary), var(--purple-secondary));
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
     }
-    
-    .table-modern th {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        padding: 1rem;
-        font-weight: 600;
+
+    .user-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow);
+        border-color: rgba(139, 92, 246, 0.4);
     }
-    
-    .table-modern td {
-        padding: 1rem;
-        border: none;
-        border-bottom: 1px solid #eee;
-        vertical-align: middle;
+
+    .user-card:hover::before {
+        transform: scaleX(1);
     }
-    
-    .table-modern tbody tr:hover {
-        background: rgba(102, 126, 234, 0.05);
+
+    .user-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
     }
-    
-    .status-badge {
-        padding: 0.5rem 1rem;
+
+    .user-info h4 {
+        color: var(--text-primary);
+        font-weight: 700;
+        margin: 0 0 0.25rem 0;
+        font-size: 1.1rem;
+    }
+
+    .user-email {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .user-role {
+        display: inline-block;
+        background: rgba(139, 92, 246, 0.2);
+        color: var(--purple-accent);
+        padding: 0.25rem 0.75rem;
         border-radius: 20px;
         font-size: 0.8rem;
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
     }
-    
-    .status-linked {
-        background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
-        color: white;
-    }
-    
-    .status-unlinked {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        color: white;
-    }
-    
-    .ticket-stats {
+
+    .user-status {
         display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-    
-    .ticket-stat {
-        background: rgba(102, 126, 234, 0.1);
-        padding: 0.5rem 1rem;
-        border-radius: 10px;
-        font-size: 0.8rem;
-        color: #667eea;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
         font-weight: 600;
     }
-    
-    .user-select {
-        border: 2px solid #ddd;
-        border-radius: 10px;
-        padding: 0.5rem;
-        background: white;
-        min-width: 200px;
+
+    .status-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
     }
-    
-    .user-select:focus {
-        border-color: #667eea;
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+
+    .status-linked {
+        background: var(--success-color);
+        box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
     }
-    
+
+    .status-unlinked {
+        background: var(--warning-color);
+        box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+    }
+
+    .user-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 0.75rem;
+        background: rgba(26, 26, 26, 0.4);
+        border-radius: 8px;
+        border: 1px solid rgba(139, 92, 246, 0.1);
+    }
+
+    .stat-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--purple-accent);
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label-small {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .user-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        border-radius: 8px;
+    }
+
+    .freshworks-info {
+        background: rgba(26, 26, 26, 0.4);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    .freshworks-info h6 {
+        color: var(--purple-accent);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .freshworks-name {
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .freshworks-id {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        font-family: 'Monaco', 'Menlo', monospace;
+    }
+
+    .modal-modern .modal-content {
+        background: var(--dark-gray);
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .modal-modern .modal-header {
+        background: linear-gradient(135deg, var(--purple-primary), var(--purple-secondary));
+        color: white;
+        border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+        border: none;
+        padding: 1.5rem 2rem;
+    }
+
+    .modal-modern .modal-title {
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    .modal-modern .modal-body {
+        padding: 2rem;
+        color: var(--text-primary);
+    }
+
+    .modal-modern .modal-footer {
+        border-top: 1px solid rgba(139, 92, 246, 0.2);
+        padding: 1.5rem 2rem;
+        background: rgba(26, 26, 26, 0.5);
+    }
+
+    .form-label {
+        color: var(--text-secondary);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        background: var(--medium-gray);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: 8px;
+        color: var(--text-primary);
+        padding: 0.75rem 1rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background: var(--medium-gray);
+        border-color: var(--purple-primary);
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        color: var(--text-primary);
+    }
+
+    .form-control::placeholder {
+        color: var(--text-muted);
+    }
+
     .loading-spinner {
         display: inline-block;
         width: 20px;
         height: 20px;
-        border: 3px solid rgba(255, 255, 255, 0.3);
+        border: 3px solid rgba(139, 92, 246, 0.3);
         border-radius: 50%;
-        border-top-color: white;
+        border-top-color: var(--purple-primary);
         animation: spin 1s ease-in-out infinite;
     }
-    
+
     @keyframes spin {
         to { transform: rotate(360deg); }
     }
-    
-    .modal-modern .modal-content {
-        border-radius: 20px;
-        border: none;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--text-muted);
     }
-    
-    .modal-modern .modal-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 20px 20px 0 0;
-        border: none;
-    }
-    
-    .modal-modern .modal-body {
-        padding: 2rem;
-    }
-    
-    .ticket-details {
-        max-height: 400px;
-        overflow-y: auto;
-    }
-    
-    .ticket-item {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 1rem;
+
+    .empty-state i {
+        font-size: 3rem;
         margin-bottom: 1rem;
-        border-left: 4px solid #667eea;
+        opacity: 0.5;
     }
-    
-    .ticket-numbers {
+
+    .empty-state h4 {
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    .filters-bar {
+        background: rgba(42, 42, 42, 0.6);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
         display: flex;
+        gap: 1rem;
+        align-items: center;
         flex-wrap: wrap;
+    }
+
+    .filter-group {
+        display: flex;
+        align-items: center;
         gap: 0.5rem;
-        margin-top: 0.5rem;
     }
-    
-    .ticket-number {
-        background: #667eea;
-        color: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 15px;
-        font-size: 0.8rem;
+
+    .filter-label {
+        color: var(--text-secondary);
         font-weight: 600;
+        font-size: 0.9rem;
     }
-    
+
+    .search-box {
+        flex: 1;
+        min-width: 250px;
+    }
+
     @media (max-width: 768px) {
         .freshworks-dashboard {
             padding: 1rem;
         }
         
         .dashboard-header,
-        .mappings-container {
-            padding: 1rem;
+        .main-container {
+            padding: 1.5rem;
         }
         
         .stats-grid {
             grid-template-columns: 1fr;
         }
         
-        .mappings-header {
+        .users-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .section-header {
             flex-direction: column;
             align-items: stretch;
         }
@@ -278,14 +569,41 @@
             justify-content: center;
         }
         
-        .table-modern {
-            font-size: 0.9rem;
+        .filters-bar {
+            flex-direction: column;
+            align-items: stretch;
         }
         
-        .table-modern th,
-        .table-modern td {
-            padding: 0.75rem 0.5rem;
+        .search-box {
+            min-width: auto;
         }
+    }
+
+    /* Toast notifications */
+    .toast-container {
+        z-index: 9999;
+    }
+
+    .toast {
+        background: var(--dark-gray);
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        border-radius: var(--border-radius);
+        color: var(--text-primary);
+    }
+
+    .toast.bg-success {
+        background: rgba(16, 185, 129, 0.2) !important;
+        border-color: var(--success-color);
+    }
+
+    .toast.bg-danger {
+        background: rgba(239, 68, 68, 0.2) !important;
+        border-color: var(--danger-color);
+    }
+
+    .toast.bg-warning {
+        background: rgba(245, 158, 11, 0.2) !important;
+        border-color: var(--warning-color);
     }
 </style>
 {% endblock %}
@@ -296,22 +614,22 @@
         <!-- Dashboard Header -->
         <div class="dashboard-header">
             <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="mb-2">
+                <div class="col-lg-8">
+                    <h1 class="dashboard-title">
                         <i class="bi bi-link-45deg me-3"></i>
-                        Freshworks Users Linking Dashboard
+                        Freshworks Linking Dashboard
                     </h1>
-                    <p class="text-muted mb-0">
-                        Link Freshworks responder IDs to website members and track ticket closures
+                    <p class="dashboard-subtitle">
+                        Link website members to Freshworks responder IDs and track ticket performance
                     </p>
                 </div>
-                <div class="col-md-4 text-end">
-                    <div class="d-flex justify-content-end gap-2">
+                <div class="col-lg-4 text-end">
+                    <div class="d-flex justify-content-end gap-2 flex-wrap">
                         <button class="btn btn-modern btn-success-modern" onclick="syncMappings()">
                             <i class="bi bi-arrow-clockwise"></i>
-                            Sync Mappings
+                            Sync Data
                         </button>
-                        <button class="btn btn-modern btn-warning-modern" onclick="autoLinkMappings()">
+                        <button class="btn btn-modern btn-warning-modern" onclick="autoLinkUsers()">
                             <i class="bi bi-magic"></i>
                             Auto-Link
                         </button>
@@ -323,15 +641,15 @@
         <!-- Statistics Cards -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-number" id="totalMappings">-</div>
-                <div class="stat-label">Total Mappings</div>
+                <div class="stat-number" id="totalUsers">-</div>
+                <div class="stat-label">Website Members</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="linkedMappings">-</div>
+                <div class="stat-number" id="linkedUsers">-</div>
                 <div class="stat-label">Linked Users</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number" id="unlinkedMappings">-</div>
+                <div class="stat-number" id="unlinkedUsers">-</div>
                 <div class="stat-label">Unlinked Users</div>
             </div>
             <div class="stat-card">
@@ -340,60 +658,52 @@
             </div>
         </div>
 
-        <!-- Mappings Container -->
-        <div class="mappings-container">
-            <div class="mappings-header">
-                <h2 class="mappings-title">User Mappings</h2>
+        <!-- Main Content -->
+        <div class="main-container">
+            <!-- Filters Bar -->
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label class="filter-label">Search:</label>
+                    <input type="text" class="form-control search-box" id="searchInput" placeholder="Search users by name or email...">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Status:</label>
+                    <select class="form-select" id="statusFilter">
+                        <option value="">All Users</option>
+                        <option value="linked">Linked Only</option>
+                        <option value="unlinked">Unlinked Only</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Role:</label>
+                    <select class="form-select" id="roleFilter">
+                        <option value="">All Roles</option>
+                        <option value="admin">Admin</option>
+                        <option value="technician">Technician</option>
+                        <option value="elevated">Elevated</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Section Header -->
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="bi bi-people-fill"></i>
+                    Website Members
+                </h2>
                 <div class="action-buttons">
-                    <button class="btn btn-modern btn-primary-modern" onclick="refreshMappings()">
+                    <button class="btn btn-modern btn-primary-modern" onclick="refreshData()">
                         <i class="bi bi-arrow-clockwise"></i>
                         Refresh
                     </button>
                 </div>
             </div>
 
-            <div class="mappings-table">
-                <table class="table table-modern">
-                    <thead>
-                        <tr>
-                            <th>Freshworks User</th>
-                            <th>Website Member</th>
-                            <th>Status</th>
-                            <th>Ticket Statistics</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="mappingsTableBody">
-                        <tr>
-                            <td colspan="5" class="text-center py-4">
-                                <div class="loading-spinner"></div>
-                                <span class="ms-2">Loading mappings...</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Ticket Details Modal -->
-<div class="modal fade modal-modern" id="ticketDetailsModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="bi bi-ticket-detailed me-2"></i>
-                    Ticket Details
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div id="ticketDetailsContent">
-                    <div class="text-center">
-                        <div class="loading-spinner"></div>
-                        <span class="ms-2">Loading ticket details...</span>
-                    </div>
+            <!-- Users Grid -->
+            <div class="users-grid" id="usersGrid">
+                <div class="text-center py-4">
+                    <div class="loading-spinner"></div>
+                    <span class="ms-2">Loading users...</span>
                 </div>
             </div>
         </div>
@@ -402,25 +712,30 @@
 
 <!-- Link User Modal -->
 <div class="modal fade modal-modern" id="linkUserModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
                     <i class="bi bi-link-45deg me-2"></i>
-                    Link Freshworks User
+                    Link Website Member to Freshworks
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label">Freshworks User</label>
-                    <div class="form-control-plaintext" id="freshworksUserDisplay"></div>
+                <div class="mb-4">
+                    <label class="form-label">Website Member</label>
+                    <div class="form-control-plaintext" id="websiteUserDisplay"></div>
                 </div>
                 <div class="mb-3">
-                    <label for="userSelect" class="form-label">Select Website Member</label>
-                    <select class="user-select" id="userSelect">
-                        <option value="">-- Select User --</option>
+                    <label for="freshworksSelect" class="form-label">Select Freshworks User</label>
+                    <select class="form-select" id="freshworksSelect">
+                        <option value="">-- Select Freshworks User --</option>
                     </select>
+                </div>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Note:</strong> This will link the website member to the selected Freshworks user. 
+                    If the Freshworks user is already linked to another website member, that link will be replaced.
                 </div>
             </div>
             <div class="modal-footer">
@@ -433,153 +748,242 @@
         </div>
     </div>
 </div>
+
+<!-- Unlink User Modal -->
+<div class="modal fade modal-modern" id="unlinkUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-link-break me-2"></i>
+                    Unlink User
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to unlink <strong id="unlinkUserName"></strong> from their Freshworks account?</p>
+                <p class="text-muted">This will remove the connection but won't delete any data.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-modern btn-danger-modern" onclick="confirmUnlinkUser()">
+                    <i class="bi bi-link-break"></i>
+                    Unlink User
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-let currentMappings = [];
-let currentMappingId = null;
+let allUsers = [];
+let allMappings = [];
+let allFreshworksUsers = [];
+let currentUserId = null;
 
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
-    loadMappings();
+    loadAllData();
+    setupEventListeners();
 });
 
-// Load mappings data
-async function loadMappings() {
+// Setup event listeners
+function setupEventListeners() {
+    document.getElementById('searchInput').addEventListener('input', filterUsers);
+    document.getElementById('statusFilter').addEventListener('change', filterUsers);
+    document.getElementById('roleFilter').addEventListener('change', filterUsers);
+}
+
+// Load all data
+async function loadAllData() {
     try {
-        const response = await fetch('/freshworks-linking/api/mappings');
-        const data = await response.json();
-        
-        if (data.success) {
-            currentMappings = data.mappings;
-            updateStats(data.stats);
-            renderMappingsTable(data.mappings);
-            populateUserSelect(data.available_users);
+        const [usersResponse, mappingsResponse, freshworksResponse] = await Promise.all([
+            fetch('/api/users'),
+            fetch('/freshworks-linking/api/mappings'),
+            fetch('/freshworks-linking/api/freshworks-users')
+        ]);
+
+        const usersData = await usersResponse.json();
+        const mappingsData = await mappingsResponse.json();
+        const freshworksData = await freshworksResponse.json();
+
+        if (Array.isArray(usersData)) {
+            allUsers = usersData.filter(user => user.role !== 'user');
         } else {
-            showToast('Error loading mappings: ' + data.error, 'error');
+            allUsers = (usersData.users || []).filter(user => user.role !== 'user');
         }
+
+        if (mappingsData.success) {
+            allMappings = mappingsData.mappings || [];
+        }
+
+        if (freshworksData.success) {
+            allFreshworksUsers = freshworksData.freshworks_users || [];
+        }
+
+        updateStats();
+        renderUsers();
+        populateFreshworksSelect();
     } catch (error) {
-        console.error('Error loading mappings:', error);
-        showToast('Error loading mappings', 'error');
+        console.error('Error loading data:', error);
+        showToast('Error loading data', 'error');
     }
 }
 
 // Update statistics
-function updateStats(stats) {
-    document.getElementById('totalMappings').textContent = stats.total_mappings;
-    document.getElementById('linkedMappings').textContent = stats.linked_count;
-    document.getElementById('unlinkedMappings').textContent = stats.unlinked_count;
+function updateStats() {
+    const totalUsers = allUsers.length;
+    const linkedUsers = allUsers.filter(user => {
+        return allMappings.some(mapping => mapping.user_id === user.id);
+    }).length;
+    const unlinkedUsers = totalUsers - linkedUsers;
     
-    // Calculate total tickets
-    const totalTickets = currentMappings.reduce((sum, mapping) => {
+    const totalTickets = allMappings.reduce((sum, mapping) => {
         return sum + (mapping.ticket_stats?.total_tickets || 0);
     }, 0);
+
+    document.getElementById('totalUsers').textContent = totalUsers;
+    document.getElementById('linkedUsers').textContent = linkedUsers;
+    document.getElementById('unlinkedUsers').textContent = unlinkedUsers;
     document.getElementById('totalTickets').textContent = totalTickets;
 }
 
-// Render mappings table
-function renderMappingsTable(mappings) {
-    const tbody = document.getElementById('mappingsTableBody');
-    
-    if (mappings.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="5" class="text-center py-4">
-                    <i class="bi bi-inbox text-muted" style="font-size: 2rem;"></i>
-                    <p class="mt-2 text-muted">No mappings found</p>
-                </td>
-            </tr>
+// Render users grid
+function renderUsers() {
+    const grid = document.getElementById('usersGrid');
+    const filteredUsers = getFilteredUsers();
+
+    if (filteredUsers.length === 0) {
+        grid.innerHTML = `
+            <div class="empty-state">
+                <i class="bi bi-people"></i>
+                <h4>No users found</h4>
+                <p>Try adjusting your search or filter criteria</p>
+            </div>
         `;
         return;
     }
-    
-    tbody.innerHTML = mappings.map(mapping => `
-        <tr>
-            <td>
-                <div>
-                    <strong>${mapping.freshworks_username}</strong>
-                    <br>
-                    <small class="text-muted">ID: ${mapping.freshworks_user_id}</small>
-                </div>
-            </td>
-            <td>
-                ${mapping.user_info ? `
-                    <div>
-                        <strong>${mapping.user_info.username}</strong>
-                        <br>
-                        <small class="text-muted">${mapping.user_info.email}</small>
-                        <br>
-                        <span class="badge bg-secondary">${mapping.user_info.role}</span>
+
+    grid.innerHTML = filteredUsers.map(user => {
+        const mapping = allMappings.find(m => m.user_id === user.id);
+        const isLinked = !!mapping;
+        const ticketStats = mapping?.ticket_stats || { total_tickets: 0, this_month: 0, this_week: 0 };
+
+        return `
+            <div class="user-card">
+                <div class="user-header">
+                    <div class="user-info">
+                        <h4>${user.username}</h4>
+                        <div class="user-email">${user.email || 'No email'}</div>
+                        <span class="user-role">${user.role}</span>
                     </div>
-                ` : `
-                    <span class="text-muted">Not linked</span>
-                `}
-            </td>
-            <td>
-                <span class="status-badge ${mapping.status === 'linked' ? 'status-linked' : 'status-unlinked'}">
-                    ${mapping.status}
-                </span>
-            </td>
-            <td>
-                <div class="ticket-stats">
-                    <div class="ticket-stat">
-                        <i class="bi bi-ticket-detailed"></i>
-                        ${mapping.ticket_stats.total_tickets} total
-                    </div>
-                    <div class="ticket-stat">
-                        <i class="bi bi-calendar-month"></i>
-                        ${mapping.ticket_stats.this_month} this month
-                    </div>
-                    <div class="ticket-stat">
-                        <i class="bi bi-calendar-week"></i>
-                        ${mapping.ticket_stats.this_week} this week
+                    <div class="user-status">
+                        <span class="status-indicator ${isLinked ? 'status-linked' : 'status-unlinked'}"></span>
+                        <span>${isLinked ? 'Linked' : 'Unlinked'}</span>
                     </div>
                 </div>
-                ${mapping.user_info ? `
-                    <button class="btn btn-sm btn-outline-primary mt-2" onclick="viewTicketDetails(${mapping.user_info.id})">
-                        <i class="bi bi-eye"></i>
-                        View Details
-                    </button>
+
+                <div class="user-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">${ticketStats.total_tickets}</div>
+                        <div class="stat-label-small">Total</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${ticketStats.this_month}</div>
+                        <div class="stat-label-small">This Month</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${ticketStats.this_week}</div>
+                        <div class="stat-label-small">This Week</div>
+                    </div>
+                </div>
+
+                ${isLinked ? `
+                    <div class="freshworks-info">
+                        <h6>Linked to Freshworks</h6>
+                        <div class="freshworks-name">${mapping.freshworks_username}</div>
+                        <div class="freshworks-id">ID: ${mapping.freshworks_user_id}</div>
+                    </div>
                 ` : ''}
-            </td>
-            <td>
-                <div class="btn-group" role="group">
-                    ${mapping.status === 'linked' ? `
-                        <button class="btn btn-sm btn-outline-warning" onclick="unlinkUser(${mapping.id})">
+
+                <div class="user-actions">
+                    ${isLinked ? `
+                        <button class="btn btn-modern btn-warning-modern btn-sm" onclick="unlinkUser(${user.id}, '${user.username}')">
                             <i class="bi bi-link-break"></i>
                             Unlink
                         </button>
                     ` : `
-                        <button class="btn btn-sm btn-outline-primary" onclick="linkUser(${mapping.id}, '${mapping.freshworks_username}')">
+                        <button class="btn btn-modern btn-primary-modern btn-sm" onclick="linkUser(${user.id}, '${user.username}')">
                             <i class="bi bi-link-45deg"></i>
                             Link
                         </button>
                     `}
+                    <button class="btn btn-modern btn-success-modern btn-sm" onclick="viewUserDetails(${user.id})">
+                        <i class="bi bi-eye"></i>
+                        Details
+                    </button>
                 </div>
-            </td>
-        </tr>
-    `).join('');
+            </div>
+        `;
+    }).join('');
 }
 
-// Populate user select dropdown
-function populateUserSelect(users) {
-    const select = document.getElementById('userSelect');
-    select.innerHTML = '<option value="">-- Select User --</option>';
+// Get filtered users
+function getFilteredUsers() {
+    let filtered = [...allUsers];
+
+    // Search filter
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    if (searchTerm) {
+        filtered = filtered.filter(user => 
+            user.username.toLowerCase().includes(searchTerm) ||
+            (user.email && user.email.toLowerCase().includes(searchTerm))
+        );
+    }
+
+    // Status filter
+    const statusFilter = document.getElementById('statusFilter').value;
+    if (statusFilter) {
+        filtered = filtered.filter(user => {
+            const isLinked = allMappings.some(mapping => mapping.user_id === user.id);
+            return statusFilter === 'linked' ? isLinked : !isLinked;
+        });
+    }
+
+    // Role filter
+    const roleFilter = document.getElementById('roleFilter').value;
+    if (roleFilter) {
+        filtered = filtered.filter(user => user.role === roleFilter);
+    }
+
+    return filtered;
+}
+
+// Filter users
+function filterUsers() {
+    renderUsers();
+}
+
+// Populate Freshworks select dropdown
+function populateFreshworksSelect() {
+    const select = document.getElementById('freshworksSelect');
+    select.innerHTML = '<option value="">-- Select Freshworks User --</option>';
     
-    users.forEach(user => {
+    allFreshworksUsers.forEach(user => {
         const option = document.createElement('option');
         option.value = user.id;
-        option.textContent = `${user.username} (${user.email})`;
+        option.textContent = `${user.name} (ID: ${user.id})`;
         select.appendChild(option);
     });
 }
 
 // Link user
-function linkUser(mappingId, freshworksUsername) {
-    currentMappingId = mappingId;
-    document.getElementById('freshworksUserDisplay').textContent = freshworksUsername;
-    document.getElementById('userSelect').value = '';
+function linkUser(userId, username) {
+    currentUserId = userId;
+    document.getElementById('websiteUserDisplay').textContent = username;
+    document.getElementById('freshworksSelect').value = '';
     
     const modal = new bootstrap.Modal(document.getElementById('linkUserModal'));
     modal.show();
@@ -587,20 +991,23 @@ function linkUser(mappingId, freshworksUsername) {
 
 // Confirm link user
 async function confirmLinkUser() {
-    const userId = document.getElementById('userSelect').value;
+    const freshworksUserId = document.getElementById('freshworksSelect').value;
     
-    if (!userId) {
-        showToast('Please select a user to link', 'warning');
+    if (!freshworksUserId) {
+        showToast('Please select a Freshworks user to link', 'warning');
         return;
     }
     
     try {
-        const response = await fetch(`/freshworks-linking/api/mappings/${currentMappingId}`, {
-            method: 'PUT',
+        const response = await fetch('/freshworks-linking/api/link-user', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ user_id: parseInt(userId) })
+            body: JSON.stringify({ 
+                user_id: currentUserId, 
+                freshworks_user_id: parseInt(freshworksUserId) 
+            })
         });
         
         const data = await response.json();
@@ -608,7 +1015,7 @@ async function confirmLinkUser() {
         if (data.success) {
             showToast('User linked successfully', 'success');
             bootstrap.Modal.getInstance(document.getElementById('linkUserModal')).hide();
-            loadMappings();
+            loadAllData();
         } else {
             showToast('Error linking user: ' + data.error, 'error');
         }
@@ -619,25 +1026,31 @@ async function confirmLinkUser() {
 }
 
 // Unlink user
-async function unlinkUser(mappingId) {
-    if (!confirm('Are you sure you want to unlink this user?')) {
-        return;
-    }
+function unlinkUser(userId, username) {
+    currentUserId = userId;
+    document.getElementById('unlinkUserName').textContent = username;
     
+    const modal = new bootstrap.Modal(document.getElementById('unlinkUserModal'));
+    modal.show();
+}
+
+// Confirm unlink user
+async function confirmUnlinkUser() {
     try {
-        const response = await fetch(`/freshworks-linking/api/mappings/${mappingId}`, {
-            method: 'PUT',
+        const response = await fetch('/freshworks-linking/api/unlink-user', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ user_id: null })
+            body: JSON.stringify({ user_id: currentUserId })
         });
         
         const data = await response.json();
         
         if (data.success) {
             showToast('User unlinked successfully', 'success');
-            loadMappings();
+            bootstrap.Modal.getInstance(document.getElementById('unlinkUserModal')).hide();
+            loadAllData();
         } else {
             showToast('Error unlinking user: ' + data.error, 'error');
         }
@@ -647,92 +1060,10 @@ async function unlinkUser(mappingId) {
     }
 }
 
-// View ticket details
-async function viewTicketDetails(userId) {
-    const modal = new bootstrap.Modal(document.getElementById('ticketDetailsModal'));
-    modal.show();
-    
-    try {
-        const response = await fetch(`/freshworks-linking/api/tickets/user/${userId}?days=30`);
-        const data = await response.json();
-        
-        if (data.success) {
-            renderTicketDetails(data);
-        } else {
-            document.getElementById('ticketDetailsContent').innerHTML = `
-                <div class="text-center text-danger">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    Error loading ticket details: ${data.error}
-                </div>
-            `;
-        }
-    } catch (error) {
-        console.error('Error loading ticket details:', error);
-        document.getElementById('ticketDetailsContent').innerHTML = `
-            <div class="text-center text-danger">
-                <i class="bi bi-exclamation-triangle"></i>
-                Error loading ticket details
-            </div>
-        `;
-    }
-}
-
-// Render ticket details
-function renderTicketDetails(data) {
-    const { user_info, tickets, date_range } = data;
-    
-    let content = `
-        <div class="mb-4">
-            <h6>User Information</h6>
-            <div class="row">
-                <div class="col-md-6">
-                    <strong>Username:</strong> ${user_info.username}<br>
-                    <strong>Email:</strong> ${user_info.email}<br>
-                    <strong>Role:</strong> <span class="badge bg-secondary">${user_info.role}</span>
-                </div>
-                <div class="col-md-6">
-                    <strong>Date Range:</strong> ${new Date(date_range.start_date).toLocaleDateString()} - ${new Date(date_range.end_date).toLocaleDateString()}<br>
-                    <strong>Total Tickets:</strong> ${tickets.reduce((sum, t) => sum + t.tickets_closed, 0)}
-                </div>
-            </div>
-        </div>
-    `;
-    
-    if (tickets.length === 0) {
-        content += `
-            <div class="text-center text-muted">
-                <i class="bi bi-inbox" style="font-size: 2rem;"></i>
-                <p class="mt-2">No tickets found for this period</p>
-            </div>
-        `;
-    } else {
-        content += `
-            <h6>Ticket Details</h6>
-            <div class="ticket-details">
-                ${tickets.map(ticket => `
-                    <div class="ticket-item">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <strong>Date:</strong> ${new Date(ticket.date).toLocaleDateString()}<br>
-                                <strong>Tickets Closed:</strong> ${ticket.tickets_closed}
-                            </div>
-                            <small class="text-muted">Freshworks ID: ${ticket.freshworks_user_id}</small>
-                        </div>
-                        ${ticket.ticket_numbers && ticket.ticket_numbers.length > 0 ? `
-                            <div class="ticket-numbers">
-                                <strong>Ticket Numbers:</strong>
-                                ${ticket.ticket_numbers.map(num => `
-                                    <span class="ticket-number">${num}</span>
-                                `).join('')}
-                            </div>
-                        ` : ''}
-                    </div>
-                `).join('')}
-            </div>
-        `;
-    }
-    
-    document.getElementById('ticketDetailsContent').innerHTML = content;
+// View user details
+function viewUserDetails(userId) {
+    // This could open a modal with detailed user information
+    showToast('User details feature coming soon', 'info');
 }
 
 // Sync mappings
@@ -752,7 +1083,7 @@ async function syncMappings() {
         
         if (data.success) {
             showToast(data.message, 'success');
-            loadMappings();
+            loadAllData();
         } else {
             showToast('Error syncing mappings: ' + data.error, 'error');
         }
@@ -765,8 +1096,8 @@ async function syncMappings() {
     }
 }
 
-// Auto-link mappings
-async function autoLinkMappings() {
+// Auto-link users
+async function autoLinkUsers() {
     const button = event.target.closest('button');
     const originalContent = button.innerHTML;
     
@@ -782,7 +1113,7 @@ async function autoLinkMappings() {
         
         if (data.success) {
             showToast(data.message, 'success');
-            loadMappings();
+            loadAllData();
         } else {
             showToast('Error auto-linking: ' + data.error, 'error');
         }
@@ -795,14 +1126,13 @@ async function autoLinkMappings() {
     }
 }
 
-// Refresh mappings
-function refreshMappings() {
-    loadMappings();
+// Refresh data
+function refreshData() {
+    loadAllData();
 }
 
 // Toast notification function
 function showToast(message, type = 'info') {
-    // Create toast element
     const toast = document.createElement('div');
     toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type} border-0`;
     toast.setAttribute('role', 'alert');
@@ -818,18 +1148,15 @@ function showToast(message, type = 'info') {
         </div>
     `;
     
-    // Add to page
     const container = document.createElement('div');
     container.className = 'toast-container position-fixed top-0 end-0 p-3';
     container.style.zIndex = '9999';
     container.appendChild(toast);
     document.body.appendChild(container);
     
-    // Show toast
     const bsToast = new bootstrap.Toast(toast);
     bsToast.show();
     
-    // Remove after hidden
     toast.addEventListener('hidden.bs.toast', () => {
         document.body.removeChild(container);
     });

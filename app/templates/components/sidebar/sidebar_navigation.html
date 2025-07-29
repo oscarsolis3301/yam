@@ -112,10 +112,25 @@
   </li>
 
   {% if current_user.is_authenticated and current_user.is_admin %}
-  <li>
-    <a href="/admin/clock-id-cache" class="nav-link py-2 rounded-0 {% if active_page == 'clock_id_cache' %}active{% endif %}" title="Clock ID Cache" data-bs-toggle="tooltip" data-bs-placement="right">
-      <i class="bi bi-database-check" style="font-size: 20px;"></i>
+  <li style="position: relative;">
+    <a href="/admin/dashboard" class="nav-link py-2 rounded-0 {% if active_page == 'admin_dashboard' %}active{% endif %}" title="Admin Dashboard" data-bs-toggle="tooltip" data-bs-placement="right">
+      <i class="bi bi-shield-check" style="font-size: 20px;"></i>
     </a>
+    <!-- Submenu for Admin -->
+    <div class="submenu-container">
+      <ul class="nav flex-column submenu">
+        <li class="nav-item">
+          <a href="/admin/clock-id-cache" class="nav-link py-1 rounded-pill {% if active_page == 'clock_id_cache' %}active{% endif %}" title="Clock ID Cache" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="bi bi-database-check" style="font-size: 16px;"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="/admin/cache-management" class="nav-link py-1 rounded-pill {% if active_page == 'cache_management' %}active{% endif %}" title="Cache Management" data-bs-toggle="tooltip" data-bs-placement="right">
+            <i class="bi bi-gear" style="font-size: 16px;"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
   </li>
   {% endif %}
   <!-- ======================================================== -->

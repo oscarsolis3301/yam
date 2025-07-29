@@ -1944,6 +1944,12 @@ def import_blueprints():
     except Exception as e:
         logger.warning(f"Failed to import private_messages blueprint: {e}")
     
+    try:
+        from app.blueprints.freshworks_linking import bp as freshworks_linking_bp
+        blueprints['freshworks_linking_bp'] = freshworks_linking_bp
+    except Exception as e:
+        logger.warning(f"Failed to import freshworks_linking blueprint: {e}")
+    
     return blueprints
 
 def register_all_blueprints(yam_app):
@@ -2050,6 +2056,8 @@ def register_all_blueprints(yam_app):
         yam_app.register_blueprint(blueprints['modal_api_bp'])
     if 'private_messages_bp' in blueprints:
         yam_app.register_blueprint(blueprints['private_messages_bp'], url_prefix='/api/private-messages')
+    if 'freshworks_linking_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['freshworks_linking_bp'])
     
     # Register additional blueprints
     try:

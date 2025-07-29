@@ -24,6 +24,8 @@ from .base import (
     UserCache,
     SearchIndex,
     AllowedWindowsUser,
+    FreshworksUserMapping,
+    TicketClosure,
     init_db
 )
 from .chat import (
@@ -172,6 +174,8 @@ __all__ = [
     'UserCache',
     'SearchIndex',
     'AllowedWindowsUser',
+    'FreshworksUserMapping',
+    'TicketClosure',
     'TeamChatMessage',
     'TeamChatSession',
     'TeamChatTyping',

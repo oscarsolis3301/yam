@@ -1,0 +1,402 @@
+{% extends "base.html" %}
+
+{% block title %}Team Members Management{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-users"></i> Team Members Management
+                    </h3>
+                    <p class="card-subtitle text-muted">
+                        Manage user accounts for team members from Daily Ticket Closures database
+                    </p>
+                </div>
+                <div class="card-body">
+                    <!-- Statistics Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Team Members</h5>
+                                    <h2 id="total-team-members">-</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">User Accounts</h5>
+                                    <h2 id="total-users">-</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Missing Users</h5>
+                                    <h2 id="missing-users">-</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Mappings</h5>
+                                    <h2 id="total-mappings">-</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-primary" onclick="syncTeamMembers()">
+                                    <i class="fas fa-sync"></i> Sync Team Members
+                                </button>
+                                <button type="button" class="btn btn-success" onclick="createMissingUsers()">
+                                    <i class="fas fa-user-plus"></i> Create Missing Users
+                                </button>
+                                <button type="button" class="btn btn-info" onclick="refreshStatus()">
+                                    <i class="fas fa-refresh"></i> Refresh Status
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Team Members Table -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">Freshworks Team Members</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped" id="team-members-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Freshworks ID</th>
+                                                    <th>User Account</th>
+                                                    <th>Mapping</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="team-members-tbody">
+                                                <!-- Data will be populated by JavaScript -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Missing Users Section -->
+                    <div class="row mt-4" id="missing-users-section" style="display: none;">
+                        <div class="col-12">
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning text-white">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-exclamation-triangle"></i> Missing User Accounts
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted">The following team members don't have user accounts yet:</p>
+                                    <ul id="missing-users-list" class="list-group">
+                                        <!-- Missing users will be listed here -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Existing Users Section -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">Existing User Accounts</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm" id="existing-users-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Username</th>
+                                                    <th>Email</th>
+                                                    <th>Role</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="existing-users-tbody">
+                                                <!-- Data will be populated by JavaScript -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <p class="mt-2" id="loading-message">Processing...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let teamMembersData = null;
+
+// Load page data on page load
+document.addEventListener('DOMContentLoaded', function() {
+    refreshStatus();
+});
+
+function showLoading(message = 'Processing...') {
+    document.getElementById('loading-message').textContent = message;
+    $('#loadingModal').modal('show');
+}
+
+function hideLoading() {
+    $('#loadingModal').modal('hide');
+}
+
+function showAlert(message, type = 'success') {
+    // Create alert element
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+        </button>
+    `;
+    
+    // Insert at top of card body
+    const cardBody = document.querySelector('.card-body');
+    cardBody.insertBefore(alertDiv, cardBody.firstChild);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+async function refreshStatus() {
+    try {
+        showLoading('Loading team members status...');
+        
+        const response = await fetch('/admin/api/team-members/status');
+        const data = await response.json();
+        
+        if (data.success) {
+            teamMembersData = data;
+            updateStatistics(data.statistics);
+            updateTeamMembersTable(data.freshworks_team, data.existing_users);
+            updateMissingUsersSection(data.missing_users);
+            updateExistingUsersTable(data.existing_users);
+        } else {
+            showAlert('Error loading team members status: ' + data.error, 'danger');
+        }
+    } catch (error) {
+        showAlert('Error loading team members status: ' + error.message, 'danger');
+    } finally {
+        hideLoading();
+    }
+}
+
+function updateStatistics(stats) {
+    document.getElementById('total-team-members').textContent = stats.total_team_members;
+    document.getElementById('total-users').textContent = stats.total_users;
+    document.getElementById('missing-users').textContent = stats.missing_users;
+    document.getElementById('total-mappings').textContent = stats.total_mappings;
+}
+
+function updateTeamMembersTable(freshworksTeam, existingUsers) {
+    const tbody = document.getElementById('team-members-tbody');
+    tbody.innerHTML = '';
+    
+    const existingUsernames = new Set(existingUsers.map(user => user.username));
+    
+    freshworksTeam.forEach(member => {
+        const hasUserAccount = existingUsernames.has(member.name);
+        const hasMapping = teamMembersData.missing_mappings.indexOf(member.name) === -1;
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${member.name}</td>
+            <td><code>${member.freshworks_id}</code></td>
+            <td>
+                ${hasUserAccount ? 
+                    '<span class="badge badge-success"><i class="fas fa-check"></i> Yes</span>' : 
+                    '<span class="badge badge-danger"><i class="fas fa-times"></i> No</span>'
+                }
+            </td>
+            <td>
+                ${hasMapping ? 
+                    '<span class="badge badge-success"><i class="fas fa-check"></i> Yes</span>' : 
+                    '<span class="badge badge-warning"><i class="fas fa-exclamation"></i> No</span>'
+                }
+            </td>
+            <td>
+                ${hasUserAccount && hasMapping ? 
+                    '<span class="badge badge-success">Complete</span>' :
+                    hasUserAccount ? 
+                        '<span class="badge badge-warning">No Mapping</span>' :
+                        '<span class="badge badge-danger">Missing Account</span>'
+                }
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function updateMissingUsersSection(missingUsers) {
+    const section = document.getElementById('missing-users-section');
+    const list = document.getElementById('missing-users-list');
+    
+    if (missingUsers.length > 0) {
+        list.innerHTML = '';
+        missingUsers.forEach(username => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.textContent = username;
+            list.appendChild(li);
+        });
+        section.style.display = 'block';
+    } else {
+        section.style.display = 'none';
+    }
+}
+
+function updateExistingUsersTable(existingUsers) {
+    const tbody = document.getElementById('existing-users-tbody');
+    tbody.innerHTML = '';
+    
+    existingUsers.forEach(user => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${user.username}</td>
+            <td>${user.email}</td>
+            <td><span class="badge badge-${user.role === 'admin' ? 'danger' : 'primary'}">${user.role}</span></td>
+            <td><span class="badge badge-success">Active</span></td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+async function syncTeamMembers() {
+    try {
+        showLoading('Syncing team members from Freshworks...');
+        
+        const response = await fetch('/admin/api/team-members/sync', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showAlert(`Team members synced successfully! Total users: ${data.total_users}`);
+            refreshStatus();
+        } else {
+            showAlert('Error syncing team members: ' + data.error, 'danger');
+        }
+    } catch (error) {
+        showAlert('Error syncing team members: ' + error.message, 'danger');
+    } finally {
+        hideLoading();
+    }
+}
+
+async function createMissingUsers() {
+    try {
+        showLoading('Creating missing user accounts...');
+        
+        const response = await fetch('/admin/api/team-members/create-missing', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (data.created_users && data.created_users.length > 0) {
+                showAlert(`Created ${data.created_users.length} new user accounts: ${data.created_users.join(', ')}`);
+            } else {
+                showAlert('All team members already have user accounts');
+            }
+            refreshStatus();
+        } else {
+            showAlert('Error creating missing users: ' + data.error, 'danger');
+        }
+    } catch (error) {
+        showAlert('Error creating missing users: ' + error.message, 'danger');
+    } finally {
+        hideLoading();
+    }
+}
+</script>
+
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.btn-group .btn {
+    margin-right: 0.25rem;
+}
+
+.alert {
+    margin-bottom: 1rem;
+}
+
+code {
+    background-color: #f8f9fa;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+}
+</style>
+{% endblock %} 

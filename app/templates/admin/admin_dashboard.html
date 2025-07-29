@@ -180,6 +180,43 @@
         </div>
     </div>
 
+    <!-- Quick Links Section -->
+    <div class="dashboard-section">
+        <div class="dashboard-section-title">
+            <i class="bi bi-lightning-fill me-2"></i>Quick Links
+        </div>
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('admin.team_members') }}" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                    <i class="bi bi-people-fill mb-2" style="font-size: 2rem;"></i>
+                    <span>Team Members</span>
+                    <small class="text-muted">Manage Freshworks team</small>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('admin.freshworks_mappings') }}" class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                    <i class="bi bi-link-45deg mb-2" style="font-size: 2rem;"></i>
+                    <span>Freshworks Mappings</span>
+                    <small class="text-muted">Link user accounts</small>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('admin.cache_management') }}" class="btn btn-outline-warning w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                    <i class="bi bi-gear-fill mb-2" style="font-size: 2rem;"></i>
+                    <span>Cache Management</span>
+                    <small class="text-muted">System cache tools</small>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('admin.chat_history') }}" class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                    <i class="bi bi-chat-dots-fill mb-2" style="font-size: 2rem;"></i>
+                    <span>Chat History</span>
+                    <small class="text-muted">AI conversation logs</small>
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- User Management Section -->
     <div class="dashboard-section">
         <div class="d-flex justify-content-between align-items-center mb-3">

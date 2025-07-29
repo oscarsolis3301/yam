@@ -1,0 +1,1048 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Ultra Dark Theme Admin Dashboard -->
+<style>
+/* Ultra Dark Theme - Admin Dashboard */
+:root {
+    --admin-bg-primary: #0a0a0a;
+    --admin-bg-secondary: #111111;
+    --admin-bg-tertiary: #1a1a1a;
+    --admin-bg-card: #1e1e1e;
+    --admin-border: #333333;
+    --admin-text-primary: #ffffff;
+    --admin-text-secondary: #cccccc;
+    --admin-text-muted: #888888;
+    --admin-accent: #6366f1;
+    --admin-success: #10b981;
+    --admin-warning: #f59e0b;
+    --admin-danger: #ef4444;
+    --admin-info: #3b82f6;
+}
+
+body {
+    background: linear-gradient(135deg, var(--admin-bg-primary) 0%, var(--admin-bg-secondary) 100%);
+    color: var(--admin-text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+.admin-dashboard {
+    padding: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.admin-header {
+    background: rgba(30, 30, 30, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--admin-border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.admin-header h1 {
+    color: var(--admin-text-primary);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(135deg, var(--admin-accent), #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.admin-header p {
+    color: var(--admin-text-secondary);
+    font-size: 1.1rem;
+    margin: 0.5rem 0 0 0;
+}
+
+.admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.admin-card {
+    background: rgba(30, 30, 30, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--admin-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.admin-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    border-color: var(--admin-accent);
+}
+
+.admin-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--admin-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.admin-card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: white;
+}
+
+.admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.admin-stat {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid var(--admin-border);
+}
+
+.admin-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--admin-accent);
+    margin-bottom: 0.25rem;
+}
+
+.admin-stat-label {
+    font-size: 0.875rem;
+    color: var(--admin-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-table th {
+    background: rgba(255, 255, 255, 0.05);
+    font-weight: 600;
+    color: var(--admin-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.875rem;
+}
+
+.admin-table td {
+    color: var(--admin-text-primary);
+}
+
+.admin-btn {
+    background: linear-gradient(135deg, var(--admin-accent), #8b5cf6);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.admin-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.admin-btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--admin-border);
+}
+
+.admin-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.admin-search {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--admin-border);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    color: var(--admin-text-primary);
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.admin-search::placeholder {
+    color: var(--admin-text-muted);
+}
+
+.admin-modal {
+    background: var(--admin-bg-card);
+    border: 1px solid var(--admin-border);
+    border-radius: 16px;
+    color: var(--admin-text-primary);
+}
+
+.admin-modal-header {
+    border-bottom: 1px solid var(--admin-border);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.admin-modal-body {
+    background: var(--admin-bg-card);
+}
+
+.admin-modal-footer {
+    border-top: 1px solid var(--admin-border);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.user-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-online {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--admin-success);
+    border: 1px solid var(--admin-success);
+}
+
+.status-offline {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--admin-danger);
+    border: 1px solid var(--admin-danger);
+}
+
+.status-warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--admin-warning);
+    border: 1px solid var(--admin-warning);
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .admin-dashboard {
+        padding: 0.5rem;
+    }
+    
+    .admin-header {
+        padding: 1.5rem;
+    }
+    
+    .admin-header h1 {
+        font-size: 2rem;
+    }
+    
+    .admin-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .admin-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+
+<div class="admin-dashboard">
+    <!-- Header -->
+    <div class="admin-header">
+        <h1><i class="bi bi-shield-check"></i> Admin Dashboard</h1>
+        <p>Centralized management for user accounts, clock IDs, tickets, and system monitoring</p>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="admin-grid">
+        <!-- Clock ID Management -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <div class="admin-card-title">
+                    <div class="admin-card-icon" style="background: linear-gradient(135deg, var(--admin-accent), #8b5cf6);">
+                        <i class="bi bi-database-check"></i>
+                    </div>
+                    Clock ID Management
+                </div>
+                <button class="admin-btn" onclick="refreshClockIDStats()">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+            
+            <div class="admin-stats-grid">
+                <div class="admin-stat">
+                    <div class="admin-stat-value" id="clockIDTotal">-</div>
+                    <div class="admin-stat-label">Total Cached</div>
+                </div>
+                <div class="admin-stat">
+                    <div class="admin-stat-value" id="clockIDSearches">-</div>
+                    <div class="admin-stat-label">Searches</div>
+                </div>
+                <div class="admin-stat">
+                    <div class="admin-stat-value" id="clockIDPopular">-</div>
+                    <div class="admin-stat-label">Popular</div>
+                </div>
+            </div>
+            
+            <input type="text" class="admin-search" id="clockIDSearch" placeholder="Search Clock ID, name, or username...">
+            
+            <div class="admin-table-container" style="max-height: 300px; overflow-y: auto;">
+                <table class="admin-table" id="clockIDTable">
+                    <thead>
+                        <tr>
+                            <th>Clock ID</th>
+                            <th>Name</th>
+                            <th>Username</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clockIDTableBody">
+                        <tr><td colspan="4" class="text-center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="margin-top: 1rem;">
+                <button class="admin-btn" onclick="showClockIDModal()">
+                    <i class="bi bi-plus-circle"></i> Add Clock ID
+                </button>
+                <button class="admin-btn admin-btn-secondary" onclick="populateClockIDCache()">
+                    <i class="bi bi-download"></i> Populate Cache
+                </button>
+            </div>
+        </div>
+
+        <!-- User Activity & Security -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <div class="admin-card-title">
+                    <div class="admin-card-icon" style="background: linear-gradient(135deg, var(--admin-success), #059669);">
+                        <i class="bi bi-shield-lock"></i>
+                    </div>
+                    User Security & Activity
+                </div>
+                <button class="admin-btn" onclick="refreshUserActivity()">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+            
+            <div class="admin-stats-grid">
+                <div class="admin-stat">
+                    <div class="admin-stat-value" id="usersTotal">-</div>
+                    <div class="admin-stat-label">Total Users</div>
+                </div>
+                <div class="admin-stat">
+                    <div class="admin-stat-value" id="usersActive">-</div>
+                    <div class="admin-stat-label">Active Today</div>
+                </div>
+                <div class="admin-stat">
+                    <div class="admin-stat-value" id="usersLocked">-</div>
+                    <div class="admin-stat-label">Locked Out</div>
+                </div>
+            </div>
+            
+            <input type="text" class="admin-search" id="userActivitySearch" placeholder="Search users...">
+            
+            <div class="admin-table-container" style="max-height: 300px; overflow-y: auto;">
+                <table class="admin-table" id="userActivityTable">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Last Login</th>
+                            <th>Password Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userActivityTableBody">
+                        <tr><td colspan="4" class="text-center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Ticket Statistics -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <div class="admin-card-title">
+                    <div class="admin-card-icon" style="background: linear-gradient(135deg, var(--admin-info), #2563eb);">
+                        <i class="bi bi-ticket-detailed"></i>
+                    </div>
+                    Ticket Statistics
+                </div>
+                <button class="admin-btn" onclick="refreshTicketStats()">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+            
+            <div class="admin-stats-grid">
+                <div class="admin-stat">
+                    <div class="admin-stat-value" id="ticketsTotal">-</div>
+                    <div class="admin-stat-label">Total Closed</div>
+                </div>
+                <div class="admin-stat">
+                    <div class="admin-stat-value" id="ticketsThisMonth">-</div>
+                    <div class="admin-stat-label">This Month</div>
+                </div>
+                <div class="admin-stat">
+                    <div class="admin-stat-value" id="ticketsThisWeek">-</div>
+                    <div class="admin-stat-label">This Week</div>
+                </div>
+            </div>
+            
+            <div class="admin-table-container" style="max-height: 300px; overflow-y: auto;">
+                <table class="admin-table" id="ticketStatsTable">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Total Tickets</th>
+                            <th>This Month</th>
+                            <th>Last Activity</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ticketStatsTableBody">
+                        <tr><td colspan="4" class="text-center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Freshworks Integration -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <div class="admin-card-title">
+                    <div class="admin-card-icon" style="background: linear-gradient(135deg, var(--admin-warning), #d97706);">
+                        <i class="bi bi-link-45deg"></i>
+                    </div>
+                    Freshworks Integration
+                </div>
+                <button class="admin-btn" onclick="refreshFreshworksData()">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+            
+            <div class="admin-stats-grid">
+                <div class="admin-stat">
+                    <div class="admin-stat-value" id="freshworksMappings">-</div>
+                    <div class="admin-stat-label">Mappings</div>
+                </div>
+                <div class="admin-stat">
+                    <div class="admin-stat-value" id="freshworksLinked">-</div>
+                    <div class="admin-stat-label">Linked</div>
+                </div>
+                <div class="admin-stat">
+                    <div class="admin-stat-value" id="freshworksUnlinked">-</div>
+                    <div class="admin-stat-label">Unlinked</div>
+                </div>
+            </div>
+            
+            <div class="admin-table-container" style="max-height: 300px; overflow-y: auto;">
+                <table class="admin-table" id="freshworksTable">
+                    <thead>
+                        <tr>
+                            <th>Freshworks User</th>
+                            <th>Local User</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="freshworksTableBody">
+                        <tr><td colspan="4" class="text-center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="margin-top: 1rem;">
+                <button class="admin-btn" onclick="autoLinkFreshworks()">
+                    <i class="bi bi-magic"></i> Auto-Link
+                </button>
+                <button class="admin-btn admin-btn-secondary" onclick="openFreshworksLinking()">
+                    <i class="bi bi-gear"></i> Manage
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Clock ID Modal -->
+<div class="modal fade admin-modal" id="clockIDModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Clock ID to Cache</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="clockIDsInput" class="form-label">Clock IDs (one per line or comma-separated)</label>
+                    <textarea class="form-control" id="clockIDsInput" rows="10" placeholder="Enter clock IDs here...&#10;Example:&#10;12345&#10;67890&#10;11111"></textarea>
+                </div>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Note:</strong> This will attempt to lookup each clock ID in Active Directory and cache the user information for faster future searches.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="admin-btn" onclick="addClockIDs()">
+                    <i class="bi bi-plus-circle"></i> Add to Cache
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div class="modal fade admin-modal" id="userDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="userDetailsContent">
+                <!-- User details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Global variables
+let clockIDData = [];
+let userActivityData = [];
+let ticketStatsData = [];
+let freshworksData = [];
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Admin Dashboard - Initializing...');
+    loadAllData();
+    setupEventListeners();
+});
+
+// Setup event listeners
+function setupEventListeners() {
+    // Clock ID search
+    document.getElementById('clockIDSearch').addEventListener('input', function() {
+        filterClockIDs(this.value);
+    });
+    
+    // User activity search
+    document.getElementById('userActivitySearch').addEventListener('input', function() {
+        filterUserActivity(this.value);
+    });
+}
+
+// Load all data
+async function loadAllData() {
+    try {
+        await Promise.all([
+            loadClockIDData(),
+            loadUserActivityData(),
+            loadTicketStatsData(),
+            loadFreshworksData()
+        ]);
+    } catch (error) {
+        console.error('Error loading data:', error);
+        showToast('Error loading dashboard data', 'error');
+    }
+}
+
+// Clock ID Management
+async function loadClockIDData() {
+    try {
+        const response = await fetch('/api/clock-id/stats');
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('clockIDTotal').textContent = data.stats.total_entries || 0;
+            document.getElementById('clockIDSearches').textContent = data.stats.total_searches || 0;
+            document.getElementById('clockIDPopular').textContent = data.stats.popular_searches || 0;
+            
+            // Load popular searches
+            const popularResponse = await fetch('/api/clock-id/popular');
+            const popularData = await popularResponse.json();
+            
+            if (popularData.success) {
+                clockIDData = popularData.popular_searches || [];
+                renderClockIDTable();
+            }
+        }
+    } catch (error) {
+        console.error('Error loading Clock ID data:', error);
+    }
+}
+
+function renderClockIDTable() {
+    const tbody = document.getElementById('clockIDTableBody');
+    tbody.innerHTML = '';
+    
+    if (clockIDData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center">No data available</td></tr>';
+        return;
+    }
+    
+    clockIDData.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><strong>${item.clock_id}</strong></td>
+            <td>${item.full_name || 'N/A'}</td>
+            <td>${item.username || 'N/A'}</td>
+            <td>
+                <span class="user-status status-online">Cached</span>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function filterClockIDs(query) {
+    if (!query) {
+        renderClockIDTable();
+        return;
+    }
+    
+    const filtered = clockIDData.filter(item => 
+        item.clock_id.includes(query) ||
+        (item.full_name && item.full_name.toLowerCase().includes(query.toLowerCase())) ||
+        (item.username && item.username.toLowerCase().includes(query.toLowerCase()))
+    );
+    
+    renderFilteredClockIDTable(filtered);
+}
+
+function renderFilteredClockIDTable(data) {
+    const tbody = document.getElementById('clockIDTableBody');
+    tbody.innerHTML = '';
+    
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center">No matches found</td></tr>';
+        return;
+    }
+    
+    data.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><strong>${item.clock_id}</strong></td>
+            <td>${item.full_name || 'N/A'}</td>
+            <td>${item.username || 'N/A'}</td>
+            <td>
+                <span class="user-status status-online">Cached</span>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// User Activity & Security
+async function loadUserActivityData() {
+    try {
+        const response = await fetch('/api/users');
+        const data = await response.json();
+        
+        if (Array.isArray(data)) {
+            userActivityData = data.filter(user => user.role !== 'user');
+        } else {
+            userActivityData = (data.users || []).filter(user => user.role !== 'user');
+        }
+        
+        document.getElementById('usersTotal').textContent = userActivityData.length;
+        document.getElementById('usersActive').textContent = userActivityData.filter(u => u.last_login).length;
+        document.getElementById('usersLocked').textContent = userActivityData.filter(u => u.locked_out).length;
+        
+        renderUserActivityTable();
+    } catch (error) {
+        console.error('Error loading user activity data:', error);
+    }
+}
+
+function renderUserActivityTable() {
+    const tbody = document.getElementById('userActivityTableBody');
+    tbody.innerHTML = '';
+    
+    if (userActivityData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center">No users found</td></tr>';
+        return;
+    }
+    
+    userActivityData.forEach(user => {
+        const row = document.createElement('tr');
+        const lastLogin = user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never';
+        const passwordStatus = user.password_changed ? 'Changed' : 'Temporary';
+        const statusClass = user.password_changed ? 'status-online' : 'status-warning';
+        
+        row.innerHTML = `
+            <td><strong>${user.username}</strong></td>
+            <td>${lastLogin}</td>
+            <td><span class="user-status ${statusClass}">${passwordStatus}</span></td>
+            <td>
+                <button class="admin-btn admin-btn-secondary" onclick="viewUserDetails(${user.id})">
+                    <i class="bi bi-eye"></i> View
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function filterUserActivity(query) {
+    if (!query) {
+        renderUserActivityTable();
+        return;
+    }
+    
+    const filtered = userActivityData.filter(user => 
+        user.username.toLowerCase().includes(query.toLowerCase()) ||
+        (user.email && user.email.toLowerCase().includes(query.toLowerCase()))
+    );
+    
+    renderFilteredUserActivityTable(filtered);
+}
+
+function renderFilteredUserActivityTable(data) {
+    const tbody = document.getElementById('userActivityTableBody');
+    tbody.innerHTML = '';
+    
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center">No matches found</td></tr>';
+        return;
+    }
+    
+    data.forEach(user => {
+        const row = document.createElement('tr');
+        const lastLogin = user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never';
+        const passwordStatus = user.password_changed ? 'Changed' : 'Temporary';
+        const statusClass = user.password_changed ? 'status-online' : 'status-warning';
+        
+        row.innerHTML = `
+            <td><strong>${user.username}</strong></td>
+            <td>${lastLogin}</td>
+            <td><span class="user-status ${statusClass}">${passwordStatus}</span></td>
+            <td>
+                <button class="admin-btn admin-btn-secondary" onclick="viewUserDetails(${user.id})">
+                    <i class="bi bi-eye"></i> View
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Ticket Statistics
+async function loadTicketStatsData() {
+    try {
+        const response = await fetch('/api/tickets/stats');
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('ticketsTotal').textContent = data.stats.total_tickets || 0;
+            document.getElementById('ticketsThisMonth').textContent = data.stats.this_month || 0;
+            document.getElementById('ticketsThisWeek').textContent = data.stats.this_week || 0;
+            
+            // Load user ticket stats
+            const userStatsResponse = await fetch('/api/tickets/user-stats');
+            const userStatsData = await userStatsResponse.json();
+            
+            if (userStatsData.success) {
+                ticketStatsData = userStatsData.user_stats || [];
+                renderTicketStatsTable();
+            }
+        }
+    } catch (error) {
+        console.error('Error loading ticket stats data:', error);
+    }
+}
+
+function renderTicketStatsTable() {
+    const tbody = document.getElementById('ticketStatsTableBody');
+    tbody.innerHTML = '';
+    
+    if (ticketStatsData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center">No ticket data available</td></tr>';
+        return;
+    }
+    
+    ticketStatsData.forEach(stat => {
+        const row = document.createElement('tr');
+        const lastActivity = stat.last_activity ? new Date(stat.last_activity).toLocaleDateString() : 'Never';
+        
+        row.innerHTML = `
+            <td><strong>${stat.username}</strong></td>
+            <td>${stat.total_tickets || 0}</td>
+            <td>${stat.this_month || 0}</td>
+            <td>${lastActivity}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Freshworks Integration
+async function loadFreshworksData() {
+    try {
+        const response = await fetch('/freshworks-linking/api/mappings');
+        const data = await response.json();
+        
+        if (data.success) {
+            freshworksData = data.mappings || [];
+            
+            const linked = freshworksData.filter(m => m.user_id).length;
+            const unlinked = freshworksData.length - linked;
+            
+            document.getElementById('freshworksMappings').textContent = freshworksData.length;
+            document.getElementById('freshworksLinked').textContent = linked;
+            document.getElementById('freshworksUnlinked').textContent = unlinked;
+            
+            renderFreshworksTable();
+        }
+    } catch (error) {
+        console.error('Error loading Freshworks data:', error);
+    }
+}
+
+function renderFreshworksTable() {
+    const tbody = document.getElementById('freshworksTableBody');
+    tbody.innerHTML = '';
+    
+    if (freshworksData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center">No Freshworks mappings found</td></tr>';
+        return;
+    }
+    
+    freshworksData.slice(0, 10).forEach(mapping => {
+        const row = document.createElement('tr');
+        const status = mapping.user_id ? 'Linked' : 'Unlinked';
+        const statusClass = mapping.user_id ? 'status-online' : 'status-offline';
+        
+        row.innerHTML = `
+            <td><strong>${mapping.freshworks_username}</strong></td>
+            <td>${mapping.user_info ? mapping.user_info.username : 'Not linked'}</td>
+            <td><span class="user-status ${statusClass}">${status}</span></td>
+            <td>
+                <button class="admin-btn admin-btn-secondary" onclick="manageFreshworksMapping(${mapping.freshworks_user_id})">
+                    <i class="bi bi-gear"></i> Manage
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Modal functions
+function showClockIDModal() {
+    const modal = new bootstrap.Modal(document.getElementById('clockIDModal'));
+    modal.show();
+}
+
+async function addClockIDs() {
+    const clockIDsText = document.getElementById('clockIDsInput').value.trim();
+    if (!clockIDsText) {
+        showToast('Please enter some clock IDs', 'warning');
+        return;
+    }
+    
+    const clockIDs = clockIDsText
+        .split(/[,\n]/)
+        .map(id => id.trim())
+        .filter(id => id && /^\d+$/.test(id));
+    
+    if (clockIDs.length === 0) {
+        showToast('Please enter valid numeric clock IDs', 'warning');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/admin/api/cache/populate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ clock_ids: clockIDs })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast(`Successfully added ${data.results.success.length} clock IDs to cache`, 'success');
+            bootstrap.Modal.getInstance(document.getElementById('clockIDModal')).hide();
+            document.getElementById('clockIDsInput').value = '';
+            loadClockIDData();
+        } else {
+            showToast('Error adding clock IDs: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error adding clock IDs:', error);
+        showToast('Error adding clock IDs', 'error');
+    }
+}
+
+async function viewUserDetails(userId) {
+    try {
+        const response = await fetch(`/api/users/${userId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const user = data.user;
+            const content = document.getElementById('userDetailsContent');
+            
+            content.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>User Information</h6>
+                        <p><strong>Username:</strong> ${user.username}</p>
+                        <p><strong>Email:</strong> ${user.email || 'N/A'}</p>
+                        <p><strong>Role:</strong> ${user.role}</p>
+                        <p><strong>Created:</strong> ${new Date(user.created_at).toLocaleDateString()}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Security Status</h6>
+                        <p><strong>Password Changed:</strong> ${user.password_changed ? 'Yes' : 'No'}</p>
+                        <p><strong>Last Login:</strong> ${user.last_login ? new Date(user.last_login).toLocaleString() : 'Never'}</p>
+                        <p><strong>Account Status:</strong> ${user.active ? 'Active' : 'Inactive'}</p>
+                    </div>
+                </div>
+            `;
+            
+            const modal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
+            modal.show();
+        } else {
+            showToast('Error loading user details', 'error');
+        }
+    } catch (error) {
+        console.error('Error loading user details:', error);
+        showToast('Error loading user details', 'error');
+    }
+}
+
+// Action functions
+function refreshClockIDStats() {
+    loadClockIDData();
+}
+
+function refreshUserActivity() {
+    loadUserActivityData();
+}
+
+function refreshTicketStats() {
+    loadTicketStatsData();
+}
+
+function refreshFreshworksData() {
+    loadFreshworksData();
+}
+
+function populateClockIDCache() {
+    showClockIDModal();
+}
+
+async function autoLinkFreshworks() {
+    try {
+        const response = await fetch('/freshworks-linking/api/mappings/auto-link', {
+            method: 'POST'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast(data.message, 'success');
+            loadFreshworksData();
+        } else {
+            showToast('Error auto-linking: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error auto-linking:', error);
+        showToast('Error auto-linking', 'error');
+    }
+}
+
+function openFreshworksLinking() {
+    window.open('/freshworks-linking', '_blank');
+}
+
+function manageFreshworksMapping(freshworksId) {
+    window.open(`/freshworks-linking?edit=${freshworksId}`, '_blank');
+}
+
+// Utility functions
+function showToast(message, type = 'info') {
+    // Simple toast implementation
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? 'var(--admin-success)' : type === 'error' ? 'var(--admin-danger)' : 'var(--admin-info)'};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        z-index: 9999;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    `;
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>
+{% endblock %} 

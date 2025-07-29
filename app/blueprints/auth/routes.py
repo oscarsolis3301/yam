@@ -124,6 +124,23 @@ def login():
                     flash('Your account has been deactivated. Please contact an administrator.', 'danger')
                     return render_template('login.html', year=datetime.utcnow().year)
                 
+                # Check if this is first-time login and requires password change
+                if user.is_first_time_login():
+                    if current_app.debug:
+                        print(f"First-time login detected for user: {user.username}")
+                    
+                    # Store user info in session for password change
+                    session['temp_user_id'] = user.id
+                    session['temp_username'] = user.username
+                    session['temp_email'] = user.email
+                    session['first_time_login'] = True
+                    
+                    # Redirect to password change page
+                    return render_template('login.html', 
+                                         year=datetime.utcnow().year,
+                                         first_time_login=True,
+                                         username=user.username)
+                
                 if current_app.debug:
                     print(f"Logging in user: {user.username}")
                 
@@ -224,6 +241,115 @@ def login():
         </body>
         </html>
         """
+
+@bp.route('/change-password', methods=['GET', 'POST'])
+def change_password():
+    """Handle first-time password change for new users."""
+    # Check if user is in first-time login session
+    if not session.get('first_time_login') or not session.get('temp_user_id'):
+        flash('Invalid password change request', 'danger')
+        return redirect(url_for('auth.login'))
+    
+    if request.method == 'POST':
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+        
+        # Validate input
+        if not new_password or not confirm_password:
+            flash('Please fill in all password fields', 'warning')
+            return render_template('login.html', 
+                                 year=datetime.utcnow().year,
+                                 first_time_login=True,
+                                 username=session.get('temp_username'))
+        
+        if new_password != confirm_password:
+            flash('Passwords do not match', 'warning')
+            return render_template('login.html', 
+                                 year=datetime.utcnow().year,
+                                 first_time_login=True,
+                                 username=session.get('temp_username'))
+        
+        # Get user info for validation
+        username = session.get('temp_username', '')
+        first_name = username.split()[0] if username else ''
+        last_name = ' '.join(username.split()[1:]) if len(username.split()) > 1 else ''
+        
+        # Validate password strength
+        from app.utils.password_validation import validate_password
+        is_valid, errors = validate_password(new_password, username, first_name, last_name)
+        
+        if not is_valid:
+            error_message = '<br>'.join(errors)
+            flash(f'Password does not meet requirements:<br>{error_message}', 'warning')
+            return render_template('login.html', 
+                                 year=datetime.utcnow().year,
+                                 first_time_login=True,
+                                 username=session.get('temp_username'))
+        
+        try:
+            # Get user and update password
+            user = User.query.get(session.get('temp_user_id'))
+            if not user:
+                flash('User not found', 'danger')
+                return redirect(url_for('auth.login'))
+            
+            # Update password and mark as changed
+            user.set_password(new_password)
+            user.mark_password_changed()
+            
+            # Clear temporary session data
+            session.pop('temp_user_id', None)
+            session.pop('temp_username', None)
+            session.pop('temp_email', None)
+            session.pop('first_time_login', None)
+            
+            # Log the user in properly
+            session.permanent = True
+            login_user(user, remember=True)
+            
+            # Hydrate session
+            hydrate_user_session(user)
+            
+            # Mark user as online
+            try:
+                update_user_status(user.id, online=True)
+                emit_online_users()
+            except Exception as e:
+                current_app.logger.error(f"Error marking user online: {e}")
+            
+            # Update last login
+            user.last_login = datetime.utcnow()
+            safe_commit(db.session)
+            
+            # Log activity
+            try:
+                act = Activity(
+                    user_id=user.id,
+                    action='password_change',
+                    details='First-time password change completed'
+                )
+                db.session.add(act)
+                safe_commit(db.session)
+            except Exception as e:
+                current_app.logger.error(f"Error logging password change activity: {e}")
+                db.session.rollback()
+            
+            flash('Password changed successfully! Welcome to YAM.', 'success')
+            return redirect(url_for('main.index'))
+            
+        except Exception as e:
+            current_app.logger.error(f"Error changing password: {e}")
+            flash('An error occurred while changing your password. Please try again.', 'danger')
+            return render_template('login.html', 
+                                 year=datetime.utcnow().year,
+                                 first_time_login=True,
+                                 username=session.get('temp_username'))
+    
+    # GET request - show password change form
+    return render_template('login.html', 
+                         year=datetime.utcnow().year,
+                         first_time_login=True,
+                         username=session.get('temp_username'))
 
 @bp.route('/logout')
 @login_required

@@ -5,6 +5,7 @@ from app.extensions import db
 from app.utils.logger import setup_logging
 from app.config import Config
 from sqlalchemy import inspect
+import os
 
 logger = setup_logging()
 
@@ -24,6 +25,12 @@ def init_database(app):
     
     # Create default admin user
     create_admin_user()
+    
+    # Sync Freshworks team members and create user accounts
+    sync_freshworks_team_members()
+    
+    # Create users from ticket closures database
+    create_users_from_ticket_closures()
     
     # Initialize cache table
     init_cache_table()
@@ -185,6 +192,130 @@ def create_admin_user():
     except Exception as e:
         db.session.rollback()
         logger.error(f"Error creating/updating admin user: {e}")
+
+def create_users_from_ticket_closures():
+    """Create user accounts for team members found in Daily Ticket Closures database"""
+    try:
+        from app.models import User, FreshworksUserMapping
+        
+        # Get all unique Freshworks users from the mapping table
+        mappings = FreshworksUserMapping.query.all()
+        created_users = []
+        
+        logger.info(f"Found {len(mappings)} Freshworks user mappings")
+        
+        for mapping in mappings:
+            if mapping.freshworks_username:
+                # Check if user already exists
+                existing_user = User.query.filter_by(username=mapping.freshworks_username).first()
+                if not existing_user:
+                    # Create email from username
+                    first_name = mapping.freshworks_username.split()[0].lower()
+                    email = f"{first_name}@pdshealth.com"
+                    
+                    # Create new user
+                    user = User(
+                        username=mapping.freshworks_username,
+                        email=email,
+                        role='user',
+                        is_active=True,
+                        profile_picture='default.png',
+                        okta_verified=False,
+                        teams_notifications=True
+                    )
+                    user.set_password('password')  # Set default password
+                    db.session.add(user)
+                    created_users.append(mapping.freshworks_username)
+                    logger.info(f"Created user from ticket closures: {mapping.freshworks_username}")
+        
+        if created_users:
+            db.session.commit()
+            logger.info(f"Created {len(created_users)} users from ticket closures database")
+            logger.info(f"Created users: {', '.join(created_users)}")
+        else:
+            logger.info("No new users to create from ticket closures database")
+            
+    except Exception as e:
+        logger.error(f"Error creating users from ticket closures: {e}")
+        db.session.rollback()
+
+def sync_freshworks_team_members():
+    """Sync team members from Freshworks IDs.txt and create user accounts"""
+    try:
+        from app.models import User, FreshworksUserMapping
+        
+        # Load team members from Freshworks IDs.txt
+        ids_file_path = os.path.join(os.path.dirname(__file__), '..', 'Freshworks', 'IDs.txt')
+        
+        if not os.path.exists(ids_file_path):
+            logger.warning(f"Freshworks IDs.txt not found at {ids_file_path}")
+            return
+        
+        team_members = []
+        with open(ids_file_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line and ' - ' in line:
+                    name, freshworks_id = line.split(' - ', 1)
+                    clean_name = name.strip()
+                    freshworks_id = freshworks_id.strip()
+                    
+                    team_members.append({
+                        'username': clean_name,
+                        'freshworks_id': freshworks_id
+                    })
+        
+        logger.info(f"Loaded {len(team_members)} team members from Freshworks IDs.txt")
+        
+        # Create/update Freshworks mappings
+        mappings_created = 0
+        for member in team_members:
+            existing_mapping = FreshworksUserMapping.query.filter_by(
+                freshworks_user_id=member['freshworks_id']
+            ).first()
+            
+            if not existing_mapping:
+                new_mapping = FreshworksUserMapping(
+                    freshworks_user_id=member['freshworks_id'],
+                    freshworks_username=member['username']
+                )
+                db.session.add(new_mapping)
+                mappings_created += 1
+                logger.info(f"Created Freshworks mapping: {member['username']}")
+        
+        if mappings_created > 0:
+            db.session.commit()
+            logger.info(f"Created {mappings_created} new Freshworks mappings")
+        
+        # Create user accounts for team members
+        users_created = 0
+        for member in team_members:
+            existing_user = User.query.filter_by(username=member['username']).first()
+            if not existing_user:
+                first_name = member['username'].split()[0].lower()
+                email = f"{first_name}@pdshealth.com"
+                
+                user = User(
+                    username=member['username'],
+                    email=email,
+                    role='user',
+                    is_active=True,
+                    profile_picture='default.png',
+                    okta_verified=False,
+                    teams_notifications=True
+                )
+                user.set_password('password')
+                db.session.add(user)
+                users_created += 1
+                logger.info(f"Created user account: {member['username']}")
+        
+        if users_created > 0:
+            db.session.commit()
+            logger.info(f"Created {users_created} new user accounts for team members")
+        
+    except Exception as e:
+        logger.error(f"Error syncing Freshworks team members: {e}")
+        db.session.rollback()
 
 def init_cache_table():
     """Create api_cache if it doesn't exist yet."""

@@ -41,9 +41,84 @@ from app.models import (
     KBAttachment,
     SharedLink,
     KBFeedback,
+    FreshworksUserMapping,
+    TicketClosure,
 )
 
 logger = logging.getLogger(__name__)
+
+def load_freshworks_team_members():
+    """Load team members from Freshworks IDs.txt file"""
+    team_members = []
+    ids_file_path = os.path.join(PROJECT_ROOT, 'app', 'Freshworks', 'IDs.txt')
+    
+    try:
+        if os.path.exists(ids_file_path):
+            with open(ids_file_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and ' - ' in line:
+                        name, freshworks_id = line.split(' - ', 1)
+                        # Clean up the name and create email
+                        clean_name = name.strip()
+                        # Create email from name (first name + @pdshealth.com)
+                        first_name = clean_name.split()[0].lower()
+                        email = f"{first_name}@pdshealth.com"
+                        
+                        team_members.append({
+                            'username': clean_name,
+                            'email': email,
+                            'freshworks_id': freshworks_id.strip()
+                        })
+            print(f"✓ Loaded {len(team_members)} team members from Freshworks IDs.txt")
+        else:
+            print(f"⚠️ Freshworks IDs.txt not found at {ids_file_path}")
+    except Exception as e:
+        print(f"Error loading Freshworks team members: {e}")
+    
+    return team_members
+
+def create_users_from_ticket_closures():
+    """Create user accounts for team members found in Daily Ticket Closures database"""
+    try:
+        # Get all unique Freshworks users from the mapping table
+        mappings = FreshworksUserMapping.query.all()
+        created_users = []
+        
+        for mapping in mappings:
+            if mapping.freshworks_username:
+                # Check if user already exists
+                existing_user = User.query.filter_by(username=mapping.freshworks_username).first()
+                if not existing_user:
+                    # Create email from username
+                    first_name = mapping.freshworks_username.split()[0].lower()
+                    email = f"{first_name}@pdshealth.com"
+                    
+                    # Create new user
+                    user = User(
+                        username=mapping.freshworks_username,
+                        email=email,
+                        role='user',
+                        is_active=True,
+                        profile_picture='default.png',
+                        okta_verified=False,
+                        teams_notifications=True
+                    )
+                    user.set_password('password')  # Set default password
+                    db.session.add(user)
+                    created_users.append(mapping.freshworks_username)
+                    print(f"➕ Created user from ticket closures: {mapping.freshworks_username}")
+        
+        if created_users:
+            db.session.commit()
+            print(f"✓ Created {len(created_users)} users from ticket closures database")
+            print(f"Created users: {', '.join(created_users)}")
+        else:
+            print("✓ No new users to create from ticket closures database")
+            
+    except Exception as e:
+        print(f"Error creating users from ticket closures: {e}")
+        db.session.rollback()
 
 def kill_processes_using_file(file_path):
     """Kill all processes that have the specified file open."""
@@ -222,8 +297,32 @@ def reset_database():
             settings = SystemSettings()
             db.session.add(settings)
             
-            # Create default users
-            default_users = [
+            # Load team members from Freshworks IDs.txt
+            freshworks_team = load_freshworks_team_members()
+            
+            # Create default users from Freshworks team
+            created_users = []
+            for user_data in freshworks_team:
+                try:
+                    user = User(
+                        username=user_data['username'],
+                        email=user_data['email'],
+                        role='user',
+                        is_active=True,
+                        profile_picture='default.png',
+                        okta_verified=False,
+                        teams_notifications=True,
+                        requires_password_change=True
+                    )
+                    user.set_password('password')  # Set default password
+                    db.session.add(user)
+                    created_users.append(user_data['username'])
+                    print(f"Added Freshworks team member: {user_data['username']}")
+                except Exception as e:
+                    print(f"Error creating user {user_data['username']}: {e}")
+            
+            # Create additional default users (fallback list)
+            additional_default_users = [
                 {'username': 'Alex', 'email': 'alex@pdshealth.com'},
                 {'username': 'Sam', 'email': 'sam@pdshealth.com'},
                 {'username': 'AJ', 'email': 'aj@pdshealth.com'},
@@ -234,33 +333,33 @@ def reset_database():
                 {'username': 'Jonathan', 'email': 'jonathan@pdshealth.com'},
                 {'username': 'Richard', 'email': 'richard@pdshealth.com'},
                 {'username': 'JZ', 'email': 'jz@pdshealth.com'},
-                {'username': 'Pietro', 'email': 'pietro@pdshealth.com'}
             ]
             
-            # Create default users
-            created_users = []
-            for user_data in default_users:
-                try:
-                    user = User(
-                        username=user_data['username'],
-                        email=user_data['email'],
-                        role='user',
-                        is_active=True,
-                        profile_picture='default.png',
-                        okta_verified=False,
-                        teams_notifications=True
-                    )
-                    user.set_password('password')  # Set default password
-                    db.session.add(user)
-                    created_users.append(user_data['username'])
-                    print(f"Added user: {user_data['username']}")
-                except Exception as e:
-                    print(f"Error creating user {user_data['username']}: {e}")
+            # Create additional default users (only if not already created from Freshworks)
+            existing_usernames = {user_data['username'] for user_data in freshworks_team}
+            for user_data in additional_default_users:
+                if user_data['username'] not in existing_usernames:
+                    try:
+                        user = User(
+                            username=user_data['username'],
+                            email=user_data['email'],
+                            role='user',
+                            is_active=True,
+                            profile_picture='default.png',
+                            okta_verified=False,
+                            teams_notifications=True
+                        )
+                        user.set_password('password')  # Set default password
+                        db.session.add(user)
+                        created_users.append(user_data['username'])
+                        print(f"Added additional user: {user_data['username']}")
+                    except Exception as e:
+                        print(f"Error creating user {user_data['username']}: {e}")
             
             # Commit all changes
             try:
                 db.session.commit()
-                print(f"✓ Admin user and {len(created_users)} default users created successfully")
+                print(f"✓ Admin user and {len(created_users)} team members created successfully")
                 print(f"Created users: {', '.join(created_users)}")
             except Exception as e:
                 print(f"Error committing users to database: {e}")

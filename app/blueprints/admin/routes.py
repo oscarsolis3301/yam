@@ -61,11 +61,11 @@ def admin():
 @bp.route('/dashboard')
 @login_required
 def admin_dashboard():
-    """Render the admin dashboard"""
+    """Render the centralized admin dashboard"""
     if not current_user.is_authenticated or current_user.role != 'admin':
         flash('Access denied. Admin privileges required.', 'danger')
         return redirect(url_for('index'))
-    return render_template('admin/admin_dashboard.html', name=current_user.username)
+    return render_template('components/yam/yam_admin_dashboard.html', active_page='admin_dashboard')
 
 @bp.route('/users')
 @login_required
@@ -82,18 +82,50 @@ def documents():
 @bp.route('/api/users', methods=['GET'])
 @login_required
 def get_users():
-    """Get all users"""
+    """Get all users with enhanced data for admin dashboard"""
     try:
         users = User.query.all()
-        return jsonify([{
-            'id': user.id,
-            'username': user.username,
-            'email': user.email,
-            'role': user.role
-        } for user in users])
+        return jsonify({
+            'success': True,
+            'users': [{
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'role': user.role,
+                'is_active': getattr(user, 'is_active', True),
+                'last_login': user.last_login.isoformat() if user.last_login else None,
+                'password_changed': getattr(user, 'password_changed', True),
+                'locked_out': getattr(user, 'locked_out', False),
+                'created_at': user.created_at.isoformat() if hasattr(user, 'created_at') and user.created_at else None
+            } for user in users]
+        })
     except Exception as e:
         logger.error(f"Error getting users: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@bp.route('/api/users/<int:user_id>', methods=['GET'])
+@login_required
+def get_user_details(user_id):
+    """Get detailed user information"""
+    try:
+        user = User.query.get_or_404(user_id)
+        return jsonify({
+            'success': True,
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'role': user.role,
+                'is_active': getattr(user, 'is_active', True),
+                'last_login': user.last_login.isoformat() if user.last_login else None,
+                'password_changed': getattr(user, 'password_changed', True),
+                'locked_out': getattr(user, 'locked_out', False),
+                'created_at': user.created_at.isoformat() if hasattr(user, 'created_at') and user.created_at else None
+            }
+        })
+    except Exception as e:
+        logger.error(f"Error getting user {user_id}: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @bp.route('/api/users/<int:user_id>', methods=['PUT'])
 @login_required
@@ -931,9 +963,191 @@ def admin_clear_cache():
 @bp.route('/freshworks-mappings')
 @login_required
 def freshworks_mappings():
-    """Admin page for managing Freshworks user mappings"""
-    if current_user.role not in ['admin', 'manager', 'developer']:
-        flash('Access denied. Admin privileges required.', 'error')
-        return redirect(url_for('main.index'))
+    """Render the Freshworks mappings management page"""
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('index'))
+    return render_template('admin/freshworks_mappings.html')
+
+@bp.route('/team-members')
+@login_required
+def team_members():
+    """Render the team members management page"""
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('index'))
+    return render_template('admin/team_members.html')
+
+@bp.route('/api/team-members/sync', methods=['POST'])
+@login_required
+def sync_team_members():
+    """Sync team members from Freshworks IDs.txt and create user accounts"""
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        return jsonify({'error': 'Access denied. Admin privileges required.'}), 403
     
-    return render_template('admin/freshworks_mappings.html') 
+    try:
+        from app.utils.database import sync_freshworks_team_members, create_users_from_ticket_closures
+        
+        # Sync Freshworks team members
+        sync_freshworks_team_members()
+        
+        # Create users from ticket closures
+        create_users_from_ticket_closures()
+        
+        # Get updated user count
+        total_users = User.query.count()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Team members synced successfully',
+            'total_users': total_users
+        })
+        
+    except Exception as e:
+        logger.error(f"Error syncing team members: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/api/team-members/status')
+@login_required
+def team_members_status():
+    """Get team members status and statistics"""
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        return jsonify({'error': 'Access denied. Admin privileges required.'}), 403
+    
+    try:
+        from app.models import FreshworksUserMapping
+        import os
+        
+        # Get Freshworks team members from IDs.txt
+        ids_file_path = os.path.join(current_app.root_path, 'Freshworks', 'IDs.txt')
+        freshworks_team = []
+        
+        if os.path.exists(ids_file_path):
+            with open(ids_file_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and ' - ' in line:
+                        name, freshworks_id = line.split(' - ', 1)
+                        freshworks_team.append({
+                            'name': name.strip(),
+                            'freshworks_id': freshworks_id.strip()
+                        })
+        
+        # Get existing users
+        existing_users = User.query.all()
+        existing_usernames = {user.username for user in existing_users}
+        
+        # Get Freshworks mappings
+        mappings = FreshworksUserMapping.query.all()
+        mapped_users = {mapping.freshworks_username for mapping in mappings if mapping.freshworks_username}
+        
+        # Calculate statistics
+        total_team_members = len(freshworks_team)
+        total_users = len(existing_users)
+        total_mappings = len(mappings)
+        
+        # Find team members without user accounts
+        missing_users = []
+        for member in freshworks_team:
+            if member['name'] not in existing_usernames:
+                missing_users.append(member['name'])
+        
+        # Find team members without mappings
+        missing_mappings = []
+        for member in freshworks_team:
+            if member['name'] not in mapped_users:
+                missing_mappings.append(member['name'])
+        
+        return jsonify({
+            'success': True,
+            'statistics': {
+                'total_team_members': total_team_members,
+                'total_users': total_users,
+                'total_mappings': total_mappings,
+                'missing_users': len(missing_users),
+                'missing_mappings': len(missing_mappings)
+            },
+            'freshworks_team': freshworks_team,
+            'missing_users': missing_users,
+            'missing_mappings': missing_mappings,
+            'existing_users': [{'username': user.username, 'email': user.email, 'role': user.role} for user in existing_users]
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting team members status: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@bp.route('/api/team-members/create-missing', methods=['POST'])
+@login_required
+def create_missing_team_members():
+    """Create user accounts for team members who don't have accounts yet"""
+    if not current_user.is_authenticated or current_user.role != 'admin':
+        return jsonify({'error': 'Access denied. Admin privileges required.'}), 403
+    
+    try:
+        from app.models import FreshworksUserMapping
+        import os
+        
+        # Get Freshworks team members from IDs.txt
+        ids_file_path = os.path.join(current_app.root_path, 'Freshworks', 'IDs.txt')
+        created_users = []
+        
+        if os.path.exists(ids_file_path):
+            with open(ids_file_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and ' - ' in line:
+                        name, freshworks_id = line.split(' - ', 1)
+                        clean_name = name.strip()
+                        freshworks_id = freshworks_id.strip()
+                        
+                        # Check if user already exists
+                        existing_user = User.query.filter_by(username=clean_name).first()
+                        if not existing_user:
+                            # Create email from name
+                            first_name = clean_name.split()[0].lower()
+                            email = f"{first_name}@pdshealth.com"
+                            
+                            # Create new user
+                            user = User(
+                                username=clean_name,
+                                email=email,
+                                role='user',
+                                is_active=True,
+                                profile_picture='default.png',
+                                okta_verified=False,
+                                teams_notifications=True
+                            )
+                            user.set_password('password')
+                            db.session.add(user)
+                            created_users.append(clean_name)
+                            
+                            # Create Freshworks mapping if it doesn't exist
+                            existing_mapping = FreshworksUserMapping.query.filter_by(
+                                freshworks_user_id=freshworks_id
+                            ).first()
+                            
+                            if not existing_mapping:
+                                new_mapping = FreshworksUserMapping(
+                                    freshworks_user_id=freshworks_id,
+                                    freshworks_username=clean_name
+                                )
+                                db.session.add(new_mapping)
+        
+        if created_users:
+            db.session.commit()
+            return jsonify({
+                'success': True,
+                'message': f'Created {len(created_users)} new user accounts',
+                'created_users': created_users
+            })
+        else:
+            return jsonify({
+                'success': True,
+                'message': 'All team members already have user accounts'
+            })
+        
+    except Exception as e:
+        logger.error(f"Error creating missing team members: {str(e)}")
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500 

@@ -3859,3 +3859,73 @@
 2025-07-29 15:13:18,861 - spark - INFO - Fetching ticket closures for date: 2025-07-29
 2025-07-29 15:13:18,863 - spark - INFO - Found 15 closure records in database for 2025-07-29
 2025-07-29 15:13:18,869 - spark - INFO - Returning ticket closure data: 172 total tickets, 15 users
+2025-07-29 15:19:19,217 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 15:19:22,666 - spark - INFO - Fetching ticket closures for date: 2025-07-29
+2025-07-29 15:19:22,669 - spark - INFO - Found 15 closure records in database for 2025-07-29
+2025-07-29 15:19:22,680 - spark - INFO - Returning ticket closure data: 172 total tickets, 15 users
+2025-07-29 15:19:22,711 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753827562397_44l67n204
+2025-07-29 15:19:22,712 - spark - INFO - [socketio] marking user 1 online
+2025-07-29 15:19:22,720 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-29 15:19:25,324 - spark - INFO - Fetching ticket closures for date: 2025-07-29
+2025-07-29 15:19:25,325 - spark - INFO - Found 15 closure records in database for 2025-07-29
+2025-07-29 15:19:25,332 - spark - INFO - Returning ticket closure data: 172 total tickets, 15 users
+2025-07-29 15:19:37,714 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-29 15:19:37,716 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-29 15:25:42,578 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 15:26:37,159 - spark - INFO - Fetching ticket closures for date: 2025-07-29
+2025-07-29 15:26:37,162 - spark - INFO - Found 15 closure records in database for 2025-07-29
+2025-07-29 15:26:37,168 - spark - INFO - Returning ticket closure data: 172 total tickets, 15 users
+2025-07-29 15:26:37,532 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753827996905_bq2paijni
+2025-07-29 15:26:37,535 - spark - INFO - [socketio] marking user 1 online
+2025-07-29 15:26:37,547 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-29 15:26:38,425 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-29 15:26:38,427 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-29 15:26:40,041 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753827999771_haelltzbk
+2025-07-29 15:26:40,042 - spark - INFO - [socketio] marking user 1 online
+2025-07-29 15:26:40,048 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-29 15:33:58,661 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-29 15:33:58,662 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-29 15:34:00,366 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753828440062_n3a6wa28e
+2025-07-29 15:34:00,367 - spark - INFO - [socketio] marking user 1 online
+2025-07-29 15:34:00,377 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-29 15:34:37,483 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-29 15:34:37,485 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-29 15:34:39,154 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753828478847_6rec3gh9u
+2025-07-29 15:34:39,158 - spark - INFO - [socketio] marking user 1 online
+2025-07-29 15:34:39,167 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-29 15:35:01,653 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-29 15:35:01,655 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-29 15:35:03,361 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753828503037_aie8nxz6b
+2025-07-29 15:35:03,365 - spark - INFO - [socketio] marking user 1 online
+2025-07-29 15:35:03,380 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-29 15:35:48,557 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 15:35:52,641 - spark - INFO - Fetching ticket closures for date: 2025-07-29
+2025-07-29 15:35:52,643 - spark - INFO - Found 15 closure records in database for 2025-07-29
+2025-07-29 15:35:52,650 - spark - INFO - Returning ticket closure data: 172 total tickets, 15 users
+2025-07-29 15:35:52,997 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753828552359_q43alkysu
+2025-07-29 15:35:53,000 - spark - INFO - [socketio] marking user 1 online
+2025-07-29 15:35:53,028 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-29 15:35:54,717 - spark - INFO - Fetching ticket closures for date: 2025-07-29
+2025-07-29 15:35:54,719 - spark - INFO - Found 15 closure records in database for 2025-07-29
+2025-07-29 15:35:54,728 - spark - INFO - Returning ticket closure data: 172 total tickets, 15 users
+2025-07-29 15:35:56,081 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-29 15:35:56,083 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-29 15:35:58,134 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753828557503_xahzhfq7x
+2025-07-29 15:35:58,142 - spark - INFO - [socketio] marking user 1 online
+2025-07-29 15:35:58,156 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-29 15:35:58,462 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-29 15:36:17,727 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-29 15:36:17,729 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-29 15:36:19,247 - spark - INFO - Fetching ticket closures for date: 2025-07-29
+2025-07-29 15:36:19,248 - spark - INFO - Found 15 closure records in database for 2025-07-29
+2025-07-29 15:36:19,256 - spark - INFO - Returning ticket closure data: 172 total tickets, 15 users
+2025-07-29 15:36:19,574 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753828578962_jnovlrrug
+2025-07-29 15:36:19,579 - spark - INFO - [socketio] marking user 1 online
+2025-07-29 15:36:19,591 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-29 15:36:21,294 - spark - INFO - Fetching ticket closures for date: 2025-07-29
+2025-07-29 15:36:21,295 - spark - INFO - Found 15 closure records in database for 2025-07-29
+2025-07-29 15:36:21,300 - spark - INFO - Returning ticket closure data: 172 total tickets, 15 users
+2025-07-29 15:38:08,895 - spark - INFO - Fetching ticket closures for date: 2025-07-29
+2025-07-29 15:38:08,903 - spark - INFO - Found 15 closure records in database for 2025-07-29
+2025-07-29 15:38:08,910 - spark - INFO - Returning ticket closure data: 172 total tickets, 15 users
+2025-07-29 15:58:11,798 - spark - INFO - Scheduled periodic presence cleanup task

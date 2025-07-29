@@ -198,6 +198,112 @@
       font-size: 1rem;
       border: 1px solid rgba(67, 160, 71, 0.3);
     }
+    
+    /* Password change form styles */
+    .login-subtitle {
+      font-size: 1rem;
+      color: var(--label-color);
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .password-requirements {
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.4rem;
+    }
+    
+    .password-requirements h6 {
+      color: var(--label-color);
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .password-requirements ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .password-requirements li {
+      color: var(--label-color);
+      font-size: 0.85rem;
+      margin-bottom: 0.25rem;
+      padding-left: 1.2rem;
+      position: relative;
+    }
+    
+    .password-requirements li::before {
+      content: '✗';
+      position: absolute;
+      left: 0;
+      color: #ff6b6b;
+    }
+    
+    .password-requirements li.valid::before {
+      content: '✓';
+      color: #43a047;
+    }
+    
+    .password-strength {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+    
+    .password-strength.weak {
+      background: rgba(255, 107, 107, 0.2);
+      color: #ff6b6b;
+    }
+    
+    .password-strength.medium {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffc107;
+    }
+    
+    .password-strength.strong {
+      background: rgba(67, 160, 71, 0.2);
+      color: #43a047;
+    }
+    
+    .password-strength.very_strong {
+      background: rgba(33, 150, 243, 0.2);
+      color: #2196f3;
+    }
+    
+    .password-suggestions {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+    
+    .password-suggestions h6 {
+      color: var(--label-color);
+      margin-bottom: 0.75rem;
+      font-size: 0.9rem;
+    }
+    
+    .suggestion-btn {
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text-color);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      margin: 0.25rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .suggestion-btn:hover {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -208,32 +314,85 @@
   </div>
 
   <div class="login-container">
-    <form class="login-form" method="POST" action="{{ url_for('auth.login') }}">
-      <div class="login-title">Sign in</div>
-      
-      <!-- Flash messages -->
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          {% for category, message in messages %}
-            <div class="login-error">{{ message }}</div>
-          {% endfor %}
+    {% if first_time_login %}
+      <!-- First-time password change form -->
+      <form class="login-form" method="POST" action="{{ url_for('auth.change_password') }}" id="password-change-form">
+        <div class="login-title">Welcome, {{ username }}!</div>
+        <div class="login-subtitle">Please set your new password</div>
+        
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="login-error">{{ message | safe }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        
+        <!-- Password requirements -->
+        <div class="password-requirements">
+          <h6>Password Requirements:</h6>
+          <ul>
+            <li id="req-length">At least 8 characters</li>
+            <li id="req-uppercase">One uppercase letter</li>
+            <li id="req-lowercase">One lowercase letter</li>
+            <li id="req-number">One number</li>
+            <li id="req-symbol">One symbol</li>
+            <li id="req-name">Cannot contain your name</li>
+          </ul>
+        </div>
+        
+        <label for="new_password">New Password</label>
+        <input type="password" id="new_password" name="new_password" placeholder="Enter your new password" required>
+        <div class="password-strength" id="password-strength"></div>
+        
+        <label for="confirm_password">Confirm Password</label>
+        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your new password" required>
+        
+        <button class="btn-login" type="submit" id="change-password-btn">
+          <span class="btn-text">Change Password</span>
+        </button>
+        
+        <div class="password-suggestions">
+          <h6>Password Suggestions:</h6>
+          <div id="suggestions-list">
+            <button type="button" class="suggestion-btn" onclick="useSuggestion(this)">SecurePass123!</button>
+            <button type="button" class="suggestion-btn" onclick="useSuggestion(this)">MySecure2024#</button>
+            <button type="button" class="suggestion-btn" onclick="useSuggestion(this)">StrongP@ssw0rd</button>
+          </div>
+        </div>
+        
+        <div class="login-footer">&copy; {{ year }} YAM. All rights reserved.</div>
+      </form>
+    {% else %}
+      <!-- Regular login form -->
+      <form class="login-form" method="POST" action="{{ url_for('auth.login') }}">
+        <div class="login-title">Sign in</div>
+        
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="login-error">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        
+        <!-- Template error -->
+        {% if error %}
+          <div class="login-error">{{ error }}</div>
         {% endif %}
-      {% endwith %}
-      
-      <!-- Template error -->
-      {% if error %}
-        <div class="login-error">{{ error }}</div>
-      {% endif %}
-      
-      <label for="login_id">Email or Username</label>
-      <input type="text" id="login_id" name="email" placeholder="Enter your email or username" required autofocus>
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" placeholder="Enter your password" required>
-      <button class="btn-login" type="submit">
-        <span class="btn-text">Sign In</span>
-      </button>
-      <div class="login-footer">&copy; {{ year }} YAM. All rights reserved.</div>
-    </form>
+        
+        <label for="login_id">Email or Username</label>
+        <input type="text" id="login_id" name="email" placeholder="Enter your email or username" required autofocus>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        <button class="btn-login" type="submit">
+          <span class="btn-text">Sign In</span>
+        </button>
+        <div class="login-footer">&copy; {{ year }} YAM. All rights reserved.</div>
+      </form>
+    {% endif %}
   </div>
 
   <script src="{{ url_for('static', filename='JS/stars.js') }}"></script>
@@ -317,6 +476,148 @@
       // Log the function availability
       console.log('YAM storage clear function available: window.clearYAMStorage()');
     });
+    
+    // Password validation for first-time login
+    {% if first_time_login %}
+    document.addEventListener('DOMContentLoaded', function() {
+      const newPasswordInput = document.getElementById('new_password');
+      const confirmPasswordInput = document.getElementById('confirm_password');
+      const passwordStrength = document.getElementById('password-strength');
+      const changePasswordBtn = document.getElementById('change-password-btn');
+      
+      // Get user info for validation
+      const username = '{{ username }}';
+      const firstName = username.split(' ')[0] || '';
+      const lastName = username.split(' ').slice(1).join(' ') || '';
+      
+      function validatePassword(password) {
+        const errors = [];
+        
+        // Check length
+        if (password.length < 8) {
+          errors.push('length');
+        }
+        
+        // Check uppercase
+        if (!/[A-Z]/.test(password)) {
+          errors.push('uppercase');
+        }
+        
+        // Check lowercase
+        if (!/[a-z]/.test(password)) {
+          errors.push('lowercase');
+        }
+        
+        // Check numbers
+        if (!/\d/.test(password)) {
+          errors.push('number');
+        }
+        
+        // Check symbols
+        if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+          errors.push('symbol');
+        }
+        
+        // Check against user info
+        const passwordLower = password.toLowerCase();
+        const userInfo = [username, firstName, lastName].filter(info => info && info.length >= 3);
+        
+        for (const info of userInfo) {
+          if (info && passwordLower.includes(info.toLowerCase())) {
+            errors.push('name');
+            break;
+          }
+        }
+        
+        return errors;
+      }
+      
+      function updatePasswordStrength(password) {
+        let score = 0;
+        
+        // Length bonus
+        if (password.length >= 8) score++;
+        if (password.length >= 12) score++;
+        if (password.length >= 16) score++;
+        
+        // Character variety bonus
+        if (/[a-z]/.test(password)) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/\d/.test(password)) score++;
+        if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) score++;
+        
+        // Complexity bonus
+        if (new Set(password).size >= password.length * 0.8) score++;
+        
+        let strength = 'weak';
+        if (score <= 3) strength = 'weak';
+        else if (score <= 5) strength = 'medium';
+        else if (score <= 7) strength = 'strong';
+        else strength = 'very_strong';
+        
+        const strengthText = {
+          'weak': 'Weak Password',
+          'medium': 'Medium Password',
+          'strong': 'Strong Password',
+          'very_strong': 'Very Strong Password'
+        };
+        
+        passwordStrength.textContent = strengthText[strength];
+        passwordStrength.className = `password-strength ${strength}`;
+      }
+      
+      function updateRequirements(password) {
+        const errors = validatePassword(password);
+        
+        // Update requirement indicators
+        document.getElementById('req-length').classList.toggle('valid', !errors.includes('length'));
+        document.getElementById('req-uppercase').classList.toggle('valid', !errors.includes('uppercase'));
+        document.getElementById('req-lowercase').classList.toggle('valid', !errors.includes('lowercase'));
+        document.getElementById('req-number').classList.toggle('valid', !errors.includes('number'));
+        document.getElementById('req-symbol').classList.toggle('valid', !errors.includes('symbol'));
+        document.getElementById('req-name').classList.toggle('valid', !errors.includes('name'));
+      }
+      
+      function validateForm() {
+        const newPassword = newPasswordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        
+        const errors = validatePassword(newPassword);
+        const passwordsMatch = newPassword === confirmPassword;
+        
+        // Enable/disable submit button
+        changePasswordBtn.disabled = errors.length > 0 || !passwordsMatch || !newPassword || !confirmPassword;
+        
+        return errors.length === 0 && passwordsMatch;
+      }
+      
+      // Event listeners
+      newPasswordInput.addEventListener('input', function() {
+        const password = this.value;
+        updatePasswordStrength(password);
+        updateRequirements(password);
+        validateForm();
+      });
+      
+      confirmPasswordInput.addEventListener('input', function() {
+        validateForm();
+      });
+      
+      // Initial validation
+      validateForm();
+    });
+    
+    function useSuggestion(button) {
+      const password = button.textContent;
+      document.getElementById('new_password').value = password;
+      document.getElementById('confirm_password').value = password;
+      
+      // Trigger validation
+      const event = new Event('input');
+      document.getElementById('new_password').dispatchEvent(event);
+      document.getElementById('confirm_password').dispatchEvent(event);
+    }
+    {% endif %}
   </script>
 </body>
 </html>

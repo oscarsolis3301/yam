@@ -321,6 +321,18 @@ def get_ticket_stats():
         ).all()
         week_total = sum(closure.tickets_closed for closure in week_closures)
         
+        # This month's stats
+        month_start = today.replace(day=1)
+        month_closures = TicketClosure.query.filter(
+            TicketClosure.date >= month_start,
+            TicketClosure.date <= today
+        ).all()
+        month_total = sum(closure.tickets_closed for closure in month_closures)
+        
+        # Total stats
+        total_closures = TicketClosure.query.all()
+        total_tickets = sum(closure.tickets_closed for closure in total_closures)
+        
         # Top performer today
         if today_closures:
             top_today = max(today_closures, key=lambda x: x.tickets_closed)
@@ -333,14 +345,66 @@ def get_ticket_stats():
         
         return jsonify({
             'success': True,
-            'today_total': today_total,
-            'week_total': week_total,
+            'stats': {
+                'total_tickets': total_tickets,
+                'today_total': today_total,
+                'this_week': week_total,
+                'this_month': month_total
+            },
             'top_performer': top_performer,
             'date': today.isoformat()
         })
         
     except Exception as e:
         logger.error(f"Error fetching ticket stats: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@tickets_api_bp.route('/api/tickets/user-stats', methods=['GET'])
+def get_user_ticket_stats():
+    """Get ticket statistics by user"""
+    try:
+        # Get all ticket closures with user information
+        closures = db.session.query(TicketClosure, User).join(User).all()
+        
+        # Group by user
+        user_stats = {}
+        for closure, user in closures:
+            if user.id not in user_stats:
+                user_stats[user.id] = {
+                    'user_id': user.id,
+                    'username': user.username,
+                    'total_tickets': 0,
+                    'this_month': 0,
+                    'this_week': 0,
+                    'last_activity': None
+                }
+            
+            user_stats[user.id]['total_tickets'] += closure.tickets_closed
+            
+            # Check if this month
+            if closure.date >= date.today().replace(day=1):
+                user_stats[user.id]['this_month'] += closure.tickets_closed
+            
+            # Check if this week
+            week_start = date.today() - timedelta(days=date.today().weekday())
+            if closure.date >= week_start:
+                user_stats[user.id]['this_week'] += closure.tickets_closed
+            
+            # Track last activity
+            if not user_stats[user.id]['last_activity'] or closure.date > user_stats[user.id]['last_activity']:
+                user_stats[user.id]['last_activity'] = closure.date
+        
+        # Convert to list and sort by total tickets
+        user_stats_list = list(user_stats.values())
+        user_stats_list.sort(key=lambda x: x['total_tickets'], reverse=True)
+        
+        return jsonify({
+            'success': True,
+            'user_stats': user_stats_list
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching user ticket stats: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @tickets_api_bp.route('/api/tickets/sync-status', methods=['GET'])

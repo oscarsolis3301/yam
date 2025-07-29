@@ -8,6 +8,14 @@ import os
 import json
 from pathlib import Path
 from typing import Dict, Any, Optional
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Freshworks API Configuration
+FRESH_ENDPOINT = os.getenv('FRESH_ENDPOINT', 'https://disabled.freshservice.com/api/v2/')
+FRESH_API = os.getenv('FRESH_API', 'disabled-api-key')
 
 
 class ConfigManager:
@@ -117,12 +125,9 @@ class ConfigManager:
         })
 
 
-# Import the Config class from extensions
-from app.extensions import Config
-
-# Add a Config class to config.py for backward compatibility
+# Configuration class for Flask application
 class Config:
-    """Configuration class for backward compatibility."""
+    """Configuration class for Flask application."""
     from pathlib import Path
     BASE_DIR = Path(__file__).parent.resolve()
     DATA_DIR = 'data'
@@ -131,6 +136,16 @@ class Config:
     UPLOAD_FOLDER = 'static/uploads'  # Base upload folder for file serving
     DB_DIR = 'db'
     DB_PATH = str(BASE_DIR / 'db' / 'app.db')
+    
+    # Flask settings
+    SECRET_KEY = 'server-key-2025'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///app.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SESSION_TYPE = 'filesystem'
+    PERMANENT_SESSION_LIFETIME = 7200  # 2 hours
+    JSON_AS_ASCII = False
+    TEMPLATES_AUTO_RELOAD = True
+    SEND_FILE_MAX_AGE_DEFAULT = 0
 
 
 def get_config(workspace_dir: Optional[Path] = None) -> ConfigManager:

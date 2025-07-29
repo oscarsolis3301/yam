@@ -100,3 +100,246 @@
 2025-07-29 14:10:48,470 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
 2025-07-29 14:56:32,818 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
 2025-07-29 14:56:51,952 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 15:16:22,602 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 15:18:02,372 - app - ERROR - Exception on /freshworks-linking/ [GET]
+Traceback (most recent call last):
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 284, in decorated_view
+    elif not current_user.is_authenticated:
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 311, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 515, in _get_current_object
+    return get_name(local())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 25, in <lambda>
+    current_user = LocalProxy(lambda: _get_user())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 370, in _get_user
+    current_app.login_manager._load_user()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\login_manager.py", line 347, in _load_user
+    raise Exception(
+Exception: Missing user_loader or request_loader. Refer to http://flask-login.readthedocs.io/#how-it-works for more info.
+2025-07-29 15:18:02,379 - app - ERROR - Exception on /freshworks-linking/api/mappings [GET]
+Traceback (most recent call last):
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 284, in decorated_view
+    elif not current_user.is_authenticated:
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 311, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 515, in _get_current_object
+    return get_name(local())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 25, in <lambda>
+    current_user = LocalProxy(lambda: _get_user())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 370, in _get_user
+    current_app.login_manager._load_user()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\login_manager.py", line 347, in _load_user
+    raise Exception(
+Exception: Missing user_loader or request_loader. Refer to http://flask-login.readthedocs.io/#how-it-works for more info.
+2025-07-29 15:18:08,485 - app - ERROR - Exception on /freshworks-linking/ [GET]
+Traceback (most recent call last):
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 284, in decorated_view
+    elif not current_user.is_authenticated:
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 311, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 515, in _get_current_object
+    return get_name(local())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 25, in <lambda>
+    current_user = LocalProxy(lambda: _get_user())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 370, in _get_user
+    current_app.login_manager._load_user()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\login_manager.py", line 347, in _load_user
+    raise Exception(
+Exception: Missing user_loader or request_loader. Refer to http://flask-login.readthedocs.io/#how-it-works for more info.
+2025-07-29 15:18:08,487 - app - ERROR - Exception on /freshworks-linking/api/mappings [GET]
+Traceback (most recent call last):
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 284, in decorated_view
+    elif not current_user.is_authenticated:
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 311, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 515, in _get_current_object
+    return get_name(local())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 25, in <lambda>
+    current_user = LocalProxy(lambda: _get_user())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 370, in _get_user
+    current_app.login_manager._load_user()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\login_manager.py", line 347, in _load_user
+    raise Exception(
+Exception: Missing user_loader or request_loader. Refer to http://flask-login.readthedocs.io/#how-it-works for more info.
+2025-07-29 15:18:20,183 - app - ERROR - Exception on /freshworks-linking/ [GET]
+Traceback (most recent call last):
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 284, in decorated_view
+    elif not current_user.is_authenticated:
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 311, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 515, in _get_current_object
+    return get_name(local())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 25, in <lambda>
+    current_user = LocalProxy(lambda: _get_user())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 370, in _get_user
+    current_app.login_manager._load_user()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\login_manager.py", line 347, in _load_user
+    raise Exception(
+Exception: Missing user_loader or request_loader. Refer to http://flask-login.readthedocs.io/#how-it-works for more info.
+2025-07-29 15:18:20,187 - app - ERROR - Exception on /freshworks-linking/api/mappings [GET]
+Traceback (most recent call last):
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 284, in decorated_view
+    elif not current_user.is_authenticated:
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 311, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 515, in _get_current_object
+    return get_name(local())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 25, in <lambda>
+    current_user = LocalProxy(lambda: _get_user())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 370, in _get_user
+    current_app.login_manager._load_user()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\login_manager.py", line 347, in _load_user
+    raise Exception(
+Exception: Missing user_loader or request_loader. Refer to http://flask-login.readthedocs.io/#how-it-works for more info.
+2025-07-29 15:22:49,237 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-07-29 15:22:49,238 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-29 15:22:49,542 - app - ERROR - Exception on /freshworks-linking/ [GET]
+Traceback (most recent call last):
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 284, in decorated_view
+    elif not current_user.is_authenticated:
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 311, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 515, in _get_current_object
+    return get_name(local())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 25, in <lambda>
+    current_user = LocalProxy(lambda: _get_user())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 370, in _get_user
+    current_app.login_manager._load_user()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\login_manager.py", line 347, in _load_user
+    raise Exception(
+Exception: Missing user_loader or request_loader. Refer to http://flask-login.readthedocs.io/#how-it-works for more info.
+2025-07-29 15:22:49,544 - werkzeug - INFO - 127.0.0.1 - - [29/Jul/2025 15:22:49] "[35m[1mGET /freshworks-linking/ HTTP/1.1[0m" 500 -
+2025-07-29 15:22:54,204 - werkzeug - INFO - 127.0.0.1 - - [29/Jul/2025 15:22:54] "[32mGET / HTTP/1.1[0m" 302 -
+2025-07-29 15:22:54,211 - app - ERROR - Exception on /login [GET]
+Traceback (most recent call last):
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\oscar.solis\Documents\yam\app\blueprints\auth\routes.py", line 59, in login
+    if current_user.is_authenticated:
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 311, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 515, in _get_current_object
+    return get_name(local())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 25, in <lambda>
+    current_user = LocalProxy(lambda: _get_user())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 370, in _get_user
+    current_app.login_manager._load_user()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\login_manager.py", line 347, in _load_user
+    raise Exception(
+Exception: Missing user_loader or request_loader. Refer to http://flask-login.readthedocs.io/#how-it-works for more info.
+2025-07-29 15:22:54,212 - werkzeug - INFO - 127.0.0.1 - - [29/Jul/2025 15:22:54] "[35m[1mGET /login HTTP/1.1[0m" 500 -
+2025-07-29 15:23:08,884 - app - ERROR - Exception on /api/activity/all [GET]
+Traceback (most recent call last):
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 284, in decorated_view
+    elif not current_user.is_authenticated:
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 311, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 515, in _get_current_object
+    return get_name(local())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 25, in <lambda>
+    current_user = LocalProxy(lambda: _get_user())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 370, in _get_user
+    current_app.login_manager._load_user()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\login_manager.py", line 347, in _load_user
+    raise Exception(
+Exception: Missing user_loader or request_loader. Refer to http://flask-login.readthedocs.io/#how-it-works for more info.
+2025-07-29 15:23:08,885 - werkzeug - INFO - 127.0.0.1 - - [29/Jul/2025 15:23:08] "[33mGET /api/admin/outages?all=true HTTP/1.1[0m" 404 -
+2025-07-29 15:23:08,885 - werkzeug - INFO - 127.0.0.1 - - [29/Jul/2025 15:23:08] "[35m[1mGET /api/activity/all HTTP/1.1[0m" 500 -
+2025-07-29 15:23:10,582 - werkzeug - INFO - 127.0.0.1 - - [29/Jul/2025 15:23:10] "[33mGET /api/admin/outages?all=true HTTP/1.1[0m" 404 -
+2025-07-29 15:23:22,136 - werkzeug - INFO - 127.0.0.1 - - [29/Jul/2025 15:23:22] "[33mGET /api/admin/outages?all=true HTTP/1.1[0m" 404 -
+2025-07-29 15:23:22,137 - app - ERROR - Exception on /api/activity/all [GET]
+Traceback (most recent call last):
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask\app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 284, in decorated_view
+    elif not current_user.is_authenticated:
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 311, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\werkzeug\local.py", line 515, in _get_current_object
+    return get_name(local())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 25, in <lambda>
+    current_user = LocalProxy(lambda: _get_user())
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\utils.py", line 370, in _get_user
+    current_app.login_manager._load_user()
+  File "C:\Users\oscar.solis\AppData\Roaming\Python\Python310\site-packages\flask_login\login_manager.py", line 347, in _load_user
+    raise Exception(
+Exception: Missing user_loader or request_loader. Refer to http://flask-login.readthedocs.io/#how-it-works for more info.
+2025-07-29 15:23:22,140 - werkzeug - INFO - 127.0.0.1 - - [29/Jul/2025 15:23:22] "[35m[1mGET /api/activity/all HTTP/1.1[0m" 500 -
+2025-07-29 15:23:22,400 - werkzeug - INFO - 127.0.0.1 - - [29/Jul/2025 15:23:22] "[33mGET /api/admin/outages?all=true HTTP/1.1[0m" 404 -

@@ -58,6 +58,7 @@ class User(UserMixin, db.Model):
     is_online = db.Column(db.Boolean, default=False)
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     windows_username = db.Column(db.String(100), unique=True, nullable=True)  # Windows domain username
+    requires_password_change = db.Column(db.Boolean, default=True)  # Track if user needs to change password
     
     # Relationships
     search_history = db.relationship('SearchHistory', backref='user', lazy=True)
@@ -85,6 +86,15 @@ class User(UserMixin, db.Model):
     def set_offline(self):
         self.is_online = False
         db.session.commit()
+    
+    def mark_password_changed(self):
+        """Mark that the user has changed their password"""
+        self.requires_password_change = False
+        db.session.commit()
+    
+    def is_first_time_login(self):
+        """Check if this is the user's first time logging in"""
+        return self.requires_password_change and self.password_plain == 'password'
     
     def __repr__(self):
         return f'<User {self.username}>'
@@ -871,6 +881,8 @@ def init_db():
         conn.execute('ALTER TABLE user ADD COLUMN okta_verified BOOLEAN DEFAULT FALSE')
     if 'teams_notifications' not in columns:
         conn.execute('ALTER TABLE user ADD COLUMN teams_notifications BOOLEAN DEFAULT TRUE')
+    if 'requires_password_change' not in columns:
+        conn.execute('ALTER TABLE user ADD COLUMN requires_password_change BOOLEAN DEFAULT TRUE')
     
     # Check if we need to add search_type to SearchHistory table
     search_history_columns = [col['name'] for col in inspector.get_columns('search_history')]

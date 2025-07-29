@@ -26,6 +26,134 @@ def dashboard():
     
     return render_template('freshworks_linking/dashboard.html')
 
+@bp.route('/api/freshworks-users', methods=['GET'])
+@login_required
+def get_freshworks_users():
+    """Get all Freshworks users from the service"""
+    auth_check = require_non_user_role()
+    if auth_check:
+        return auth_check
+    
+    try:
+        # Get all Freshworks users from the service
+        id_name_map = freshworks_service.load_id_name_mapping()
+        
+        freshworks_users = []
+        for freshworks_id, freshworks_name in id_name_map.items():
+            freshworks_users.append({
+                'id': freshworks_id,
+                'name': freshworks_name
+            })
+        
+        return jsonify({
+            'success': True,
+            'freshworks_users': freshworks_users
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching Freshworks users: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@bp.route('/api/link-user', methods=['POST'])
+@login_required
+def link_user():
+    """Link a website user to a Freshworks user"""
+    auth_check = require_non_user_role()
+    if auth_check:
+        return auth_check
+    
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        freshworks_user_id = data.get('freshworks_user_id')
+        
+        if not user_id or not freshworks_user_id:
+            return jsonify({'success': False, 'error': 'Both user_id and freshworks_user_id are required'}), 400
+        
+        # Check if user exists
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'success': False, 'error': 'Website user not found'}), 404
+        
+        # Check if Freshworks user exists
+        id_name_map = freshworks_service.load_id_name_mapping()
+        if freshworks_user_id not in id_name_map:
+            return jsonify({'success': False, 'error': 'Freshworks user not found'}), 404
+        
+        # Check if this Freshworks user is already linked to another website user
+        existing_mapping = FreshworksUserMapping.query.filter_by(
+            freshworks_user_id=freshworks_user_id
+        ).first()
+        
+        if existing_mapping:
+            # Update existing mapping
+            existing_mapping.user_id = user_id
+            existing_mapping.updated_at = datetime.utcnow()
+            logger.info(f"Updated mapping: Freshworks user {freshworks_user_id} -> Website user {user_id}")
+        else:
+            # Create new mapping
+            mapping = FreshworksUserMapping(
+                user_id=user_id,
+                freshworks_user_id=freshworks_user_id,
+                freshworks_username=id_name_map[freshworks_user_id]
+            )
+            db.session.add(mapping)
+            logger.info(f"Created mapping: Freshworks user {freshworks_user_id} -> Website user {user_id}")
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Successfully linked {user.username} to Freshworks user {id_name_map[freshworks_user_id]}'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error linking user: {e}")
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@bp.route('/api/unlink-user', methods=['POST'])
+@login_required
+def unlink_user():
+    """Unlink a website user from their Freshworks account"""
+    auth_check = require_non_user_role()
+    if auth_check:
+        return auth_check
+    
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        
+        if not user_id:
+            return jsonify({'success': False, 'error': 'user_id is required'}), 400
+        
+        # Check if user exists
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'success': False, 'error': 'Website user not found'}), 404
+        
+        # Find and remove the mapping
+        mapping = FreshworksUserMapping.query.filter_by(user_id=user_id).first()
+        
+        if not mapping:
+            return jsonify({'success': False, 'error': 'No mapping found for this user'}), 404
+        
+        freshworks_username = mapping.freshworks_username
+        db.session.delete(mapping)
+        db.session.commit()
+        
+        logger.info(f"Unlinked user {user.username} from Freshworks user {freshworks_username}")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Successfully unlinked {user.username} from Freshworks user {freshworks_username}'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error unlinking user: {e}")
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @bp.route('/api/mappings', methods=['GET'])
 @login_required
 def get_mappings():
