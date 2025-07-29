@@ -7,7 +7,7 @@ import os
 import requests
 from . import bp
 from app.models import User, SearchHistory, SystemSettings, UserSettings, Note, Activity, Document, KBArticle, KBAttachment, SharedLink, UserPresence, TimeEntry, UserMapping, PattersonTicket, PattersonCalendarEvent  # Import new models
-from extensions import Config
+from app.extensions import Config
 from app.utils.patterson_file_manager import get_patterson_file_manager
 from app.utils.patterson_db_manager import get_patterson_db_manager
 # Import the new Freshworks database manager
@@ -20,7 +20,7 @@ except ImportError:
 import socket
 import time
 from flask_sqlalchemy import SQLAlchemy
-from extensions import db
+from app.extensions import db
 import subprocess
 import sys
 import re

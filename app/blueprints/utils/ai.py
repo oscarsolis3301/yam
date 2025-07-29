@@ -1,5 +1,5 @@
 from flask import current_app
-from extensions import db
+from app.extensions import db
 from app.models import User, ChatQA
 import logging
 

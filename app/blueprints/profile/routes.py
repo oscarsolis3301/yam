@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 import os
 from . import bp
-from extensions import db
+from app.extensions import db
 from app.models import User
 import logging
 

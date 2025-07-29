@@ -14,7 +14,7 @@ import logging
 # Import the optimized search engine
 from app.utils.optimized_search_engine import optimized_search_engine
 from app.models import SearchHistory
-from extensions import db
+from app.extensions import db
 
 logger = logging.getLogger(__name__)
 

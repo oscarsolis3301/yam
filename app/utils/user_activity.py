@@ -1,7 +1,7 @@
 from flask import request
 from flask_login import current_user
 from app.models.base import Activity, User, db
-from extensions import socketio
+from app.extensions import socketio
 from datetime import datetime
 import logging
 
@@ -89,16 +89,20 @@ def emit_online_users():
         # Also get presence statistics
         stats = presence_service.get_presence_stats()
         
-        # Emit both the user list and stats
-        socketio.emit('online_users_update', user_list)
-        socketio.emit('presence_stats_update', {
-            'active_users': stats.get('online_users', 0),  # Fix: use 'online_users' key from stats
-            'total_users': stats.get('total_users', 0),
-            'last_cleanup': stats.get('last_cleanup', datetime.utcnow().isoformat()),
-            'timestamp': datetime.utcnow().isoformat()
-        })
-        
-        logger.debug(f"Emitted online users list: {len(user_list)} users, {stats.get('online_users', 0)} active")
+        # Check if socketio is available before emitting
+        if socketio and hasattr(socketio, 'emit'):
+            # Emit both the user list and stats
+            socketio.emit('online_users_update', user_list)
+            socketio.emit('presence_stats_update', {
+                'active_users': stats.get('online_users', 0),  # Fix: use 'online_users' key from stats
+                'total_users': stats.get('total_users', 0),
+                'last_cleanup': stats.get('last_cleanup', datetime.utcnow().isoformat()),
+                'timestamp': datetime.utcnow().isoformat()
+            })
+            
+            logger.debug(f"Emitted online users list: {len(user_list)} users, {stats.get('online_users', 0)} active")
+        else:
+            logger.warning("SocketIO not available for emitting online users")
         
     except Exception as e:
         logger.error(f"Error emitting online users via presence service: {e}")
@@ -120,8 +124,12 @@ def _fallback_emit_online_users():
             'last_seen_human': _format_last_seen_human(user.last_seen) if user.last_seen else 'Never'
         } for user in online_users]
         
-        socketio.emit('online_users_update', user_list)
-        logger.info(f"Fallback: Emitted {len(user_list)} online users")
+        # Check if socketio is available before emitting
+        if socketio and hasattr(socketio, 'emit'):
+            socketio.emit('online_users_update', user_list)
+            logger.info(f"Fallback: Emitted {len(user_list)} online users")
+        else:
+            logger.warning("SocketIO not available for fallback online users emission")
         
     except Exception as e:
         logger.error(f"Error in fallback online users emission: {e}")
@@ -179,18 +187,21 @@ def log_user_activity():
             
             # Emit real-time update for admin dashboard
             try:
-                from extensions import socketio
-                socketio.emit('activity_update', {
-                    'id': activity.id,
-                    'type': action,
-                    'description': details,
-                    'timestamp': activity.timestamp.isoformat(),
-                    'user': {
-                        'id': current_user.id,
-                        'name': current_user.username,
-                        'profile_picture': current_user.profile_picture or 'boy.png'
-                    }
-                }, namespace='/')
+                from app.extensions import socketio
+                if socketio and hasattr(socketio, 'emit'):
+                    socketio.emit('activity_update', {
+                        'id': activity.id,
+                        'type': action,
+                        'description': details,
+                        'timestamp': activity.timestamp.isoformat(),
+                        'user': {
+                            'id': current_user.id,
+                            'name': current_user.username,
+                            'profile_picture': current_user.profile_picture or 'boy.png'
+                        }
+                    }, namespace='/')
+                else:
+                    logger.debug("SocketIO not available for activity update emission")
             except Exception as emit_error:
                 logger.debug(f"Could not emit activity update: {emit_error}")
             
@@ -318,11 +329,11 @@ def track_specific_activity(user_id, action, details=None):
         
         # Emit real-time update
         try:
-            from extensions import socketio
+            from app.extensions import socketio
             from app.models import User
             
             user = User.query.get(user_id)
-            if user:
+            if user and socketio and hasattr(socketio, 'emit'):
                 socketio.emit('activity_update', {
                     'id': activity.id,
                     'type': action,
@@ -334,6 +345,8 @@ def track_specific_activity(user_id, action, details=None):
                         'profile_picture': user.profile_picture or 'boy.png'
                     }
                 }, namespace='/')
+            else:
+                logger.debug("SocketIO not available or user not found for activity update emission")
         except Exception as emit_error:
             logger.debug(f"Could not emit activity update: {emit_error}")
         

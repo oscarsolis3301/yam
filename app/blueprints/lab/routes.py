@@ -2,7 +2,7 @@ from flask import render_template
 from flask_login import login_required
 
 from . import bp  # Import the shared blueprint instance
-from extensions import db
+from app.extensions import db
 
 
 @bp.route('/', methods=['GET'])

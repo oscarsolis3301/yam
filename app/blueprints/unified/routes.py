@@ -15,7 +15,7 @@ from flask_login import login_required
 from . import bp
 
 # Import the root-level extensions.py
-from extensions import db
+from app.extensions import db
 
 
 # ---------------------------------------------------------------------------

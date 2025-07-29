@@ -1,7 +1,7 @@
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from extensions import db
+from app.extensions import db
 import psutil
 import json
 
@@ -719,6 +719,141 @@ class AllowedWindowsUser(db.Model):
         if success:
             self.login_count += 1
         db.session.commit()
+
+class TicketClosure(db.Model):
+    """Track daily ticket closures by user for persistent storage and reporting"""
+    __tablename__ = 'ticket_closure'
+    __table_args__ = {'extend_existing': True}
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    freshworks_user_id = db.Column(db.Integer, nullable=True)  # Freshworks responder ID
+    date = db.Column(db.Date, nullable=False, default=datetime.utcnow().date)
+    tickets_closed = db.Column(db.Integer, nullable=False, default=0)
+    ticket_numbers = db.Column(db.Text, nullable=True)  # JSON string of ticket IDs that were closed
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Add a unique constraint to prevent duplicate entries for the same user/date
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'date', name='unique_user_date_closure'),
+        {'extend_existing': True}
+    )
+    
+    # Relationship
+    user = db.relationship('User', backref='ticket_closures')
+    
+    def to_dict(self):
+        import json
+        ticket_numbers_list = []
+        if self.ticket_numbers:
+            try:
+                ticket_numbers_list = json.loads(self.ticket_numbers)
+            except (json.JSONDecodeError, TypeError):
+                ticket_numbers_list = []
+        
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'username': self.user.username if self.user else None,
+            'freshworks_user_id': self.freshworks_user_id,
+            'date': self.date.isoformat(),
+            'tickets_closed': self.tickets_closed,
+            'ticket_numbers': ticket_numbers_list,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+
+class FreshworksUserMapping(db.Model):
+    """Map Freshworks user IDs to local users for ticket closure tracking"""
+    __tablename__ = 'freshworks_user_mapping'
+    __table_args__ = {'extend_existing': True}
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Allow null for unmapped users
+    freshworks_user_id = db.Column(db.Integer, nullable=False, unique=True)
+    freshworks_username = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationship
+    user = db.relationship('User', backref='freshworks_mapping')
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'username': self.user.username if self.user else None,
+            'freshworks_user_id': self.freshworks_user_id,
+            'freshworks_username': self.freshworks_username,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+
+class TicketSyncMetadata(db.Model):
+    """Track ticket sync metadata and timestamps for rate limiting"""
+    __tablename__ = 'ticket_sync_metadata'
+    __table_args__ = {'extend_existing': True}
+    
+    id = db.Column(db.Integer, primary_key=True)
+    sync_date = db.Column(db.Date, nullable=False, unique=True)
+    last_sync_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    sync_count = db.Column(db.Integer, nullable=False, default=0)
+    tickets_processed = db.Column(db.Integer, nullable=False, default=0)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'sync_date': self.sync_date.isoformat(),
+            'last_sync_time': self.last_sync_time.isoformat(),
+            'sync_count': self.sync_count,
+            'tickets_processed': self.tickets_processed,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+    
+    @staticmethod
+    def can_sync_now(target_date=None):
+        """Check if we can sync now (more than 1 hour since last sync)"""
+        if target_date is None:
+            target_date = datetime.utcnow().date()
+        
+        metadata = TicketSyncMetadata.query.filter_by(sync_date=target_date).first()
+        if not metadata:
+            return True  # No previous sync for this date
+        
+        # Check if at least 1 hour has passed
+        now = datetime.utcnow()
+        time_diff = now - metadata.last_sync_time
+        return time_diff.total_seconds() >= 3600  # 1 hour = 3600 seconds
+    
+    @staticmethod
+    def update_sync_metadata(target_date, tickets_processed=0):
+        """Update sync metadata for a given date"""
+        if target_date is None:
+            target_date = datetime.utcnow().date()
+        
+        metadata = TicketSyncMetadata.query.filter_by(sync_date=target_date).first()
+        if metadata:
+            # Update existing record
+            metadata.last_sync_time = datetime.utcnow()
+            metadata.sync_count += 1
+            metadata.tickets_processed += tickets_processed
+            metadata.updated_at = datetime.utcnow()
+        else:
+            # Create new record
+            metadata = TicketSyncMetadata(
+                sync_date=target_date,
+                last_sync_time=datetime.utcnow(),
+                sync_count=1,
+                tickets_processed=tickets_processed
+            )
+            db.session.add(metadata)
+        
+        db.session.commit()
+        return metadata
 
 def init_db():
     # Create all tables

@@ -1,0 +1,838 @@
+{% extends "base.html" %}
+
+{% block title %}Freshworks Users Linking Dashboard{% endblock %}
+
+{% block head %}
+<style>
+    .freshworks-dashboard {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+    
+    .dashboard-header {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .mappings-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    .mappings-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .mappings-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+        margin: 0;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-modern {
+        border: none;
+        border-radius: 10px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-primary-modern {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .btn-success-modern {
+        background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+        color: white;
+    }
+    
+    .btn-warning-modern {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+    
+    .btn-modern:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+    
+    .mappings-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .table-modern {
+        margin: 0;
+    }
+    
+    .table-modern th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+    }
+    
+    .table-modern td {
+        padding: 1rem;
+        border: none;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+    }
+    
+    .table-modern tbody tr:hover {
+        background: rgba(102, 126, 234, 0.05);
+    }
+    
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .status-linked {
+        background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+        color: white;
+    }
+    
+    .status-unlinked {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+    
+    .ticket-stats {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .ticket-stat {
+        background: rgba(102, 126, 234, 0.1);
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        color: #667eea;
+        font-weight: 600;
+    }
+    
+    .user-select {
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        padding: 0.5rem;
+        background: white;
+        min-width: 200px;
+    }
+    
+    .user-select:focus {
+        border-color: #667eea;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    .modal-modern .modal-content {
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    
+    .modal-modern .modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 20px 20px 0 0;
+        border: none;
+    }
+    
+    .modal-modern .modal-body {
+        padding: 2rem;
+    }
+    
+    .ticket-details {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .ticket-item {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid #667eea;
+    }
+    
+    .ticket-numbers {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    
+    .ticket-number {
+        background: #667eea;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    @media (max-width: 768px) {
+        .freshworks-dashboard {
+            padding: 1rem;
+        }
+        
+        .dashboard-header,
+        .mappings-container {
+            padding: 1rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .mappings-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .action-buttons {
+            justify-content: center;
+        }
+        
+        .table-modern {
+            font-size: 0.9rem;
+        }
+        
+        .table-modern th,
+        .table-modern td {
+            padding: 0.75rem 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="freshworks-dashboard">
+    <div class="container-fluid">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-2">
+                        <i class="bi bi-link-45deg me-3"></i>
+                        Freshworks Users Linking Dashboard
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Link Freshworks responder IDs to website members and track ticket closures
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="d-flex justify-content-end gap-2">
+                        <button class="btn btn-modern btn-success-modern" onclick="syncMappings()">
+                            <i class="bi bi-arrow-clockwise"></i>
+                            Sync Mappings
+                        </button>
+                        <button class="btn btn-modern btn-warning-modern" onclick="autoLinkMappings()">
+                            <i class="bi bi-magic"></i>
+                            Auto-Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalMappings">-</div>
+                <div class="stat-label">Total Mappings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="linkedMappings">-</div>
+                <div class="stat-label">Linked Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="unlinkedMappings">-</div>
+                <div class="stat-label">Unlinked Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalTickets">-</div>
+                <div class="stat-label">Total Tickets</div>
+            </div>
+        </div>
+
+        <!-- Mappings Container -->
+        <div class="mappings-container">
+            <div class="mappings-header">
+                <h2 class="mappings-title">User Mappings</h2>
+                <div class="action-buttons">
+                    <button class="btn btn-modern btn-primary-modern" onclick="refreshMappings()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="mappings-table">
+                <table class="table table-modern">
+                    <thead>
+                        <tr>
+                            <th>Freshworks User</th>
+                            <th>Website Member</th>
+                            <th>Status</th>
+                            <th>Ticket Statistics</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mappingsTableBody">
+                        <tr>
+                            <td colspan="5" class="text-center py-4">
+                                <div class="loading-spinner"></div>
+                                <span class="ms-2">Loading mappings...</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ticket Details Modal -->
+<div class="modal fade modal-modern" id="ticketDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-ticket-detailed me-2"></i>
+                    Ticket Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="ticketDetailsContent">
+                    <div class="text-center">
+                        <div class="loading-spinner"></div>
+                        <span class="ms-2">Loading ticket details...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Link User Modal -->
+<div class="modal fade modal-modern" id="linkUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-link-45deg me-2"></i>
+                    Link Freshworks User
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Freshworks User</label>
+                    <div class="form-control-plaintext" id="freshworksUserDisplay"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="userSelect" class="form-label">Select Website Member</label>
+                    <select class="user-select" id="userSelect">
+                        <option value="">-- Select User --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-modern btn-primary-modern" onclick="confirmLinkUser()">
+                    <i class="bi bi-link-45deg"></i>
+                    Link User
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentMappings = [];
+let currentMappingId = null;
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    loadMappings();
+});
+
+// Load mappings data
+async function loadMappings() {
+    try {
+        const response = await fetch('/freshworks-linking/api/mappings');
+        const data = await response.json();
+        
+        if (data.success) {
+            currentMappings = data.mappings;
+            updateStats(data.stats);
+            renderMappingsTable(data.mappings);
+            populateUserSelect(data.available_users);
+        } else {
+            showToast('Error loading mappings: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error loading mappings:', error);
+        showToast('Error loading mappings', 'error');
+    }
+}
+
+// Update statistics
+function updateStats(stats) {
+    document.getElementById('totalMappings').textContent = stats.total_mappings;
+    document.getElementById('linkedMappings').textContent = stats.linked_count;
+    document.getElementById('unlinkedMappings').textContent = stats.unlinked_count;
+    
+    // Calculate total tickets
+    const totalTickets = currentMappings.reduce((sum, mapping) => {
+        return sum + (mapping.ticket_stats?.total_tickets || 0);
+    }, 0);
+    document.getElementById('totalTickets').textContent = totalTickets;
+}
+
+// Render mappings table
+function renderMappingsTable(mappings) {
+    const tbody = document.getElementById('mappingsTableBody');
+    
+    if (mappings.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center py-4">
+                    <i class="bi bi-inbox text-muted" style="font-size: 2rem;"></i>
+                    <p class="mt-2 text-muted">No mappings found</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = mappings.map(mapping => `
+        <tr>
+            <td>
+                <div>
+                    <strong>${mapping.freshworks_username}</strong>
+                    <br>
+                    <small class="text-muted">ID: ${mapping.freshworks_user_id}</small>
+                </div>
+            </td>
+            <td>
+                ${mapping.user_info ? `
+                    <div>
+                        <strong>${mapping.user_info.username}</strong>
+                        <br>
+                        <small class="text-muted">${mapping.user_info.email}</small>
+                        <br>
+                        <span class="badge bg-secondary">${mapping.user_info.role}</span>
+                    </div>
+                ` : `
+                    <span class="text-muted">Not linked</span>
+                `}
+            </td>
+            <td>
+                <span class="status-badge ${mapping.status === 'linked' ? 'status-linked' : 'status-unlinked'}">
+                    ${mapping.status}
+                </span>
+            </td>
+            <td>
+                <div class="ticket-stats">
+                    <div class="ticket-stat">
+                        <i class="bi bi-ticket-detailed"></i>
+                        ${mapping.ticket_stats.total_tickets} total
+                    </div>
+                    <div class="ticket-stat">
+                        <i class="bi bi-calendar-month"></i>
+                        ${mapping.ticket_stats.this_month} this month
+                    </div>
+                    <div class="ticket-stat">
+                        <i class="bi bi-calendar-week"></i>
+                        ${mapping.ticket_stats.this_week} this week
+                    </div>
+                </div>
+                ${mapping.user_info ? `
+                    <button class="btn btn-sm btn-outline-primary mt-2" onclick="viewTicketDetails(${mapping.user_info.id})">
+                        <i class="bi bi-eye"></i>
+                        View Details
+                    </button>
+                ` : ''}
+            </td>
+            <td>
+                <div class="btn-group" role="group">
+                    ${mapping.status === 'linked' ? `
+                        <button class="btn btn-sm btn-outline-warning" onclick="unlinkUser(${mapping.id})">
+                            <i class="bi bi-link-break"></i>
+                            Unlink
+                        </button>
+                    ` : `
+                        <button class="btn btn-sm btn-outline-primary" onclick="linkUser(${mapping.id}, '${mapping.freshworks_username}')">
+                            <i class="bi bi-link-45deg"></i>
+                            Link
+                        </button>
+                    `}
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Populate user select dropdown
+function populateUserSelect(users) {
+    const select = document.getElementById('userSelect');
+    select.innerHTML = '<option value="">-- Select User --</option>';
+    
+    users.forEach(user => {
+        const option = document.createElement('option');
+        option.value = user.id;
+        option.textContent = `${user.username} (${user.email})`;
+        select.appendChild(option);
+    });
+}
+
+// Link user
+function linkUser(mappingId, freshworksUsername) {
+    currentMappingId = mappingId;
+    document.getElementById('freshworksUserDisplay').textContent = freshworksUsername;
+    document.getElementById('userSelect').value = '';
+    
+    const modal = new bootstrap.Modal(document.getElementById('linkUserModal'));
+    modal.show();
+}
+
+// Confirm link user
+async function confirmLinkUser() {
+    const userId = document.getElementById('userSelect').value;
+    
+    if (!userId) {
+        showToast('Please select a user to link', 'warning');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/freshworks-linking/api/mappings/${currentMappingId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ user_id: parseInt(userId) })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('User linked successfully', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('linkUserModal')).hide();
+            loadMappings();
+        } else {
+            showToast('Error linking user: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error linking user:', error);
+        showToast('Error linking user', 'error');
+    }
+}
+
+// Unlink user
+async function unlinkUser(mappingId) {
+    if (!confirm('Are you sure you want to unlink this user?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/freshworks-linking/api/mappings/${mappingId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ user_id: null })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('User unlinked successfully', 'success');
+            loadMappings();
+        } else {
+            showToast('Error unlinking user: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error unlinking user:', error);
+        showToast('Error unlinking user', 'error');
+    }
+}
+
+// View ticket details
+async function viewTicketDetails(userId) {
+    const modal = new bootstrap.Modal(document.getElementById('ticketDetailsModal'));
+    modal.show();
+    
+    try {
+        const response = await fetch(`/freshworks-linking/api/tickets/user/${userId}?days=30`);
+        const data = await response.json();
+        
+        if (data.success) {
+            renderTicketDetails(data);
+        } else {
+            document.getElementById('ticketDetailsContent').innerHTML = `
+                <div class="text-center text-danger">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Error loading ticket details: ${data.error}
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading ticket details:', error);
+        document.getElementById('ticketDetailsContent').innerHTML = `
+            <div class="text-center text-danger">
+                <i class="bi bi-exclamation-triangle"></i>
+                Error loading ticket details
+            </div>
+        `;
+    }
+}
+
+// Render ticket details
+function renderTicketDetails(data) {
+    const { user_info, tickets, date_range } = data;
+    
+    let content = `
+        <div class="mb-4">
+            <h6>User Information</h6>
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Username:</strong> ${user_info.username}<br>
+                    <strong>Email:</strong> ${user_info.email}<br>
+                    <strong>Role:</strong> <span class="badge bg-secondary">${user_info.role}</span>
+                </div>
+                <div class="col-md-6">
+                    <strong>Date Range:</strong> ${new Date(date_range.start_date).toLocaleDateString()} - ${new Date(date_range.end_date).toLocaleDateString()}<br>
+                    <strong>Total Tickets:</strong> ${tickets.reduce((sum, t) => sum + t.tickets_closed, 0)}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    if (tickets.length === 0) {
+        content += `
+            <div class="text-center text-muted">
+                <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                <p class="mt-2">No tickets found for this period</p>
+            </div>
+        `;
+    } else {
+        content += `
+            <h6>Ticket Details</h6>
+            <div class="ticket-details">
+                ${tickets.map(ticket => `
+                    <div class="ticket-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>Date:</strong> ${new Date(ticket.date).toLocaleDateString()}<br>
+                                <strong>Tickets Closed:</strong> ${ticket.tickets_closed}
+                            </div>
+                            <small class="text-muted">Freshworks ID: ${ticket.freshworks_user_id}</small>
+                        </div>
+                        ${ticket.ticket_numbers && ticket.ticket_numbers.length > 0 ? `
+                            <div class="ticket-numbers">
+                                <strong>Ticket Numbers:</strong>
+                                ${ticket.ticket_numbers.map(num => `
+                                    <span class="ticket-number">${num}</span>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+    
+    document.getElementById('ticketDetailsContent').innerHTML = content;
+}
+
+// Sync mappings
+async function syncMappings() {
+    const button = event.target.closest('button');
+    const originalContent = button.innerHTML;
+    
+    try {
+        button.innerHTML = '<span class="loading-spinner"></span> Syncing...';
+        button.disabled = true;
+        
+        const response = await fetch('/freshworks-linking/api/mappings/sync', {
+            method: 'POST'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast(data.message, 'success');
+            loadMappings();
+        } else {
+            showToast('Error syncing mappings: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error syncing mappings:', error);
+        showToast('Error syncing mappings', 'error');
+    } finally {
+        button.innerHTML = originalContent;
+        button.disabled = false;
+    }
+}
+
+// Auto-link mappings
+async function autoLinkMappings() {
+    const button = event.target.closest('button');
+    const originalContent = button.innerHTML;
+    
+    try {
+        button.innerHTML = '<span class="loading-spinner"></span> Auto-linking...';
+        button.disabled = true;
+        
+        const response = await fetch('/freshworks-linking/api/mappings/auto-link', {
+            method: 'POST'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast(data.message, 'success');
+            loadMappings();
+        } else {
+            showToast('Error auto-linking: ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error auto-linking:', error);
+        showToast('Error auto-linking', 'error');
+    } finally {
+        button.innerHTML = originalContent;
+        button.disabled = false;
+    }
+}
+
+// Refresh mappings
+function refreshMappings() {
+    loadMappings();
+}
+
+// Toast notification function
+function showToast(message, type = 'info') {
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    // Add to page
+    const container = document.createElement('div');
+    container.className = 'toast-container position-fixed top-0 end-0 p-3';
+    container.style.zIndex = '9999';
+    container.appendChild(toast);
+    document.body.appendChild(container);
+    
+    // Show toast
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    // Remove after hidden
+    toast.addEventListener('hidden.bs.toast', () => {
+        document.body.removeChild(container);
+    });
+}
+</script>
+{% endblock %} 

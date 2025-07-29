@@ -5,7 +5,7 @@ from flask import jsonify, request, render_template_string, current_app
 from flask_login import login_required, current_user
 from sqlalchemy import text
 from . import bp
-from extensions import db
+from app.extensions import db
 from app.shared_state import memory_manager, _initialization_state, _app_initialized, _blueprints_registered
 
 logger = logging.getLogger(__name__)

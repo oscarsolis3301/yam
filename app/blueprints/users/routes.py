@@ -1,7 +1,7 @@
 from flask import jsonify, request, render_template
 from flask_login import login_required, current_user
 from . import bp
-from extensions import db
+from app.extensions import db
 from app.models import User, UserCache
 import logging
 import subprocess

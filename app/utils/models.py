@@ -3,7 +3,7 @@ import logging
 import queue
 import numpy as np
 from flask import current_app
-from extensions import Config
+from app.extensions import Config
 from pathlib import Path
 import torch
 from sentence_transformers import SentenceTransformer

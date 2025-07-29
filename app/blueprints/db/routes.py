@@ -3,7 +3,7 @@ from flask_login import login_required
 import os
 import sqlite3
 from datetime import datetime
-from extensions import db
+from app.extensions import db
 
 bp = Blueprint('db', __name__)
 

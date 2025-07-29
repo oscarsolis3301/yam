@@ -1,6 +1,6 @@
 from flask import jsonify, request
 from flask_login import login_required, current_user
-from extensions import db
+from app.extensions import db
 from app.models import UserSettings
 from . import bp
 import logging

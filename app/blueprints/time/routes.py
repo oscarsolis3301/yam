@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
 from datetime import datetime
 from app.models.time import TimeEntry
-from extensions import db
+from app.extensions import db
 
 bp = Blueprint('time', __name__, url_prefix='/time')
 

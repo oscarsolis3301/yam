@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import render_template, jsonify
 from flask_login import current_user  # not strictly necessary but kept for potential future use
 
-from extensions import db
+from app.extensions import db
 from app.models import SharedLink
 
 from . import bp

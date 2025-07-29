@@ -1,1 +1,1 @@
-from extensions import db 
+from app.extensions import db 

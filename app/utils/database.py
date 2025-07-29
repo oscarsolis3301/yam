@@ -1,9 +1,10 @@
 import sqlite3
 from datetime import datetime
 from sqlalchemy import text, Index
-from extensions import db
+from app.extensions import db
 from app.utils.logger import setup_logging
 from app.config import Config
+from sqlalchemy import inspect
 
 logger = setup_logging()
 
@@ -37,10 +38,18 @@ def init_database(app):
 
 def add_missing_columns():
     """Add any missing columns to existing tables"""
-    conn = db.engine.connect()
-    inspector = db.inspect(db.engine)
-    
     try:
+        conn = db.engine.connect()
+        inspector = inspect(conn)
+        
+        # Check if ticket_closure table exists and add ticket_numbers column if missing
+        if inspector.has_table('ticket_closure'):
+            columns = [col['name'] for col in inspector.get_columns('ticket_closure')]
+            if 'ticket_numbers' not in columns:
+                conn.execute(text('ALTER TABLE ticket_closure ADD COLUMN ticket_numbers TEXT'))
+                conn.commit()
+                logger.info("Added ticket_numbers column to ticket_closure table")
+        
         # Check search_history table
         if inspector.has_table('search_history'):
             columns = [col['name'] for col in inspector.get_columns('search_history')]
@@ -69,11 +78,62 @@ def add_missing_columns():
                 conn.execute(text('ALTER TABLE user ADD COLUMN teams_notifications BOOLEAN DEFAULT TRUE'))
             
             conn.commit()
-            
+        
+        # Create ticket closure tables if they don't exist
+        if not inspector.has_table('ticket_closure'):
+            conn.execute(text('''
+                CREATE TABLE ticket_closure (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    freshworks_user_id INTEGER,
+                    date DATE NOT NULL,
+                    tickets_closed INTEGER NOT NULL DEFAULT 0,
+                    ticket_numbers TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES user (id),
+                    UNIQUE (user_id, date)
+                )
+            '''))
+            conn.commit()
+            logger.info("Created ticket_closure table")
+        
+        if not inspector.has_table('freshworks_user_mapping'):
+            conn.execute(text('''
+                CREATE TABLE freshworks_user_mapping (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    freshworks_user_id INTEGER NOT NULL UNIQUE,
+                    freshworks_username VARCHAR(100),
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES user (id)
+                )
+            '''))
+            conn.commit()
+            logger.info("Created freshworks_user_mapping table")
+        
+        if not inspector.has_table('ticket_sync_metadata'):
+            conn.execute(text('''
+                CREATE TABLE ticket_sync_metadata (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    sync_date DATE NOT NULL UNIQUE,
+                    last_sync_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    sync_count INTEGER NOT NULL DEFAULT 0,
+                    tickets_processed INTEGER NOT NULL DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            '''))
+            conn.commit()
+            logger.info("Created ticket_sync_metadata table")
+        
+        conn.close()
+        
     except Exception as e:
         logger.error(f"Error adding missing columns: {e}")
-    finally:
-        conn.close()
+        if 'conn' in locals():
+            conn.close()
 
 def create_indexes():
     """Create database indexes for better performance"""

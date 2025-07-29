@@ -20,7 +20,7 @@ from datetime import datetime
 from flask import current_app
 from sqlalchemy.exc import SQLAlchemyError
 
-from extensions import db
+from app.extensions import db
 from app.models import KBArticle, User
 from app.blueprints.utils.db import safe_commit
 from app.utils.helpers import extract_pdf_details  # already re-exported in spark utils

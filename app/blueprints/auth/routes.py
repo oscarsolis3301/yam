@@ -11,7 +11,7 @@ from app.utils.helpers import safe_commit
 from app.utils.user_activity import update_user_status, emit_online_users
 from app.utils.windows_auth import authenticate_windows_user, get_windows_auth_status
 from . import bp
-from extensions import db
+from app.extensions import db
 from app.shared_state import _app_initialized
 
 def hydrate_user_session(user):
@@ -241,7 +241,7 @@ def logout():
             
             # Broadcast update to all clients
             from flask_socketio import emit
-            from extensions import socketio
+            from app.extensions import socketio
             users_list = presence_service.get_online_users(include_details=True)
             socketio.emit('online_users_update', users_list, broadcast=True)
             current_app.logger.info(f"User {username} marked offline and broadcast sent")

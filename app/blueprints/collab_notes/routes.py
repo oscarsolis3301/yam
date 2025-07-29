@@ -6,7 +6,7 @@ from functools import wraps
 from flask import render_template, request, jsonify, abort, current_app
 from flask_login import login_required, current_user
 
-from extensions import db
+from app.extensions import db
 from app.models import Note, NoteCollaborator, NoteVersion
 
 from app.blueprints.collab_notes import bp

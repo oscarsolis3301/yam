@@ -16,7 +16,7 @@ from flask import request
 from flask_login import current_user
 from flask_socketio import emit
 
-from extensions import db, socketio
+from app.extensions import db, socketio
 from app.services.user_presence import UserPresenceService
 
 # Import for backward compatibility

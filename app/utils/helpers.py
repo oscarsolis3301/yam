@@ -11,9 +11,28 @@ from PIL import Image
 import fitz  # PyMuPDF
 import pytesseract
 from werkzeug.utils import secure_filename
-from sentence_transformers import SentenceTransformer
-from transformers import BlipProcessor, BlipForConditionalGeneration
-from gpt4all import GPT4All
+# Optional imports - these may not be available in all environments
+try:
+    from sentence_transformers import SentenceTransformer
+    SENTENCE_TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    SENTENCE_TRANSFORMERS_AVAILABLE = False
+    SentenceTransformer = None
+
+try:
+    from transformers import BlipProcessor, BlipForConditionalGeneration
+    TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    TRANSFORMERS_AVAILABLE = False
+    BlipProcessor = None
+    BlipForConditionalGeneration = None
+
+try:
+    from gpt4all import GPT4All
+    GPT4ALL_AVAILABLE = True
+except ImportError:
+    GPT4ALL_AVAILABLE = False
+    GPT4All = None
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -32,29 +51,42 @@ def init_models():
     global model, embedder, processor, caption_model, asr_model
     
     # Initialize GPT4All model
-    try:
-        from app.config import Config
-        model = GPT4All(Config.MODEL_ID)
-        logger.info("Loaded GPT4All model")
-    except Exception as e:
-        logger.error(f"Error initializing GPT4All model: {e}")
+    if GPT4ALL_AVAILABLE:
+        try:
+            from app.config import Config
+            model = GPT4All(Config.MODEL_ID)
+            logger.info("Loaded GPT4All model")
+        except Exception as e:
+            logger.error(f"Error initializing GPT4All model: {e}")
+            model = None
+    else:
+        logger.warning("GPT4All not available; AI features disabled.")
         model = None
     
     # Initialize embedder
-    try:
-        embedder = SentenceTransformer('all-MiniLM-L6-v2')
-        logger.info("Loaded embedder model")
-    except Exception as e:
-        logger.error(f"Error initializing embedder: {e}")
+    if SENTENCE_TRANSFORMERS_AVAILABLE:
+        try:
+            embedder = SentenceTransformer('all-MiniLM-L6-v2')
+            logger.info("Loaded embedder model")
+        except Exception as e:
+            logger.error(f"Error initializing embedder: {e}")
+            embedder = None
+    else:
+        logger.warning("SentenceTransformers not available; embedding features disabled.")
         embedder = None
     
     # Initialize image captioning
-    try:
-        processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
-        caption_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
-        logger.info("Loaded image captioning model")
-    except Exception as e:
-        logger.error(f"Error initializing image captioning: {e}")
+    if TRANSFORMERS_AVAILABLE:
+        try:
+            processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
+            caption_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
+            logger.info("Loaded image captioning model")
+        except Exception as e:
+            logger.error(f"Error initializing image captioning: {e}")
+            processor = None
+            caption_model = None
+    else:
+        logger.warning("Transformers not available; image captioning disabled.")
         processor = None
         caption_model = None
     

@@ -6,7 +6,7 @@ import os
 import requests
 import psutil
 
-from extensions import db, socketio
+from app.extensions import db, socketio
 from app.models import User, Outage, Activity
 
 bp = Blueprint('system', __name__, url_prefix='/api')

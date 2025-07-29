@@ -1,17 +1,16 @@
 // YAM Dashboard Service Worker
-// Version: 1.0.0
+// Version: 1.0.1
 // Purpose: Provide offline support and performance optimization
 
-const CACHE_NAME = 'yam-dashboard-v1.0.0';
-const STATIC_CACHE_NAME = 'yam-static-v1.0.0';
-const DYNAMIC_CACHE_NAME = 'yam-dynamic-v1.0.0';
+const CACHE_NAME = 'yam-dashboard-v1.0.1';
+const STATIC_CACHE_NAME = 'yam-static-v1.0.1';
+const DYNAMIC_CACHE_NAME = 'yam-dynamic-v1.0.1';
 
 // Files to cache immediately
 const STATIC_FILES = [
     '/',
     '/static/CSS/yam-enhanced.css',
     '/static/CSS/styles.css',
-    '/static/JS/session_monitor.js',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css',
     'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css',
     'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap'

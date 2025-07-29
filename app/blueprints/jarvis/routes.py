@@ -15,7 +15,7 @@ from werkzeug.utils import secure_filename
 from sqlalchemy import text
 from flask_cors import cross_origin
 
-from extensions import db
+from app.extensions import db
 from app.utils.ai_helpers import (
     store_qa,
     find_semantic_qa,

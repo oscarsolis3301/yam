@@ -1,6 +1,6 @@
 from flask import jsonify, request, current_app, url_for, send_from_directory, send_file
 from flask_login import login_required, current_user
-from extensions import db
+from app.extensions import db
 from . import bp
 import logging
 from app.models import KBArticle, SharedLink, KBAttachment, KBFeedback
@@ -10,7 +10,7 @@ from app.utils.helpers import summarize_text, generate_short_code, extract_pdf_d
 from werkzeug.utils import secure_filename
 import time
 from app.blueprints.utils.db import safe_commit
-from extensions import socketio
+from app.extensions import socketio
 from app.utils.kb_import import import_docs_folder
 from app.utils.cache import _articles_cache_lock, _articles_cache  # shared cache
 

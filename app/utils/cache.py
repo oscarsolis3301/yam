@@ -102,7 +102,7 @@ def load_articles_cache(force_reload=False):
                     return _articles_cache  # Return existing cache or empty list
                 
                 # Test database connectivity before proceeding
-                from extensions import db
+                from app.extensions import db
                 from sqlalchemy import text
                 try:
                     db.session.execute(text('SELECT 1'))

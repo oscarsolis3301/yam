@@ -18,7 +18,7 @@ from typing import Dict
 from flask import request, current_app
 from flask_socketio import emit
 
-from extensions import socketio  # shared Socket.IO instance
+from app.extensions import socketio  # shared Socket.IO instance
 from app.utils.user_activity import log_user_activity
 
 __all__ = [

@@ -1,0 +1,387 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3>Freshworks User Mappings</h3>
+                    <div>
+                        <button class="btn btn-primary" onclick="refreshMappings()">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh Mappings
+                        </button>
+                        <button class="btn btn-success" onclick="syncFromIdsFile()">
+                            <i class="bi bi-file-earmark-text"></i> Sync from IDs.txt
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Current Mappings</h5>
+                            <div id="mappingsList" class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Freshworks ID</th>
+                                            <th>Freshworks Name</th>
+                                            <th>Local User</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="mappingsTableBody">
+                                        <!-- Mappings will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Unmapped Users</h5>
+                            <div id="unmappedList" class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Freshworks ID</th>
+                                            <th>Name</th>
+                                            <th>Tickets</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="unmappedTableBody">
+                                        <!-- Unmapped users will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5>Add New Mapping</h5>
+                            <form id="addMappingForm" class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="freshworksId" class="form-label">Freshworks ID</label>
+                                    <input type="text" class="form-control" id="freshworksId" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="freshworksName" class="form-label">Freshworks Name</label>
+                                    <input type="text" class="form-control" id="freshworksName" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="localUserId" class="form-label">Local User</label>
+                                    <select class="form-control" id="localUserId">
+                                        <option value="">Select User</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button type="submit" class="btn btn-primary d-block">Add Mapping</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Mapping Modal -->
+<div class="modal fade" id="editMappingModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Mapping</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editMappingForm">
+                    <input type="hidden" id="editMappingId">
+                    <div class="mb-3">
+                        <label for="editFreshworksId" class="form-label">Freshworks ID</label>
+                        <input type="text" class="form-control" id="editFreshworksId" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editFreshworksName" class="form-label">Freshworks Name</label>
+                        <input type="text" class="form-control" id="editFreshworksName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editLocalUserId" class="form-label">Local User</label>
+                        <select class="form-control" id="editLocalUserId">
+                            <option value="">Select User</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveMapping()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let allUsers = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadMappings();
+    loadUsers();
+});
+
+function loadMappings() {
+    fetch('/api/tickets/user-mappings')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayMappings(data.mappings);
+                displayUnmappedUsers(data.unmapped_users);
+            } else {
+                console.error('Failed to load mappings:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading mappings:', error);
+        });
+}
+
+function loadUsers() {
+    fetch('/api/users')
+        .then(response => response.json())
+        .then(data => {
+            allUsers = data.users || data || [];
+            populateUserSelects();
+        })
+        .catch(error => {
+            console.error('Error loading users:', error);
+        });
+}
+
+function populateUserSelects() {
+    const selects = ['localUserId', 'editLocalUserId'];
+    selects.forEach(selectId => {
+        const select = document.getElementById(selectId);
+        if (select) {
+            select.innerHTML = '<option value="">Select User</option>';
+            allUsers.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = `${user.username} (${user.email})`;
+                select.appendChild(option);
+            });
+        }
+    });
+}
+
+function displayMappings(mappings) {
+    const tbody = document.getElementById('mappingsTableBody');
+    tbody.innerHTML = '';
+    
+    mappings.forEach(mapping => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${mapping.freshworks_id}</td>
+            <td>${mapping.freshworks_name}</td>
+            <td>${mapping.user_info ? mapping.user_info.username : 'Not linked'}</td>
+            <td>
+                <span class="badge ${mapping.status === 'mapped' ? 'bg-success' : 'bg-warning'}">
+                    ${mapping.status}
+                </span>
+            </td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary" onclick="editMapping(${mapping.freshworks_id})">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteMapping(${mapping.freshworks_id})">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function displayUnmappedUsers(unmappedUsers) {
+    const tbody = document.getElementById('unmappedTableBody');
+    tbody.innerHTML = '';
+    
+    if (unmappedUsers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center">No unmapped users found</td></tr>';
+        return;
+    }
+    
+    unmappedUsers.forEach(user => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${user.freshworks_id}</td>
+            <td>${user.name}</td>
+            <td>${user.ticket_count}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-success" onclick="addMappingFromUnmapped('${user.freshworks_id}', '${user.name}')">
+                    <i class="bi bi-plus"></i> Map
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function refreshMappings() {
+    fetch('/api/tickets/sync-user-mappings', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Mappings refreshed successfully', 'success');
+                loadMappings();
+            } else {
+                showToast('Failed to refresh mappings: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error refreshing mappings:', error);
+            showToast('Error refreshing mappings', 'error');
+        });
+}
+
+function syncFromIdsFile() {
+    fetch('/api/tickets/sync-from-ids', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Synced from IDs.txt successfully', 'success');
+                loadMappings();
+            } else {
+                showToast('Failed to sync from IDs.txt: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error syncing from IDs.txt:', error);
+            showToast('Error syncing from IDs.txt', 'error');
+        });
+}
+
+function editMapping(freshworksId) {
+    fetch(`/api/tickets/user-mappings/${freshworksId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const mapping = data.mapping;
+                document.getElementById('editMappingId').value = mapping.freshworks_id;
+                document.getElementById('editFreshworksId').value = mapping.freshworks_id;
+                document.getElementById('editFreshworksName').value = mapping.freshworks_name;
+                document.getElementById('editLocalUserId').value = mapping.user_id || '';
+                
+                const modal = new bootstrap.Modal(document.getElementById('editMappingModal'));
+                modal.show();
+            }
+        })
+        .catch(error => {
+            console.error('Error loading mapping:', error);
+        });
+}
+
+function saveMapping() {
+    const mappingId = document.getElementById('editMappingId').value;
+    const freshworksName = document.getElementById('editFreshworksName').value;
+    const localUserId = document.getElementById('editLocalUserId').value;
+    
+    fetch(`/api/tickets/user-mappings/${mappingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            freshworks_name: freshworksName,
+            user_id: localUserId || null
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Mapping updated successfully', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('editMappingModal')).hide();
+            loadMappings();
+        } else {
+            showToast('Failed to update mapping: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating mapping:', error);
+        showToast('Error updating mapping', 'error');
+    });
+}
+
+function deleteMapping(freshworksId) {
+    if (!confirm('Are you sure you want to delete this mapping?')) {
+        return;
+    }
+    
+    fetch(`/api/tickets/user-mappings/${freshworksId}`, { method: 'DELETE' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Mapping deleted successfully', 'success');
+                loadMappings();
+            } else {
+                showToast('Failed to delete mapping: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting mapping:', error);
+            showToast('Error deleting mapping', 'error');
+        });
+}
+
+function addMappingFromUnmapped(freshworksId, name) {
+    document.getElementById('freshworksId').value = freshworksId;
+    document.getElementById('freshworksName').value = name;
+    document.getElementById('freshworksId').focus();
+}
+
+document.getElementById('addMappingForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        freshworks_id: document.getElementById('freshworksId').value,
+        freshworks_name: document.getElementById('freshworksName').value,
+        user_id: document.getElementById('localUserId').value || null
+    };
+    
+    fetch('/api/tickets/user-mappings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Mapping added successfully', 'success');
+            document.getElementById('addMappingForm').reset();
+            loadMappings();
+        } else {
+            showToast('Failed to add mapping: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error adding mapping:', error);
+        showToast('Error adding mapping', 'error');
+    });
+});
+
+function showToast(message, type = 'info') {
+    // Simple toast implementation - you can replace with your preferred toast library
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
+    toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999;';
+    toast.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 5000);
+}
+</script>
+{% endblock %} 

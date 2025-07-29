@@ -13,7 +13,7 @@ from typing import Any, List
 from flask_socketio import emit
 from rapidfuzz import fuzz, process
 
-from extensions import socketio  # Reuse the global instance initialised in *extensions.py*
+from app.extensions import socketio  # Reuse the global instance initialised in *extensions.py*
 from app.utils.device import get_devices_csv_path
 
 # ---------------------------------------------------------------------------

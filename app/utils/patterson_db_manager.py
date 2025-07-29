@@ -3,7 +3,7 @@ import os
 import glob
 from datetime import datetime, date
 from sqlalchemy.exc import IntegrityError
-from extensions import db
+from app.extensions import db
 from app.models import PattersonTicket, PattersonCalendarEvent, UserMapping, User
 from app.utils.patterson_file_manager import get_patterson_file_manager
 from app.config import Config

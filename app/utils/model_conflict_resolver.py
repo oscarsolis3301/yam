@@ -9,7 +9,7 @@ from pathlib import Path
 from sqlalchemy import inspect, text
 from sqlalchemy.exc import InvalidRequestError, OperationalError
 from sqlalchemy.orm import clear_mappers
-from extensions import db
+from app.extensions import db
 
 logger = logging.getLogger(__name__)
 

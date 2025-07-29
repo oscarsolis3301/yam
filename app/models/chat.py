@@ -4,7 +4,7 @@ Persistent storage that won't be wiped by reset_db.py
 """
 
 from datetime import datetime
-from extensions import db
+from app.extensions import db
 from app.models.base import User
 
 

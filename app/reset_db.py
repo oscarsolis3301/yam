@@ -28,7 +28,7 @@ if PROJECT_ROOT not in sys.path:
 # Third-party / application imports (now that PYTHONPATH is patched)
 # ---------------------------------------------------------------------------
 from flask import Flask
-from extensions import db  # use the root-level singleton instance
+from app.extensions import db  # use the root-level singleton instance
 from app.models import (
     User,
     SearchHistory,

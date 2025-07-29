@@ -8,7 +8,7 @@ from datetime import datetime
 from flask import current_app
 from flask_socketio import emit, join_room, leave_room
 from flask_login import current_user
-from extensions import socketio, db
+from app.extensions import socketio, db
 from app.models.chat import (
     TeamChatMessage, TeamChatSession, TeamChatTyping,
     get_recent_messages, get_active_participants, get_typing_users,

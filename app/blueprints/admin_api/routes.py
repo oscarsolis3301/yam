@@ -17,7 +17,7 @@ from flask import (
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 
-from extensions import db
+from app.extensions import db
 from app.models import Activity, Document, User, AllowedWindowsUser
 from app.utils.windows_auth import add_windows_user_to_allowed_list, remove_windows_user_from_allowed_list
 from app.utils.helpers import safe_commit

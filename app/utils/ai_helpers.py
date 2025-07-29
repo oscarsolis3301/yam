@@ -1,5 +1,5 @@
 import logging
-from extensions import db
+from app.extensions import db
 from app.config import Config
 import sqlite3
 import hashlib
@@ -9,7 +9,7 @@ from sqlalchemy import text
 from flask import current_app
 import numpy as np
 from app.utils.models import get_embedder, FallbackEmbedder, get_model, FallbackModel
-from extensions import socketio  # Emits events so admin UI updates instantly
+from app.extensions import socketio  # Emits events so admin UI updates instantly
 import re
 from rapidfuzz import fuzz
 from app.models import KBArticle
@@ -379,15 +379,19 @@ def store_qa(user, question, answer, image_path=None, image_caption=None):
                 # Only emit socket event on *new* insert so the front-end doesn't
                 # append duplicates in real-time.
                 try:
-                    socketio.emit(
-                        "chatqa_new",
-                        {
-                            "timestamp": datetime.utcnow().isoformat(),
-                            "user": str(user),
-                            "question": question,
-                            "answer": answer,
-                        },
-                    )
+                    from app.extensions import socketio
+                    if socketio and hasattr(socketio, 'emit'):
+                        socketio.emit(
+                            "chatqa_new",
+                            {
+                                "timestamp": datetime.utcnow().isoformat(),
+                                "user": str(user),
+                                "question": question,
+                                "answer": answer,
+                            },
+                        )
+                    else:
+                        logger.debug("SocketIO not available for chatqa_new emission")
                 except Exception as emit_err:
                     logger.warning(f"Failed to emit chatqa_new event: {emit_err}")
             else:

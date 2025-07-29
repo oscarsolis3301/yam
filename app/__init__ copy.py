@@ -6,7 +6,7 @@ import logging
 from pathlib import Path
 
 from .config import Config
-from extensions import db, login_manager, socketio, migrate, init_extensions
+from app.extensions import db, login_manager, socketio, migrate, init_extensions
 
 # Import blueprints
 from .blueprints.auth import bp as auth_bp, init_auth_blueprint

@@ -1,20 +1,103 @@
 <script>
-// Daily Ticket Closures JavaScript
+// Daily Ticket Closures JavaScript - INSTANT LOADING OPTIMIZED
 let userTicketsChart = null;
 let realUsers = [];
+let syncStatus = null;
+let ticketDataCache = {
+    data: null,
+    lastUpdate: 0,
+    cacheDuration: 300000 // 5 minutes cache
+};
+
+// Preload data immediately when script loads
+let preloadedData = null;
+let chartInitialized = false;
+
+// Immediate data preloading - start before DOM is ready
+(function() {
+    console.log('🚀 Preloading ticket closure data for instant chart display...');
+    
+    // Try to get cached data from localStorage first
+    const cachedData = localStorage.getItem('yam_ticket_closures_cache');
+    if (cachedData) {
+        try {
+            const parsed = JSON.parse(cachedData);
+            const cacheAge = Date.now() - parsed.timestamp;
+            
+            // Use cache if it's less than 5 minutes old
+            if (cacheAge < 300000) {
+                preloadedData = parsed.data;
+                console.log('✅ Using cached data for instant display:', preloadedData);
+            }
+        } catch (e) {
+            console.log('⚠️ Invalid cache data, will fetch fresh');
+        }
+    }
+    
+    // Always fetch fresh data in background
+    fetch('/api/tickets/closures/today')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                preloadedData = data;
+                // Cache the fresh data
+                localStorage.setItem('yam_ticket_closures_cache', JSON.stringify({
+                    data: data,
+                    timestamp: Date.now()
+                }));
+                console.log('✅ Fresh data preloaded:', data);
+                
+                // Update chart if already initialized
+                if (chartInitialized && userTicketsChart) {
+                    updateChartWithData(data);
+                }
+            }
+        })
+        .catch(error => {
+            console.log('⚠️ Preload failed, will use cached or empty data:', error);
+        });
+})();
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 YAM User Tickets Scripts - DOM Content Loaded');
     initializeDailyClosures();
 });
 
 function initializeDailyClosures() {
+    console.log('🚀 Initializing Daily Closures with instant loading...');
+    
+    // Check if chart container exists
+    const chartContainer = document.querySelector('.user-tickets-chart.enhanced');
+    if (chartContainer) {
+        console.log('✅ Chart container found:', chartContainer);
+        console.log('📊 Container dimensions:', chartContainer.offsetWidth, 'x', chartContainer.offsetHeight);
+    } else {
+        console.error('❌ Chart container not found!');
+    }
+    
     loadRealUsers();
     initializeDailyClosuresChart();
-    updateDailyClosuresData();
-    updateDailyClosuresStats();
     
-    // Set up refresh intervals - more frequent for daily tracking
-    setInterval(updateDailyClosuresData, 180000); // Update every 3 minutes
+    // Update data immediately if we have preloaded data
+    if (preloadedData) {
+        console.log('⚡ Using preloaded data for instant display');
+        updateChartWithData(preloadedData);
+        updateDailyClosuresStatsFromData(preloadedData);
+        updateTopPerformers(preloadedData);
+        
+        // Hide loading overlay immediately if we have data
+        hideChartLoading();
+    } else {
+        // Fallback to API call - immediate
+        updateDailyClosuresData();
+        updateDailyClosuresStats();
+        checkSyncStatus();
+    }
+    
+    // Set up optimized refresh intervals with caching
+    setInterval(updateDailyClosuresData, 3600000); // Update every 60 minutes
+    setInterval(updateDailyClosuresStats, 7200000); // Update stats every 2 hours
+    setInterval(checkSyncStatus, 1200000); // Check sync status every 20 minutes
 }
 
 function loadRealUsers() {
@@ -37,45 +120,63 @@ function loadRealUsers() {
                 profile_picture: user.profile_picture
             }));
             
-            // Initialize chart with real users
-            if (userTicketsChart) {
-                updateDailyClosuresData();
-            }
-            
-            // Update top performers immediately
-            updateTopPerformers(generateDailyClosuresData());
+            console.log('✅ Loaded real users:', realUsers.length);
         })
         .catch(error => {
             console.error('Error loading users:', error);
-            // Fallback to default users if API fails
-            realUsers = [
-                { id: 1, username: 'Admin', role: 'System Administrator', email: 'admin@company.com' },
-                { id: 2, username: 'AJ', role: 'Senior Admin', email: 'aj@company.com' },
-                { id: 3, username: 'Cole', role: 'IT Specialist', email: 'cole@company.com' },
-                { id: 4, username: 'Oscar', role: 'Support Lead', email: 'oscar@company.com' },
-                { id: 5, username: 'Sarah', role: 'Help Desk', email: 'sarah@company.com' },
-                { id: 6, username: 'Mike', role: 'Technical Support', email: 'mike@company.com' },
-                { id: 7, username: 'Emily', role: 'Customer Service', email: 'emily@company.com' },
-                { id: 8, username: 'David', role: 'IT Manager', email: 'david@company.com' }
-            ];
-            
-            // Update top performers with fallback data
-            updateTopPerformers(generateDailyClosuresData());
+            realUsers = [];
+            console.log('⚠️ No fallback users loaded - will rely on ticket closures API for real data');
         });
 }
 
 function initializeDailyClosuresChart() {
-    const ctx = document.getElementById('userTicketsChart').getContext('2d');
+    // Check if Chart.js is available
+    if (typeof Chart === 'undefined') {
+        console.error('❌ Chart.js not loaded! Waiting for it to load...');
+        setTimeout(initializeDailyClosuresChart, 100);
+        return;
+    }
     
-    const data = generateDailyClosuresData();
+    const canvas = document.getElementById('userTicketsChart');
+    if (!canvas) {
+        console.error('❌ Chart canvas not found!');
+        return;
+    }
+    
+    // Ensure canvas has proper dimensions
+    const container = canvas.parentElement;
+    if (container) {
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        console.log('📊 Chart container dimensions:', container.offsetWidth, 'x', container.offsetHeight);
+        
+        // Ensure container is visible and has dimensions
+        if (container.offsetWidth === 0 || container.offsetHeight === 0) {
+            console.log('⚠️ Container has no dimensions, waiting for layout...');
+            setTimeout(initializeDailyClosuresChart, 50);
+            return;
+        }
+    }
+    
+    const ctx = canvas.getContext('2d');
+    console.log('📊 Initializing chart with canvas:', canvas);
+    console.log('📊 Canvas dimensions:', canvas.width, 'x', canvas.height);
+    
+    // Use preloaded data if available, otherwise use empty data
+    const initialData = preloadedData ? {
+        labels: preloadedData.labels || [],
+        today: preloadedData.data || []
+    } : generateDailyClosuresData();
+    
+    console.log('📊 Creating chart with initial data:', initialData);
     
     userTicketsChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: data.labels,
+            labels: initialData.labels,
             datasets: [{
                 label: 'Closed Today',
-                data: data.today,
+                data: initialData.today,
                 backgroundColor: 'rgba(40, 167, 69, 0.8)',
                 borderColor: '#28a745',
                 borderWidth: 2,
@@ -89,6 +190,12 @@ function initializeDailyClosuresChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            indexAxis: 'x', // Ensure horizontal bar chart
+            elements: {
+                bar: {
+                    borderWidth: 2,
+                }
+            },
             plugins: {
                 legend: {
                     display: false
@@ -107,6 +214,9 @@ function initializeDailyClosuresChart() {
                         },
                         label: function(context) {
                             return `Closed Today: ${context.parsed.y} tickets`;
+                        },
+                        afterLabel: function(context) {
+                            return 'Click to view details';
                         }
                     }
                 }
@@ -114,202 +224,421 @@ function initializeDailyClosuresChart() {
             scales: {
                 x: {
                     grid: {
-                        color: 'rgba(255, 255, 255, 0.05)'
+                        display: false
                     },
                     ticks: {
-                        color: '#999',
+                        color: '#666666',
                         font: {
-                            size: 11
-                        }
+                            size: 12
+                        },
+                        maxRotation: 45, // Rotate labels if needed
+                        minRotation: 0
                     }
                 },
                 y: {
+                    beginAtZero: true,
                     grid: {
-                        color: 'rgba(255, 255, 255, 0.05)'
+                        color: 'rgba(255, 255, 255, 0.1)'
                     },
                     ticks: {
-                        color: '#999',
+                        color: '#666666',
                         font: {
-                            size: 11
+                            size: 12
                         },
-                        beginAtZero: true
+                        stepSize: 1 // Ensure integer steps
                     }
                 }
             },
-            interaction: {
-                intersect: false,
-                mode: 'index'
+            onClick: function(event, elements) {
+                if (elements.length > 0) {
+                    const element = elements[0];
+                    const username = this.data.labels[element.index];
+                    const ticketCount = this.data.datasets[0].data[element.index];
+                    
+                    console.log(`🎯 User clicked on ${username} with ${ticketCount} tickets`);
+                    showUserTicketDetails(username, ticketCount);
+                }
             }
         }
     });
+    
+    chartInitialized = true;
+    console.log('✅ Chart initialized successfully');
+    
+    // If we have preloaded data, update immediately
+    if (preloadedData) {
+        console.log('⚡ Updating chart with preloaded data immediately');
+        updateChartWithData(preloadedData);
+    } else {
+        // Show loading if no preloaded data
+        showChartLoading();
+    }
 }
 
 function generateDailyClosuresData() {
-    // Use real users if available, otherwise fallback
-    const users = realUsers.length > 0 ? realUsers : [
-        { username: 'Admin', role: 'System Administrator' },
-        { username: 'AJ', role: 'Senior Admin' },
-        { username: 'Cole', role: 'IT Specialist' },
-        { username: 'Oscar', role: 'Support Lead' },
-        { username: 'Sarah', role: 'Help Desk' },
-        { username: 'Mike', role: 'Technical Support' },
-        { username: 'Emily', role: 'Customer Service' },
-        { username: 'David', role: 'IT Manager' }
-    ];
+    // Return empty data initially - will be populated by real API data
+    return { labels: [], today: [] };
+}
+
+function showChartLoading() {
+    const loadingOverlay = document.getElementById('chartLoadingOverlay');
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'flex';
+        loadingOverlay.classList.remove('hidden');
+    }
+}
+
+function hideChartLoading() {
+    const loadingOverlay = document.getElementById('chartLoadingOverlay');
+    if (loadingOverlay) {
+        loadingOverlay.classList.add('hidden');
+        setTimeout(() => {
+            loadingOverlay.style.display = 'none';
+        }, 300);
+    }
+}
+
+function updateChartWithData(data) {
+    if (!userTicketsChart) {
+        console.warn('⚠️ Chart not initialized yet');
+        return;
+    }
     
-    const labels = users.slice(0, 8).map(user => user.username);
-    const today = users.slice(0, 8).map(() => Math.floor(Math.random() * 15) + 2); // 2-17 closures today
+    console.log('📊 Updating chart with data:', data);
     
-    return { labels, today };
+    const labels = data.labels || [];
+    const chartData = data.data || [];
+    
+    if (labels.length > 0 && chartData.length > 0) {
+        userTicketsChart.data.labels = labels;
+        userTicketsChart.data.datasets[0].data = chartData;
+        userTicketsChart.update('active');
+        console.log('✅ Chart updated successfully with data');
+        console.log('   Chart now shows', labels.length, 'users with bars');
+        
+        // Hide loading overlay
+        hideChartLoading();
+        
+        // Force a resize to ensure proper rendering
+        setTimeout(() => {
+            if (userTicketsChart) {
+                userTicketsChart.resize();
+                console.log('📊 Chart resized for proper rendering');
+            }
+        }, 10); // Minimal delay for instant rendering
+    } else {
+        console.warn('⚠️ No valid data to display in chart');
+        userTicketsChart.data.labels = [];
+        userTicketsChart.data.datasets[0].data = [];
+        userTicketsChart.update('active');
+        
+        // Hide loading overlay even if no data
+        hideChartLoading();
+    }
 }
 
 function updateDailyClosuresData() {
-    // Simulate loading daily closures data
-    const data = generateDailyClosuresData();
+    // Check cache first
+    const now = Date.now();
+    const period = getCurrentPeriod() || 'today';
+    
+    // Use cached data if available and not expired
+    if (ticketDataCache.data && 
+        ticketDataCache.data.period === period && 
+        (now - ticketDataCache.lastUpdate) < ticketDataCache.cacheDuration) {
+        console.log('📊 Using cached ticket closure data');
+        updateChartWithData(ticketDataCache.data);
+        return;
+    }
+    
+    // Show loading overlay if we don't have cached data
+    if (!ticketDataCache.data || ticketDataCache.data.period !== period) {
+        showChartLoading();
+    }
+    
+    // Fetch real data from API
+    const endpoint = period === 'today' ? 
+        '/api/tickets/closures/today' : 
+        `/api/tickets/closures/period?period=${period}`;
+    
+    console.log('🔄 Fetching ticket closure data from:', endpoint);
+    console.log('📊 Current period:', period);
+    
+    fetch(endpoint)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('🔄 Raw API response:', data);
+            
+            if (data.success) {
+                console.log('✅ Received real ticket closure data:', data);
+                
+                // Cache the data
+                ticketDataCache.data = {
+                    ...data,
+                    period: period
+                };
+                ticketDataCache.lastUpdate = Date.now();
+                
+                // Also cache to localStorage for instant loading on next page load
+                localStorage.setItem('yam_ticket_closures_cache', JSON.stringify({
+                    data: data,
+                    timestamp: Date.now()
+                }));
+                
+                // Store sync status
+                if (data.sync_status) {
+                    syncStatus = data.sync_status;
+                    updateSyncStatusDisplay();
+                }
+                
+                // Update chart with real data
+                updateChartWithData(data);
+                
+                // Update top performers list with real data
+                console.log('Updating top performers...');
+                updateTopPerformers(data);
+                
+                // Update stats display
+                console.log('Updating stats display...');
+                updateDailyClosuresStatsFromData(data);
+                
+                // Show success message if data was just synced
+                if (data.sync_status && data.sync_status.sync_count_today > 0) {
+                    showToast(`✅ Data updated! ${data.total_closed} tickets processed`, 'success');
+                }
+            } else {
+                console.error('❌ API returned error:', data.error);
+                console.log('⚠️ API error - clearing chart data');
+                // Clear chart data instead of loading fallback
+                if (userTicketsChart) {
+                    userTicketsChart.data.labels = [];
+                    userTicketsChart.data.datasets[0].data = [];
+                    userTicketsChart.update('none');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('❌ Error fetching ticket closure data:', error);
+            console.log('⚠️ Falling back to empty data instead of dummy data');
+            // Don't load fallback data - show empty chart instead
+            if (userTicketsChart) {
+                userTicketsChart.data.labels = [];
+                userTicketsChart.data.datasets[0].data = [];
+                userTicketsChart.update('none');
+                console.log('📊 Chart cleared due to API error');
+            }
+        });
+}
+
+function loadFallbackData() {
+    console.warn('Loading fallback dummy data due to API error');
+    
+    // Generate fallback data
+    const fallbackData = generateDailyClosuresDataForPeriod(getCurrentPeriod() || 'today');
     
     if (userTicketsChart) {
-        userTicketsChart.data.labels = data.labels;
-        userTicketsChart.data.datasets[0].data = data.today;
+        userTicketsChart.data.labels = fallbackData.labels;
+        userTicketsChart.data.datasets[0].data = fallbackData.periodData;
         userTicketsChart.update('none');
     }
     
-    // Update top performers list
-    updateTopPerformers(data);
+    updateTopPerformers(fallbackData);
+    updateDailyClosuresStatsForPeriod(getCurrentPeriod() || 'today');
+}
+
+function updateDailyClosuresStatsFromData(data) {
+    const totalClosed = data.total_closed || 0;
+    const topPerformer = data.top_performer;
     
-    // Update stats
-    updateDailyClosuresStats();
+    // Update total tickets display - Fixed element ID
+    const totalElement = document.getElementById('ticketsClosedToday');
+    if (totalElement) {
+        totalElement.textContent = totalClosed;
+    }
+    
+    // Update top performer display
+    const topCloserElement = document.getElementById('topCloserToday');
+    if (topCloserElement && topPerformer) {
+        topCloserElement.textContent = `${topPerformer.username} (${topPerformer.tickets_closed})`;
+    }
+    
+    // Update sync status if available
+    if (data.sync_status) {
+        updateSyncStatusDisplay(data.sync_status);
+    }
+}
+
+function updateSyncStatusDisplay(status = syncStatus) {
+    if (!status) return;
+    
+    const syncStatusElement = document.getElementById('syncStatus');
+    if (!syncStatusElement) return;
+    
+    const canSync = status.can_sync_now;
+    const minutesUntilNext = status.minutes_until_next || 0;
+    const lastSyncTime = status.last_sync_time;
+    const ticketsProcessed = status.tickets_processed_today || 0;
+    
+    let statusText = '';
+    let statusClass = '';
+    
+    if (canSync) {
+        statusText = '🔄 Ready to sync';
+        statusClass = 'text-success';
+    } else {
+        statusText = `⏰ Next sync in ${minutesUntilNext} minutes`;
+        statusClass = 'text-warning';
+    }
+    
+    if (lastSyncTime) {
+        const lastSync = new Date(lastSyncTime);
+        const timeAgo = Math.floor((Date.now() - lastSync.getTime()) / 60000); // minutes ago
+        statusText += ` | Last: ${timeAgo}m ago (${ticketsProcessed} tickets)`;
+    }
+    
+    syncStatusElement.textContent = statusText;
+    syncStatusElement.className = `sync-status ${statusClass}`;
+}
+
+function checkSyncStatus() {
+    fetch('/api/tickets/sync-status')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                syncStatus = data.sync_info;
+                updateSyncStatusDisplay();
+            }
+        })
+        .catch(error => {
+            console.error('Error checking sync status:', error);
+        });
 }
 
 function updateTopPerformers(data) {
+    // Update both the hidden section and the modal content
     const topPerformersContainer = document.getElementById('topPerformers');
     const topPerformersModalContent = document.getElementById('topPerformersModalContent');
     
-    // Update both the hidden container and modal content
-    const containers = [topPerformersContainer, topPerformersModalContent];
+    // Use modal content if available, otherwise fall back to hidden section
+    const container = topPerformersModalContent || topPerformersContainer;
+    if (!container) return;
     
-    containers.forEach(container => {
-        if (!container) return;
+    let performers = [];
+    
+    if (data.users && Array.isArray(data.users)) {
+        // Real data from API
+        performers = data.users
+            .sort((a, b) => b.tickets_closed - a.tickets_closed)
+            .slice(0, 5);
+    } else if (data.labels && data.data) {
+        // Chart data format
+        performers = data.labels.map((label, index) => ({
+            username: label,
+            tickets_closed: data.data[index] || 0,
+            role: 'User'
+        })).sort((a, b) => b.tickets_closed - a.tickets_closed).slice(0, 5);
+    }
+    
+    // Clear existing content
+    container.innerHTML = '';
+    
+    if (performers.length === 0) {
+        container.innerHTML = '<div class="no-data">No data available</div>';
+        return;
+    }
+    
+    // Create a list for the performers
+    const performersList = document.createElement('ul');
+    performersList.className = 'performers-list';
+    performersList.style.cssText = 'list-style: none; padding: 0; margin: 0;';
+    
+    // Add performers to list
+    performers.forEach((performer, index) => {
+        const listItem = document.createElement('li');
+        listItem.className = 'performer-item';
+        listItem.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1);';
         
-        // Create performers data from chart data
-        const performers = data.labels.map((label, index) => ({
-            name: label,
-            closedToday: data.today[index],
-            efficiency: Math.floor(Math.random() * 30) + 70, // 70-100% efficiency
-            role: getRoleForUser(label)
-        })).sort((a, b) => b.closedToday - a.closedToday);
+        const rank = index + 1;
+        const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
         
-        const performersHTML = performers.map((user, index) => {
-            const avatarColor = getAvatarColor(user.name);
-            const profilePic = getProfilePicture(user.name);
-            const role = user.role || 'Team Member';
-            
-            return `
-                <div class="performer-item enhanced" onclick="showUserDetails('${user.name}')">
-                    <div class="performer-info">
-                        <div class="performer-avatar" style="background: ${avatarColor};">
-                            ${profilePic ? 
-                                `<img src="${profilePic}" alt="${user.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                 <span style="display: none;">${user.name.charAt(0)}</span>` :
-                                user.name.charAt(0)
-                            }
-                        </div>
-                        <div class="performer-details">
-                            <div class="performer-name">${user.name}</div>
-                            <div class="performer-role">${role}</div>
-                        </div>
-                    </div>
-                    <div class="performer-stats">
-                        <div class="stat-group">
-                            <div class="stat-value">${user.closedToday}</div>
-                            <div class="stat-label">Closed</div>
-                        </div>
-                        <div class="stat-group">
-                            <div class="stat-value">${user.efficiency}%</div>
-                            <div class="stat-label">Efficiency</div>
-                        </div>
-                    </div>
+        listItem.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div class="performer-avatar" style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: linear-gradient(135deg, #28a745, #20c997); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.8rem; border: 2px solid rgba(40, 167, 69, 0.3);">
+                    ${getUserProfileImage(performer, performer.username)}
                 </div>
-            `;
-        }).join('');
+                <span class="performer-name" style="color: #ffffff; font-weight: 500;">
+                    <span class="rank-icon" style="margin-right: 0.5rem;">${rankIcon}</span>
+                    ${performer.username}
+                    <small style="color: rgba(255, 255, 255, 0.6); margin-left: 0.5rem;">(${performer.role})</small>
+                </span>
+            </div>
+            <span class="ticket-count" style="background: #28a745; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 600;">${performer.tickets_closed}</span>
+        `;
         
-        container.innerHTML = performersHTML;
+        performersList.appendChild(listItem);
     });
-}
-
-// Helper functions
-function getRoleForUser(username) {
-    const roles = {
-        'Admin': 'System Administrator',
-        'AJ': 'Senior Admin',
-        'Cole': 'IT Specialist',
-        'Oscar': 'Support Lead',
-        'Sarah': 'Help Desk',
-        'Mike': 'Technical Support',
-        'Emily': 'Customer Service',
-        'David': 'IT Manager'
-    };
-    return roles[username] || 'Team Member';
-}
-
-function getAvatarColor(username) {
-    const colors = [
-        'linear-gradient(135deg, #28a745, #20c997)',
-        'linear-gradient(135deg, #007bff, #0056b3)',
-        'linear-gradient(135deg, #6f42c1, #5a2d91)',
-        'linear-gradient(135deg, #e83e8c, #d63384)',
-        'linear-gradient(135deg, #fd7e14, #e55a00)',
-        'linear-gradient(135deg, #20c997, #17a2b8)',
-        'linear-gradient(135deg, #ffc107, #e0a800)',
-        'linear-gradient(135deg, #dc3545, #c82333)'
-    ];
     
-    const index = username.charCodeAt(0) % colors.length;
-    return colors[index];
-}
-
-function getProfilePicture(username) {
-    const userData = realUsers.find(u => u.username === username);
-    return userData && userData.profile_picture ? 
-        `/static/uploads/profile_pictures/${userData.profile_picture}` : null;
+    container.appendChild(performersList);
 }
 
 function updateDailyClosuresStats() {
-    // Simulate updating stats with realistic daily values
-    const ticketsClosedToday = Math.floor(Math.random() * 50) + 25; // 25-75 closures today
-    const topCloserToday = Math.floor(Math.random() * 12) + 8; // 8-20 closures for top performer
-    
-    document.getElementById('ticketsClosedToday').textContent = ticketsClosedToday;
-    document.getElementById('topCloserToday').textContent = topCloserToday;
+    fetch('/api/tickets/stats')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const totalElement = document.getElementById('ticketsClosedToday');
+                const topCloserElement = document.getElementById('topCloserToday');
+                
+                if (totalElement) {
+                    totalElement.textContent = data.today_total || 0;
+                }
+                
+                if (topCloserElement && data.top_performer) {
+                    topCloserElement.textContent = `${data.top_performer.username} (${data.top_performer.tickets_closed})`;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching ticket stats:', error);
+        });
+}
+
+function getCurrentPeriod() {
+    const periodButtons = document.querySelectorAll('.period-filter-btn');
+    for (const button of periodButtons) {
+        if (button.classList.contains('active')) {
+            return button.getAttribute('data-period');
+        }
+    }
+    return 'today';
 }
 
 function filterDailyClosures(period) {
-    // Update chart based on selected period
-    const data = generateDailyClosuresDataForPeriod(period);
+    // Update the chart dataset label
+    const periodLabel = period === 'today' ? 'Closed Today' :
+                       period === 'week' ? 'Closed This Week' : 'Closed This Month';
     
     if (userTicketsChart) {
-        userTicketsChart.data.labels = data.labels;
-        userTicketsChart.data.datasets[0].data = data.periodData;
-        userTicketsChart.update('none');
+        userTicketsChart.data.datasets[0].label = periodLabel;
     }
     
-    // Update stats based on period
-    updateDailyClosuresStatsForPeriod(period);
-    
-    // Update top performers based on period
-    updateTopPerformersForPeriod(data, period);
+    // Fetch new data for the selected period using the real API
+    updateDailyClosuresData();
 }
 
 function generateDailyClosuresDataForPeriod(period) {
-    const users = realUsers.length > 0 ? realUsers : [
-        { username: 'Admin', role: 'System Administrator' },
-        { username: 'AJ', role: 'Senior Admin' },
-        { username: 'Cole', role: 'IT Specialist' },
-        { username: 'Oscar', role: 'Support Lead' },
-        { username: 'Sarah', role: 'Help Desk' },
-        { username: 'Mike', role: 'Technical Support' },
-        { username: 'Emily', role: 'Customer Service' },
-        { username: 'David', role: 'IT Manager' }
-    ];
+    // Only use real users, no dummy data
+    const users = realUsers.length > 0 ? realUsers : [];
+    
+    // If no real users, return empty data
+    if (users.length === 0) {
+        return { labels: [], periodData: [] };
+    }
     
     const labels = users.slice(0, 8).map(user => user.username);
     
@@ -317,9 +646,6 @@ function generateDailyClosuresDataForPeriod(period) {
     switch (period) {
         case 'today':
             periodData = users.slice(0, 8).map(() => Math.floor(Math.random() * 15) + 2);
-            break;
-        case 'yesterday':
-            periodData = users.slice(0, 8).map(() => Math.floor(Math.random() * 18) + 3);
             break;
         case 'week':
             periodData = users.slice(0, 8).map(() => Math.floor(Math.random() * 80) + 20);
@@ -334,610 +660,322 @@ function generateDailyClosuresDataForPeriod(period) {
     return { labels, periodData };
 }
 
+function updateTopPerformers(data) {
+    const topPerformersElement = document.getElementById('topPerformers');
+    const topPerformersModalElement = document.getElementById('topPerformersModalContent');
+    
+    if (!topPerformersElement && !topPerformersModalElement) {
+        return;
+    }
+    
+    const users = data.users || [];
+    const totalClosed = data.total_closed || 0;
+    
+    if (users.length === 0) {
+        const noDataHtml = '<div class="no-data">No ticket closure data available</div>';
+        if (topPerformersElement) topPerformersElement.innerHTML = noDataHtml;
+        if (topPerformersModalElement) topPerformersModalElement.innerHTML = noDataHtml;
+        return;
+    }
+    
+    // Sort users by tickets closed (descending)
+    const sortedUsers = users.sort((a, b) => b.tickets_closed - a.tickets_closed);
+    
+    let performersHtml = `
+        <div class="performers-header">
+            <h4>Top Performers Today</h4>
+            <span class="total-tickets">Total: ${totalClosed} tickets</span>
+        </div>
+        <div class="performers-list">
+    `;
+    
+    sortedUsers.forEach((user, index) => {
+        const rank = index + 1;
+        const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+        const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+        
+        performersHtml += `
+            <div class="performer-item ${rankClass}">
+                <div class="performer-rank">${rankIcon}</div>
+                <div class="performer-avatar">
+                    ${getUserProfileImage(user, user.username)}
+                </div>
+                <div class="performer-info">
+                    <div class="performer-name">${user.username}</div>
+                    <div class="performer-role">${user.role || 'User'}</div>
+                </div>
+                <div class="performer-stats">
+                    <div class="tickets-count">${user.tickets_closed}</div>
+                    <div class="tickets-label">tickets</div>
+                </div>
+            </div>
+        `;
+    });
+    
+    performersHtml += '</div>';
+    
+    if (topPerformersElement) topPerformersElement.innerHTML = performersHtml;
+    if (topPerformersModalElement) topPerformersModalElement.innerHTML = performersHtml;
+}
+
 function updateDailyClosuresStatsForPeriod(period) {
-    let ticketsClosed, topCloser;
+    const data = generateDailyClosuresDataForPeriod(period);
+    const total = data.periodData.reduce((sum, count) => sum + count, 0);
+    const topCloserToday = data.labels[0] || 'N/A';
     
-    switch (period) {
-        case 'today':
-            ticketsClosed = Math.floor(Math.random() * 50) + 25;
-            topCloser = Math.floor(Math.random() * 12) + 8;
-            break;
-        case 'yesterday':
-            ticketsClosed = Math.floor(Math.random() * 60) + 30;
-            topCloser = Math.floor(Math.random() * 15) + 10;
-            break;
-        case 'week':
-            ticketsClosed = Math.floor(Math.random() * 300) + 200;
-            topCloser = Math.floor(Math.random() * 60) + 40;
-            break;
-        case 'month':
-            ticketsClosed = Math.floor(Math.random() * 1000) + 800;
-            topCloser = Math.floor(Math.random() * 200) + 150;
-            break;
-        default:
-            ticketsClosed = Math.floor(Math.random() * 50) + 25;
-            topCloser = Math.floor(Math.random() * 12) + 8;
+    const totalElement = document.getElementById('ticketsClosedToday');
+    const topCloserElement = document.getElementById('topCloserToday');
+    
+    if (totalElement) {
+        totalElement.textContent = total;
     }
     
-    document.getElementById('ticketsClosedToday').textContent = ticketsClosed;
-    document.getElementById('topCloserToday').textContent = topCloser;
+    if (topCloserElement) {
+        topCloserElement.textContent = topCloserToday;
+    }
 }
 
-function updateTopPerformersForPeriod(data, period) {
-    const topPerformersContainer = document.getElementById('topPerformers');
-    const topPerformersModalContent = document.getElementById('topPerformersModalContent');
-    
-    // Update both the hidden container and modal content
-    const containers = [topPerformersContainer, topPerformersModalContent];
-    
-    containers.forEach(container => {
-        if (!container) return;
-        
-        // Create performers data from chart data
-        const performers = data.labels.map((label, index) => ({
-            name: label,
-            closures: data.periodData[index],
-            efficiency: Math.floor(Math.random() * 30) + 70, // 70-100% efficiency
-            role: getRoleForUser(label)
-        })).sort((a, b) => b.closures - a.closures);
-        
-        const performersHTML = performers.map((user, index) => {
-            const avatarColor = getAvatarColor(user.name);
-            const profilePic = getProfilePicture(user.name);
-            const role = user.role || 'Team Member';
-            
-            return `
-                <div class="performer-item enhanced" onclick="showUserDetails('${user.name}')">
-                    <div class="performer-info">
-                        <div class="performer-avatar" style="background: ${avatarColor};">
-                            ${profilePic ? 
-                                `<img src="${profilePic}" alt="${user.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                 <span style="display: none;">${user.name.charAt(0)}</span>` :
-                                user.name.charAt(0)
-                            }
-                        </div>
-                        <div class="performer-details">
-                            <div class="performer-name">${user.name}</div>
-                            <div class="performer-role">${role}</div>
-                        </div>
-                    </div>
-                    <div class="performer-stats">
-                        <div class="stat-group">
-                            <div class="stat-value">${user.closures}</div>
-                            <div class="stat-label">${period.charAt(0).toUpperCase() + period.slice(1)}</div>
-                        </div>
-                        <div class="stat-group">
-                            <div class="stat-value">${user.efficiency}%</div>
-                            <div class="stat-label">Efficiency</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-        
-        container.innerHTML = performersHTML;
-    });
-}
-
-// Updated Ticket Management Functions for Daily Focus
-function createQuickTicket() {
-    showQuickTicketModal();
-}
-
-function viewDailyReport() {
-    // Show daily closure report
-    window.location.href = '/admin/daily-closure-report';
-}
-
-function exportClosureData() {
-    showExportModal();
-}
-
-function showUserDetails(userName) {
-    showUserDetailsModal(userName);
-}
-
-function openDailyAnalytics() {
-    // Implement daily analytics functionality
-    console.log('Opening daily closure analytics');
-    window.location.href = '/admin/daily-analytics';
-}
-
-// Enhanced Modal Functions
-function showExportModal() {
-    const modal = document.createElement('div');
-    modal.className = 'export-modal';
-    modal.innerHTML = `
-        <div class="export-content">
-            <div class="modal-header">
-                <h3>Export Daily Closure Data</h3>
-                <button class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</button>
-            </div>
-            <div class="export-options">
-                <div class="option-group">
-                    <label>Export Type</label>
-                    <select id="exportType">
-                        <option value="daily">Daily Closures</option>
-                        <option value="performance">Performance Metrics</option>
-                        <option value="comparison">Team Comparison</option>
-                    </select>
-                </div>
-                <div class="option-group">
-                    <label>Date Range</label>
-                    <select id="exportRange">
-                        <option value="today">Today</option>
-                        <option value="yesterday">Yesterday</option>
-                        <option value="week">This Week</option>
-                        <option value="month">This Month</option>
-                    </select>
-                </div>
-                <div class="option-group">
-                    <label>Format</label>
-                    <select id="exportFormat">
-                        <option value="csv">CSV</option>
-                        <option value="excel">Excel</option>
-                        <option value="pdf">PDF Report</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-actions">
-                <button type="button" class="btn-secondary" onclick="this.parentElement.parentElement.parentElement.remove()">Cancel</button>
-                <button type="button" class="btn-primary" onclick="performExport()">Export Data</button>
-            </div>
-        </div>
-    `;
-    
-    // Add styles (similar to previous modals)
-    const style = document.createElement('style');
-    style.textContent = `
-        .export-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 999999;
-        }
-        .export-content {
-            background: rgba(15, 15, 15, 0.95);
-            border-radius: 12px;
-            padding: 2rem;
-            width: 90%;
-            max-width: 500px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .export-options {
-            margin-bottom: 1.5rem;
-        }
-        .option-group {
-            margin-bottom: 1rem;
-        }
-        .option-group label {
-            display: block;
-            color: #ffffff;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-        .option-group select {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-            font-size: 0.9rem;
-        }
-    `;
-    
-    document.head.appendChild(style);
-    document.body.appendChild(modal);
-}
-
-function performExport() {
-    const exportType = document.getElementById('exportType').value;
-    const exportRange = document.getElementById('exportRange').value;
-    const exportFormat = document.getElementById('exportFormat').value;
-    
-    console.log('Exporting closure data:', { exportType, exportRange, exportFormat });
-    
-    // Show success message
-    showNotification('Data exported successfully!', 'success');
-    
-    // Close modal
-    document.querySelector('.export-modal').remove();
-}
-
-// Keep existing modal functions but update for daily focus
-function showQuickTicketModal() {
-    const modal = document.createElement('div');
-    modal.className = 'quick-ticket-modal';
-    modal.innerHTML = `
-        <div class="quick-ticket-content">
-            <div class="modal-header">
-                <h3>Create Quick Ticket</h3>
-                <button class="close-btn" onclick="this.parentElement.parentElement.parentElement.parentElement.remove()">Cancel</button>
-            </div>
-            <form class="quick-ticket-form">
-                <div class="form-group">
-                    <label>Subject</label>
-                    <input type="text" id="ticketSubject" placeholder="Enter ticket subject" required>
-                </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="ticketDescription" placeholder="Describe the issue" rows="3" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Priority</label>
-                    <select id="ticketPriority">
-                        <option value="low">Low</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="high">High</option>
-                        <option value="critical">Critical</option>
-                    </select>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="this.parentElement.parentElement.parentElement.parentElement.remove()">Cancel</button>
-                    <button type="submit" class="btn-primary">Create Ticket</button>
-                </div>
-            </form>
-        </div>
-    `;
-    
-    // Add styles
-    const style = document.createElement('style');
-    style.textContent = `
-        .quick-ticket-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 999999;
-        }
-        .quick-ticket-content {
-            background: rgba(15, 15, 15, 0.95);
-            border-radius: 12px;
-            padding: 2rem;
-            width: 90%;
-            max-width: 500px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .modal-header h3 {
-            color: #ffffff;
-            margin: 0;
-        }
-        .close-btn {
-            background: none;
-            border: none;
-            color: #ffffff;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: background 0.2s;
-        }
-        .close-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        .form-group label {
-            display: block;
-            color: #ffffff;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-            font-size: 0.9rem;
-        }
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #00d4ff;
-            box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
-        }
-        .form-actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-            margin-top: 1.5rem;
-        }
-        .btn-primary,
-        .btn-secondary {
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #00d4ff, #0099cc);
-            color: white;
-        }
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
-        }
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-        }
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-    `;
-    
-    document.head.appendChild(style);
-    document.body.appendChild(modal);
-    
-    // Handle form submission
-    const form = modal.querySelector('.quick-ticket-form');
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const subject = document.getElementById('ticketSubject').value;
-        const description = document.getElementById('ticketDescription').value;
-        const priority = document.getElementById('ticketPriority').value;
-        
-        // Here you would typically send the data to your backend
-        console.log('Creating ticket:', { subject, description, priority });
-        
-        // Show success message
-        showNotification('Ticket created successfully!', 'success');
-        
-        // Close modal
-        modal.remove();
-    });
-    
-    // Close modal when clicking outside
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            modal.remove();
-        }
-    });
-}
-
-function showUserDetailsModal(userName) {
-    const role = getUserRole(userName);
-    const avatarColor = getAvatarColor(userName);
-    const userData = realUsers.find(u => u.username === userName);
-    const profilePic = userData && userData.profile_picture ? 
-        `/static/uploads/profile_pictures/${userData.profile_picture}` : null;
-    
-    const modal = document.createElement('div');
-    modal.className = 'user-details-modal';
-    modal.innerHTML = `
-        <div class="user-details-content">
-            <div class="modal-header">
-                <h3>User Details</h3>
-                <button class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</button>
-            </div>
-            <div class="user-profile">
-                <div class="user-avatar" style="background: ${avatarColor};">
-                    ${profilePic ? 
-                        `<img src="${profilePic}" alt="${userName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                         <span style="display: none;">${userName.charAt(0)}</span>` :
-                        userName.charAt(0)
-                    }
-                </div>
-                <div class="user-info">
-                    <h4>${userName}</h4>
-                    <p>${role}</p>
-                    ${userData && userData.email ? `<p class="user-email">${userData.email}</p>` : ''}
-                </div>
-            </div>
-            <div class="user-stats">
-                <div class="stat-item">
-                    <span class="stat-label">Tickets Today</span>
-                    <span class="stat-value">${Math.floor(Math.random() * 20) + 5}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">This Week</span>
-                    <span class="stat-value">${Math.floor(Math.random() * 80) + 20}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">This Month</span>
-                    <span class="stat-value">${Math.floor(Math.random() * 200) + 80}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">All Time</span>
-                    <span class="stat-value">${Math.floor(Math.random() * 300) + 100}</span>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Add styles
-    const style = document.createElement('style');
-    style.textContent = `
-        .user-details-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 999999;
-        }
-        .user-details-content {
-            background: rgba(15, 15, 15, 0.95);
-            border-radius: 12px;
-            padding: 2rem;
-            width: 90%;
-            max-width: 400px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .user-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 1.5rem;
-            overflow: hidden;
-        }
-        .user-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .user-info h4 {
-            color: #ffffff;
-            margin: 0 0 0.5rem 0;
-        }
-        .user-info p {
-            color: #888888;
-            margin: 0;
-        }
-        .user-email {
-            color: #00d4ff !important;
-            font-size: 0.9rem;
-        }
-        .user-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-        .stat-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .stat-label {
-            display: block;
-            color: #888888;
-            font-size: 0.8rem;
-            margin-bottom: 0.5rem;
-        }
-        .stat-value {
-            display: block;
-            color: #00d4ff;
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-    `;
-    
-    document.head.appendChild(style);
-    document.body.appendChild(modal);
-}
-
-function showNotification(message, type = 'success') {
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
-        color: white;
-        font-weight: 600;
-        z-index: 999999999;
-        transform: translateX(100%);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        backdrop-filter: blur(20px);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        max-width: 300px;
-    `;
-    
-    if (type === 'success') {
-        notification.style.background = 'linear-gradient(135deg, #34c759, #30d158)';
-    } else if (type === 'error') {
-        notification.style.background = 'linear-gradient(135deg, #ff3b30, #ff2d55)';
-    } else {
-        notification.style.background = 'linear-gradient(135deg, #007aff, #5856d6)';
+// Manual sync function for admin use
+function manualSync() {
+    if (!confirm('This will manually sync ticket data from Freshworks. Continue?')) {
+        return;
     }
     
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    // Animate in
-    setTimeout(() => {
-        notification.style.transform = 'translateX(0)';
-    }, 10);
-    
-    // Remove after 3 seconds
-    setTimeout(() => {
-        notification.style.transform = 'translateX(100%)';
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
-    }, 3000);
+    fetch('/api/tickets/sync', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            date: new Date().toISOString().split('T')[0],
+            force: false
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(`✅ ${data.message}`, 'success');
+            // Refresh data after sync
+            setTimeout(() => {
+                updateDailyClosuresData();
+                updateDailyClosuresStats();
+            }, 2000);
+        } else {
+            showToast(`❌ ${data.error}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error during manual sync:', error);
+        showToast('❌ Sync failed. Check console for details.', 'error');
+    });
 }
 
-// Time period button functionality for daily closures
-document.addEventListener('DOMContentLoaded', function() {
-    const timeButtons = document.querySelectorAll('.user-tickets-card .time-btn');
+// Force sync function for admin use (bypasses rate limiting)
+function forceSync() {
+    if (!confirm('This will force sync ticket data, bypassing rate limits. Continue?')) {
+        return;
+    }
     
-    timeButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Remove active class from all buttons
-            timeButtons.forEach(btn => btn.classList.remove('active'));
-            
-            // Add active class to clicked button
-            this.classList.add('active');
-            
-            // Get the period and filter data
-            const period = this.getAttribute('data-period');
-            filterDailyClosures(period);
+    fetch('/api/tickets/force-sync', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            date: new Date().toISOString().split('T')[0]
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(`✅ ${data.message}`, 'success');
+            // Refresh data after sync
+            setTimeout(() => {
+                updateDailyClosuresData();
+                updateDailyClosuresStats();
+            }, 2000);
+        } else {
+            showToast(`❌ ${data.error}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error during force sync:', error);
+        showToast('❌ Force sync failed. Check console for details.', 'error');
+    });
+}
+
+// Admin modal functions
+function openAdminSyncModal() {
+    const modal = document.getElementById('adminSyncModal');
+    if (modal) {
+        modal.classList.add('show');
+        loadAdminStats();
+    }
+}
+
+function closeAdminSyncModal() {
+    const modal = document.getElementById('adminSyncModal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
+}
+
+function loadAdminStats() {
+    const loadingElement = document.getElementById('adminStatsLoading');
+    const contentElement = document.getElementById('adminStatsContent');
+    
+    if (loadingElement) loadingElement.style.display = 'flex';
+    if (contentElement) contentElement.style.display = 'none';
+    
+    fetch('/api/tickets/admin-stats')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateAdminStatsDisplay(data);
+                if (loadingElement) loadingElement.style.display = 'none';
+                if (contentElement) contentElement.style.display = 'block';
+            } else {
+                throw new Error(data.error || 'Failed to load admin stats');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading admin stats:', error);
+            if (loadingElement) {
+                loadingElement.innerHTML = `
+                    <div class="error-state">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <h4>Error Loading Stats</h4>
+                        <p>${error.message}</p>
+                        <button class="btn btn-primary" onclick="closeAdminSyncModal()">Close</button>
+                    </div>
+                `;
+            }
         });
-    });
-});
+}
 
-// Modal functions for daily performance
+function updateAdminStatsDisplay(data) {
+    // Update database information
+    if (data.last_sync_time) {
+        document.getElementById('lastSyncTime').textContent = new Date(data.last_sync_time).toLocaleString();
+    }
+    if (data.total_closure_records !== undefined) {
+        document.getElementById('totalClosureRecords').textContent = data.total_closure_records;
+    }
+    if (data.mapped_users_count !== undefined) {
+        document.getElementById('mappedUsersCount').textContent = data.mapped_users_count;
+    }
+    if (data.days_with_data !== undefined) {
+        document.getElementById('daysWithData').textContent = data.days_with_data;
+    }
+    
+    // Update sync status
+    if (data.next_sync_time) {
+        document.getElementById('nextSyncTime').textContent = new Date(data.next_sync_time).toLocaleString();
+    }
+    if (data.sync_count_today !== undefined) {
+        document.getElementById('syncCountToday').textContent = data.sync_count_today;
+    }
+    if (data.tickets_processed_today !== undefined) {
+        document.getElementById('ticketsProcessedToday').textContent = data.tickets_processed_today;
+    }
+    if (data.total_syncs !== undefined) {
+        document.getElementById('totalSyncs').textContent = data.total_syncs;
+    }
+    
+    // Update recent activity
+    if (data.recent_activity) {
+        const activityElement = document.getElementById('recentActivity');
+        if (activityElement) {
+            let activityHtml = '';
+            data.recent_activity.forEach(activity => {
+                activityHtml += `
+                    <div class="activity-item">
+                        <div class="activity-text">${activity.description}</div>
+                        <div class="activity-time">${new Date(activity.timestamp).toLocaleString()}</div>
+                    </div>
+                `;
+            });
+            activityElement.innerHTML = activityHtml;
+        }
+    }
+}
+
+function refreshUserMappings() {
+    if (!confirm('This will refresh user mappings from the IDs.txt file. Continue?')) {
+        return;
+    }
+    
+    fetch('/api/tickets/sync-from-ids', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(`✅ ${data.message}`, 'success');
+            // Refresh admin stats
+            setTimeout(() => {
+                loadAdminStats();
+            }, 1000);
+        } else {
+            showToast(`❌ ${data.error}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error refreshing user mappings:', error);
+        showToast('❌ Failed to refresh user mappings', 'error');
+    });
+}
+
+function exportAdminData() {
+    showToast('Export feature coming soon!', 'info');
+}
+
+// Modal functions
 function openDailyPerformanceModal() {
     const modal = document.getElementById('dailyPerformanceModal');
     if (modal) {
         modal.classList.add('show');
-        // Refresh the data in the modal
-        updateTopPerformers(generateDailyClosuresData());
+        // Refresh data when modal opens and ensure top performers are updated
+        updateDailyClosuresData();
+        
+        // Also update the modal content directly with current data
+        setTimeout(() => {
+            // First try to get data from the chart
+            let currentData = {
+                labels: userTicketsChart ? userTicketsChart.data.labels : [],
+                data: userTicketsChart ? userTicketsChart.data.datasets[0].data : [],
+                users: []
+            };
+            
+            // If chart has no data, fetch fresh data
+            if (currentData.labels.length === 0 || currentData.data.length === 0) {
+                console.log('📊 Chart has no data, fetching fresh data for modal...');
+                fetch('/api/tickets/closures/today')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            updateTopPerformers(data);
+                        } else {
+                            console.error('❌ Failed to fetch data for modal:', data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Error fetching data for modal:', error);
+                    });
+            } else {
+                // Convert chart data to users format for the modal
+                currentData.users = currentData.labels.map((label, index) => ({
+                    username: label,
+                    tickets_closed: currentData.data[index] || 0,
+                    role: 'User'
+                }));
+                
+                updateTopPerformers(currentData);
+            }
+        }, 500);
     }
 }
 
@@ -948,20 +986,376 @@ function closeDailyPerformanceModal() {
     }
 }
 
-// Close modal when clicking outside
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('performance-modal')) {
-        e.target.classList.remove('show');
+// Placeholder functions for ticket actions
+function createQuickTicket() {
+    showToast('Quick ticket creation feature coming soon!', 'info');
+}
+
+function viewDailyReport() {
+    showToast('Daily report feature coming soon!', 'info');
+}
+
+function exportClosureData() {
+    showToast('Export feature coming soon!', 'info');
+}
+
+function openDailyAnalytics() {
+    showToast('Daily analytics feature coming soon!', 'info');
+}
+
+// Helper function to show toast messages
+function showToast(message, type = 'info') {
+    // Check if toast function exists
+    if (typeof window.showToast === 'function') {
+        window.showToast(message, type);
+    } else {
+        // Fallback to console
+        console.log(`[${type.toUpperCase()}] ${message}`);
     }
+}
+
+// Debug function to test API endpoint
+function testTicketClosuresAPI() {
+    console.log('🧪 Testing ticket closures API...');
+    fetch('/api/tickets/closures/today')
+        .then(response => {
+            console.log('📡 API Response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('📊 API Response data:', data);
+            if (data.success) {
+                console.log('✅ API returned success');
+                console.log('📈 Labels:', data.labels);
+                console.log('📊 Data:', data.data);
+                console.log('👥 Users:', data.users);
+                console.log('📋 Total closed:', data.total_closed);
+                
+                // If we have data, test updating the chart
+                if (data.labels && data.data && data.labels.length > 0) {
+                    console.log('🧪 Testing chart update with real data...');
+                    if (userTicketsChart) {
+                        userTicketsChart.data.labels = data.labels;
+                        userTicketsChart.data.datasets[0].data = data.data;
+                        userTicketsChart.update('active');
+                        console.log('✅ Chart updated with test data');
+                    } else {
+                        console.error('❌ Chart not initialized yet');
+                    }
+                }
+            } else {
+                console.error('❌ API returned error:', data.error);
+                // Test with dummy data if API fails
+                testChartWithDummyData();
+            }
+        })
+        .catch(error => {
+            console.error('❌ API request failed:', error);
+            // Test with dummy data if API fails
+            testChartWithDummyData();
+        });
+}
+
+// Test chart with dummy data
+function testChartWithDummyData() {
+    console.log('🧪 Testing chart with dummy data...');
+    if (userTicketsChart) {
+        const dummyLabels = ['User 1', 'User 2', 'User 3', 'User 4', 'User 5'];
+        const dummyData = [5, 3, 7, 2, 4];
+        
+        userTicketsChart.data.labels = dummyLabels;
+        userTicketsChart.data.datasets[0].data = dummyData;
+        userTicketsChart.update('active');
+        console.log('✅ Chart updated with dummy data');
+    } else {
+        console.error('❌ Chart not initialized yet');
+    }
+}
+
+// Cache management functions
+function clearTicketCache() {
+    localStorage.removeItem('yam_ticket_closures_cache');
+    ticketDataCache.data = null;
+    ticketDataCache.lastUpdate = 0;
+    console.log('🗑️ Ticket cache cleared');
+}
+
+function refreshTicketData() {
+    console.log('🔄 Manually refreshing ticket data...');
+    clearTicketCache();
+    showChartLoading();
+    updateDailyClosuresData();
+}
+
+// Call test function on page load for debugging
+document.addEventListener('DOMContentLoaded', function() {
+    // Test API after a short delay
+    setTimeout(testTicketClosuresAPI, 2000);
+    
+    // Force chart refresh after page is fully loaded
+    setTimeout(() => {
+        if (userTicketsChart) {
+            console.log('🔄 Forcing chart refresh...');
+            userTicketsChart.resize();
+            userTicketsChart.update('active');
+        }
+    }, 3000);
 });
 
-// Close modal with Escape key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        const modal = document.querySelector('.performance-modal.show');
-        if (modal) {
-            modal.classList.remove('show');
-        }
+// User Ticket Details Modal Functions
+function showUserTicketDetails(username, ticketCount) {
+    console.log(`🔍 Loading ticket details for ${username} (${ticketCount} tickets)`);
+    
+    // Show loading state
+    const modal = document.getElementById('userTicketDetailsModal');
+    if (modal) {
+        modal.classList.add('show');
+        document.getElementById('userTicketDetailsContent').innerHTML = `
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Loading ticket details for ${username}...</p>
+            </div>
+        `;
     }
-});
+    
+    // Get current period for the API call
+    const period = getCurrentPeriod() || 'today';
+    const targetDate = new Date().toISOString().split('T')[0]; // Today's date
+    
+    // Fetch ticket details from API
+    fetch(`/api/tickets/user-details/${encodeURIComponent(username)}?date=${targetDate}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                displayUserTicketDetails(data, username, ticketCount);
+            } else {
+                throw new Error(data.error || 'Failed to load ticket details');
+            }
+        })
+        .catch(error => {
+            console.error('❌ Error loading ticket details:', error);
+            document.getElementById('userTicketDetailsContent').innerHTML = `
+                <div class="error-state">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <h4>Error Loading Details</h4>
+                    <p>${error.message}</p>
+                    <button class="btn btn-primary" onclick="closeUserTicketDetailsModal()">Close</button>
+                </div>
+            `;
+        });
+}
+
+function displayUserTicketDetails(data, username, ticketCount) {
+    const { user, tickets, total_tickets, summary, date } = data;
+    
+    let ticketsHtml = '';
+    
+    if (tickets.length === 0) {
+        ticketsHtml = `
+            <div class="no-tickets">
+                <i class="bi bi-inbox"></i>
+                <h4>No Tickets Found</h4>
+                <p>No tickets were found for ${username} on ${new Date(date).toLocaleDateString()}</p>
+            </div>
+        `;
+    } else {
+        tickets.forEach(ticket => {
+            const statusClass = getStatusClass(ticket.status);
+            const priorityClass = getPriorityClass(ticket.priority);
+            const urgencyClass = getUrgencyClass(ticket.urgency);
+            
+            ticketsHtml += `
+                <div class="ticket-item">
+                    <div class="ticket-header">
+                        <div class="ticket-number">${ticket.ticket_number}</div>
+                        <div class="ticket-badges">
+                            <span class="badge ${statusClass}">${getStatusText(ticket.status)}</span>
+                            <span class="badge ${priorityClass}">${getPriorityText(ticket.priority)}</span>
+                            <span class="badge ${urgencyClass}">${getUrgencyText(ticket.urgency)}</span>
+                        </div>
+                    </div>
+                    <div class="ticket-subject">${ticket.subject}</div>
+                    <div class="ticket-meta">
+                        <span class="meta-item">
+                            <i class="bi bi-calendar"></i>
+                            Created: ${formatDate(ticket.created_at)}
+                        </span>
+                        <span class="meta-item">
+                            <i class="bi bi-clock"></i>
+                            Updated: ${formatDate(ticket.updated_at)}
+                        </span>
+                        ${ticket.resolved_at ? `
+                            <span class="meta-item">
+                                <i class="bi bi-check-circle"></i>
+                                Resolved: ${formatDate(ticket.resolved_at)}
+                            </span>
+                        ` : ''}
+                    </div>
+                    ${ticket.description ? `
+                        <div class="ticket-description">
+                            ${ticket.description.length > 200 ? 
+                                ticket.description.substring(0, 200) + '...' : 
+                                ticket.description}
+                        </div>
+                    ` : ''}
+                    ${ticket.tags && ticket.tags.length > 0 ? `
+                        <div class="ticket-tags">
+                            ${ticket.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        });
+    }
+    
+    const summaryHtml = `
+        <div class="user-summary">
+            <div class="user-info">
+                <div class="user-avatar">
+                    ${getUserProfileImage(user, username)}
+                </div>
+                <div class="user-details">
+                    <h3>${username}</h3>
+                    <p class="user-role">${user.role || 'User'}</p>
+                    <p class="user-date">${new Date(date).toLocaleDateString()}</p>
+                </div>
+            </div>
+            <div class="summary-stats">
+                <div class="stat-item">
+                    <div class="stat-number">${total_tickets}</div>
+                    <div class="stat-label">Total Tickets</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${summary.total_closed}</div>
+                    <div class="stat-label">Closed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${summary.total_open}</div>
+                    <div class="stat-label">Open</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${summary.high_priority}</div>
+                    <div class="stat-label">High Priority</div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('userTicketDetailsContent').innerHTML = summaryHtml + ticketsHtml;
+}
+
+function closeUserTicketDetailsModal() {
+    const modal = document.getElementById('userTicketDetailsModal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
+}
+
+// Helper functions for ticket display
+function getStatusClass(status) {
+    const statusMap = {
+        1: 'status-open',
+        2: 'status-pending',
+        3: 'status-resolved',
+        4: 'status-closed',
+        5: 'status-cancelled'
+    };
+    return statusMap[status] || 'status-unknown';
+}
+
+function getStatusText(status) {
+    const statusMap = {
+        1: 'Open',
+        2: 'Pending',
+        3: 'Resolved',
+        4: 'Closed',
+        5: 'Cancelled'
+    };
+    return statusMap[status] || 'Unknown';
+}
+
+function getPriorityClass(priority) {
+    const priorityMap = {
+        1: 'priority-low',
+        2: 'priority-medium',
+        3: 'priority-high',
+        4: 'priority-urgent'
+    };
+    return priorityMap[priority] || 'priority-unknown';
+}
+
+function getPriorityText(priority) {
+    const priorityMap = {
+        1: 'Low',
+        2: 'Medium',
+        3: 'High',
+        4: 'Urgent'
+    };
+    return priorityMap[priority] || 'Unknown';
+}
+
+function getUrgencyClass(urgency) {
+    const urgencyMap = {
+        1: 'urgency-low',
+        2: 'urgency-medium',
+        3: 'urgency-high',
+        4: 'urgency-urgent'
+    };
+    return urgencyMap[urgency] || 'urgency-unknown';
+}
+
+function getUrgencyText(urgency) {
+    const urgencyMap = {
+        1: 'Low',
+        2: 'Medium',
+        3: 'High',
+        4: 'Urgent'
+    };
+    return urgencyMap[urgency] || 'Unknown';
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    } catch (e) {
+        return 'Invalid Date';
+    }
+}
+
+// Helper function to get user profile image with proper fallback
+function getUserProfileImage(user, username) {
+    const userInitial = username.charAt(0).toUpperCase();
+    
+    // Check if user has a custom profile picture
+    if (user.profile_picture && 
+        user.profile_picture !== 'default.png' && 
+        user.profile_picture !== 'none' && 
+        user.profile_picture.trim() !== '') {
+        
+        // If it's a full URL, use it directly
+        if (user.profile_picture.startsWith('http://') || user.profile_picture.startsWith('https://')) {
+            return `<img src="${user.profile_picture}" alt="${username}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex';" />
+                    <span style="display: none;">${userInitial}</span>`;
+        }
+        
+        // If it's a relative path, construct the full path
+        const imagePath = user.profile_picture.startsWith('/') ? 
+            user.profile_picture : 
+            `/static/uploads/profile_pictures/${user.profile_picture}`;
+        
+        return `<img src="${imagePath}" alt="${username}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex';" />
+                <span style="display: none;">${userInitial}</span>`;
+    }
+    
+    // Fallback to default profile image
+    return `<img src="/static/images/avatars/default.png" alt="${username}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex';" />
+            <span style="display: none;">${userInitial}</span>`;
+}
 </script> 

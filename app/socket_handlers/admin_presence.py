@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 from flask_login import current_user
 from flask_socketio import emit
 
-from extensions import db, socketio
+from app.extensions import db, socketio
 from app.models import User, Outage
 from app.services.user_presence import UserPresenceService
 

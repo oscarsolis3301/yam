@@ -84,7 +84,7 @@ from base64 import b64encode
 import string
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from extensions import db, login_manager, socketio, migrate, init_extensions
+from app.extensions import db, login_manager, socketio, migrate, init_extensions
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import OperationalError
 from flask_login import UserMixin
@@ -225,7 +225,7 @@ app = Flask(__name__, template_folder='templates')
 app.config.from_object(Config)
 
 # Initialize extensions only once
-from extensions import db, login_manager, socketio, migrate
+from app.extensions import db, login_manager, socketio, migrate
 db.init_app(app)
 login_manager.init_app(app)
 

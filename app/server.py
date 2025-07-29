@@ -29,6 +29,7 @@ if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
 from flask import Flask, jsonify, request, render_template, send_from_directory, redirect, url_for, session
+from flask_login import current_user
 from flask_cors import CORS
 from datetime import datetime, timedelta
 import time
@@ -51,7 +52,11 @@ yam_app = Flask(__name__,
 yam_app.config['SECRET_KEY'] = 'server-key-2025'
 yam_app.config['JSON_AS_ASCII'] = False
 yam_app.config['SESSION_TYPE'] = 'filesystem'
-yam_app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=2)  # 2 hours for better stability
+
+# Dynamic session lifetime based on multiple sessions setting
+session_lifetime_hours = 4 if os.getenv('YAM_ALLOW_MULTIPLE_SESSIONS') == '1' else 2
+yam_app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=session_lifetime_hours)
+
 yam_app.config['SESSION_FILE_THRESHOLD'] = 1000
 yam_app.config['SESSION_REFRESH_EACH_REQUEST'] = True
 yam_app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -79,14 +84,17 @@ yam_app.config['SESSION_FILE_DIR'] = str(session_dir)
 CORS(yam_app)
 
 # Import config and extensions
-from extensions import Config, db, login_manager, socketio, migrate
+from app.extensions import Config, db, login_manager, socketio, migrate, init_extensions
 from app.models import User
 
 yam_app.config.from_object(Config)
 
 # Ensure session lifetime is set correctly
-if yam_app.config.get('PERMANENT_SESSION_LIFETIME') != timedelta(hours=2):
-    yam_app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=2)
+if yam_app.config.get('PERMANENT_SESSION_LIFETIME') != timedelta(hours=session_lifetime_hours):
+    yam_app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=session_lifetime_hours)
+
+# Initialize extensions properly using the init_extensions function
+init_extensions(yam_app)
 
 # Add debug route for session testing
 @yam_app.route('/debug/session')
@@ -100,7 +108,9 @@ def debug_session():
         'session_modified': session.modified,
         'session_lifetime': str(yam_app.config.get('PERMANENT_SESSION_LIFETIME')),
         'session_dir': yam_app.config.get('SESSION_FILE_DIR'),
-        'server_startup_time': yam_app.config.get('SERVER_STARTUP_TIME').isoformat() if yam_app.config.get('SERVER_STARTUP_TIME') else None
+        'server_startup_time': yam_app.config.get('SERVER_STARTUP_TIME').isoformat() if yam_app.config.get('SERVER_STARTUP_TIME') else None,
+        'force_reset_marker_exists': Path('force_session_reset.txt').exists(),
+        'session_health': check_session_health()
     })
 
 # Add test login route
@@ -135,55 +145,78 @@ def test_login():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Initialize extensions
-db.init_app(yam_app)
-login_manager.init_app(yam_app)
-socketio.init_app(yam_app)
-migrate.init_app(yam_app, db)
-
 def clear_all_sessions():
     """Clear all user sessions on server restart/shutdown."""
     try:
         with yam_app.app_context():
-            # Clear all session files
-            session_dir = Path(yam_app.config['SESSION_FILE_DIR'])
-            if session_dir.exists():
-                for session_file in session_dir.glob('*'):
-                    try:
-                        session_file.unlink()
-                        logger.info(f"Cleared session file: {session_file}")
-                    except Exception as e:
-                        logger.warning(f"Could not delete session file {session_file}: {e}")
+            logger.info("=" * 60)
+            logger.info("[SHUTDOWN] CLEARING ALL USER SESSIONS")
+            logger.info("=" * 60)
             
-            # Mark all users as offline in presence service
+            cleared_count = 0
+            
+            # Phase 1: Clear all session files
+            logger.info("[STEP] Phase 1: Clearing session files...")
+            session_dirs = [
+                Path(yam_app.config.get('SESSION_FILE_DIR', 'sessions')),
+                Path('sessions'),
+                Path('app/sessions'),
+                Path('YAM/sessions'),
+                Path('yam_workspace/sessions')
+            ]
+            
+            for session_dir in session_dirs:
+                if session_dir.exists():
+                    for session_file in session_dir.glob('*'):
+                        try:
+                            session_file.unlink()
+                            cleared_count += 1
+                            logger.info(f"  [OK] Cleared session file: {session_file}")
+                        except Exception as e:
+                            logger.warning(f"  [WARN] Could not delete session file {session_file}: {e}")
+            
+            # Phase 2: Mark all users as offline in presence service
+            logger.info("[STEP] Phase 2: Clearing user presence...")
             try:
                 from app.services.user_presence import presence_service
                 presence_service.clear_all_users()
-                logger.info("All users marked as offline via presence service")
+                logger.info("  [OK] All users marked as offline via presence service")
             except Exception as e:
-                logger.warning(f"Could not clear user presence: {e}")
+                logger.warning(f"  [WARN] Could not clear user presence: {e}")
             
-            # Directly mark all users as offline in database
+            # Phase 3: Directly mark all users as offline in database
+            logger.info("[STEP] Phase 3: Updating database user status...")
             try:
                 from app.models import User
-                from extensions import db
+                from app.extensions import db
                 
                 # Update all users to offline status
                 User.query.update({User.is_online: False})
                 db.session.commit()
-                logger.info("All users marked as offline in database")
+                logger.info("  [OK] All users marked as offline in database")
             except Exception as e:
-                logger.warning(f"Could not update database user status: {e}")
+                logger.warning(f"  [WARN] Could not update database user status: {e}")
             
-            # Clear any cached sessions
+            # Phase 4: Clear any cached sessions
+            logger.info("[STEP] Phase 4: Clearing session interface...")
             if hasattr(yam_app, 'session_interface'):
                 try:
                     yam_app.session_interface.clear()
-                    logger.info("Session interface cleared")
+                    logger.info("  [OK] Session interface cleared")
                 except Exception as e:
-                    logger.warning(f"Could not clear session interface: {e}")
+                    logger.warning(f"  [WARN] Could not clear session interface: {e}")
             
-            # Clear any session cookies by setting them to expire
+            # Phase 5: Clear Flask session data
+            logger.info("[STEP] Phase 5: Clearing Flask session data...")
+            try:
+                from flask import session
+                session.clear()
+                logger.info("  [OK] Flask session data cleared")
+            except Exception as e:
+                logger.warning(f"  [WARN] Flask session clear: {e}")
+            
+            # Phase 6: Clear any session cookies by setting them to expire
+            logger.info("[STEP] Phase 6: Clearing session cookies...")
             try:
                 from flask import make_response
                 response = make_response()
@@ -191,12 +224,40 @@ def clear_all_sessions():
                 response.delete_cookie('yam_session')
                 response.delete_cookie('csrf_token')
                 response.delete_cookie('remember_token')
-                logger.info("Session cookies cleared")
+                logger.info("  [OK] Session cookies cleared")
             except Exception as e:
-                logger.warning(f"Could not clear session cookies: {e}")
-                    
+                logger.warning(f"  [WARN] Could not clear session cookies: {e}")
+            
+            # Phase 7: Broadcasting logout to all clients
+            logger.info("[STEP] Phase 7: Broadcasting logout to all clients...")
+            try:
+                from flask_socketio import emit
+                from app.extensions import socketio
+                
+                # Emit logout event to all connected clients
+                socketio.emit('server_shutdown', {
+                    'message': 'Server is shutting down. All users must re-authenticate.',
+                    'timestamp': datetime.utcnow().isoformat(),
+                    'require_relogin': True
+                }, broadcast=True)
+                
+                logger.info("  [OK] Logout broadcast sent to all clients")
+            except Exception as e:
+                logger.warning(f"  [WARN] SocketIO broadcast: {e}")
+            
+            # Summary
+            logger.info("=" * 60)
+            logger.info("[OK] ALL USER SESSIONS CLEARED SUCCESSFULLY")
+            logger.info(f"[COUNT] Total session files cleared: {cleared_count}")
+            logger.info("[INFO] All users will need to re-authenticate on next server start")
+            logger.info("=" * 60)
+            
+            return True
+            
     except Exception as e:
-        logger.error(f"Error clearing sessions: {e}")
+        logger.error(f"[ERROR] Critical error during session cleanup: {e}")
+        logger.error("[FATAL] Session cleanup failed - users may retain sessions")
+        return False
 
 # Add template context processor to make hasattr available in templates
 @yam_app.context_processor
@@ -858,8 +919,27 @@ def service_worker():
 def before_request_handler():
     """Handle session management before each request."""
     try:
-        # Skip session checks for login-related routes to prevent redirect loops
-        if request.endpoint in ['auth.login', 'static'] or request.path.startswith('/static/'):
+        # Skip session checks for login-related routes and API endpoints to prevent redirect loops
+        if (request.endpoint in ['auth.login', 'static'] or 
+            request.path.startswith('/static/') or
+            request.path.startswith('/api/session/') or
+            request.path.startswith('/api/auth/') or
+            request.path.startswith('/force-logout')):
+            return
+        
+        # Check for force session reset marker (created by server.bat)
+        force_reset_file = Path('force_session_reset.txt')
+        if force_reset_file.exists():
+            logger.info("Force session reset marker detected - clearing all sessions")
+            session.clear()
+            # Remove the marker after using it
+            try:
+                force_reset_file.unlink()
+            except Exception as e:
+                logger.warning(f"Could not remove force reset marker: {e}")
+            # Only redirect for non-API requests to prevent loops
+            if not request.path.startswith('/api/'):
+                return redirect(url_for('auth.login'))
             return
         
         # Check if server has restarted (session created before server startup)
@@ -874,11 +954,16 @@ def before_request_handler():
                     if session_startup_dt < current_startup_time:
                         logger.info(f"Invalidating session for user {session.get('user_id')} - server restarted")
                         session.clear()
-                        return redirect(url_for('auth.login'))
+                        # Only redirect for non-API requests to prevent loops
+                        if not request.path.startswith('/api/'):
+                            return redirect(url_for('auth.login'))
+                        return
                 except (ValueError, TypeError):
                     # Invalid timestamp, clear session
                     session.clear()
-                    return redirect(url_for('auth.login'))
+                    if not request.path.startswith('/api/'):
+                        return redirect(url_for('auth.login'))
+                    return
             
             # Update session with current server startup time
             session['server_startup_time'] = current_startup_time.isoformat()
@@ -894,7 +979,9 @@ def before_request_handler():
                 # Session is stale, clear it
                 session.clear()
                 logger.info(f"Cleared stale session for user {session.get('user_id')}")
-                return redirect(url_for('auth.login'))
+                if not request.path.startswith('/api/'):
+                    return redirect(url_for('auth.login'))
+                return
             
             # Update session activity
             session['last_activity'] = datetime.utcnow().isoformat()
@@ -966,21 +1053,53 @@ def is_web_browser_request():
 
 @yam_app.route('/api/server-info')
 def server_info():
-    """Server information endpoint."""
+    """Server information endpoint with enhanced session management info."""
     client_type = detect_client_type()
+    
+    # Check for multiple sessions markers
+    from pathlib import Path
+    multiple_sessions_enabled = (
+        os.getenv('YAM_ALLOW_MULTIPLE_SESSIONS') == '1' or
+        Path('multiple_sessions_allowed.txt').exists() or
+        Path('session_conflict_resolution.txt').exists()
+    )
+    
+    # Get session information
+    session_info = {}
+    if current_user.is_authenticated:
+        session_info = {
+            'user_id': current_user.id,
+            'username': current_user.username,
+            'session_active': True,
+            'time_remaining': get_session_time_remaining(),
+            'session_id': session.get('session_id', 'unknown'),
+            'multiple_sessions_enabled': session.get('multiple_sessions_enabled', False)
+        }
+    else:
+        session_info = {
+            'session_active': False,
+            'time_remaining': 0,
+            'session_id': None,
+            'multiple_sessions_enabled': False
+        }
     
     response_data = {
         'success': True,
         'server': {
             'name': 'YAM Server',
-            'version': '1.0.0',
+            'version': '2.0.0',
             'type': 'yam',
-            'startup_time': datetime.now().isoformat(),
+            'startup_time': SERVER_STARTUP_TIME.isoformat(),
             'status': 'running',
             'client_type': client_type,
             'dual_mode': True,
-            'session_lifetime_minutes': 30
+            'session_lifetime_hours': session_lifetime_hours,
+            'session_lifetime_minutes': session_lifetime_hours * 60,
+            'multiple_sessions': multiple_sessions_enabled,
+            'session_conflict_resolution': os.getenv('YAM_SESSION_CONFLICT_RESOLUTION') == '1',
+            'enhanced_session_management': True
         },
+        'session': session_info,
         'timestamp': datetime.now().isoformat()
     }
     
@@ -992,7 +1111,8 @@ def server_info():
             'socket_io_support',
             'windows_auth',
             'auto_login',
-            'session_hydration'
+            'session_hydration',
+            'enhanced_session_management'
         ]
     else:
         response_data['server']['mode'] = 'web_mode'
@@ -1000,8 +1120,13 @@ def server_info():
             'web_interface',
             'responsive_design',
             'browser_compatibility',
-            'session_management'
+            'session_management',
+            'multiple_sessions' if multiple_sessions_enabled else 'single_session',
+            'session_conflict_resolution' if multiple_sessions_enabled else None,
+            'enhanced_session_management'
         ]
+        # Remove None values from features list
+        response_data['server']['features'] = [f for f in response_data['server']['features'] if f is not None]
     
     return jsonify(response_data)
 
@@ -1089,6 +1214,11 @@ def force_logout():
         from flask_login import current_user, logout_user
         from flask import make_response, redirect, url_for
         
+        logger.info("[SECURITY] Force logout initiated")
+        
+        # Clear all sessions using the comprehensive function
+        clear_all_sessions()
+        
         # Clear all session data
         session.clear()
         
@@ -1096,11 +1226,20 @@ def force_logout():
         if current_user.is_authenticated:
             logout_user()
         
+        # Create force session reset marker
+        try:
+            force_reset_file = Path('force_session_reset.txt')
+            force_reset_file.write_text(f"{datetime.utcnow().isoformat()}\nForce logout initiated")
+            logger.info("Created force session reset marker")
+        except Exception as e:
+            logger.warning(f"Could not create force reset marker: {e}")
+        
         # Clear all cookies
         response = make_response(redirect(url_for('auth.login', shutdown='true')))
         response.delete_cookie('session')
         response.delete_cookie('yam_session')
         response.delete_cookie('csrf_token')
+        response.delete_cookie('remember_token')
         
         logger.info("[SECURITY] Force logout executed - all users logged out")
         return response
@@ -1108,6 +1247,44 @@ def force_logout():
     except Exception as e:
         logger.error(f"Error in force logout: {e}")
         return redirect(url_for('auth.login', shutdown='true'))
+
+@yam_app.route('/admin/clear-sessions', methods=['GET', 'POST'])
+def admin_clear_sessions():
+    """Admin endpoint to clear all user sessions."""
+    try:
+        from flask_login import current_user
+        
+        # Check if user is admin
+        if not current_user.is_authenticated or not current_user.is_admin:
+            return jsonify({'error': 'Unauthorized'}), 403
+        
+        logger.info(f"[ADMIN] Session clear initiated by admin user: {current_user.username}")
+        
+        # Clear all sessions
+        success = clear_all_sessions()
+        
+        if success:
+            logger.info(f"[ADMIN] Session clear completed successfully by {current_user.username}")
+            return jsonify({
+                'success': True,
+                'message': 'All user sessions cleared successfully',
+                'timestamp': datetime.now().isoformat()
+            }), 200
+        else:
+            logger.error(f"[ADMIN] Session clear failed for admin {current_user.username}")
+            return jsonify({
+                'success': False,
+                'message': 'Failed to clear all sessions',
+                'timestamp': datetime.now().isoformat()
+            }), 500
+            
+    except Exception as e:
+        logger.error(f"Error in admin clear sessions: {e}")
+        return jsonify({
+            'success': False,
+            'message': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 500
 
 @yam_app.route('/login-ready')
 def login_ready_check():
@@ -1491,52 +1668,289 @@ def debug_pdfs():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Import and register blueprints
-from app.blueprints.admin import init_admin_blueprint
-from app.blueprints.offices import init_offices_blueprint
-from app.blueprints.devices import bp as devices_bp
-from app.blueprints.main import bp as main_bp
-from app.blueprints.unified import bp as unified_bp
-from app.blueprints.workstations import bp as workstations_bp
-from app.blueprints.admin_outages import bp as admin_outages_bp
-from app.blueprints.lab import bp as lab_bp
-from app.blueprints.team import bp as team_bp
-from app.blueprints.events import bp as events_bp
-from app.blueprints.oralyzer import bp as oralyzer_bp
-from app.blueprints.kb_api import bp as kb_api_bp
-from app.blueprints.api import bp as api_bp
-from app.blueprints.unified_search import bp as unified_search_bp
-from app.blueprints.universal_search import bp as universal_search_bp
-from app.blueprints.kb_files import bp as kb_files_bp
-from app.blueprints.kb_shared import bp as kb_shared_bp
-from app.blueprints.admin_api import bp as admin_api_bp
-from app.blueprints.jarvis import bp as jarvis_bp
-from app.blueprints.outages import bp as outages_bp
-from app.blueprints.patterson import bp as patterson_bp
-from app.blueprints.kb import bp as kb_bp
-from app.blueprints.system import bp as system_bp
-from app.blueprints.collab_notes import bp as collab_notes_bp
-from app.blueprints.dameware import bp as dameware_bp
-from app.blueprints.system_management import bp as system_management_bp
-from app.blueprints.cache_management import bp as cache_management_bp
-from app.blueprints.admin_management import bp as admin_management_bp
-from app.blueprints.profile_management import bp as profile_management_bp
-from app.blueprints.legacy_routes import bp as legacy_routes_bp
-from app.blueprints.file_serving import bp as file_serving_bp
-from app.blueprints.core import bp as core_bp
-from app.blueprints.socket_handlers import bp as socket_handlers_bp
-from app.blueprints.error_handlers import bp as error_handlers_bp
-from app.blueprints.utility_functions import bp as utility_functions_bp
-from app.blueprints.initialization import bp as initialization_bp
-from app.blueprints.settings_api import bp as settings_api_bp
-from app.blueprints.settings import bp as settings_bp
-from app.blueprints.users import bp as users_bp
-from app.blueprints.users.clock_id_routes import bp as clock_id_cache_bp
-from app.blueprints.service_desk import bp as service_desk_bp
-from app.blueprints.modal_api import bp as modal_api_bp
-from app.blueprints.api.private_messages import private_messages_bp
+# Import and register blueprints - moved after extensions initialization
+# This ensures Flask app context is properly set up before blueprint imports
+def import_blueprints():
+    """Import all blueprints with proper error handling"""
+    blueprints = {}
+    
+    try:
+        from app.blueprints.admin import init_admin_blueprint
+        blueprints['init_admin_blueprint'] = init_admin_blueprint
+    except Exception as e:
+        logger.warning(f"Failed to import admin blueprint: {e}")
+    
+    try:
+        from app.blueprints.offices import init_offices_blueprint
+        blueprints['init_offices_blueprint'] = init_offices_blueprint
+    except Exception as e:
+        logger.warning(f"Failed to import offices blueprint: {e}")
+    
+    try:
+        from app.blueprints.devices import bp as devices_bp
+        blueprints['devices_bp'] = devices_bp
+    except Exception as e:
+        logger.warning(f"Failed to import devices blueprint: {e}")
+    
+    try:
+        from app.blueprints.main import bp as main_bp
+        blueprints['main_bp'] = main_bp
+    except Exception as e:
+        logger.warning(f"Failed to import main blueprint: {e}")
+    
+    try:
+        from app.blueprints.unified import bp as unified_bp
+        blueprints['unified_bp'] = unified_bp
+    except Exception as e:
+        logger.warning(f"Failed to import unified blueprint: {e}")
+    
+    try:
+        from app.blueprints.workstations import bp as workstations_bp
+        blueprints['workstations_bp'] = workstations_bp
+    except Exception as e:
+        logger.warning(f"Failed to import workstations blueprint: {e}")
+    
+    try:
+        from app.blueprints.admin_outages import bp as admin_outages_bp
+        blueprints['admin_outages_bp'] = admin_outages_bp
+    except Exception as e:
+        logger.warning(f"Failed to import admin_outages blueprint: {e}")
+    
+    try:
+        from app.blueprints.lab import bp as lab_bp
+        blueprints['lab_bp'] = lab_bp
+    except Exception as e:
+        logger.warning(f"Failed to import lab blueprint: {e}")
+    
+    try:
+        from app.blueprints.team import bp as team_bp
+        blueprints['team_bp'] = team_bp
+    except Exception as e:
+        logger.warning(f"Failed to import team blueprint: {e}")
+    
+    try:
+        from app.blueprints.events import bp as events_bp
+        blueprints['events_bp'] = events_bp
+    except Exception as e:
+        logger.warning(f"Failed to import events blueprint: {e}")
+    
+    try:
+        from app.blueprints.oralyzer import bp as oralyzer_bp
+        blueprints['oralyzer_bp'] = oralyzer_bp
+    except Exception as e:
+        logger.warning(f"Failed to import oralyzer blueprint: {e}")
+    
+    try:
+        from app.blueprints.kb_api import bp as kb_api_bp
+        blueprints['kb_api_bp'] = kb_api_bp
+    except Exception as e:
+        logger.warning(f"Failed to import kb_api blueprint: {e}")
+    
+    try:
+        from app.blueprints.api import bp as api_bp
+        blueprints['api_bp'] = api_bp
+    except Exception as e:
+        logger.warning(f"Failed to import api blueprint: {e}")
+    
+    try:
+        from app.blueprints.unified_search import bp as unified_search_bp
+        blueprints['unified_search_bp'] = unified_search_bp
+    except Exception as e:
+        logger.warning(f"Failed to import unified_search blueprint: {e}")
+    
+    try:
+        from app.blueprints.universal_search import bp as universal_search_bp
+        blueprints['universal_search_bp'] = universal_search_bp
+    except Exception as e:
+        logger.warning(f"Failed to import universal_search blueprint: {e}")
+    
+    try:
+        from app.blueprints.kb_files import bp as kb_files_bp
+        blueprints['kb_files_bp'] = kb_files_bp
+    except Exception as e:
+        logger.warning(f"Failed to import kb_files blueprint: {e}")
+    
+    try:
+        from app.blueprints.kb_shared import bp as kb_shared_bp
+        blueprints['kb_shared_bp'] = kb_shared_bp
+    except Exception as e:
+        logger.warning(f"Failed to import kb_shared blueprint: {e}")
+    
+    try:
+        from app.blueprints.admin_api import bp as admin_api_bp
+        blueprints['admin_api_bp'] = admin_api_bp
+    except Exception as e:
+        logger.warning(f"Failed to import admin_api blueprint: {e}")
+    
+    try:
+        from app.blueprints.jarvis import bp as jarvis_bp
+        blueprints['jarvis_bp'] = jarvis_bp
+    except Exception as e:
+        logger.warning(f"Failed to import jarvis blueprint: {e}")
+    
+    try:
+        from app.blueprints.outages import bp as outages_bp
+        blueprints['outages_bp'] = outages_bp
+    except Exception as e:
+        logger.warning(f"Failed to import outages blueprint: {e}")
+    
+    try:
+        from app.blueprints.patterson import bp as patterson_bp
+        blueprints['patterson_bp'] = patterson_bp
+    except Exception as e:
+        logger.warning(f"Failed to import patterson blueprint: {e}")
+    
+    try:
+        from app.blueprints.kb import bp as kb_bp
+        blueprints['kb_bp'] = kb_bp
+    except Exception as e:
+        logger.warning(f"Failed to import kb blueprint: {e}")
+    
+    try:
+        from app.blueprints.system import bp as system_bp
+        blueprints['system_bp'] = system_bp
+    except Exception as e:
+        logger.warning(f"Failed to import system blueprint: {e}")
+    
+    try:
+        from app.blueprints.collab_notes import bp as collab_notes_bp
+        blueprints['collab_notes_bp'] = collab_notes_bp
+    except Exception as e:
+        logger.warning(f"Failed to import collab_notes blueprint: {e}")
+    
+    try:
+        from app.blueprints.dameware import bp as dameware_bp
+        blueprints['dameware_bp'] = dameware_bp
+    except Exception as e:
+        logger.warning(f"Failed to import dameware blueprint: {e}")
+    
+    try:
+        from app.blueprints.system_management import bp as system_management_bp
+        blueprints['system_management_bp'] = system_management_bp
+    except Exception as e:
+        logger.warning(f"Failed to import system_management blueprint: {e}")
+    
+    try:
+        from app.blueprints.cache_management import bp as cache_management_bp
+        blueprints['cache_management_bp'] = cache_management_bp
+    except Exception as e:
+        logger.warning(f"Failed to import cache_management blueprint: {e}")
+    
+    try:
+        from app.blueprints.admin_management import bp as admin_management_bp
+        blueprints['admin_management_bp'] = admin_management_bp
+    except Exception as e:
+        logger.warning(f"Failed to import admin_management blueprint: {e}")
+    
+    try:
+        from app.blueprints.profile_management import bp as profile_management_bp
+        blueprints['profile_management_bp'] = profile_management_bp
+    except Exception as e:
+        logger.warning(f"Failed to import profile_management blueprint: {e}")
+    
+    try:
+        from app.blueprints.legacy_routes import bp as legacy_routes_bp
+        blueprints['legacy_routes_bp'] = legacy_routes_bp
+    except Exception as e:
+        logger.warning(f"Failed to import legacy_routes blueprint: {e}")
+    
+    try:
+        from app.blueprints.file_serving import bp as file_serving_bp
+        blueprints['file_serving_bp'] = file_serving_bp
+    except Exception as e:
+        logger.warning(f"Failed to import file_serving blueprint: {e}")
+    
+    try:
+        from app.blueprints.core import bp as core_bp
+        blueprints['core_bp'] = core_bp
+    except Exception as e:
+        logger.warning(f"Failed to import core blueprint: {e}")
+    
+    try:
+        from app.blueprints.socket_handlers import bp as socket_handlers_bp
+        blueprints['socket_handlers_bp'] = socket_handlers_bp
+    except Exception as e:
+        logger.warning(f"Failed to import socket_handlers blueprint: {e}")
+    
+    try:
+        from app.blueprints.error_handlers import bp as error_handlers_bp
+        blueprints['error_handlers_bp'] = error_handlers_bp
+    except Exception as e:
+        logger.warning(f"Failed to import error_handlers blueprint: {e}")
+    
+    try:
+        from app.blueprints.utility_functions import bp as utility_functions_bp
+        blueprints['utility_functions_bp'] = utility_functions_bp
+    except Exception as e:
+        logger.warning(f"Failed to import utility_functions blueprint: {e}")
+    
+    try:
+        from app.blueprints.initialization import bp as initialization_bp
+        blueprints['initialization_bp'] = initialization_bp
+    except Exception as e:
+        logger.warning(f"Failed to import initialization blueprint: {e}")
+    
+    try:
+        from app.blueprints.settings_api import bp as settings_api_bp
+        blueprints['settings_api_bp'] = settings_api_bp
+    except Exception as e:
+        logger.warning(f"Failed to import settings_api blueprint: {e}")
+    
+    try:
+        from app.blueprints.settings import bp as settings_bp
+        blueprints['settings_bp'] = settings_bp
+    except Exception as e:
+        logger.warning(f"Failed to import settings blueprint: {e}")
+    
+    try:
+        from app.blueprints.users import bp as users_bp
+        blueprints['users_bp'] = users_bp
+    except Exception as e:
+        logger.warning(f"Failed to import users blueprint: {e}")
+    
+    try:
+        from app.blueprints.users.clock_id_routes import bp as clock_id_cache_bp
+        blueprints['clock_id_cache_bp'] = clock_id_cache_bp
+    except Exception as e:
+        logger.warning(f"Failed to import clock_id_cache blueprint: {e}")
+    
+    try:
+        from app.blueprints.service_desk import bp as service_desk_bp
+        blueprints['service_desk_bp'] = service_desk_bp
+    except Exception as e:
+        logger.warning(f"Failed to import service_desk blueprint: {e}")
+    
+    try:
+        from app.blueprints.tickets_api import tickets_api_bp
+        blueprints['tickets_api_bp'] = tickets_api_bp
+    except Exception as e:
+        logger.warning(f"Failed to import tickets_api blueprint: {e}")
+    
+    try:
+        from app.blueprints.tickets import bp as tickets_bp
+        blueprints['tickets_bp'] = tickets_bp
+    except Exception as e:
+        logger.warning(f"Failed to import tickets blueprint: {e}")
+    
+    try:
+        from app.blueprints.modal_api import bp as modal_api_bp
+        blueprints['modal_api_bp'] = modal_api_bp
+    except Exception as e:
+        logger.warning(f"Failed to import modal_api blueprint: {e}")
+    
+    try:
+        from app.blueprints.api.private_messages import private_messages_bp
+        blueprints['private_messages_bp'] = private_messages_bp
+    except Exception as e:
+        logger.warning(f"Failed to import private_messages blueprint: {e}")
+    
+    return blueprints
 
 def register_all_blueprints(yam_app):
+    """Register all blueprints with proper error handling"""
+    # Import blueprints with proper app context
+    blueprints = import_blueprints()
+    
     # Register blueprints (order matters for some)
     try:
         from app.blueprints.auth import init_auth_blueprint
@@ -1546,67 +1960,132 @@ def register_all_blueprints(yam_app):
         logger.error(f"Failed to register auth blueprint: {e}")
         # Don't fail completely, but log the error
         pass
-    yam_app.register_blueprint(system_management_bp)
-    yam_app.register_blueprint(cache_management_bp)
-    yam_app.register_blueprint(admin_management_bp)
-    yam_app.register_blueprint(profile_management_bp)
-    yam_app.register_blueprint(legacy_routes_bp)
-    yam_app.register_blueprint(file_serving_bp)
-    yam_app.register_blueprint(core_bp)
-    yam_app.register_blueprint(socket_handlers_bp)
-    yam_app.register_blueprint(error_handlers_bp)
-    yam_app.register_blueprint(utility_functions_bp)
-    yam_app.register_blueprint(initialization_bp)
-    yam_app.register_blueprint(main_bp)
-    yam_app.register_blueprint(api_bp, url_prefix='/api')
-    yam_app.register_blueprint(devices_bp, url_prefix='/devices')
-    yam_app.register_blueprint(unified_bp, url_prefix='/unified')
-    yam_app.register_blueprint(workstations_bp, url_prefix='/workstations')
-    yam_app.register_blueprint(admin_outages_bp, url_prefix='/api/admin/outages')
-    yam_app.register_blueprint(lab_bp, url_prefix='/lab')
-    yam_app.register_blueprint(team_bp, url_prefix='/team')
-    yam_app.register_blueprint(events_bp, url_prefix='/events')
-    yam_app.register_blueprint(oralyzer_bp, url_prefix='/oralyzer')
-    yam_app.register_blueprint(kb_api_bp)
-    yam_app.register_blueprint(unified_search_bp)
-    yam_app.register_blueprint(universal_search_bp, url_prefix='/api/universal-search')
-    yam_app.register_blueprint(kb_files_bp, url_prefix='/kb/files')
-    yam_app.register_blueprint(users_bp)
-    yam_app.register_blueprint(clock_id_cache_bp)
-    yam_app.register_blueprint(kb_shared_bp, url_prefix='/kb/shared')
-    yam_app.register_blueprint(jarvis_bp, url_prefix='/jarvis')
-    yam_app.register_blueprint(outages_bp)
-    yam_app.register_blueprint(patterson_bp, url_prefix='/patterson')
-    yam_app.register_blueprint(kb_bp, url_prefix='/kb')
-    yam_app.register_blueprint(system_bp, url_prefix='/system')
-    yam_app.register_blueprint(collab_notes_bp, url_prefix='/collab-notes')
-    yam_app.register_blueprint(settings_bp, url_prefix='/settings')
-    yam_app.register_blueprint(settings_api_bp, url_prefix='/api/settings')
-    yam_app.register_blueprint(dameware_bp)
-    yam_app.register_blueprint(admin_api_bp, url_prefix='/api/admin')
-    yam_app.register_blueprint(service_desk_bp, url_prefix='/service-desk')
-    yam_app.register_blueprint(modal_api_bp)
-    yam_app.register_blueprint(private_messages_bp, url_prefix='/api/private-messages')
-    # Add any additional blueprints as needed
+    
+    # Register system management blueprints first
+    if 'system_management_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['system_management_bp'])
+    if 'cache_management_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['cache_management_bp'])
+    if 'admin_management_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['admin_management_bp'])
+    if 'profile_management_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['profile_management_bp'])
+    if 'legacy_routes_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['legacy_routes_bp'])
+    if 'file_serving_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['file_serving_bp'])
+    if 'core_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['core_bp'])
+    if 'socket_handlers_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['socket_handlers_bp'])
+    if 'error_handlers_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['error_handlers_bp'])
+    if 'utility_functions_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['utility_functions_bp'])
+    if 'initialization_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['initialization_bp'])
+    
+    # Register main application blueprints
+    if 'main_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['main_bp'])
+    if 'api_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['api_bp'], url_prefix='/api')
+    if 'devices_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['devices_bp'], url_prefix='/devices')
+    if 'unified_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['unified_bp'], url_prefix='/unified')
+    if 'workstations_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['workstations_bp'], url_prefix='/workstations')
+    if 'admin_outages_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['admin_outages_bp'], url_prefix='/api/admin/outages')
+    if 'lab_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['lab_bp'], url_prefix='/lab')
+    if 'team_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['team_bp'], url_prefix='/team')
+    if 'events_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['events_bp'], url_prefix='/events')
+    if 'oralyzer_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['oralyzer_bp'], url_prefix='/oralyzer')
+    if 'kb_api_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['kb_api_bp'])
+    if 'unified_search_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['unified_search_bp'])
+    if 'universal_search_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['universal_search_bp'], url_prefix='/api/universal-search')
+    if 'kb_files_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['kb_files_bp'], url_prefix='/kb/files')
+    if 'users_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['users_bp'])
+    if 'clock_id_cache_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['clock_id_cache_bp'])
+    if 'kb_shared_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['kb_shared_bp'], url_prefix='/kb/shared')
+    if 'jarvis_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['jarvis_bp'], url_prefix='/jarvis')
+    if 'outages_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['outages_bp'])
+    if 'patterson_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['patterson_bp'], url_prefix='/patterson')
+    if 'kb_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['kb_bp'], url_prefix='/kb')
+    if 'system_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['system_bp'], url_prefix='/system')
+    if 'collab_notes_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['collab_notes_bp'], url_prefix='/collab-notes')
+    if 'settings_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['settings_bp'], url_prefix='/settings')
+    if 'settings_api_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['settings_api_bp'], url_prefix='/api/settings')
+    if 'dameware_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['dameware_bp'])
+    if 'admin_api_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['admin_api_bp'], url_prefix='/api/admin')
+    if 'service_desk_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['service_desk_bp'], url_prefix='/service-desk')
+    if 'tickets_api_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['tickets_api_bp'])
+    if 'tickets_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['tickets_bp'])
+    if 'modal_api_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['modal_api_bp'])
+    if 'private_messages_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['private_messages_bp'], url_prefix='/api/private-messages')
+    
+    # Register additional blueprints
     try:
         from app.blueprints.tracking import init_tracking_blueprint
         init_tracking_blueprint(yam_app)
         logger.info("Tracking blueprint registered successfully")
     except Exception as e:
         logger.warning(f"Failed to register tracking blueprint: {e}")
-    try:
-        init_admin_blueprint(yam_app)
-        logger.info("Admin blueprint registered successfully")
-    except Exception as e:
-        logger.warning(f"Failed to register admin blueprint: {e}")
-    try:
-        init_offices_blueprint(yam_app)
-        logger.info("Offices blueprint registered successfully")
-    except Exception as e:
-        logger.warning(f"Failed to register offices blueprint: {e}")
+    
+    # Register init blueprints
+    if 'init_admin_blueprint' in blueprints:
+        try:
+            blueprints['init_admin_blueprint'](yam_app)
+            logger.info("Admin blueprint registered successfully")
+        except Exception as e:
+            logger.warning(f"Failed to register admin blueprint: {e}")
+    
+    if 'init_offices_blueprint' in blueprints:
+        try:
+            blueprints['init_offices_blueprint'](yam_app)
+            logger.info("Offices blueprint registered successfully")
+        except Exception as e:
+            logger.warning(f"Failed to register offices blueprint: {e}")
 
-register_all_blueprints(yam_app)
-logger.info("All blueprints registered successfully")
+# Register blueprints with proper app context
+with yam_app.app_context():
+    # Ensure database is properly initialized
+    try:
+        db.create_all()
+        logger.info("Database tables created successfully")
+    except Exception as e:
+        logger.warning(f"Database initialization warning: {e}")
+    
+    # Register all blueprints
+    register_all_blueprints(yam_app)
+    logger.info("All blueprints registered successfully")
 
 # Add test route for hot reloading (always available)
 @yam_app.route('/test-hot-reload')
@@ -2181,7 +2660,14 @@ if __name__ == '__main__':
     parser.add_argument('--debug', action='store_true', help='Enable debug mode')
     parser.add_argument('--no-reloader', action='store_true', help='Disable auto-reloader for better stability')
     parser.add_argument('--debugger-mode', action='store_true', help='Enable debugger mode with real-time file monitoring')
+    parser.add_argument('--allow-multiple-sessions', action='store_true', help='Allow multiple sessions from the same user to prevent conflicts')
     args = parser.parse_args()
+
+    # Set environment variables based on arguments
+    if args.allow_multiple_sessions:
+        os.environ['YAM_ALLOW_MULTIPLE_SESSIONS'] = '1'
+        os.environ['YAM_SESSION_CONFLICT_RESOLUTION'] = '1'
+        print('[INFO] Multiple sessions mode enabled - users can have multiple concurrent sessions')
 
     # Signal handler for instant termination
     def signal_handler(signum, frame):
@@ -2504,21 +2990,34 @@ if __name__ == '__main__':
     print(f'Port: {args.port}')
     print(f'Debug: {args.debug}')
     print(f'Debugger Mode: {args.debugger_mode}')
+    print(f'Multiple Sessions: {args.allow_multiple_sessions}')
     print(f'Template folder: {yam_app.template_folder}')
     print(f'Static folder: {yam_app.static_folder}')
-    print(f'Session lifetime: 2 hours')
+    print(f'Session lifetime: {session_lifetime_hours} hours')
     print(f'Session directory: {session_dir}')
     print(f'Server startup time: {SERVER_STARTUP_TIME.strftime("%Y-%m-%d %H:%M:%S")}')
     print('=' * 60)
     print('🔄 SESSION MANAGEMENT:')
-    print('   • All sessions cleared on server restart')
-    print('   • Users must re-authenticate after server restart')
-    print('   • Session validation against server startup time')
+    if args.allow_multiple_sessions:
+        print('   • Multiple sessions allowed per user')
+        print('   • Session conflicts automatically resolved')
+        print('   • 4-hour session timeout for multiple sessions')
+        print('   • Enhanced session conflict resolution')
+    else:
+        print('   • Single session per user')
+        print('   • All sessions cleared on server restart')
+        print('   • Users must re-authenticate after server restart')
+        print('   • Session validation against server startup time')
     print('   • Automatic cleanup on server shutdown')
     print('=' * 60)
     print('✅ Enhanced Session Management:')
     print('   🔄 Session hydration on every request')
-    print('   ⏰ 2-hour session lifetime')
+    if args.allow_multiple_sessions:
+        print('   ⏰ 4-hour session lifetime (multiple sessions mode)')
+        print('   🔀 Multiple sessions per user allowed')
+        print('   🛡️  Session conflict resolution enabled')
+    else:
+        print('   ⏰ 2-hour session lifetime')
     print('   🧹 Automatic stale session cleanup')
     print('   💾 Persistent session storage')
     print('   🔍 Session health monitoring')

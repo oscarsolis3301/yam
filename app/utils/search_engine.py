@@ -40,7 +40,7 @@ from PIL import Image
 import pytesseract
 
 # Database imports
-from extensions import db
+from app.extensions import db
 from app.models import User, KBArticle, Outage, SearchHistory, Document, Note, Activity
 from app.blueprints.offices.routes import df as offices_df
 from app.utils.device import load_devices_cache

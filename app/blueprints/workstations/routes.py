@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required
 from rapidfuzz import process, fuzz
 from app.blueprints.devices.routes import load_devices_cache
-from extensions import db
+from app.extensions import db
 
 from . import bp  # Blueprint instance
 

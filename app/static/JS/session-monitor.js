@@ -1,13 +1,63 @@
 /**
- * YAM Enhanced Session Monitor
+ * YAM Enhanced Session Monitor - SPAM-FREE VERSION
  * Prevents disconnections and maintains stable user sessions
- * Enhanced with connection deduplication and improved stability
+ * Enhanced with proper throttling and duplicate prevention
  */
 
+// Global throttling to prevent ANY session activity spam
+window.YAM_SESSION_ACTIVITY_THROTTLE = window.YAM_SESSION_ACTIVITY_THROTTLE || {
+    lastCall: 0,
+    minInterval: 600000, // 10 minutes minimum between calls
+    isBlocked: false
+};
+
+// Global function to safely call session activity (with extreme throttling)
+window.safeUpdateSessionActivity = function() {
+    const now = Date.now();
+    const throttle = window.YAM_SESSION_ACTIVITY_THROTTLE;
+    
+    if (throttle.isBlocked || (now - throttle.lastCall) < throttle.minInterval) {
+        console.debug('Session activity update blocked by global throttle');
+        return Promise.resolve();
+    }
+    
+    throttle.lastCall = now;
+    throttle.isBlocked = true;
+    
+    // Unblock after minimum interval
+    setTimeout(() => {
+        throttle.isBlocked = false;
+    }, throttle.minInterval);
+    
+    try {
+        return fetch('/api/session/activity', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                timestamp: now,
+                throttled: true
+            })
+        });
+    } catch (error) {
+        console.debug('Session activity error (non-critical):', error);
+        return Promise.resolve();
+    }
+};
+
+// Prevent duplicate session monitors from running
+if (typeof window.YAMSessionMonitor !== 'undefined') {
+    console.log('YAMSessionMonitor already exists, skipping initialization');
+} else {
+    
 class YAMSessionMonitor {
     constructor() {
         this.sessionCheckInterval = null;
         this.sessionExtendInterval = null;
+        this.heartbeatInterval = null;
         this.lastSessionCheck = Date.now();
         this.sessionHealthStatus = 'unknown';
         this.isMonitoring = false;
@@ -15,17 +65,23 @@ class YAMSessionMonitor {
         this.autoExtendEnabled = true;
         this.connectionId = null;
         this.isConnected = false;
+        this.warningShown = false;
         
-        // Configuration for 2-hour sessions (matching server config)
+        // PROPERLY INITIALIZE THROTTLING VARIABLES
+        this._lastActivityUpdate = 0;
+        this._lastHeartbeat = 0;
+        this._lastSessionCheck = 0;
+        
+        // Configuration for 2-hour sessions - EXTREMELY CONSERVATIVE TO PREVENT SPAM
         this.config = {
-            sessionCheckInterval: 60000,    // Check session every 60 seconds (increased)
-            sessionExtendInterval: 120000,   // Extend session every 2 minutes (increased)
-            sessionWarningThreshold: 600,   // Warn when 10 minutes remaining (increased)
-            sessionCriticalThreshold: 120,   // Critical when 2 minutes remaining (increased)
-            maxSessionAge: 7200,            // 2 hours max session age (matching server)
-            autoExtendThreshold: 1800,       // Auto-extend when 30 minutes remaining (increased)
-            gracePeriod: 600,               // 10 minute grace period for reconnection (increased)
-            heartbeatInterval: 90000        // 90 second heartbeat (increased)
+            sessionCheckInterval: 1800000,   // Check session every 30 minutes
+            sessionExtendInterval: 3600000,  // Extend session every 60 minutes  
+            heartbeatInterval: 1800000,      // 30 minute heartbeat
+            sessionWarningThreshold: 600,   // Warn when 10 minutes remaining
+            sessionCriticalThreshold: 120,   // Critical when 2 minutes remaining
+            maxSessionAge: 7200,            // 2 hours max session age
+            autoExtendThreshold: 1800,       // Auto-extend when 30 minutes remaining
+            gracePeriod: 600                // 10 minute grace period
         };
         
         this.init();
@@ -50,17 +106,14 @@ class YAMSessionMonitor {
         // Set up global instance
         window.yamSessionMonitor = this;
         
-        // Start monitoring
+        // Start monitoring with CONSERVATIVE intervals
         this.startMonitoring();
         
-        // Set up activity tracking
+        // Set up MINIMAL activity tracking (no session activity calls on events)
         this.setupActivityTracking();
         
-        // Set up visibility tracking
+        // Set up visibility tracking (no session activity calls)
         this.setupVisibilityTracking();
-        
-        // Set up beforeunload handler
-        this.setupBeforeUnload();
         
         console.log('YAM Session Monitor: Initialized successfully with ID:', this.connectionId);
     }
@@ -70,7 +123,7 @@ class YAMSessionMonitor {
         const currentPath = window.location.pathname;
         const skipPaths = [
             '/auth/login',
-            '/auth/windows-login',
+            '/auth/windows-login', 
             '/auth/unauthorized',
             '/login',
             '/signin',
@@ -105,20 +158,18 @@ class YAMSessionMonitor {
         
         this.isMonitoring = true;
         
-        // Start session health checks
+        // VERY CONSERVATIVE intervals to prevent spam
         this.sessionCheckInterval = setInterval(() => {
             this.checkSessionHealth();
         }, this.config.sessionCheckInterval);
         
-        // Start automatic session extension
         this.sessionExtendInterval = setInterval(() => {
             this.extendSessionIfNeeded();
         }, this.config.sessionExtendInterval);
         
-        // Start heartbeat
         this.startHeartbeat();
         
-        console.log('YAM Session Monitor: Started monitoring');
+        console.log('YAM Session Monitor: Started monitoring with conservative intervals');
     }
     
     stopMonitoring() {
@@ -144,58 +195,44 @@ class YAMSessionMonitor {
     }
     
     setupActivityTracking() {
-        // Track user activity to prevent premature timeouts
-        const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+        // MINIMAL activity tracking - NEVER call session activity API on events
+        const activityEvents = ['click', 'keypress'];
         
         activityEvents.forEach(event => {
             document.addEventListener(event, () => {
                 this.lastActivity = Date.now();
-                this.updateSessionActivity();
+                // NO API CALLS HERE - just update timestamp
             }, { passive: true });
         });
         
-        // Track focus events
+        // Focus events - NO API CALLS
         window.addEventListener('focus', () => {
             this.lastActivity = Date.now();
-            this.updateSessionActivity();
-            this.checkSessionHealth();
+            // Just update timestamp, no API calls
         });
         
         window.addEventListener('blur', () => {
-            // Don't immediately check on blur, but update activity
             this.lastActivity = Date.now();
-            this.updateSessionActivity();
+            // Just update timestamp, no API calls
         });
     }
     
     setupVisibilityTracking() {
-        // Handle page visibility changes
+        // Visibility changes - NO API CALLS
         document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                // Page became visible - check session and update activity
-                this.lastActivity = Date.now();
-                this.updateSessionActivity();
-                this.checkSessionHealth();
-            } else {
-                // Page hidden - just update activity
-                this.lastActivity = Date.now();
-                this.updateSessionActivity();
-            }
-        });
-    }
-    
-    setupBeforeUnload() {
-        // Handle page unload gracefully
-        window.addEventListener('beforeunload', (event) => {
-            // Try to send a final activity update
-            this.updateSessionActivity();
-            
-            // Don't show confirmation dialog - just log
-            console.log('YAM Session Monitor: Page unloading');
+            this.lastActivity = Date.now();
+            // Just update timestamp, no API calls
         });
     }
     
     async checkSessionHealth() {
+        // Throttle session health checks
+        const now = Date.now();
+        if ((now - this._lastSessionCheck) < 300000) { // 5 minutes minimum
+            return;
+        }
+        this._lastSessionCheck = now;
+        
         try {
             const response = await fetch('/api/session/time-remaining', {
                 method: 'GET',
@@ -211,34 +248,26 @@ class YAMSessionMonitor {
                 const data = await response.json();
                 const timeRemaining = data.time_remaining_seconds || 0;
                 
-                // Update session status
                 this.sessionHealthStatus = timeRemaining > 0 ? 'healthy' : 'expired';
                 
-                // Show warning if session is about to expire
                 if (timeRemaining > 0 && timeRemaining < this.config.sessionWarningThreshold) {
                     this.showSessionWarning(timeRemaining);
                 }
                 
-                // Auto-extend if session is getting close to expiry
                 if (timeRemaining > 0 && timeRemaining <= this.config.autoExtendThreshold) {
                     await this.extendSession();
                 }
                 
-                // Handle expired session
                 if (timeRemaining <= 0) {
                     this.handleSessionExpired();
                 }
                 
             } else if (response.status === 401) {
-                // User not authenticated - redirect to login
                 this.handleSessionExpired();
-            } else {
-                console.warn('Session health check failed with status:', response.status);
             }
             
         } catch (error) {
-            console.error('Session health check error:', error);
-            // Don't fail completely on network errors
+            console.debug('Session health check error (non-critical):', error);
         }
     }
     
@@ -258,13 +287,12 @@ class YAMSessionMonitor {
                 const data = await response.json();
                 const timeRemaining = data.time_remaining_seconds || 0;
                 
-                // Auto-extend if session is getting close to expiry
                 if (timeRemaining > 0 && timeRemaining <= this.config.autoExtendThreshold) {
                     await this.extendSession();
                 }
             }
         } catch (error) {
-            console.error('Session extension check error:', error);
+            console.debug('Session extension check error (non-critical):', error);
         }
     }
     
@@ -285,41 +313,14 @@ class YAMSessionMonitor {
                 console.log('Session extended successfully:', data);
                 this.sessionHealthStatus = 'healthy';
             } else if (response.status === 401) {
-                // Session expired, redirect to login
                 this.handleSessionExpired();
-            } else {
-                console.warn('Session extension failed with status:', response.status);
             }
         } catch (error) {
-            console.error('Session extension error:', error);
+            console.debug('Session extension error (non-critical):', error);
         }
     }
     
-    async updateSessionActivity() {
-        try {
-            const response = await fetch('/api/session/activity', {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-Connection-ID': this.connectionId
-                },
-                body: JSON.stringify({
-                    timestamp: Date.now(),
-                    connection_id: this.connectionId,
-                    last_activity: this.lastActivity
-                })
-            });
-            
-            if (!response.ok && response.status !== 401) {
-                console.warn('Activity update failed with status:', response.status);
-            }
-        } catch (error) {
-            // Silently fail on network errors for activity updates
-            console.debug('Activity update error (non-critical):', error);
-        }
-    }
+    // REMOVED updateSessionActivity() - use global safeUpdateSessionActivity() instead
     
     startHeartbeat() {
         if (this.heartbeatInterval) {
@@ -342,6 +343,13 @@ class YAMSessionMonitor {
     }
     
     async sendHeartbeat() {
+        // Throttle heartbeats
+        const now = Date.now();
+        if ((now - this._lastHeartbeat) < 600000) { // 10 minutes minimum
+            return;
+        }
+        this._lastHeartbeat = now;
+        
         try {
             const response = await fetch('/api/session/heartbeat', {
                 method: 'POST',
@@ -352,7 +360,7 @@ class YAMSessionMonitor {
                     'X-Connection-ID': this.connectionId
                 },
                 body: JSON.stringify({
-                    timestamp: Date.now(),
+                    timestamp: now,
                     connection_id: this.connectionId,
                     last_activity: this.lastActivity
                 })
@@ -373,11 +381,9 @@ class YAMSessionMonitor {
     showSessionWarning(timeRemaining) {
         const minutes = Math.ceil(timeRemaining / 60);
         
-        // Only show warning if not already shown
         if (!this.warningShown) {
             this.warningShown = true;
             
-            // Create or update warning element
             let warningElement = document.getElementById('session-warning');
             if (!warningElement) {
                 warningElement = document.createElement('div');
@@ -390,8 +396,8 @@ class YAMSessionMonitor {
                     color: white;
                     padding: 15px;
                     border-radius: 5px;
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
                     z-index: 10000;
-                    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
                     max-width: 300px;
                     font-family: Arial, sans-serif;
                 `;
@@ -399,133 +405,69 @@ class YAMSessionMonitor {
             }
             
             warningElement.innerHTML = `
-                <strong>Session Expiring Soon</strong><br>
-                Your session will expire in ${minutes} minute${minutes !== 1 ? 's' : ''}.<br>
-                <button onclick="window.yamSessionMonitor.extendSession()" 
-                        style="margin-top: 10px; padding: 5px 10px; background: white; color: #ff9800; border: none; border-radius: 3px; cursor: pointer;">
+                <div style="margin-bottom: 10px;">
+                    <strong>Session Expiring Soon!</strong>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    Your session will expire in ${minutes} minute${minutes > 1 ? 's' : ''}.
+                </div>
+                <button onclick="window.yamSessionMonitor.extendSession(); this.parentElement.remove();" 
+                        style="background: white; color: #ff9800; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
                     Extend Session
                 </button>
             `;
             
-            // Auto-hide after 10 seconds
             setTimeout(() => {
-                if (warningElement && warningElement.parentNode) {
-                    warningElement.parentNode.removeChild(warningElement);
-                    this.warningShown = false;
+                if (warningElement && warningElement.parentElement) {
+                    warningElement.remove();
                 }
-            }, 10000);
+                this.warningShown = false;
+            }, 30000);
         }
     }
     
     handleSessionExpired() {
-        console.log('Session expired, redirecting to login');
+        console.log('Session expired - redirecting to login');
+        this.stopMonitoring();
         
-        // Clear all client-side data
-        this.clearAllClientData();
+        // Clear any existing warning
+        const warning = document.getElementById('session-warning');
+        if (warning) {
+            warning.remove();
+        }
         
-        // Redirect to login page
-        window.location.href = '/auth/login?expired=true';
-    }
-    
-    clearAllClientData() {
-        try {
-            // Clear localStorage
-            localStorage.clear();
-            
-            // Clear sessionStorage
-            sessionStorage.clear();
-            
-            // Clear cookies (except essential ones)
-            this.clearCookies();
-            
-            console.log('Client data cleared');
-        } catch (error) {
-            console.error('Error clearing client data:', error);
-        }
-    }
-    
-    clearCookies() {
-        try {
-            const cookies = document.cookie.split(';');
-            
-            for (let cookie of cookies) {
-                const eqPos = cookie.indexOf('=');
-                const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
-                
-                // Don't clear essential cookies
-                if (!['session', 'yam_session', 'csrf_token'].includes(name)) {
-                    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-                }
-            }
-        } catch (error) {
-            console.error('Error clearing cookies:', error);
-        }
-    }
-    
-    forceLogout() {
-        try {
-            // Send logout request
-            fetch('/auth/logout', {
-                method: 'POST',
-                credentials: 'include'
-            }).finally(() => {
-                this.clearAllClientData();
-                window.location.href = '/auth/login';
-            });
-        } catch (error) {
-            console.error('Error during force logout:', error);
-            this.clearAllClientData();
-            window.location.href = '/auth/login';
-        }
-    }
-    
-    forceExtend() {
-        return this.extendSession();
-    }
-    
-    getStatus() {
-        return {
-            isMonitoring: this.isMonitoring,
-            sessionHealthStatus: this.sessionHealthStatus,
-            lastActivity: this.lastActivity,
-            connectionId: this.connectionId,
-            isConnected: this.isConnected,
-            config: this.config
-        };
-    }
-    
-    enableAutoExtend() {
-        this.autoExtendEnabled = true;
-    }
-    
-    disableAutoExtend() {
-        this.autoExtendEnabled = false;
+        // Redirect to login
+        window.location.href = '/auth/login?reason=session_expired';
     }
     
     destroy() {
         this.stopMonitoring();
-        this.stopHeartbeat();
         
-        // Remove warning element if it exists
-        const warningElement = document.getElementById('session-warning');
-        if (warningElement && warningElement.parentNode) {
-            warningElement.parentNode.removeChild(warningElement);
+        // Clear any warnings
+        const warning = document.getElementById('session-warning');
+        if (warning) {
+            warning.remove();
         }
         
-        // Clear global reference
-        if (window.yamSessionMonitor === this) {
-            window.yamSessionMonitor = null;
-        }
-        
-        console.log('YAM Session Monitor destroyed');
+        console.log('YAM Session Monitor: Destroyed');
     }
 }
 
-// Auto-initialize when DOM is ready
+// Set the global class
+window.YAMSessionMonitor = YAMSessionMonitor;
+
+// Auto-initialize when DOM is ready (with duplicate prevention)
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        new YAMSessionMonitor();
+        if (!window.yamSessionMonitor) {
+            window.yamSessionMonitor = new YAMSessionMonitor();
+        }
     });
 } else {
-    new YAMSessionMonitor();
+    if (!window.yamSessionMonitor) {
+        window.yamSessionMonitor = new YAMSessionMonitor();
+    }
+}
+
+// Close the duplicate prevention check
 } 

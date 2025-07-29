@@ -21,7 +21,7 @@ from sqlalchemy import text
 from flask import current_app
 from pandas.errors import EmptyDataError
 
-from extensions import db
+from app.extensions import db
 from app.utils.ai_helpers import store_qa, ensure_chat_qa_table
 
 import logging

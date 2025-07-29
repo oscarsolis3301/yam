@@ -1,9 +1,9 @@
 from flask import jsonify, request, render_template
 from flask_login import login_required, current_user
 from . import bp
-from extensions import db, socketio
+from app.extensions import db, socketio
 from app.models import Outage
-from extensions import Config
+from app.extensions import Config
 import logging
 import requests
 import datetime

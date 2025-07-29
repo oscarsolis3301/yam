@@ -7,7 +7,7 @@ import gc
 import weakref
 from contextlib import contextmanager
 from flask import current_app
-from extensions import db
+from app.extensions import db
 from app.shared_state import memory_manager, _initialization_state, _app_initialized, _blueprints_registered
 
 logger = logging.getLogger(__name__)

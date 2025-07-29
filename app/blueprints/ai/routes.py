@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, current_app, redirect, url_for
 from flask_login import login_required, current_user
-from extensions import db
+from app.extensions import db
 from app.utils.ai_helpers import (
     store_qa,
     find_semantic_qa,

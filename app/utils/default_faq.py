@@ -10,7 +10,7 @@ from typing import List, Tuple
 from flask import current_app
 from sqlalchemy import text
 
-from extensions import db
+from app.extensions import db
 from app.utils.ai_helpers import store_qa, ensure_chat_qa_table, _normalize
 
 # ---------------------------------------------------------------------------

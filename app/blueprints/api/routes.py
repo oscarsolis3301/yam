@@ -17,7 +17,7 @@ from flask_socketio import emit
 from datetime import datetime, timedelta
 import random
 
-from extensions import socketio, db
+from app.extensions import socketio, db
 from app.utils.device import cache_storage, load_cached_storage
 from app.blueprints.devices.routes import load_devices_cache
 from app.utils.search import get_search_suggestions, save_search
@@ -553,18 +553,21 @@ def track_activity():
         
         # Emit real-time update to admin dashboard
         try:
-            from extensions import socketio
-            socketio.emit('activity_update', {
-                'id': activity.id,
-                'type': data['action'],
-                'description': data.get('details', ''),
-                'timestamp': activity.timestamp.isoformat(),
-                'user': {
-                    'id': current_user.id,
-                    'name': current_user.username,
-                    'profile_picture': current_user.profile_picture or 'boy.png'
-                }
-            }, namespace='/')
+            from app.extensions import socketio
+            if socketio and hasattr(socketio, 'emit'):
+                socketio.emit('activity_update', {
+                    'id': activity.id,
+                    'type': data['action'],
+                    'description': data.get('details', ''),
+                    'timestamp': activity.timestamp.isoformat(),
+                    'user': {
+                        'id': current_user.id,
+                        'name': current_user.username,
+                        'profile_picture': current_user.profile_picture or 'boy.png'
+                    }
+                }, namespace='/')
+            else:
+                current_app.logger.debug("SocketIO not available for activity update emission")
         except Exception as emit_error:
             current_app.logger.debug(f"Could not emit activity update: {emit_error}")
         
@@ -951,13 +954,32 @@ def api_workstation_detail():
 
 from flask import jsonify, request, current_app
 from flask_login import login_required, current_user
-from extensions import db
+from app.extensions import db
 from app.models import User
 from . import bp
 import logging
 from datetime import datetime
 
 logger = logging.getLogger('spark')
+
+@bp.route('/users', methods=['GET'])
+@login_required
+def get_users():
+    """Get all users"""
+    try:
+        users = User.query.all()
+        return jsonify([{
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'role': user.role,
+            'is_online': user.is_online,
+            'last_login': user.last_login.isoformat() if user.last_login else None,
+            'is_active': user.is_active
+        } for user in users])
+    except Exception as e:
+        logger.error(f"Error getting users: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 @bp.route('/users/online')
 @login_required
@@ -2137,12 +2159,12 @@ def system_health_metrics():
 def session_time_remaining():
     """Get the time remaining in the current session."""
     try:
-        # Get session info from the session manager
-        from app.utils.enhanced_session_manager import session_manager
+        # Get session info from the enhanced session manager
+        from app.utils.enhanced_session_manager import enhanced_session_manager
         
-        if session_manager:
-            time_remaining = session_manager.get_session_time_remaining()
-            session_status = session_manager.get_session_status()
+        if enhanced_session_manager:
+            time_remaining = enhanced_session_manager.get_session_time_remaining()
+            session_status = enhanced_session_manager.get_session_status()
             
             return jsonify({
                 'success': True,
@@ -2226,7 +2248,7 @@ def extend_session():
 @bp.route('/session/activity', methods=['POST'])
 @login_required
 def update_session_activity():
-    """Update session activity timestamp"""
+    """Update session activity timestamp - OPTIMIZED"""
     try:
         # Validate current_user exists
         if not current_user or not current_user.is_authenticated:
@@ -2236,31 +2258,38 @@ def update_session_activity():
                 'timestamp': datetime.utcnow().isoformat()
             }), 401
         
-        # Update user's last activity
-        try:
-            current_user.last_seen = datetime.utcnow()
-            current_user.is_online = True
-            db.session.commit()
-        except Exception as e:
-            logger.warning(f"Could not update user database record: {e}")
-            db.session.rollback()
-            # Continue anyway - session update is more important
+        # Throttle database updates to reduce load
+        last_db_update = session.get('_last_db_update', 0)
+        current_time = datetime.utcnow().timestamp()
         
-        # Update session activity
+        # Only update database every 60 seconds
+        if current_time - last_db_update > 60:
+            try:
+                current_user.last_seen = datetime.utcnow()
+                current_user.is_online = True
+                db.session.commit()
+                session['_last_db_update'] = current_time
+            except Exception as e:
+                logger.warning(f"Could not update user database record: {e}")
+                db.session.rollback()
+                # Continue anyway - session update is more important
+        
+        # Update session activity (always)
         try:
             session['last_activity'] = datetime.utcnow().isoformat()
         except Exception as e:
             logger.warning(f"Could not update session: {e}")
             # Continue anyway - this is not critical
         
-        # Update user presence if available
-        try:
-            from app.services.user_presence import presence_service
-            presence_service.update_heartbeat(current_user.id)
-        except ImportError as e:
-            logger.debug(f"User presence service not available: {e}")
-        except Exception as e:
-            logger.debug(f"Could not update user presence: {e}")
+        # Update user presence if available (throttled)
+        if current_time - last_db_update > 60:
+            try:
+                from app.services.user_presence import presence_service
+                presence_service.update_heartbeat(current_user.id)
+            except ImportError as e:
+                logger.debug(f"User presence service not available: {e}")
+            except Exception as e:
+                logger.debug(f"Could not update user presence: {e}")
         
         return jsonify({
             'success': True,
@@ -2904,4 +2933,63 @@ def get_all_activity():
         return jsonify({
             'error': 'Failed to get full activity list',
             'message': str(exc)
+        }), 500
+
+@bp.route('/session/heartbeat', methods=['POST'])
+@login_required  
+def session_heartbeat():
+    """Handle session heartbeat to prevent timeouts - matches Socket.IO heartbeat functionality"""
+    try:
+        # Validate current_user exists
+        if not current_user or not current_user.is_authenticated:
+            return jsonify({
+                'success': False,
+                'message': 'User not authenticated',
+                'timestamp': datetime.utcnow().isoformat()
+            }), 401
+        
+        # Update session heartbeat data
+        session['last_activity'] = datetime.utcnow().isoformat()
+        session['heartbeat_count'] = session.get('heartbeat_count', 0) + 1
+        
+        # Throttle database updates to reduce load (every 2 minutes)
+        last_heartbeat = session.get('_last_heartbeat_update', 0)
+        current_time = datetime.utcnow().timestamp()
+        
+        if current_time - last_heartbeat > 120:  # 2 minutes
+            try:
+                current_user.last_seen = datetime.utcnow()
+                current_user.is_online = True
+                db.session.commit()
+                session['_last_heartbeat_update'] = current_time
+                
+                # Update user presence service if available
+                try:
+                    from app.services.user_presence import presence_service
+                    success = presence_service.update_heartbeat(current_user.id)
+                    if not success:
+                        logger.debug(f"Presence service heartbeat failed for user {current_user.id}")
+                except ImportError:
+                    logger.debug("User presence service not available")
+                except Exception as e:
+                    logger.debug(f"Could not update user presence: {e}")
+                    
+            except Exception as e:
+                logger.warning(f"Could not update user database record during heartbeat: {e}")
+                db.session.rollback()
+                # Continue - session update is more important than DB update
+        
+        return jsonify({
+            'success': True,
+            'message': 'Heartbeat received',
+            'timestamp': datetime.utcnow().isoformat(),
+            'heartbeat_count': session.get('heartbeat_count', 0)
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error handling session heartbeat: {e}")
+        return jsonify({
+            'success': False,
+            'message': 'Heartbeat failed',
+            'timestamp': datetime.utcnow().isoformat()
         }), 500

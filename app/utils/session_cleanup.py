@@ -95,7 +95,7 @@ def clear_all_user_sessions():
         # Phase 4: Clear database session data
         logger.info("[STEP] Phase 4: Clearing database session data...")
         try:
-            from extensions import db
+            from app.extensions import db
             from app.models import User
             
             with current_app.app_context():
@@ -158,7 +158,7 @@ def clear_all_user_sessions():
         logger.info("[STEP] Phase 7: Broadcasting logout to all clients...")
         try:
             from flask_socketio import emit
-            from extensions import socketio
+            from app.extensions import socketio
             
             # Emit logout event to all connected clients
             socketio.emit('server_shutdown', {

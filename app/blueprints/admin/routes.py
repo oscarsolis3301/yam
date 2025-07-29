@@ -1,7 +1,7 @@
 from flask import jsonify, request, render_template, redirect, url_for, flash, current_app, has_app_context
 from flask_login import login_required, current_user
 from flask_socketio import emit
-from extensions import db, socketio
+from app.extensions import db, socketio
 from app.models import User, Outage, Document, Activity, KBArticle, ChatQA
 from datetime import datetime, timedelta
 import json
@@ -719,17 +719,23 @@ def _prewarm_chat_history_cache():
                 
             # Test database connectivity before attempting cache operations
             try:
+                # Check if db is properly initialized
+                if not hasattr(db, 'engine') or db.engine is None:
+                    return  # Database not initialized yet
+                    
                 db.session.execute(text('SELECT 1'))
                 # Only proceed if database is accessible
                 _ensure_cache_loaded()
             except Exception as db_err:
                 # Database not ready yet, skip cache warming
-                current_app.logger.debug(f"Database not ready for cache warming: {db_err}")
+                # Only log at debug level to reduce noise
+                if current_app.debug:
+                    current_app.logger.debug(f"Database not ready for cache warming: {db_err}")
                 return
                 
     except Exception as e:
         # Log the error but don't fail the request
-        if hasattr(current_app, 'logger'):
+        if hasattr(current_app, 'logger') and current_app.debug:
             current_app.logger.debug(f"Cache pre-warming skipped due to context issue: {e}")
         # Don't raise the exception - let the request continue 
 
@@ -921,3 +927,13 @@ def admin_clear_cache():
         db.session.rollback()
         logger.error(f"Cache clear error: {e}")
         return jsonify({'error': 'Failed to clear cache'}), 500 
+
+@bp.route('/freshworks-mappings')
+@login_required
+def freshworks_mappings():
+    """Admin page for managing Freshworks user mappings"""
+    if current_user.role not in ['admin', 'manager', 'developer']:
+        flash('Access denied. Admin privileges required.', 'error')
+        return redirect(url_for('main.index'))
+    
+    return render_template('admin/freshworks_mappings.html') 

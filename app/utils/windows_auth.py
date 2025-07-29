@@ -16,7 +16,7 @@ from datetime import datetime
 from typing import Dict, Optional, Tuple
 from flask import current_app
 from app.models import User, AllowedWindowsUser
-from extensions import db
+from app.extensions import db
 
 
 def get_windows_username() -> str:

@@ -4,14 +4,22 @@
         <h2 class="card-title">Daily Ticket Closures</h2>
         <div class="time-controls">
             <button class="time-btn active" data-period="today">Today</button>
-            <button class="time-btn" data-period="yesterday">Yesterday</button>
             <button class="time-btn" data-period="week">This Week</button>
             <button class="time-btn" data-period="month">This Month</button>
+            {% if current_user.role != 'user' %}
+            <button class="admin-stats-btn" onclick="openAdminSyncModal()" title="Database Info & Sync (Admin)">
+                <i class="bi bi-gear-fill"></i>
+            </button>
+            {% endif %}
         </div>
     </div>
     
     <!-- Enhanced Daily Closures Chart - Taller to match outages -->
     <div class="user-tickets-chart enhanced">
+        <div class="chart-loading-overlay" id="chartLoadingOverlay">
+            <div class="loading-spinner"></div>
+            <p>Loading ticket data...</p>
+        </div>
         <canvas id="userTicketsChart" class="chart-canvas"></canvas>
     </div>
     
@@ -44,7 +52,6 @@
             <div class="user-tickets-filters">
                 <select class="user-tickets-filter" onchange="filterDailyClosures(this.value)">
                     <option value="today">Today</option>
-                    <option value="yesterday">Yesterday</option>
                     <option value="week">This Week</option>
                     <option value="month">This Month</option>
                 </select>
@@ -94,7 +101,6 @@
             <div class="user-tickets-filters">
                 <select class="user-tickets-filter" onchange="filterDailyClosures(this.value)">
                     <option value="today">Today</option>
-                    <option value="yesterday">Yesterday</option>
                     <option value="week">This Week</option>
                     <option value="month">This Month</option>
                 </select>
@@ -127,6 +133,114 @@
                 </button>
             </div>
             {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Admin Sync Statistics Modal -->
+<div id="adminSyncModal" class="admin-sync-modal">
+    <div class="admin-sync-modal-content round-modal">
+        <div class="admin-sync-modal-header">
+            <h3><i class="bi bi-gear-fill"></i> Database Info & Sync</h3>
+            <button class="admin-sync-modal-close" onclick="closeAdminSyncModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="admin-sync-modal-body">
+            <div class="stats-loading" id="adminStatsLoading">
+                <div class="loading-spinner"></div>
+                <p>Loading database information...</p>
+            </div>
+            
+            <div class="admin-stats-content" id="adminStatsContent" style="display: none;">
+                <!-- Database Information Section -->
+                <div class="stats-section">
+                    <h4><i class="bi bi-database"></i> Database Information</h4>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Last Sync Occurred</div>
+                            <div class="stat-value" id="lastSyncTime">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Total Closure Records</div>
+                            <div class="stat-value" id="totalClosureRecords">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Mapped Users</div>
+                            <div class="stat-value" id="mappedUsersCount">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Days with Data</div>
+                            <div class="stat-value" id="daysWithData">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sync Status Section -->
+                <div class="stats-section">
+                    <h4><i class="bi bi-clock-history"></i> Sync Status</h4>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Next Sync Available</div>
+                            <div class="stat-value" id="nextSyncTime">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Sync Count Today</div>
+                            <div class="stat-value" id="syncCountToday">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Tickets Processed Today</div>
+                            <div class="stat-value" id="ticketsProcessedToday">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Total Syncs</div>
+                            <div class="stat-value" id="totalSyncs">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Section -->
+                <div class="stats-section">
+                    <h4><i class="bi bi-activity"></i> Recent Activity</h4>
+                    <div class="recent-activity" id="recentActivity">
+                        <!-- Recent sync activity will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Manual Sync Actions -->
+                <div class="admin-actions-section">
+                    <h4><i class="bi bi-tools"></i> Manual Sync Options</h4>
+                    <div class="admin-action-buttons">
+                        <button class="admin-action-btn force-sync" onclick="forceSync()">
+                            <i class="bi bi-arrow-clockwise"></i>
+                            Manual Sync Now
+                        </button>
+                        <button class="admin-action-btn refresh-mappings" onclick="refreshUserMappings()">
+                            <i class="bi bi-people"></i>
+                            Refresh User Mappings
+                        </button>
+                        <button class="admin-action-btn export-data" onclick="exportAdminData()">
+                            <i class="bi bi-download"></i>
+                            Export All Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Ticket Details Modal -->
+<div id="userTicketDetailsModal" class="user-ticket-details-modal">
+    <div class="user-ticket-details-modal-content">
+        <div class="user-ticket-details-modal-header">
+            <h3><i class="bi bi-ticket-detailed-fill"></i> Ticket Details</h3>
+            <button class="user-ticket-details-modal-close" onclick="closeUserTicketDetailsModal()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="user-ticket-details-modal-body" id="userTicketDetailsContent">
+            <!-- Content will be populated by JavaScript -->
         </div>
     </div>
 </div>
@@ -210,6 +324,44 @@
     box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
 
+
+
+/* Admin stats button */
+.user-tickets-card .admin-stats-btn {
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    color: #dc3545;
+    padding: 0.6rem;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.5rem;
+}
+
+.user-tickets-card .admin-stats-btn:hover {
+    background: rgba(220, 53, 69, 0.2);
+    color: #ffffff;
+    border-color: #dc3545;
+    transform: scale(1.1);
+}
+
+.user-tickets-card .admin-stats-btn:active {
+    transform: scale(0.95);
+}
+
+/* Spin animation for loading spinner */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
 .user-tickets-chart.enhanced {
     height: 400px; /* Increased to match outages chart height */
     margin-bottom: 1.5rem;
@@ -217,6 +369,46 @@
     border-radius: 12px;
     padding: 1rem;
     border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 15, 15, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    backdrop-filter: blur(5px);
+    transition: opacity 0.3s ease;
+}
+
+.chart-loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.chart-loading-overlay .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(40, 167, 69, 0.3);
+    border-top: 3px solid #28a745;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+.chart-loading-overlay p {
+    color: #cccccc;
+    font-size: 0.9rem;
+    margin: 0;
+    text-align: center;
 }
 
 .user-tickets-stats {
@@ -597,6 +789,138 @@
     transform: translateY(-2px);
 }
 
+/* Top Performers Display Styles */
+.performers-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.performers-header h4 {
+    color: #ffffff;
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.total-tickets {
+    color: #28a745;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.performers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.performer-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(25, 25, 25, 0.6);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.performer-item:hover {
+    background: rgba(30, 30, 30, 0.8);
+    border-color: rgba(40, 167, 69, 0.3);
+    transform: translateX(5px);
+}
+
+.performer-item.gold {
+    border-color: #ffd700;
+    background: rgba(255, 215, 0, 0.1);
+}
+
+.performer-item.silver {
+    border-color: #c0c0c0;
+    background: rgba(192, 192, 192, 0.1);
+}
+
+.performer-item.bronze {
+    border-color: #cd7f32;
+    background: rgba(205, 127, 50, 0.1);
+}
+
+.performer-rank {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #28a745, #20c997);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.performer-item.gold .performer-rank {
+    background: linear-gradient(135deg, #ffd700, #ffb300);
+    color: #000;
+}
+
+.performer-item.silver .performer-rank {
+    background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
+    color: #000;
+}
+
+.performer-item.bronze .performer-rank {
+    background: linear-gradient(135deg, #cd7f32, #b8860b);
+    color: #fff;
+}
+
+.performer-info {
+    flex: 1;
+}
+
+.performer-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 0.2rem;
+}
+
+.performer-role {
+    font-size: 0.8rem;
+    color: #888888;
+    font-weight: 500;
+}
+
+.performer-stats {
+    text-align: right;
+}
+
+.tickets-count {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #28a745;
+    margin-bottom: 0.2rem;
+}
+
+.tickets-label {
+    font-size: 0.7rem;
+    color: #888888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.no-data {
+    text-align: center;
+    color: #888888;
+    font-style: italic;
+    padding: 2rem;
+}
+
 /* Admin Actions */
 .admin-actions {
     margin-top: 1.5rem;
@@ -642,6 +966,252 @@
     }
 }
 
+/* Admin Sync Modal Styles */
+.admin-sync-modal {
+    display: none;
+    position: fixed;
+    z-index: 999999999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.3s ease;
+}
+
+.admin-sync-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-sync-modal-content {
+    background: rgba(15, 15, 15, 0.95);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    width: 95%;
+    max-width: 1200px;
+    max-height: 90vh;
+    overflow: hidden;
+    animation: slideIn 0.3s ease;
+}
+
+.admin-sync-modal-content.round-modal {
+    border-radius: 50px;
+    max-width: 800px;
+    width: 90%;
+}
+
+.admin-sync-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.admin-sync-modal-header h3 {
+    color: #ffffff;
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.admin-sync-modal-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    color: #ffffff;
+    padding: 0.5rem;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.admin-sync-modal-close:hover {
+    background: rgba(220, 53, 69, 0.3);
+    border-color: #dc3545;
+    color: #dc3545;
+    transform: scale(1.1);
+}
+
+.admin-sync-modal-body {
+    padding: 2rem;
+    max-height: 75vh;
+    overflow-y: auto;
+}
+
+.stats-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: #cccccc;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(220, 53, 69, 0.3);
+    border-top: 3px solid #dc3545;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+.stats-section {
+    margin-bottom: 2rem;
+    background: rgba(25, 25, 25, 0.8);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stats-section h4 {
+    color: #ffffff;
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.stat-card {
+    background: rgba(30, 30, 30, 0.8);
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    background: rgba(35, 35, 35, 0.9);
+    border-color: rgba(220, 53, 69, 0.3);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #888888;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #dc3545;
+    text-shadow: 0 0 10px rgba(220, 53, 69, 0.3);
+}
+
+.recent-activity {
+    background: rgba(30, 30, 30, 0.8);
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-text {
+    color: #cccccc;
+    font-size: 0.9rem;
+}
+
+.activity-time {
+    color: #888888;
+    font-size: 0.8rem;
+}
+
+.admin-action-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.admin-action-btn {
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    backdrop-filter: blur(10px);
+}
+
+.admin-action-btn.force-sync {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+}
+
+.admin-action-btn.force-sync:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);
+}
+
+.admin-action-btn.refresh-mappings {
+    background: rgba(0, 123, 255, 0.2);
+    color: #007bff;
+    border: 1px solid rgba(0, 123, 255, 0.3);
+}
+
+.admin-action-btn.refresh-mappings:hover {
+    background: rgba(0, 123, 255, 0.3);
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.admin-action-btn.export-data {
+    background: rgba(108, 117, 125, 0.2);
+    color: #6c757d;
+    border: 1px solid rgba(108, 117, 125, 0.3);
+}
+
+.admin-action-btn.export-data:hover {
+    background: rgba(108, 117, 125, 0.3);
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .performance-modal-content {
@@ -667,6 +1237,427 @@
     
     .quick-ticket-actions {
         flex-direction: column;
+    }
+
+    .admin-sync-modal-content {
+        width: 98%;
+        margin: 0.5rem;
+    }
+    
+    .admin-sync-modal-header {
+        padding: 1rem 1.5rem;
+    }
+    
+    .admin-sync-modal-body {
+        padding: 1.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .admin-action-buttons {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* User Ticket Details Modal Styles */
+.user-ticket-details-modal {
+    display: none;
+    position: fixed;
+    z-index: 999999999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.3s ease;
+}
+
+.user-ticket-details-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-ticket-details-modal-content {
+    background: rgba(15, 15, 15, 0.95);
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    width: 95%;
+    max-width: 1000px;
+    max-height: 90vh;
+    overflow: hidden;
+    animation: slideIn 0.3s ease;
+}
+
+.user-ticket-details-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(40, 167, 69, 0.1);
+}
+
+.user-ticket-details-modal-header h3 {
+    color: #ffffff;
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.user-ticket-details-modal-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    color: #ffffff;
+    padding: 0.5rem;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.user-ticket-details-modal-close:hover {
+    background: rgba(40, 167, 69, 0.3);
+    border-color: #28a745;
+    color: #28a745;
+    transform: scale(1.1);
+}
+
+.user-ticket-details-modal-body {
+    padding: 2rem;
+    max-height: 75vh;
+    overflow-y: auto;
+}
+
+/* User Summary Section */
+.user-summary {
+    background: rgba(25, 25, 25, 0.8);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #28a745, #20c997);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.5rem;
+    border: 3px solid rgba(40, 167, 69, 0.3);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+    overflow: hidden;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.user-details h3 {
+    color: #ffffff;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.user-role {
+    color: #28a745;
+    margin: 0 0 0.3rem 0;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.user-date {
+    color: #888888;
+    margin: 0;
+    font-size: 0.8rem;
+}
+
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.summary-stats .stat-item {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(30, 30, 30, 0.8);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.summary-stats .stat-number {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #28a745;
+    margin-bottom: 0.3rem;
+    text-shadow: 0 0 10px rgba(40, 167, 69, 0.3);
+}
+
+.summary-stats .stat-label {
+    font-size: 0.8rem;
+    color: #cccccc;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+/* Ticket Items */
+.ticket-item {
+    background: rgba(25, 25, 25, 0.8);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.ticket-item:hover {
+    background: rgba(30, 30, 30, 0.9);
+    border-color: rgba(40, 167, 69, 0.2);
+    transform: translateY(-2px);
+}
+
+.ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.ticket-number {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #28a745;
+    font-family: 'Courier New', monospace;
+}
+
+.ticket-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.badge {
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Status Badges */
+.status-open { background: rgba(0, 123, 255, 0.2); color: #007bff; border: 1px solid rgba(0, 123, 255, 0.3); }
+.status-pending { background: rgba(255, 193, 7, 0.2); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.3); }
+.status-resolved { background: rgba(40, 167, 69, 0.2); color: #28a745; border: 1px solid rgba(40, 167, 69, 0.3); }
+.status-closed { background: rgba(108, 117, 125, 0.2); color: #6c757d; border: 1px solid rgba(108, 117, 125, 0.3); }
+.status-cancelled { background: rgba(220, 53, 69, 0.2); color: #dc3545; border: 1px solid rgba(220, 53, 69, 0.3); }
+.status-unknown { background: rgba(108, 117, 125, 0.2); color: #6c757d; border: 1px solid rgba(108, 117, 125, 0.3); }
+
+/* Priority Badges */
+.priority-low { background: rgba(40, 167, 69, 0.2); color: #28a745; border: 1px solid rgba(40, 167, 69, 0.3); }
+.priority-medium { background: rgba(255, 193, 7, 0.2); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.3); }
+.priority-high { background: rgba(255, 152, 0, 0.2); color: #ff9800; border: 1px solid rgba(255, 152, 0, 0.3); }
+.priority-urgent { background: rgba(220, 53, 69, 0.2); color: #dc3545; border: 1px solid rgba(220, 53, 69, 0.3); }
+.priority-unknown { background: rgba(108, 117, 125, 0.2); color: #6c757d; border: 1px solid rgba(108, 117, 125, 0.3); }
+
+/* Urgency Badges */
+.urgency-low { background: rgba(40, 167, 69, 0.2); color: #28a745; border: 1px solid rgba(40, 167, 69, 0.3); }
+.urgency-medium { background: rgba(255, 193, 7, 0.2); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.3); }
+.urgency-high { background: rgba(255, 152, 0, 0.2); color: #ff9800; border: 1px solid rgba(255, 152, 0, 0.3); }
+.urgency-urgent { background: rgba(220, 53, 69, 0.2); color: #dc3545; border: 1px solid rgba(220, 53, 69, 0.3); }
+.urgency-unknown { background: rgba(108, 117, 125, 0.2); color: #6c757d; border: 1px solid rgba(108, 117, 125, 0.3); }
+
+.ticket-subject {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.ticket-meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #888888;
+    font-size: 0.85rem;
+}
+
+.meta-item i {
+    color: #28a745;
+    font-size: 0.9rem;
+}
+
+.ticket-description {
+    color: #cccccc;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: rgba(20, 20, 20, 0.5);
+    border-radius: 8px;
+    border-left: 3px solid #28a745;
+}
+
+.ticket-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.tag {
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+/* Loading and Error States */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: #cccccc;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(40, 167, 69, 0.3);
+    border-top: 3px solid #28a745;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: #dc3545;
+    text-align: center;
+}
+
+.error-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.error-state h4 {
+    margin: 0 0 1rem 0;
+    color: #dc3545;
+}
+
+.error-state p {
+    color: #cccccc;
+    margin-bottom: 1.5rem;
+}
+
+.no-tickets {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: #888888;
+    text-align: center;
+}
+
+.no-tickets i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #666666;
+}
+
+.no-tickets h4 {
+    margin: 0 0 1rem 0;
+    color: #cccccc;
+}
+
+.no-tickets p {
+    color: #888888;
+}
+
+/* Responsive Design for Modal */
+@media (max-width: 768px) {
+    .user-ticket-details-modal-content {
+        width: 98%;
+        margin: 0.5rem;
+        border-radius: 20px;
+    }
+    
+    .user-ticket-details-modal-header {
+        padding: 1rem 1.5rem;
+    }
+    
+    .user-ticket-details-modal-body {
+        padding: 1.5rem;
+    }
+    
+    .user-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .summary-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .ticket-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .ticket-meta {
+        flex-direction: column;
+        gap: 0.5rem;
     }
 }
 </style> 

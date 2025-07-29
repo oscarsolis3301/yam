@@ -7,7 +7,7 @@ import logging
 
 from . import bp  # Import the shared blueprint instance
 from app.utils.device import get_devices_csv_path  # Unified path helper
-from extensions import db
+from app.extensions import db
 
 # In-memory device cache
 _devices_cache = []

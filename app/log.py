@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from app.models import Activity, User
-from extensions import db
+from app.extensions import db
 
 def get_user_history(user_id, days=7):
     """Get user activity history for the specified number of days"""

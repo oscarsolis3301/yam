@@ -3,7 +3,7 @@ import base64
 import numpy as np
 from app.utils.logger import setup_logging
 from app.utils.helpers import asr_model
-from extensions import socketio
+from app.extensions import socketio
 
 logger = setup_logging()
 

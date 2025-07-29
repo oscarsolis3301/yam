@@ -7,7 +7,7 @@ import logging
 from datetime import datetime
 from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
-from extensions import db
+from app.extensions import db
 from app.models.chat import (
     TeamChatMessage, TeamChatSession, TeamChatTyping,
     get_recent_messages, get_active_participants, get_typing_users

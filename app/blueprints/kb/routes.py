@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, render_template, current_app
 from flask_login import login_required, current_user
-from extensions import db
+from app.extensions import db
 from app.models import KBArticle
 from app.utils.ai_utils import generate_summary, get_similar_articles
 from . import bp

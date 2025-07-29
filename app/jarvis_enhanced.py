@@ -97,7 +97,7 @@ class EnhancedJarvisTrainer:
             import sys
             sys.path.append('..')  # Add parent directory to path
             from app.YAM_refactored import app
-            from extensions import db
+            from app.extensions import db
             from sqlalchemy import text
             self.app = app
             self.db = db

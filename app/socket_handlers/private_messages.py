@@ -8,7 +8,7 @@ from datetime import datetime
 from flask import current_app, request
 from flask_socketio import emit, join_room, leave_room
 from flask_login import current_user
-from extensions import socketio, db
+from app.extensions import socketio, db
 from app.models.private_messages import (
     PrivateMessage, PrivateMessageSession,
     get_conversation_messages, get_user_conversations,

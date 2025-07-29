@@ -118,7 +118,7 @@ class ConfigManager:
 
 
 # Import the Config class from extensions
-from extensions import Config
+from app.extensions import Config
 
 # Add a Config class to config.py for backward compatibility
 class Config:

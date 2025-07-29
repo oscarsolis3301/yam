@@ -33,7 +33,7 @@ def init_user_system_basic():
         
         # Basic check for database availability
         try:
-            from extensions import db
+            from app.extensions import db
             # Simple check - don't actually query yet
             if db:
                 logger.info("Database connection available")

@@ -61,3 +61,42 @@
  * Running on http://127.0.0.1:5000
  * Running on http://10.20.44.51:5000
 2025-07-24 15:41:37,452 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-29 10:51:34,352 - app - WARNING - Model registration failed: No module named 'extensions'
+2025-07-29 10:51:34,353 - app - WARNING - Blueprint registration failed: name 'init_auth_blueprint' is not defined
+2025-07-29 10:52:22,621 - app - WARNING - Model registration failed: No module named 'extensions'
+2025-07-29 10:52:22,623 - app - WARNING - Blueprint registration failed: name 'init_auth_blueprint' is not defined
+2025-07-29 10:52:45,551 - app - WARNING - Model registration failed: No module named 'extensions'
+2025-07-29 10:52:45,552 - app - WARNING - Blueprint registration failed: name 'init_auth_blueprint' is not defined
+2025-07-29 10:53:06,317 - app - WARNING - Model registration failed: No module named 'extensions'
+2025-07-29 10:53:06,318 - app - WARNING - Blueprint registration failed: name 'init_auth_blueprint' is not defined
+2025-07-29 10:53:08,250 - app - WARNING - Model registration failed: No module named 'extensions'
+2025-07-29 10:53:08,251 - app - WARNING - Blueprint registration failed: name 'init_auth_blueprint' is not defined
+2025-07-29 10:56:18,498 - app - WARNING - Blueprint registration failed: name 'init_auth_blueprint' is not defined
+2025-07-29 11:02:06,679 - app - WARNING - Blueprint registration failed: name 'init_auth_blueprint' is not defined
+2025-07-29 11:02:28,090 - app - WARNING - Blueprint registration failed: name 'init_auth_blueprint' is not defined
+2025-07-29 11:02:45,084 - app - WARNING - Blueprint registration failed: name 'init_auth_blueprint' is not defined
+2025-07-29 11:03:03,361 - app - WARNING - Blueprint registration failed: name 'init_auth_blueprint' is not defined
+2025-07-29 11:03:10,110 - app - WARNING - Blueprint registration failed: name 'init_auth_blueprint' is not defined
+2025-07-29 11:09:49,578 - app - WARNING - Blueprint registration failed: name 'init_auth_blueprint' is not defined
+2025-07-29 11:44:30,042 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 11:45:51,521 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 11:46:19,223 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 11:46:27,356 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 11:47:10,717 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 11:48:01,698 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 11:48:10,645 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 11:52:53,710 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 11:53:16,240 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 13:06:34,369 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 13:08:13,120 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 13:08:21,415 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 13:09:02,378 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 13:09:56,455 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 13:13:00,927 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 13:14:16,051 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 13:14:16,136 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 14:09:01,987 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 14:10:40,647 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 14:10:48,470 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 14:56:32,818 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined
+2025-07-29 14:56:51,952 - app - WARNING - Blueprint registration failed: name 'tickets_bp' is not defined

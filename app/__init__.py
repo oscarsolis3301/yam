@@ -193,7 +193,7 @@ class ConfigManager:
 
 # Import Config class from extensions to avoid circular imports
 try:
-    from extensions import Config
+    from app.extensions import Config
 except ImportError:
     # Fallback configuration if extensions is not available
     class Config:
@@ -239,7 +239,7 @@ from pathlib import Path
 
 # Import Config from extensions
 try:
-    from extensions import Config
+    from app.extensions import Config
 except ImportError:
     # Fallback if extensions is not available
     class Config:
@@ -254,7 +254,7 @@ except ImportError:
 
 # Import extensions
 try:
-    from extensions import db, login_manager, socketio, migrate, init_extensions
+    from app.extensions import db, login_manager, socketio, migrate, init_extensions
 except ImportError:
     # Create fallback extensions if not available
     from flask_sqlalchemy import SQLAlchemy
@@ -293,10 +293,13 @@ try:
     from .blueprints.dameware import bp as dameware_bp
     from .blueprints.users.clock_id_routes import bp as clock_id_cache_bp
     from .blueprints.api.chat_routes import chat_bp
+    from .blueprints.api import bp as api_bp
     from .blueprints.workstations import bp as workstations_bp
     from .blueprints.team import bp as team_bp
     from .blueprints.tickets import bp as tickets_bp
+    from .blueprints.tickets_api import tickets_api_bp
     from .blueprints.settings_api import bp as settings_api_bp
+    from .blueprints.freshworks_linking import bp as freshworks_linking_bp
 except ImportError as e:
     print(f"Warning: Some blueprints could not be imported: {e}")
 
@@ -372,10 +375,13 @@ def create_app(config_class=Config):
             app.register_blueprint(dameware_bp)
             app.register_blueprint(clock_id_cache_bp)
             app.register_blueprint(chat_bp, url_prefix='/api/chat')
+            app.register_blueprint(api_bp, url_prefix='/api')
             app.register_blueprint(workstations_bp)
             app.register_blueprint(team_bp)
             app.register_blueprint(tickets_bp)
+            app.register_blueprint(tickets_api_bp)
             app.register_blueprint(settings_api_bp, url_prefix='/api/settings')
+            app.register_blueprint(freshworks_linking_bp)
             
             # Import and register private messages blueprint
             from app.blueprints.api.private_messages import private_messages_bp

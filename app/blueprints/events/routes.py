@@ -1,8 +1,8 @@
 import logging
 from flask import request, jsonify
 from . import bp
-from extensions import socketio
-from extensions import db
+from app.extensions import socketio
+from app.extensions import db
 
 @bp.route('/ad_event', methods=['POST'])
 def ad_event():

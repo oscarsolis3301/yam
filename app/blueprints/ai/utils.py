@@ -9,7 +9,7 @@ from app.utils.models import get_model, get_embedder, get_processor, get_caption
 import os
 import logging
 from datetime import datetime
-from extensions import db
+from app.extensions import db
 
 logger = logging.getLogger('spark')
 

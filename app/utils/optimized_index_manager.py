@@ -16,7 +16,7 @@ import os
 
 from app.utils.optimized_search_engine import optimized_search_engine, extract_plain_text_from_quill
 from app.models import KBArticle, Outage, User, Document, Note, SearchIndex
-from extensions import db
+from app.extensions import db
 
 logger = logging.getLogger(__name__)
 

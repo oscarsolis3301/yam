@@ -243,6 +243,21 @@
       const form = document.querySelector('.login-form');
       const submitBtn = document.querySelector('.btn-login');
       
+      // Clear any stale session data on page load
+      if (typeof sessionStorage !== 'undefined') {
+        // Clear any cached authentication data
+        sessionStorage.removeItem('user_authenticated');
+        sessionStorage.removeItem('session_data');
+        sessionStorage.removeItem('redirect_loop_protection');
+      }
+      
+      // Clear any localStorage authentication data
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem('user_authenticated');
+        localStorage.removeItem('session_data');
+        localStorage.removeItem('redirect_loop_protection');
+      }
+      
       if (form) {
         form.addEventListener('submit', function(e) {
           // Ensure the stars animation continues during form submission
@@ -251,6 +266,16 @@
             // Force canvas to stay visible and animated
             canvas.style.display = 'block';
             canvas.style.visibility = 'visible';
+          }
+          
+          // Clear any cached session data before submitting
+          if (typeof sessionStorage !== 'undefined') {
+            sessionStorage.clear();
+          }
+          if (typeof localStorage !== 'undefined') {
+            localStorage.removeItem('user_authenticated');
+            localStorage.removeItem('session_data');
+            localStorage.removeItem('redirect_loop_protection');
           }
         });
       }
@@ -265,6 +290,32 @@
           }
         });
       }
+      
+      // Add a small delay to ensure any redirect loops are broken
+      setTimeout(function() {
+        // Force a clean state
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.removeItem('user_authenticated');
+          sessionStorage.removeItem('session_data');
+        }
+      }, 100);
+      
+      // Add a function to clear all storage (can be called from browser console)
+      window.clearYAMStorage = function() {
+        console.log('Clearing all YAM storage...');
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.clear();
+          console.log('SessionStorage cleared');
+        }
+        if (typeof localStorage !== 'undefined') {
+          localStorage.clear();
+          console.log('LocalStorage cleared');
+        }
+        console.log('All storage cleared. Please refresh the page.');
+      };
+      
+      // Log the function availability
+      console.log('YAM storage clear function available: window.clearYAMStorage()');
     });
   </script>
 </body>

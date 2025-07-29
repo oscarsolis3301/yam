@@ -2,3 +2,760 @@
 2025-07-23 10:07:45,962 - spark - INFO - Local embedder initialised successfully [OK]
 2025-07-23 10:10:43,276 - spark - INFO - Attempting to load local embedder from: C:\Users\oscar.solis\Documents\yam\app\data\models\local_embedder
 2025-07-23 10:10:43,549 - spark - INFO - Local embedder initialised successfully [OK]
+2025-07-29 10:56:18,507 - spark - WARNING - Could not find local user for Freshworks user: Oscar Solis (18014125885)
+2025-07-29 10:56:18,508 - spark - WARNING - Could not find local user for Freshworks user: Samuel Nightingale (18014145011)
+2025-07-29 10:56:18,510 - spark - WARNING - Could not find local user for Freshworks user: Richard Nguyen (18012793279)
+2025-07-29 10:56:18,513 - spark - WARNING - Could not find local user for Freshworks user: Jonathan Nguyen (18012793282)
+2025-07-29 10:56:18,514 - spark - WARNING - Could not find local user for Freshworks user: Vinh Nguyen (18004319087)
+2025-07-29 10:56:18,516 - spark - WARNING - Could not find local user for Freshworks user: Jabin Dejesa (18012681432)
+2025-07-29 10:56:18,518 - spark - INFO - Mapped Freshworks user AJ (18012782747) to AJ
+2025-07-29 10:56:18,521 - spark - INFO - Mapped Freshworks user JZ (18012928372) to JZ
+2025-07-29 10:56:18,522 - spark - WARNING - Could not find local user for Freshworks user: Doug Spohn (18012793278)
+2025-07-29 10:56:18,523 - spark - WARNING - Could not find local user for Freshworks user: Mayra Lopez (18012908836)
+2025-07-29 10:56:18,524 - spark - WARNING - Could not find local user for Freshworks user: Pietro Vue (18012900614)
+2025-07-29 10:56:18,526 - spark - WARNING - Could not find local user for Freshworks user: Jarrod Woodson (18014004334)
+2025-07-29 10:56:18,527 - spark - WARNING - Could not find local user for Freshworks user: Staci Valko (18012900697)
+2025-07-29 10:56:18,530 - spark - WARNING - Could not find local user for Freshworks user: Christopher Bush (18013111640)
+2025-07-29 10:56:18,531 - spark - WARNING - Could not find local user for Freshworks user: Nick Gutierrez (18013106494)
+2025-07-29 10:56:18,533 - spark - WARNING - Could not find local user for Freshworks user: Anthony Risker (18012857050)
+2025-07-29 10:56:18,534 - spark - WARNING - Could not find local user for Freshworks user: Rylan Knightstep (18012749613)
+2025-07-29 10:56:18,534 - spark - WARNING - Could not find local user for Freshworks user: Ralph Rosalin (18012900616)
+2025-07-29 10:56:18,538 - spark - INFO - User mappings synced successfully
+2025-07-29 10:56:18,538 - spark - INFO - 🔄 Starting sync for 2025-07-29...
+2025-07-29 10:56:19,653 - spark - INFO - Fetching page 1... Status: 200
+2025-07-29 10:56:20,198 - spark - INFO - Fetching page 2... Status: 200
+2025-07-29 10:56:20,692 - spark - INFO - Fetching page 3... Status: 200
+2025-07-29 10:56:21,673 - spark - INFO - Fetching page 4... Status: 200
+2025-07-29 10:56:22,223 - spark - INFO - Fetching page 5... Status: 200
+2025-07-29 10:56:23,207 - spark - INFO - Fetching page 6... Status: 200
+2025-07-29 10:56:23,704 - spark - INFO - Fetching page 7... Status: 200
+2025-07-29 10:56:24,229 - spark - INFO - Fetching page 8... Status: 200
+2025-07-29 10:56:24,759 - spark - INFO - Fetching page 9... Status: 200
+2025-07-29 10:56:25,721 - spark - INFO - Fetching page 10... Status: 200
+2025-07-29 10:56:26,250 - spark - INFO - Fetching page 11... Status: 200
+2025-07-29 10:56:27,198 - spark - INFO - Fetching page 12... Status: 200
+2025-07-29 10:56:27,731 - spark - INFO - Fetching page 13... Status: 200
+2025-07-29 10:56:28,224 - spark - INFO - Fetching page 14... Status: 200
+2025-07-29 10:56:28,699 - spark - INFO - Fetching page 15... Status: 200
+2025-07-29 10:56:29,645 - spark - INFO - Fetching page 16... Status: 200
+2025-07-29 10:56:30,193 - spark - INFO - Fetching page 17... Status: 200
+2025-07-29 10:56:30,665 - spark - INFO - Fetching page 18... Status: 200
+2025-07-29 10:56:31,198 - spark - INFO - Fetching page 19... Status: 200
+2025-07-29 10:56:31,756 - spark - INFO - Fetching page 20... Status: 200
+2025-07-29 10:56:32,379 - spark - INFO - Fetching page 21... Status: 200
+2025-07-29 10:56:32,909 - spark - INFO - Fetching page 22... Status: 200
+2025-07-29 10:56:33,783 - spark - INFO - Fetching page 23... Status: 200
+2025-07-29 10:56:34,523 - spark - INFO - Fetching page 24... Status: 200
+2025-07-29 10:56:35,092 - spark - INFO - Fetching page 25... Status: 200
+2025-07-29 10:56:35,578 - spark - INFO - Fetching page 26... Status: 200
+2025-07-29 10:56:35,948 - spark - INFO - Fetching page 27... Status: 200
+2025-07-29 10:56:35,960 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012900697
+2025-07-29 10:56:35,961 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18013106494
+2025-07-29 10:56:35,962 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18013111640
+2025-07-29 10:56:35,963 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012681432
+2025-07-29 10:56:35,977 - spark - INFO - ➕ Created new entry for JZ: 6 tickets on 2025-07-29
+2025-07-29 10:56:35,978 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012857050
+2025-07-29 10:56:35,980 - spark - INFO - ➕ Created new entry for AJ: 22 tickets on 2025-07-29
+2025-07-29 10:56:35,981 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18014125885
+2025-07-29 10:56:35,982 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18014145011
+2025-07-29 10:56:35,983 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18004319087
+2025-07-29 10:56:35,984 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012749613
+2025-07-29 10:56:35,984 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012900616
+2025-07-29 10:56:35,984 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012900614
+2025-07-29 10:56:35,986 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012793279
+2025-07-29 10:56:35,986 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012793282
+2025-07-29 10:56:35,995 - spark - INFO - ✅ Daily closures synced successfully for 2025-07-29 - 108 tickets processed
+2025-07-29 10:56:35,995 - spark - INFO - 🔄 Starting sync for 2025-07-28...
+2025-07-29 10:56:36,710 - spark - INFO - Fetching page 1... Status: 200
+2025-07-29 10:56:37,282 - spark - INFO - Fetching page 2... Status: 200
+2025-07-29 10:56:37,872 - spark - INFO - Fetching page 3... Status: 200
+2025-07-29 10:56:38,434 - spark - INFO - Fetching page 4... Status: 200
+2025-07-29 10:56:38,923 - spark - INFO - Fetching page 5... Status: 200
+2025-07-29 10:56:39,436 - spark - INFO - Fetching page 6... Status: 200
+2025-07-29 10:56:41,029 - spark - INFO - Fetching page 7... Status: 200
+2025-07-29 10:56:41,639 - spark - INFO - Fetching page 8... Status: 200
+2025-07-29 10:56:42,168 - spark - INFO - Fetching page 9... Status: 200
+2025-07-29 10:56:42,760 - spark - INFO - Fetching page 10... Status: 200
+2025-07-29 10:56:43,342 - spark - INFO - Fetching page 11... Status: 200
+2025-07-29 10:56:43,866 - spark - INFO - Fetching page 12... Status: 200
+2025-07-29 10:56:44,585 - spark - INFO - Fetching page 13... Status: 200
+2025-07-29 10:56:45,501 - spark - INFO - Fetching page 14... Status: 200
+2025-07-29 10:56:46,141 - spark - INFO - Fetching page 15... Status: 200
+2025-07-29 10:56:46,667 - spark - INFO - Fetching page 16... Status: 200
+2025-07-29 10:56:47,716 - spark - INFO - Fetching page 17... Status: 200
+2025-07-29 10:56:49,108 - spark - INFO - Fetching page 18... Status: 200
+2025-07-29 10:56:49,657 - spark - INFO - Fetching page 19... Status: 200
+2025-07-29 10:56:50,358 - spark - INFO - Fetching page 20... Status: 200
+2025-07-29 10:56:50,925 - spark - INFO - Fetching page 21... Status: 200
+2025-07-29 10:56:51,459 - spark - INFO - Fetching page 22... Status: 200
+2025-07-29 10:56:52,072 - spark - INFO - Fetching page 23... Status: 200
+2025-07-29 10:56:52,652 - spark - INFO - Fetching page 24... Status: 200
+2025-07-29 10:56:53,362 - spark - INFO - Fetching page 25... Status: 200
+2025-07-29 10:56:54,242 - spark - INFO - Fetching page 26... Status: 200
+2025-07-29 10:56:54,882 - spark - INFO - Fetching page 27... Status: 200
+2025-07-29 10:56:55,426 - spark - INFO - Fetching page 28... Status: 200
+2025-07-29 10:56:55,945 - spark - INFO - Fetching page 29... Status: 200
+2025-07-29 10:56:56,500 - spark - INFO - Fetching page 30... Status: 200
+2025-07-29 10:56:57,086 - spark - INFO - Fetching page 31... Status: 200
+2025-07-29 10:56:57,597 - spark - INFO - Fetching page 32... Status: 200
+2025-07-29 10:56:58,215 - spark - INFO - Fetching page 33... Status: 200
+2025-07-29 10:56:59,148 - spark - INFO - Fetching page 34... Status: 200
+2025-07-29 10:56:59,701 - spark - INFO - Fetching page 35... Status: 200
+2025-07-29 10:57:00,357 - spark - INFO - Fetching page 36... Status: 200
+2025-07-29 10:57:00,926 - spark - INFO - Fetching page 37... Status: 200
+2025-07-29 10:57:01,611 - spark - INFO - Fetching page 38... Status: 200
+2025-07-29 10:57:02,598 - spark - INFO - Fetching page 39... Status: 200
+2025-07-29 10:57:03,615 - spark - INFO - Fetching page 40... Status: 200
+2025-07-29 10:57:04,289 - spark - INFO - Fetching page 41... Status: 200
+2025-07-29 10:57:04,915 - spark - INFO - Fetching page 42... Status: 200
+2025-07-29 10:57:05,929 - spark - INFO - Fetching page 43... Status: 200
+2025-07-29 10:57:06,937 - spark - INFO - Fetching page 44... Status: 200
+2025-07-29 10:57:07,685 - spark - INFO - Fetching page 45... Status: 200
+2025-07-29 10:57:08,386 - spark - INFO - Fetching page 46... Status: 200
+2025-07-29 10:57:08,936 - spark - INFO - Fetching page 47... Status: 200
+2025-07-29 10:57:09,564 - spark - INFO - Fetching page 48... Status: 200
+2025-07-29 10:57:10,190 - spark - INFO - Fetching page 49... Status: 200
+2025-07-29 10:57:10,751 - spark - INFO - Fetching page 50... Status: 200
+2025-07-29 10:57:11,492 - spark - INFO - Fetching page 51... Status: 200
+2025-07-29 10:57:12,100 - spark - INFO - Fetching page 52... Status: 200
+2025-07-29 10:57:12,748 - spark - INFO - Fetching page 53... Status: 200
+2025-07-29 10:57:13,346 - spark - INFO - Fetching page 54... Status: 200
+2025-07-29 10:57:14,077 - spark - INFO - Fetching page 55... Status: 200
+2025-07-29 10:57:14,962 - spark - INFO - Fetching page 56... Status: 200
+2025-07-29 10:57:15,928 - spark - INFO - Fetching page 57... Status: 200
+2025-07-29 10:57:16,505 - spark - INFO - Fetching page 58... Status: 200
+2025-07-29 10:57:17,106 - spark - INFO - Fetching page 59... Status: 200
+2025-07-29 10:57:17,685 - spark - INFO - Fetching page 60... Status: 200
+2025-07-29 10:57:18,381 - spark - INFO - Fetching page 61... Status: 200
+2025-07-29 10:57:18,934 - spark - INFO - Fetching page 62... Status: 200
+2025-07-29 10:57:19,893 - spark - INFO - Fetching page 63... Status: 200
+2025-07-29 10:57:20,517 - spark - INFO - Fetching page 64... Status: 200
+2025-07-29 10:57:21,200 - spark - INFO - Fetching page 65... Status: 200
+2025-07-29 10:57:21,831 - spark - INFO - Fetching page 66... Status: 200
+2025-07-29 10:57:22,513 - spark - INFO - Fetching page 67... Status: 200
+2025-07-29 10:57:23,172 - spark - INFO - Fetching page 68... Status: 200
+2025-07-29 10:57:24,106 - spark - INFO - Fetching page 69... Status: 200
+2025-07-29 10:57:24,841 - spark - INFO - Fetching page 70... Status: 200
+2025-07-29 10:57:25,614 - spark - INFO - Fetching page 71... Status: 200
+2025-07-29 10:57:25,636 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012900614
+2025-07-29 10:57:25,637 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18014145011
+2025-07-29 10:57:25,638 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18014125885
+2025-07-29 10:57:25,639 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012793279
+2025-07-29 10:57:25,639 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012681432
+2025-07-29 10:57:25,640 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012900603
+2025-07-29 10:57:25,652 - spark - INFO - ➕ Created new entry for JZ: 8 tickets on 2025-07-28
+2025-07-29 10:57:25,653 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18013111640
+2025-07-29 10:57:25,654 - spark - INFO - ➕ Created new entry for AJ: 19 tickets on 2025-07-28
+2025-07-29 10:57:25,655 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012900697
+2025-07-29 10:57:25,656 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012857050
+2025-07-29 10:57:25,657 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18013106494
+2025-07-29 10:57:25,657 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18014004334
+2025-07-29 10:57:25,658 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012900616
+2025-07-29 10:57:25,658 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012749613
+2025-07-29 10:57:25,665 - spark - INFO - ✅ Daily closures synced successfully for 2025-07-28 - 205 tickets processed
+2025-07-29 11:02:06,683 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-29 11:02:06,688 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18014125885
+2025-07-29 11:02:28,097 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-29 11:02:28,102 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18014125885
+2025-07-29 11:03:10,114 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-29 11:03:10,118 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18014125885
+2025-07-29 11:03:10,121 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18014145011
+2025-07-29 11:03:10,124 - spark - INFO - ✅ Created mapping: Richard Nguyen -> Richard (ID: 18012793279)
+2025-07-29 11:03:10,126 - spark - INFO - ✅ Created mapping: Jonathan Nguyen -> Jonathan (ID: 18012793282)
+2025-07-29 11:03:10,129 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18004319087
+2025-07-29 11:03:10,131 - spark - INFO - ✅ Created mapping: Jabin Dejesa -> Jabin (ID: 18012681432)
+2025-07-29 11:03:10,133 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012782747
+2025-07-29 11:03:10,134 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012928372
+2025-07-29 11:03:10,136 - spark - INFO - ✅ Created mapping: Doug Spohn -> Doug (ID: 18012793278)
+2025-07-29 11:03:10,137 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012908836
+2025-07-29 11:03:10,140 - spark - INFO - ✅ Created mapping: Pietro Vue -> Pietro (ID: 18012900614)
+2025-07-29 11:03:10,141 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18014004334
+2025-07-29 11:03:10,144 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012900697
+2025-07-29 11:03:10,146 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18013111640
+2025-07-29 11:03:10,148 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18013106494
+2025-07-29 11:03:10,151 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012857050
+2025-07-29 11:03:10,154 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012749613
+2025-07-29 11:03:10,156 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18012900616
+2025-07-29 11:03:10,160 - spark - INFO - ✅ User mappings synced successfully: 18 created, 0 updated
+2025-07-29 11:03:10,687 - spark - INFO - Fetching page 1... Status: 200
+2025-07-29 11:03:12,121 - spark - INFO - Fetching page 2... Status: 200
+2025-07-29 11:03:12,806 - spark - INFO - Fetching page 3... Status: 200
+2025-07-29 11:03:13,583 - spark - INFO - Fetching page 4... Status: 200
+2025-07-29 11:03:14,100 - spark - INFO - Fetching page 5... Status: 200
+2025-07-29 11:03:14,628 - spark - INFO - Fetching page 6... Status: 200
+2025-07-29 11:03:15,457 - spark - INFO - Fetching page 7... Status: 200
+2025-07-29 11:03:16,124 - spark - INFO - Fetching page 8... Status: 200
+2025-07-29 11:03:16,678 - spark - INFO - Fetching page 9... Status: 200
+2025-07-29 11:03:17,313 - spark - INFO - Fetching page 10... Status: 200
+2025-07-29 11:03:17,801 - spark - INFO - Fetching page 11... Status: 200
+2025-07-29 11:03:18,352 - spark - INFO - Fetching page 12... Status: 200
+2025-07-29 11:03:18,887 - spark - INFO - Fetching page 13... Status: 200
+2025-07-29 11:03:19,412 - spark - INFO - Fetching page 14... Status: 200
+2025-07-29 11:09:49,580 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-29 11:09:49,587 - spark - INFO - ✅ User mappings synced successfully: 0 created, 0 updated
+2025-07-29 11:09:50,211 - spark - INFO - Fetching page 1... Status: 200
+2025-07-29 11:09:50,871 - spark - INFO - Fetching page 2... Status: 200
+2025-07-29 11:09:51,326 - spark - INFO - Fetching page 3... Status: 200
+2025-07-29 11:09:52,598 - spark - INFO - Fetching page 4... Status: 200
+2025-07-29 11:09:53,091 - spark - INFO - Fetching page 5... Status: 200
+2025-07-29 11:09:54,497 - spark - INFO - Fetching page 6... Status: 200
+2025-07-29 11:09:55,030 - spark - INFO - Fetching page 7... Status: 200
+2025-07-29 11:09:55,862 - spark - INFO - Fetching page 8... Status: 200
+2025-07-29 11:09:56,421 - spark - INFO - Fetching page 9... Status: 200
+2025-07-29 11:09:57,229 - spark - INFO - Fetching page 10... Status: 200
+2025-07-29 11:09:57,952 - spark - INFO - Fetching page 11... Status: 200
+2025-07-29 11:09:58,481 - spark - INFO - Fetching page 12... Status: 200
+2025-07-29 11:09:59,526 - spark - INFO - Fetching page 13... Status: 200
+2025-07-29 11:10:00,062 - spark - INFO - Fetching page 14... Status: 200
+2025-07-29 11:10:00,664 - spark - INFO - Fetching page 15... Status: 200
+2025-07-29 11:10:01,186 - spark - INFO - Fetching page 16... Status: 200
+2025-07-29 11:10:02,365 - spark - INFO - Fetching page 17... Status: 200
+2025-07-29 11:10:02,961 - spark - INFO - Fetching page 18... Status: 200
+2025-07-29 11:10:03,904 - spark - INFO - Fetching page 19... Status: 200
+2025-07-29 11:10:04,606 - spark - INFO - Fetching page 20... Status: 200
+2025-07-29 11:10:05,280 - spark - INFO - Fetching page 21... Status: 200
+2025-07-29 11:10:05,892 - spark - INFO - Fetching page 22... Status: 200
+2025-07-29 11:10:06,408 - spark - INFO - Fetching page 23... Status: 200
+2025-07-29 11:10:07,307 - spark - INFO - Fetching page 24... Status: 200
+2025-07-29 11:10:07,959 - spark - INFO - Fetching page 25... Status: 200
+2025-07-29 11:10:08,895 - spark - INFO - Fetching page 26... Status: 200
+2025-07-29 11:10:09,570 - spark - INFO - Fetching page 27... Status: 200
+2025-07-29 11:10:09,581 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-29 17:56:35.990898
+2025-07-29 11:10:09,581 - spark - INFO -    ⏱️ Time since last sync: 13 minutes
+2025-07-29 11:10:09,582 - spark - INFO -    ⏳ Time until next sync: 46 minutes
+2025-07-29 11:10:09,582 - spark - INFO - ⏰ Sync rate limited. Next sync available in 46 minutes.
+2025-07-29 11:13:08,736 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:13:16,218 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:13:23,233 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:13:30,182 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:14:09,018 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:14:15,637 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:14:22,483 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:14:27,482 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:14:29,563 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:14:34,666 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:14:37,371 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:14:42,172 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:14:44,614 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:14:48,957 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:14:51,405 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:14:55,567 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:14:58,176 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:15:02,300 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:15:05,102 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:15:09,181 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:15:11,798 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:15:16,087 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:15:18,545 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:15:22,716 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:15:25,741 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:15:31,143 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:15:33,046 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:15:38,403 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:15:40,221 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:15:45,386 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:15:47,339 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:15:51,684 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:15:53,584 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:15:58,897 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:16:01,018 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:16:02,292 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:16:05,564 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:16:07,820 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:16:18,166 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:16:25,737 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:16:55,087 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:17:01,289 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:17:08,138 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:17:14,268 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:17:21,037 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:17:27,111 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:17:33,615 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:17:39,803 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:17:46,336 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:17:52,508 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:23:52,796 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:23:59,153 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:24:05,182 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:41:28,611 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-29 11:41:54,527 - spark - INFO - [socketio] CONNECT; current_user=<flask_login.mixins.AnonymousUserMixin object at 0x0000027D5BF4F250>, connection_id=socket_1753814414365_lvlcw77tf
+2025-07-29 11:41:54,528 - spark - INFO - [socketio] Anonymous connection allowed (connection_id: socket_1753814414365_lvlcw77tf)
+2025-07-29 11:44:30,047 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-29 11:44:30,054 - spark - INFO - ✅ User mappings synced successfully: 0 created, 0 updated
+2025-07-29 11:44:30,641 - spark - INFO - Fetching page 1... Status: 200
+2025-07-29 11:44:31,489 - spark - INFO - Fetching page 2... Status: 200
+2025-07-29 11:44:32,426 - spark - INFO - Fetching page 3... Status: 200
+2025-07-29 11:44:32,918 - spark - INFO - Fetching page 4... Status: 200
+2025-07-29 11:44:33,686 - spark - INFO - Fetching page 5... Status: 200
+2025-07-29 11:44:34,470 - spark - INFO - Fetching page 6... Status: 200
+2025-07-29 11:44:35,005 - spark - INFO - Fetching page 7... Status: 200
+2025-07-29 11:44:35,641 - spark - INFO - Fetching page 8... Status: 200
+2025-07-29 11:44:36,191 - spark - INFO - Fetching page 9... Status: 200
+2025-07-29 11:44:36,720 - spark - INFO - Fetching page 10... Status: 200
+2025-07-29 11:44:37,274 - spark - INFO - Fetching page 11... Status: 200
+2025-07-29 11:44:38,173 - spark - INFO - Fetching page 12... Status: 200
+2025-07-29 11:44:38,682 - spark - INFO - Fetching page 13... Status: 200
+2025-07-29 11:44:39,551 - spark - INFO - Fetching page 14... Status: 200
+2025-07-29 11:44:40,164 - spark - INFO - Fetching page 15... Status: 200
+2025-07-29 11:44:40,660 - spark - INFO - Fetching page 16... Status: 200
+2025-07-29 11:44:41,179 - spark - INFO - Fetching page 17... Status: 200
+2025-07-29 11:44:41,756 - spark - INFO - Fetching page 18... Status: 200
+2025-07-29 11:44:42,387 - spark - INFO - Fetching page 19... Status: 200
+2025-07-29 11:44:43,250 - spark - INFO - Fetching page 20... Status: 200
+2025-07-29 11:44:43,791 - spark - INFO - Fetching page 21... Status: 200
+2025-07-29 11:44:44,441 - spark - INFO - Fetching page 22... Status: 200
+2025-07-29 11:44:45,246 - spark - INFO - Fetching page 23... Status: 200
+2025-07-29 11:44:45,731 - spark - INFO - Fetching page 24... Status: 200
+2025-07-29 11:44:46,227 - spark - INFO - Fetching page 25... Status: 200
+2025-07-29 11:44:46,902 - spark - INFO - Fetching page 26... Status: 200
+2025-07-29 11:44:47,533 - spark - INFO - Fetching page 27... Status: 200
+2025-07-29 11:44:48,443 - spark - INFO - Fetching page 28... Status: 200
+2025-07-29 11:44:48,955 - spark - INFO - Fetching page 29... Status: 200
+2025-07-29 11:44:48,964 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-29 17:56:35.990898
+2025-07-29 11:44:48,965 - spark - INFO -    ⏱️ Time since last sync: 48 minutes
+2025-07-29 11:44:48,966 - spark - INFO -    ⏳ Time until next sync: 11 minutes
+2025-07-29 11:44:48,966 - spark - INFO - ⏰ Sync rate limited. Next sync available in 11 minutes.
+2025-07-29 11:46:27,359 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-29 11:46:27,366 - spark - INFO - ✅ User mappings synced successfully: 0 created, 0 updated
+2025-07-29 11:46:27,928 - spark - INFO - Fetching page 1... Status: 200
+2025-07-29 11:46:28,443 - spark - INFO - Fetching page 2... Status: 200
+2025-07-29 11:46:29,131 - spark - INFO - Fetching page 3... Status: 200
+2025-07-29 11:46:29,761 - spark - INFO - Fetching page 4... Status: 200
+2025-07-29 11:46:30,310 - spark - INFO - Fetching page 5... Status: 200
+2025-07-29 11:46:30,856 - spark - INFO - Fetching page 6... Status: 200
+2025-07-29 11:46:31,400 - spark - INFO - Fetching page 7... Status: 200
+2025-07-29 11:46:32,504 - spark - INFO - Fetching page 8... Status: 200
+2025-07-29 11:46:33,251 - spark - INFO - Fetching page 9... Status: 200
+2025-07-29 11:46:33,711 - spark - INFO - Fetching page 10... Status: 200
+2025-07-29 11:46:34,718 - spark - INFO - Fetching page 11... Status: 200
+2025-07-29 11:46:35,704 - spark - INFO - Fetching page 12... Status: 200
+2025-07-29 11:46:36,185 - spark - INFO - Fetching page 13... Status: 200
+2025-07-29 11:46:36,764 - spark - INFO - Fetching page 14... Status: 200
+2025-07-29 11:46:37,254 - spark - INFO - Fetching page 15... Status: 200
+2025-07-29 11:46:37,751 - spark - INFO - Fetching page 16... Status: 200
+2025-07-29 11:46:38,737 - spark - INFO - Fetching page 17... Status: 200
+2025-07-29 11:46:39,320 - spark - INFO - Fetching page 18... Status: 200
+2025-07-29 11:46:40,050 - spark - INFO - Fetching page 19... Status: 200
+2025-07-29 11:46:40,630 - spark - INFO - Fetching page 20... Status: 200
+2025-07-29 11:46:41,492 - spark - INFO - Fetching page 21... Status: 200
+2025-07-29 11:46:42,122 - spark - INFO - Fetching page 22... Status: 200
+2025-07-29 11:46:42,709 - spark - INFO - Fetching page 23... Status: 200
+2025-07-29 11:46:43,312 - spark - INFO - Fetching page 24... Status: 200
+2025-07-29 11:46:44,191 - spark - INFO - Fetching page 25... Status: 200
+2025-07-29 11:46:44,699 - spark - INFO - Fetching page 26... Status: 200
+2025-07-29 11:46:45,376 - spark - INFO - Fetching page 27... Status: 200
+2025-07-29 11:46:45,978 - spark - INFO - Fetching page 28... Status: 200
+2025-07-29 11:46:46,325 - spark - INFO - Fetching page 29... Status: 200
+2025-07-29 11:46:46,334 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-29 17:56:35.990898
+2025-07-29 11:46:46,335 - spark - INFO -    ⏱️ Time since last sync: 50 minutes
+2025-07-29 11:46:46,335 - spark - INFO -    ⏳ Time until next sync: 9 minutes
+2025-07-29 11:46:46,336 - spark - INFO - ⏰ Sync rate limited. Next sync available in 9 minutes.
+2025-07-29 11:47:11,744 - spark - INFO - Fetching page 1... Status: 200
+2025-07-29 11:47:12,682 - spark - INFO - Fetching page 2... Status: 200
+2025-07-29 11:47:14,081 - spark - INFO - Fetching page 3... Status: 200
+2025-07-29 11:47:14,601 - spark - INFO - Fetching page 4... Status: 200
+2025-07-29 11:47:15,220 - spark - INFO - Fetching page 5... Status: 200
+2025-07-29 11:47:15,918 - spark - INFO - Fetching page 6... Status: 200
+2025-07-29 11:47:16,403 - spark - INFO - Fetching page 7... Status: 200
+2025-07-29 11:47:16,903 - spark - INFO - Fetching page 8... Status: 200
+2025-07-29 11:47:17,565 - spark - INFO - Fetching page 9... Status: 200
+2025-07-29 11:47:18,487 - spark - INFO - Fetching page 10... Status: 200
+2025-07-29 11:47:19,031 - spark - INFO - Fetching page 11... Status: 200
+2025-07-29 11:47:19,557 - spark - INFO - Fetching page 12... Status: 200
+2025-07-29 11:47:20,485 - spark - INFO - Fetching page 13... Status: 200
+2025-07-29 11:47:21,050 - spark - INFO - Fetching page 14... Status: 200
+2025-07-29 11:47:21,516 - spark - INFO - Fetching page 15... Status: 200
+2025-07-29 11:47:22,034 - spark - INFO - Fetching page 16... Status: 200
+2025-07-29 11:47:22,572 - spark - INFO - Fetching page 17... Status: 200
+2025-07-29 11:47:23,140 - spark - INFO - Fetching page 18... Status: 200
+2025-07-29 11:47:23,750 - spark - INFO - Fetching page 19... Status: 200
+2025-07-29 11:47:24,315 - spark - INFO - Fetching page 20... Status: 200
+2025-07-29 11:47:24,836 - spark - INFO - Fetching page 21... Status: 200
+2025-07-29 11:47:25,465 - spark - INFO - Fetching page 22... Status: 200
+2025-07-29 11:47:26,000 - spark - INFO - Fetching page 23... Status: 200
+2025-07-29 11:47:26,515 - spark - INFO - Fetching page 24... Status: 200
+2025-07-29 11:47:27,393 - spark - INFO - Fetching page 25... Status: 200
+2025-07-29 11:47:27,949 - spark - INFO - Fetching page 26... Status: 200
+2025-07-29 11:47:29,288 - spark - INFO - Fetching page 27... Status: 200
+2025-07-29 11:47:29,798 - spark - INFO - Fetching page 28... Status: 200
+2025-07-29 11:47:30,274 - spark - INFO - Fetching page 29... Status: 200
+2025-07-29 11:47:30,279 - spark - INFO - 📊 Found 15 responders with resolved tickets for 2025-07-29
+2025-07-29 11:47:30,280 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-29 11:48:11,229 - spark - INFO - Fetching page 1... Status: 200
+2025-07-29 11:48:11,769 - spark - INFO - Fetching page 2... Status: 200
+2025-07-29 11:48:12,323 - spark - INFO - Fetching page 3... Status: 200
+2025-07-29 11:48:12,838 - spark - INFO - Fetching page 4... Status: 200
+2025-07-29 11:48:13,497 - spark - INFO - Fetching page 5... Status: 200
+2025-07-29 11:48:14,017 - spark - INFO - Fetching page 6... Status: 200
+2025-07-29 11:48:14,794 - spark - INFO - Fetching page 7... Status: 200
+2025-07-29 11:48:15,343 - spark - INFO - Fetching page 8... Status: 200
+2025-07-29 11:48:15,855 - spark - INFO - Fetching page 9... Status: 200
+2025-07-29 11:48:16,324 - spark - INFO - Fetching page 10... Status: 200
+2025-07-29 11:48:16,900 - spark - INFO - Fetching page 11... Status: 200
+2025-07-29 11:48:17,905 - spark - INFO - Fetching page 12... Status: 200
+2025-07-29 11:48:18,452 - spark - INFO - Fetching page 13... Status: 200
+2025-07-29 11:48:18,979 - spark - INFO - Fetching page 14... Status: 200
+2025-07-29 11:48:19,453 - spark - INFO - Fetching page 15... Status: 200
+2025-07-29 11:48:20,396 - spark - INFO - Fetching page 16... Status: 200
+2025-07-29 11:48:20,999 - spark - INFO - Fetching page 17... Status: 200
+2025-07-29 11:48:21,480 - spark - INFO - Fetching page 18... Status: 200
+2025-07-29 11:48:22,017 - spark - INFO - Fetching page 19... Status: 200
+2025-07-29 11:48:22,560 - spark - INFO - Fetching page 20... Status: 200
+2025-07-29 11:48:23,408 - spark - INFO - Fetching page 21... Status: 200
+2025-07-29 11:48:23,910 - spark - INFO - Fetching page 22... Status: 200
+2025-07-29 11:48:24,490 - spark - INFO - Fetching page 23... Status: 200
+2025-07-29 11:48:25,008 - spark - INFO - Fetching page 24... Status: 200
+2025-07-29 11:48:25,536 - spark - INFO - Fetching page 25... Status: 200
+2025-07-29 11:48:26,084 - spark - INFO - Fetching page 26... Status: 200
+2025-07-29 11:48:26,669 - spark - INFO - Fetching page 27... Status: 200
+2025-07-29 11:48:27,278 - spark - INFO - Fetching page 28... Status: 200
+2025-07-29 11:48:27,763 - spark - INFO - Fetching page 29... Status: 200
+2025-07-29 11:48:27,768 - spark - INFO - 📊 Found 15 responders with resolved tickets for 2025-07-29
+2025-07-29 11:48:27,769 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-29 13:06:34,373 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-29 13:06:34,380 - spark - INFO - ✅ User mappings synced successfully: 0 created, 0 updated
+2025-07-29 13:06:34,914 - spark - INFO - Fetching page 1... Status: 200
+2025-07-29 13:06:35,390 - spark - INFO - Fetching page 2... Status: 200
+2025-07-29 13:06:36,314 - spark - INFO - Fetching page 3... Status: 200
+2025-07-29 13:06:36,855 - spark - INFO - Fetching page 4... Status: 200
+2025-07-29 13:06:37,325 - spark - INFO - Fetching page 5... Status: 200
+2025-07-29 13:06:37,848 - spark - INFO - Fetching page 6... Status: 200
+2025-07-29 13:06:38,397 - spark - INFO - Fetching page 7... Status: 200
+2025-07-29 13:06:39,302 - spark - INFO - Fetching page 8... Status: 200
+2025-07-29 13:06:39,879 - spark - INFO - Fetching page 9... Status: 200
+2025-07-29 13:06:40,476 - spark - INFO - Fetching page 10... Status: 200
+2025-07-29 13:06:40,988 - spark - INFO - Fetching page 11... Status: 200
+2025-07-29 13:06:41,485 - spark - INFO - Fetching page 12... Status: 200
+2025-07-29 13:06:42,052 - spark - INFO - Fetching page 13... Status: 200
+2025-07-29 13:06:42,702 - spark - INFO - Fetching page 14... Status: 200
+2025-07-29 13:06:43,176 - spark - INFO - Fetching page 15... Status: 200
+2025-07-29 13:06:43,754 - spark - INFO - Fetching page 16... Status: 200
+2025-07-29 13:06:44,269 - spark - INFO - Fetching page 17... Status: 200
+2025-07-29 13:06:44,779 - spark - INFO - Fetching page 18... Status: 200
+2025-07-29 13:06:45,399 - spark - INFO - Fetching page 19... Status: 200
+2025-07-29 13:06:46,355 - spark - INFO - Fetching page 20... Status: 200
+2025-07-29 13:06:46,984 - spark - INFO - Fetching page 21... Status: 200
+2025-07-29 13:06:47,638 - spark - INFO - Fetching page 22... Status: 200
+2025-07-29 13:06:48,252 - spark - INFO - Fetching page 23... Status: 200
+2025-07-29 13:06:49,751 - spark - INFO - Fetching page 24... Status: 200
+2025-07-29 13:06:50,590 - spark - INFO - Fetching page 25... Status: 200
+2025-07-29 13:06:51,158 - spark - INFO - Fetching page 26... Status: 200
+2025-07-29 13:06:51,695 - spark - INFO - Fetching page 27... Status: 200
+2025-07-29 13:06:52,642 - spark - INFO - Fetching page 28... Status: 200
+2025-07-29 13:06:53,276 - spark - INFO - Fetching page 29... Status: 200
+2025-07-29 13:06:53,828 - spark - INFO - Fetching page 30... Status: 200
+2025-07-29 13:06:54,380 - spark - INFO - Fetching page 31... Status: 200
+2025-07-29 13:06:54,911 - spark - INFO - Fetching page 32... Status: 200
+2025-07-29 13:06:54,925 - spark - INFO - 🔄 Starting sync for 2025-07-29...
+2025-07-29 13:06:55,405 - spark - INFO - Fetching page 1... Status: 200
+2025-07-29 13:06:55,919 - spark - INFO - Fetching page 2... Status: 200
+2025-07-29 13:06:56,414 - spark - INFO - Fetching page 3... Status: 200
+2025-07-29 13:06:56,961 - spark - INFO - Fetching page 4... Status: 200
+2025-07-29 13:06:57,518 - spark - INFO - Fetching page 5... Status: 200
+2025-07-29 13:06:58,024 - spark - INFO - Fetching page 6... Status: 200
+2025-07-29 13:06:58,613 - spark - INFO - Fetching page 7... Status: 200
+2025-07-29 13:06:59,170 - spark - INFO - Fetching page 8... Status: 200
+2025-07-29 13:07:00,289 - spark - INFO - Fetching page 9... Status: 200
+2025-07-29 13:07:00,850 - spark - INFO - Fetching page 10... Status: 200
+2025-07-29 13:07:01,364 - spark - INFO - Fetching page 11... Status: 200
+2025-07-29 13:07:01,938 - spark - INFO - Fetching page 12... Status: 200
+2025-07-29 13:07:02,484 - spark - INFO - Fetching page 13... Status: 200
+2025-07-29 13:07:02,988 - spark - INFO - Fetching page 14... Status: 200
+2025-07-29 13:07:03,465 - spark - INFO - Fetching page 15... Status: 200
+2025-07-29 13:07:04,116 - spark - INFO - Fetching page 16... Status: 200
+2025-07-29 13:07:04,703 - spark - INFO - Fetching page 17... Status: 200
+2025-07-29 13:07:05,234 - spark - INFO - Fetching page 18... Status: 200
+2025-07-29 13:07:05,861 - spark - INFO - Fetching page 19... Status: 200
+2025-07-29 13:07:06,394 - spark - INFO - Fetching page 20... Status: 200
+2025-07-29 13:07:07,415 - spark - INFO - Fetching page 21... Status: 200
+2025-07-29 13:07:07,970 - spark - INFO - Fetching page 22... Status: 200
+2025-07-29 13:07:08,552 - spark - INFO - Fetching page 23... Status: 200
+2025-07-29 13:07:09,083 - spark - INFO - Fetching page 24... Status: 200
+2025-07-29 13:07:09,573 - spark - INFO - Fetching page 25... Status: 200
+2025-07-29 13:07:10,095 - spark - INFO - Fetching page 26... Status: 200
+2025-07-29 13:07:11,387 - spark - INFO - Fetching page 27... Status: 200
+2025-07-29 13:07:11,995 - spark - INFO - Fetching page 28... Status: 200
+2025-07-29 13:07:12,544 - spark - INFO - Fetching page 29... Status: 200
+2025-07-29 13:07:13,012 - spark - INFO - Fetching page 30... Status: 200
+2025-07-29 13:07:13,599 - spark - INFO - Fetching page 31... Status: 200
+2025-07-29 13:07:14,068 - spark - INFO - Fetching page 32... Status: 200
+2025-07-29 13:07:14,074 - spark - INFO - 📊 Found 15 responders with resolved tickets for 2025-07-29
+2025-07-29 13:07:14,076 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-29 13:07:14,086 - spark - INFO - 🔄 Updated: Jabin Dejesa - 10 tickets
+2025-07-29 13:07:14,089 - spark - INFO - 🔄 Updated: Pietro Vue - 9 tickets
+2025-07-29 13:07:14,091 - spark - INFO - 🔄 Updated: Samuel Nightingale - 5 tickets
+2025-07-29 13:07:14,093 - spark - INFO - 🔄 Updated: Richard Nguyen - 8 tickets
+2025-07-29 13:07:14,094 - spark - INFO - 🔄 Updated: AJ - 28 tickets
+2025-07-29 13:07:14,096 - spark - INFO - 🔄 Updated: Nick Gutierrez - 35 tickets
+2025-07-29 13:07:14,098 - spark - INFO - 🔄 Updated: Christopher Bush - 18 tickets
+2025-07-29 13:07:14,100 - spark - INFO - 🔄 Updated: JZ - 9 tickets
+2025-07-29 13:07:14,101 - spark - INFO - 🔄 Updated: Anthony Risker - 14 tickets
+2025-07-29 13:07:14,103 - spark - INFO - 🔄 Updated: Staci Valko - 7 tickets
+2025-07-29 13:07:14,104 - spark - INFO - 🔄 Updated: Oscar Solis - 6 tickets
+2025-07-29 13:07:14,105 - spark - INFO - 🔄 Updated: Vinh Nguyen - 1 tickets
+2025-07-29 13:07:14,107 - spark - INFO - 🔄 Updated: Rylan Knightstep - 1 tickets
+2025-07-29 13:07:14,109 - spark - INFO - 🔄 Updated: Ralph Rosalin - 2 tickets
+2025-07-29 13:07:14,111 - spark - INFO - 🔄 Updated: Jonathan Nguyen - 1 tickets
+2025-07-29 13:07:14,122 - spark - INFO - ✅ Daily closures synced successfully for 2025-07-29 - 154 tickets processed
+2025-07-29 13:08:21,418 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-29 13:08:21,425 - spark - INFO - ✅ User mappings synced successfully: 0 created, 0 updated
+2025-07-29 13:08:22,277 - spark - INFO - Fetching page 1... Status: 200
+2025-07-29 13:08:22,811 - spark - INFO - Fetching page 2... Status: 200
+2025-07-29 13:08:23,581 - spark - INFO - Fetching page 3... Status: 200
+2025-07-29 13:08:24,111 - spark - INFO - Fetching page 4... Status: 200
+2025-07-29 13:08:24,686 - spark - INFO - Fetching page 5... Status: 200
+2025-07-29 13:08:25,182 - spark - INFO - Fetching page 6... Status: 200
+2025-07-29 13:08:25,696 - spark - INFO - Fetching page 7... Status: 200
+2025-07-29 13:08:26,257 - spark - INFO - Fetching page 8... Status: 200
+2025-07-29 13:08:27,151 - spark - INFO - Fetching page 9... Status: 200
+2025-07-29 13:08:27,887 - spark - INFO - Fetching page 10... Status: 200
+2025-07-29 13:08:28,407 - spark - INFO - Fetching page 11... Status: 200
+2025-07-29 13:08:28,932 - spark - INFO - Fetching page 12... Status: 200
+2025-07-29 13:08:29,477 - spark - INFO - Fetching page 13... Status: 200
+2025-07-29 13:08:29,999 - spark - INFO - Fetching page 14... Status: 200
+2025-07-29 13:08:30,566 - spark - INFO - Fetching page 15... Status: 200
+2025-07-29 13:08:31,127 - spark - INFO - Fetching page 16... Status: 200
+2025-07-29 13:08:31,647 - spark - INFO - Fetching page 17... Status: 200
+2025-07-29 13:08:32,516 - spark - INFO - Fetching page 18... Status: 200
+2025-07-29 13:08:33,045 - spark - INFO - Fetching page 19... Status: 200
+2025-07-29 13:08:33,576 - spark - INFO - Fetching page 20... Status: 200
+2025-07-29 13:08:34,163 - spark - INFO - Fetching page 21... Status: 200
+2025-07-29 13:08:34,726 - spark - INFO - Fetching page 22... Status: 200
+2025-07-29 13:08:35,417 - spark - INFO - Fetching page 23... Status: 200
+2025-07-29 13:08:35,961 - spark - INFO - Fetching page 24... Status: 200
+2025-07-29 13:08:36,872 - spark - INFO - Fetching page 25... Status: 200
+2025-07-29 13:08:37,419 - spark - INFO - Fetching page 26... Status: 200
+2025-07-29 13:08:37,937 - spark - INFO - Fetching page 27... Status: 200
+2025-07-29 13:08:38,870 - spark - INFO - Fetching page 28... Status: 200
+2025-07-29 13:08:39,386 - spark - INFO - Fetching page 29... Status: 200
+2025-07-29 13:08:39,961 - spark - INFO - Fetching page 30... Status: 200
+2025-07-29 13:08:40,471 - spark - INFO - Fetching page 31... Status: 200
+2025-07-29 13:08:41,602 - spark - INFO - Fetching page 32... Status: 200
+2025-07-29 13:08:41,613 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-29 20:07:14.117887
+2025-07-29 13:08:41,614 - spark - INFO -    ⏱️ Time since last sync: 1 minutes
+2025-07-29 13:08:41,614 - spark - INFO -    ⏳ Time until next sync: 58 minutes
+2025-07-29 13:08:41,615 - spark - INFO - ⏰ Sync rate limited. Next sync available in 58 minutes.
+2025-07-29 13:09:02,379 - spark - INFO - 🔄 Starting sync for 2025-07-29...
+2025-07-29 13:09:02,998 - spark - INFO - Fetching page 1... Status: 200
+2025-07-29 13:09:03,765 - spark - INFO - Fetching page 2... Status: 200
+2025-07-29 13:09:04,271 - spark - INFO - Fetching page 3... Status: 200
+2025-07-29 13:09:04,874 - spark - INFO - Fetching page 4... Status: 200
+2025-07-29 13:09:05,423 - spark - INFO - Fetching page 5... Status: 200
+2025-07-29 13:09:05,900 - spark - INFO - Fetching page 6... Status: 200
+2025-07-29 13:09:06,420 - spark - INFO - Fetching page 7... Status: 200
+2025-07-29 13:09:06,898 - spark - INFO - Fetching page 8... Status: 200
+2025-07-29 13:09:07,444 - spark - INFO - Fetching page 9... Status: 200
+2025-07-29 13:09:08,015 - spark - INFO - Fetching page 10... Status: 200
+2025-07-29 13:09:08,542 - spark - INFO - Fetching page 11... Status: 200
+2025-07-29 13:09:09,062 - spark - INFO - Fetching page 12... Status: 200
+2025-07-29 13:09:09,659 - spark - INFO - Fetching page 13... Status: 200
+2025-07-29 13:09:10,564 - spark - INFO - Fetching page 14... Status: 200
+2025-07-29 13:09:11,059 - spark - INFO - Fetching page 15... Status: 200
+2025-07-29 13:09:11,718 - spark - INFO - Fetching page 16... Status: 200
+2025-07-29 13:09:12,275 - spark - INFO - Fetching page 17... Status: 200
+2025-07-29 13:09:12,831 - spark - INFO - Fetching page 18... Status: 200
+2025-07-29 13:09:13,354 - spark - INFO - Fetching page 19... Status: 200
+2025-07-29 13:09:13,941 - spark - INFO - Fetching page 20... Status: 200
+2025-07-29 13:09:14,598 - spark - INFO - Fetching page 21... Status: 200
+2025-07-29 13:09:15,454 - spark - INFO - Fetching page 22... Status: 200
+2025-07-29 13:09:15,967 - spark - INFO - Fetching page 23... Status: 200
+2025-07-29 13:09:16,518 - spark - INFO - Fetching page 24... Status: 200
+2025-07-29 13:09:17,115 - spark - INFO - Fetching page 25... Status: 200
+2025-07-29 13:09:17,606 - spark - INFO - Fetching page 26... Status: 200
+2025-07-29 13:09:18,098 - spark - INFO - Fetching page 27... Status: 200
+2025-07-29 13:09:18,609 - spark - INFO - Fetching page 28... Status: 200
+2025-07-29 13:09:19,196 - spark - INFO - Fetching page 29... Status: 200
+2025-07-29 13:09:19,994 - spark - INFO - Fetching page 30... Status: 200
+2025-07-29 13:09:20,529 - spark - INFO - Fetching page 31... Status: 200
+2025-07-29 13:09:20,979 - spark - INFO - Fetching page 32... Status: 200
+2025-07-29 13:09:20,986 - spark - INFO - 📊 Found 15 responders with resolved tickets for 2025-07-29
+2025-07-29 13:09:20,986 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-29 13:09:20,995 - spark - INFO - 🔄 Updated: Jabin Dejesa - 10 tickets
+2025-07-29 13:09:21,000 - spark - INFO - 🔄 Updated: Pietro Vue - 9 tickets
+2025-07-29 13:09:21,002 - spark - INFO - 🔄 Updated: Samuel Nightingale - 6 tickets
+2025-07-29 13:09:21,003 - spark - INFO - 🔄 Updated: Richard Nguyen - 8 tickets
+2025-07-29 13:09:21,004 - spark - INFO - 🔄 Updated: AJ - 28 tickets
+2025-07-29 13:09:21,005 - spark - INFO - 🔄 Updated: Nick Gutierrez - 35 tickets
+2025-07-29 13:09:21,006 - spark - INFO - 🔄 Updated: Christopher Bush - 18 tickets
+2025-07-29 13:09:21,007 - spark - INFO - 🔄 Updated: JZ - 9 tickets
+2025-07-29 13:09:21,008 - spark - INFO - 🔄 Updated: Anthony Risker - 14 tickets
+2025-07-29 13:09:21,009 - spark - INFO - 🔄 Updated: Staci Valko - 7 tickets
+2025-07-29 13:09:21,011 - spark - INFO - 🔄 Updated: Oscar Solis - 6 tickets
+2025-07-29 13:09:21,012 - spark - INFO - 🔄 Updated: Vinh Nguyen - 1 tickets
+2025-07-29 13:09:21,013 - spark - INFO - 🔄 Updated: Rylan Knightstep - 1 tickets
+2025-07-29 13:09:21,014 - spark - INFO - 🔄 Updated: Ralph Rosalin - 2 tickets
+2025-07-29 13:09:21,015 - spark - INFO - 🔄 Updated: Jonathan Nguyen - 1 tickets
+2025-07-29 13:09:21,025 - spark - INFO - ✅ Daily closures synced successfully for 2025-07-29 - 155 tickets processed
+2025-07-29 14:09:01,989 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-29 14:09:01,994 - spark - INFO - ✅ User mappings synced successfully: 0 created, 0 updated
+2025-07-29 14:09:02,500 - spark - INFO - Fetching page 1... Status: 200
+2025-07-29 14:09:03,134 - spark - INFO - Fetching page 2... Status: 200
+2025-07-29 14:09:03,696 - spark - INFO - Fetching page 3... Status: 200
+2025-07-29 14:09:04,182 - spark - INFO - Fetching page 4... Status: 200
+2025-07-29 14:09:04,696 - spark - INFO - Fetching page 5... Status: 200
+2025-07-29 14:09:05,323 - spark - INFO - Fetching page 6... Status: 200
+2025-07-29 14:09:05,816 - spark - INFO - Fetching page 7... Status: 200
+2025-07-29 14:09:06,355 - spark - INFO - Fetching page 8... Status: 200
+2025-07-29 14:09:06,920 - spark - INFO - Fetching page 9... Status: 200
+2025-07-29 14:09:07,542 - spark - INFO - Fetching page 10... Status: 200
+2025-07-29 14:09:08,053 - spark - INFO - Fetching page 11... Status: 200
+2025-07-29 14:09:08,606 - spark - INFO - Fetching page 12... Status: 200
+2025-07-29 14:09:09,471 - spark - INFO - Fetching page 13... Status: 200
+2025-07-29 14:09:10,068 - spark - INFO - Fetching page 14... Status: 200
+2025-07-29 14:09:10,550 - spark - INFO - Fetching page 15... Status: 200
+2025-07-29 14:09:11,141 - spark - INFO - Fetching page 16... Status: 200
+2025-07-29 14:09:11,646 - spark - INFO - Fetching page 17... Status: 200
+2025-07-29 14:09:12,154 - spark - INFO - Fetching page 18... Status: 200
+2025-07-29 14:09:12,844 - spark - INFO - Fetching page 19... Status: 200
+2025-07-29 14:09:13,621 - spark - INFO - Fetching page 20... Status: 200
+2025-07-29 14:09:14,189 - spark - INFO - Fetching page 21... Status: 200
+2025-07-29 14:09:14,763 - spark - INFO - Fetching page 22... Status: 200
+2025-07-29 14:09:15,394 - spark - INFO - Fetching page 23... Status: 200
+2025-07-29 14:09:15,865 - spark - INFO - Fetching page 24... Status: 200
+2025-07-29 14:09:16,351 - spark - INFO - Fetching page 25... Status: 200
+2025-07-29 14:09:16,859 - spark - INFO - Fetching page 26... Status: 200
+2025-07-29 14:09:17,317 - spark - INFO - Fetching page 27... Status: 200
+2025-07-29 14:09:17,920 - spark - INFO - Fetching page 28... Status: 200
+2025-07-29 14:09:18,432 - spark - INFO - Fetching page 29... Status: 200
+2025-07-29 14:09:18,997 - spark - INFO - Fetching page 30... Status: 200
+2025-07-29 14:09:19,515 - spark - INFO - Fetching page 31... Status: 200
+2025-07-29 14:09:20,593 - spark - INFO - Fetching page 32... Status: 200
+2025-07-29 14:09:21,191 - spark - INFO - Fetching page 33... Status: 200
+2025-07-29 14:09:21,950 - spark - INFO - Fetching page 34... Status: 200
+2025-07-29 14:09:22,246 - spark - INFO - Fetching page 35... Status: 200
+2025-07-29 14:09:22,256 - spark - INFO - 🔄 Starting enhanced sync for 2025-07-29 with ticket tracking...
+2025-07-29 14:09:22,256 - spark - INFO - 🎫 Fetching daily closures with ticket numbers for 2025-07-29
+2025-07-29 14:09:22,756 - spark - INFO - Fetching page 1... Status: 200
+2025-07-29 14:09:23,375 - spark - INFO - Fetching page 2... Status: 200
+2025-07-29 14:09:24,417 - spark - INFO - Fetching page 3... Status: 200
+2025-07-29 14:09:24,879 - spark - INFO - Fetching page 4... Status: 200
+2025-07-29 14:09:25,462 - spark - INFO - Fetching page 5... Status: 200
+2025-07-29 14:09:25,979 - spark - INFO - Fetching page 6... Status: 200
+2025-07-29 14:09:26,584 - spark - INFO - Fetching page 7... Status: 200
+2025-07-29 14:09:27,172 - spark - INFO - Fetching page 8... Status: 200
+2025-07-29 14:09:27,728 - spark - INFO - Fetching page 9... Status: 200
+2025-07-29 14:09:28,229 - spark - INFO - Fetching page 10... Status: 200
+2025-07-29 14:09:28,768 - spark - INFO - Fetching page 11... Status: 200
+2025-07-29 14:09:29,316 - spark - INFO - Fetching page 12... Status: 200
+2025-07-29 14:09:29,873 - spark - INFO - Fetching page 13... Status: 200
+2025-07-29 14:09:30,461 - spark - INFO - Fetching page 14... Status: 200
+2025-07-29 14:09:30,969 - spark - INFO - Fetching page 15... Status: 200
+2025-07-29 14:09:31,490 - spark - INFO - Fetching page 16... Status: 200
+2025-07-29 14:09:32,049 - spark - INFO - Fetching page 17... Status: 200
+2025-07-29 14:09:32,540 - spark - INFO - Fetching page 18... Status: 200
+2025-07-29 14:09:33,065 - spark - INFO - Fetching page 19... Status: 200
+2025-07-29 14:09:33,591 - spark - INFO - Fetching page 20... Status: 200
+2025-07-29 14:09:34,153 - spark - INFO - Fetching page 21... Status: 200
+2025-07-29 14:09:34,651 - spark - INFO - Fetching page 22... Status: 200
+2025-07-29 14:09:35,257 - spark - INFO - Fetching page 23... Status: 200
+2025-07-29 14:09:35,807 - spark - INFO - Fetching page 24... Status: 200
+2025-07-29 14:09:36,408 - spark - INFO - Fetching page 25... Status: 200
+2025-07-29 14:09:36,935 - spark - INFO - Fetching page 26... Status: 200
+2025-07-29 14:09:37,430 - spark - INFO - Fetching page 27... Status: 200
+2025-07-29 14:09:37,911 - spark - INFO - Fetching page 28... Status: 200
+2025-07-29 14:09:38,469 - spark - INFO - Fetching page 29... Status: 200
+2025-07-29 14:09:38,955 - spark - INFO - Fetching page 30... Status: 200
+2025-07-29 14:09:39,503 - spark - INFO - Fetching page 31... Status: 200
+2025-07-29 14:09:40,096 - spark - INFO - Fetching page 32... Status: 200
+2025-07-29 14:09:40,592 - spark - INFO - Fetching page 33... Status: 200
+2025-07-29 14:09:41,140 - spark - INFO - Fetching page 34... Status: 200
+2025-07-29 14:09:41,421 - spark - INFO - Fetching page 35... Status: 200
+2025-07-29 14:09:41,424 - spark - INFO - 📊 Found 15 users with closures, 172 total tickets
+2025-07-29 14:09:53,068 - spark - ERROR - Error adding missing columns: name 'get_db_connection' is not defined
+2025-07-29 14:10:24,486 - spark - ERROR - Error adding missing columns: Working outside of application context.
+
+This typically means that you attempted to use functionality that needed
+the current application. To solve this, set up an application context
+with app.app_context(). See the documentation for more information.
+2025-07-29 14:10:40,653 - spark - INFO - Added ticket_numbers column to ticket_closure table
+2025-07-29 14:10:48,474 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-29 14:10:48,487 - spark - INFO - ✅ User mappings synced successfully: 0 created, 0 updated
+2025-07-29 14:10:49,102 - spark - INFO - Fetching page 1... Status: 200
+2025-07-29 14:10:49,676 - spark - INFO - Fetching page 2... Status: 200
+2025-07-29 14:10:50,371 - spark - INFO - Fetching page 3... Status: 200
+2025-07-29 14:10:50,949 - spark - INFO - Fetching page 4... Status: 200
+2025-07-29 14:10:51,484 - spark - INFO - Fetching page 5... Status: 200
+2025-07-29 14:10:52,077 - spark - INFO - Fetching page 6... Status: 200
+2025-07-29 14:10:52,618 - spark - INFO - Fetching page 7... Status: 200
+2025-07-29 14:10:53,151 - spark - INFO - Fetching page 8... Status: 200
+2025-07-29 14:10:53,673 - spark - INFO - Fetching page 9... Status: 200
+2025-07-29 14:10:54,212 - spark - INFO - Fetching page 10... Status: 200
+2025-07-29 14:10:54,710 - spark - INFO - Fetching page 11... Status: 200
+2025-07-29 14:10:55,338 - spark - INFO - Fetching page 12... Status: 200
+2025-07-29 14:10:55,927 - spark - INFO - Fetching page 13... Status: 200
+2025-07-29 14:10:57,179 - spark - INFO - Fetching page 14... Status: 200
+2025-07-29 14:10:57,844 - spark - INFO - Fetching page 15... Status: 200
+2025-07-29 14:10:58,541 - spark - INFO - Fetching page 16... Status: 200
+2025-07-29 14:10:59,040 - spark - INFO - Fetching page 17... Status: 200
+2025-07-29 14:10:59,577 - spark - INFO - Fetching page 18... Status: 200
+2025-07-29 14:11:00,121 - spark - INFO - Fetching page 19... Status: 200
+2025-07-29 14:11:00,595 - spark - INFO - Fetching page 20... Status: 200
+2025-07-29 14:11:01,065 - spark - INFO - Fetching page 21... Status: 200
+2025-07-29 14:11:01,659 - spark - INFO - Fetching page 22... Status: 200
+2025-07-29 14:11:02,369 - spark - INFO - Fetching page 23... Status: 200
+2025-07-29 14:11:02,885 - spark - INFO - Fetching page 24... Status: 200
+2025-07-29 14:11:03,683 - spark - INFO - Fetching page 25... Status: 200
+2025-07-29 14:11:04,208 - spark - INFO - Fetching page 26... Status: 200
+2025-07-29 14:11:04,738 - spark - INFO - Fetching page 27... Status: 200
+2025-07-29 14:11:05,267 - spark - INFO - Fetching page 28... Status: 200
+2025-07-29 14:11:06,227 - spark - INFO - Fetching page 29... Status: 200
+2025-07-29 14:11:06,714 - spark - INFO - Fetching page 30... Status: 200
+2025-07-29 14:11:07,345 - spark - INFO - Fetching page 31... Status: 200
+2025-07-29 14:11:08,336 - spark - INFO - Fetching page 32... Status: 200
+2025-07-29 14:11:09,576 - spark - INFO - Fetching page 33... Status: 200
+2025-07-29 14:11:10,267 - spark - INFO - Fetching page 34... Status: 200
+2025-07-29 14:11:10,577 - spark - INFO - Fetching page 35... Status: 200
+2025-07-29 14:11:10,588 - spark - INFO - 🔄 Starting enhanced sync for 2025-07-29 with ticket tracking...
+2025-07-29 14:11:10,588 - spark - INFO - 🎫 Fetching daily closures with ticket numbers for 2025-07-29
+2025-07-29 14:11:11,443 - spark - INFO - Fetching page 1... Status: 200
+2025-07-29 14:11:11,940 - spark - INFO - Fetching page 2... Status: 200
+2025-07-29 14:11:12,442 - spark - INFO - Fetching page 3... Status: 200
+2025-07-29 14:11:13,190 - spark - INFO - Fetching page 4... Status: 200
+2025-07-29 14:11:13,715 - spark - INFO - Fetching page 5... Status: 200
+2025-07-29 14:11:14,396 - spark - INFO - Fetching page 6... Status: 200
+2025-07-29 14:11:15,292 - spark - INFO - Fetching page 7... Status: 200
+2025-07-29 14:11:16,085 - spark - INFO - Fetching page 8... Status: 200
+2025-07-29 14:11:16,567 - spark - INFO - Fetching page 9... Status: 200
+2025-07-29 14:11:17,477 - spark - INFO - Fetching page 10... Status: 200
+2025-07-29 14:11:18,221 - spark - INFO - Fetching page 11... Status: 200
+2025-07-29 14:11:18,793 - spark - INFO - Fetching page 12... Status: 200
+2025-07-29 14:11:19,583 - spark - INFO - Fetching page 13... Status: 200
+2025-07-29 14:11:20,695 - spark - INFO - Fetching page 14... Status: 200
+2025-07-29 14:11:21,212 - spark - INFO - Fetching page 15... Status: 200
+2025-07-29 14:11:21,772 - spark - INFO - Fetching page 16... Status: 200
+2025-07-29 14:11:22,324 - spark - INFO - Fetching page 17... Status: 200
+2025-07-29 14:11:22,877 - spark - INFO - Fetching page 18... Status: 200
+2025-07-29 14:11:23,353 - spark - INFO - Fetching page 19... Status: 200
+2025-07-29 14:11:24,195 - spark - INFO - Fetching page 20... Status: 200
+2025-07-29 14:11:24,695 - spark - INFO - Fetching page 21... Status: 200
+2025-07-29 14:11:26,052 - spark - INFO - Fetching page 22... Status: 200
+2025-07-29 14:11:26,603 - spark - INFO - Fetching page 23... Status: 200
+2025-07-29 14:11:27,082 - spark - INFO - Fetching page 24... Status: 200
+2025-07-29 14:11:27,634 - spark - INFO - Fetching page 25... Status: 200
+2025-07-29 14:11:28,306 - spark - INFO - Fetching page 26... Status: 200
+2025-07-29 14:11:28,956 - spark - INFO - Fetching page 27... Status: 200
+2025-07-29 14:11:29,637 - spark - INFO - Fetching page 28... Status: 200
+2025-07-29 14:11:30,195 - spark - INFO - Fetching page 29... Status: 200
+2025-07-29 14:11:30,743 - spark - INFO - Fetching page 30... Status: 200
+2025-07-29 14:11:31,266 - spark - INFO - Fetching page 31... Status: 200
+2025-07-29 14:11:31,877 - spark - INFO - Fetching page 32... Status: 200
+2025-07-29 14:11:32,413 - spark - INFO - Fetching page 33... Status: 200
+2025-07-29 14:11:32,925 - spark - INFO - Fetching page 34... Status: 200
+2025-07-29 14:11:33,230 - spark - INFO - Fetching page 35... Status: 200
+2025-07-29 14:11:33,232 - spark - INFO - 📊 Found 15 users with closures, 172 total tickets
+2025-07-29 14:11:33,242 - spark - INFO - 🔄 Updated: Pietro Vue - 11 tickets with numbers
+2025-07-29 14:11:33,246 - spark - INFO - 🔄 Updated: Staci Valko - 14 tickets with numbers
+2025-07-29 14:11:33,247 - spark - INFO - 🔄 Updated: Samuel Nightingale - 7 tickets with numbers
+2025-07-29 14:11:33,248 - spark - INFO - 🔄 Updated: JZ - 10 tickets with numbers
+2025-07-29 14:11:33,249 - spark - INFO - 🔄 Updated: Anthony Risker - 16 tickets with numbers
+2025-07-29 14:11:33,250 - spark - INFO - 🔄 Updated: Jabin Dejesa - 11 tickets with numbers
+2025-07-29 14:11:33,251 - spark - INFO - 🔄 Updated: Richard Nguyen - 8 tickets with numbers
+2025-07-29 14:11:33,252 - spark - INFO - 🔄 Updated: AJ - 28 tickets with numbers
+2025-07-29 14:11:33,254 - spark - INFO - 🔄 Updated: Oscar Solis - 9 tickets with numbers
+2025-07-29 14:11:33,255 - spark - INFO - 🔄 Updated: Nick Gutierrez - 35 tickets with numbers
+2025-07-29 14:11:33,256 - spark - INFO - 🔄 Updated: Christopher Bush - 18 tickets with numbers
+2025-07-29 14:11:33,258 - spark - INFO - 🔄 Updated: Vinh Nguyen - 1 tickets with numbers
+2025-07-29 14:11:33,260 - spark - INFO - 🔄 Updated: Rylan Knightstep - 1 tickets with numbers
+2025-07-29 14:11:33,261 - spark - INFO - 🔄 Updated: Ralph Rosalin - 2 tickets with numbers
+2025-07-29 14:11:33,262 - spark - INFO - 🔄 Updated: Jonathan Nguyen - 1 tickets with numbers
+2025-07-29 14:11:33,269 - spark - INFO - ✅ Enhanced daily closures synced successfully for 2025-07-29 - 172 tickets processed with numbers

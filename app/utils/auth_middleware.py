@@ -1,6 +1,7 @@
 """
 Authentication Middleware for YAM Application
 Handles authentication redirects and session management
+Enhanced for multiple session support and conflict resolution
 """
 
 import logging
@@ -8,6 +9,7 @@ from functools import wraps
 from datetime import datetime, timedelta
 from flask import request, redirect, url_for, jsonify, session, current_app
 from flask_login import current_user, login_required
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +28,9 @@ PUBLIC_ROUTES = {
     '/socket.io/',
     '/auto-login',
     '/api/session/time-remaining',
-    '/api/session/extend'
+    '/api/session/extend',
+    '/api/activity/track',
+    '/api/activity/all'
 }
 
 # API routes that should return JSON instead of redirects
@@ -83,7 +87,7 @@ def require_auth(f):
             logger.warning(f"Unauthorized access attempt to {request.path} from {request.remote_addr}")
             return handle_unauthorized_access()
         
-        # Check if session is healthy
+        # Check if session is healthy (more lenient for multiple sessions)
         if not is_session_healthy():
             logger.warning(f"Unhealthy session for user {current_user.id} accessing {request.path}")
             return handle_unauthorized_access()
@@ -91,8 +95,31 @@ def require_auth(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def is_multiple_sessions_allowed():
+    """Check if multiple sessions are allowed for the current server instance."""
+    try:
+        # Check for environment variable
+        if os.environ.get('YAM_ALLOW_MULTIPLE_SESSIONS') == '1':
+            return True
+        
+        # Check for marker file
+        from pathlib import Path
+        marker_file = Path('multiple_sessions_allowed.txt')
+        if marker_file.exists():
+            return True
+        
+        # Check for session conflict resolution marker
+        conflict_marker = Path('session_conflict_resolution.txt')
+        if conflict_marker.exists():
+            return True
+        
+        return False
+    except Exception as e:
+        logger.warning(f"Error checking multiple sessions allowed: {e}")
+        return False
+
 def is_session_healthy():
-    """Check if the current session is healthy."""
+    """Check if the current session is healthy - enhanced for multiple sessions."""
     try:
         # If user is authenticated via Flask-Login, we should allow the request
         # even if session data is incomplete (it will be fixed by update_session_activity)
@@ -105,6 +132,7 @@ def is_session_healthy():
                     session['username'] = current_user.username
                     session['last_activity'] = datetime.utcnow().isoformat()
                     session['session_start'] = datetime.utcnow().isoformat()
+                    session['session_id'] = f"{current_user.id}_{datetime.utcnow().timestamp()}"
                     logger.info(f"Initialized missing session data for user {current_user.id}")
                 except Exception as e:
                     logger.warning(f"Could not initialize session data: {e}")
@@ -129,30 +157,61 @@ def is_session_healthy():
                     logger.info(f"Reset invalid last_activity timestamp for user {current_user.id}")
                     return True
             
-            # Check if session is within 2 hours (more lenient for API calls)
+            # More lenient session timeout for multiple sessions (4 hours instead of 2)
+            timeout_hours = 4 if is_multiple_sessions_allowed() else 2
             time_diff = datetime.utcnow() - last_activity
-            if time_diff > timedelta(hours=2):
-                logger.warning(f"Session expired for user {session.get('user_id')}")
+            if time_diff > timedelta(hours=timeout_hours):
+                logger.warning(f"Session expired for user {session.get('user_id')} (timeout: {timeout_hours}h)")
                 return False
             
             # Check if user has been marked offline in the database
-            # This is the critical fix for the redirect loop issue
+            # Be more lenient for multiple sessions - don't immediately clear session
             if current_user.is_authenticated and hasattr(current_user, 'is_online') and not current_user.is_online:
                 user_id = current_user.id if hasattr(current_user, 'id') else 'Unknown'
-                logger.warning(f"User {user_id} is authenticated but marked offline – clearing session and forcing re-login")
-                # Clear the session immediately to prevent redirect loops
-                try:
-                    from flask_login import logout_user
-                    session.clear()
-                    logout_user()
-                    logger.info(f"Cleared session for offline user {user_id}")
-                except Exception as e:
-                    logger.error(f"Error clearing session for offline user {user_id}: {e}")
-                return False
+                if is_multiple_sessions_allowed():
+                    # For multiple sessions, just log warning and allow request to proceed
+                    logger.info(f"User {user_id} is authenticated but marked offline - allowing request (multiple sessions enabled)")
+                    # Update session to mark user as online
+                    try:
+                        from app.services.user_presence import presence_service
+                        presence_service.mark_user_online(user_id)
+                        logger.info(f"Marked user {user_id} as online via session activity")
+                    except Exception as e:
+                        logger.warning(f"Could not mark user {user_id} as online: {e}")
+                    return True
+                else:
+                    # For single session mode, be more strict
+                    logger.warning(f"User {user_id} is authenticated but marked offline - clearing session")
+                    return False
             
             return True
         else:
-            # User is not authenticated, session should not be healthy
+            # User is not authenticated, but check if we have session data
+            # This handles the case where session exists but Flask-Login user is not loaded
+            if session.get('user_id'):
+                # Session exists but user is not authenticated - this could be after server restart
+                # Try to re-authenticate the user
+                try:
+                    from app.models import User
+                    user = User.query.get(session.get('user_id'))
+                    if user:
+                        # User exists, try to log them in
+                        from flask_login import login_user
+                        login_user(user, remember=True)
+                        logger.info(f"Re-authenticated user {user.username} from session data")
+                        return True
+                    else:
+                        # User doesn't exist, clear session
+                        session.clear()
+                        logger.warning(f"User {session.get('user_id')} not found in database, clearing session")
+                        return False
+                except Exception as e:
+                    logger.error(f"Error re-authenticating user from session: {e}")
+                    # Clear session on error
+                    session.clear()
+                    return False
+            
+            # No session data and not authenticated
             return False
             
     except Exception as e:
@@ -162,10 +221,20 @@ def is_session_healthy():
         return current_user.is_authenticated
 
 def update_session_activity():
-    """Update session activity timestamp."""
+    """Update session activity timestamp with enhanced tracking."""
     try:
         session['last_activity'] = datetime.utcnow().isoformat()
         session['request_count'] = session.get('request_count', 0) + 1
+        
+        # Add session ID if not present
+        if not session.get('session_id'):
+            session['session_id'] = f"{session.get('user_id', 'unknown')}_{datetime.utcnow().timestamp()}"
+        
+        # Mark session as active for multiple sessions support
+        if is_multiple_sessions_allowed():
+            session['multiple_sessions_enabled'] = True
+            session['session_active'] = True
+        
     except Exception as e:
         logger.error(f"Error updating session activity: {e}")
 
@@ -184,7 +253,9 @@ def setup_auth_middleware(app):
             
             # Check if user is authenticated
             if not current_user.is_authenticated:
-                logger.warning(f"Unauthorized access attempt to {path} from {request.remote_addr}")
+                # Only log warning for non-public routes to reduce noise
+                if not is_public_route(path):
+                    logger.warning(f"Unauthorized access attempt to {path} from {request.remote_addr}")
                 return handle_unauthorized_access()
             
             # Update session activity for authenticated users
@@ -194,15 +265,32 @@ def setup_auth_middleware(app):
             if is_api_route(path):
                 # Only check basic authentication for API routes
                 # Don't enforce strict session health for API calls
+                # Update session activity but don't block the request
+                update_session_activity()
                 return None
             
-            # Check session health for web routes
+            # Check session health for web routes (more lenient for multiple sessions)
             if not is_session_healthy():
                 user_id = current_user.id if hasattr(current_user, 'id') else 'Unknown'
                 logger.warning(f"Unhealthy session for user {user_id} accessing {path}")
-                # Clear session and redirect to login
-                # Note: is_session_healthy() already clears the session if user is offline
-                # So we only need to clear here if it wasn't already cleared
+                
+                # For multiple sessions mode, try to fix the session instead of clearing it
+                if is_multiple_sessions_allowed():
+                    try:
+                        # Try to re-initialize session data
+                        session['user_id'] = current_user.id
+                        session['username'] = current_user.username
+                        session['last_activity'] = datetime.utcnow().isoformat()
+                        session['session_start'] = datetime.utcnow().isoformat()
+                        session['session_id'] = f"{current_user.id}_{datetime.utcnow().timestamp()}"
+                        session['multiple_sessions_enabled'] = True
+                        session['session_active'] = True
+                        logger.info(f"Re-initialized session for user {user_id} (multiple sessions mode)")
+                        return None
+                    except Exception as e:
+                        logger.error(f"Error re-initializing session: {e}")
+                
+                # Clear session and redirect to login (fallback)
                 if current_user.is_authenticated:
                     try:
                         from flask_login import logout_user
@@ -245,7 +333,7 @@ def setup_auth_middleware(app):
             # Fallback: redirect to login if template fails
             return handle_unauthorized_access()
     
-    logger.info("Authentication middleware setup completed")
+    logger.info("Enhanced authentication middleware setup completed (multiple sessions supported)")
 
 def clear_user_sessions(user_id):
     """Clear all sessions for a specific user."""

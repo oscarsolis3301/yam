@@ -1,7 +1,7 @@
 from flask import Blueprint
 import logging
 from app.utils.models import initialize_models
-from extensions import db
+from app.extensions import db
 
 logger = logging.getLogger('spark')
 

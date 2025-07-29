@@ -14,17 +14,17 @@ TARGET_FILES = [
 REPLACEMENTS = [
     # Replace full import with db
     (re.compile(r"from app import db, memory_manager, _initialization_state, _app_initialized, _blueprints_registered"),
-     "from extensions import db\nfrom app.shared_state import memory_manager, _initialization_state, _app_initialized, _blueprints_registered"),
+     "from app.extensions import db\nfrom app.shared_state import memory_manager, _initialization_state, _app_initialized, _blueprints_registered"),
     # Replace full import without db
     (re.compile(r"from app import memory_manager, _initialization_state, _app_initialized, _blueprints_registered"),
      "from app.shared_state import memory_manager, _initialization_state, _app_initialized, _blueprints_registered"),
     # Replace shared_state import with db
     (re.compile(r"from app.shared_state import db, memory_manager, _initialization_state, _app_initialized, _blueprints_registered"),
-     "from extensions import db\nfrom app.shared_state import memory_manager, _initialization_state, _app_initialized, _blueprints_registered"),
+     "from app.extensions import db\nfrom app.shared_state import memory_manager, _initialization_state, _app_initialized, _blueprints_registered"),
     # Replace db from app
-    (re.compile(r"from app import db"), "from extensions import db"),
+    (re.compile(r"from app import db"), "from app.extensions import db"),
     # Replace db from shared_state
-    (re.compile(r"from app.shared_state import db"), "from extensions import db"),
+    (re.compile(r"from app.shared_state import db"), "from app.extensions import db"),
 ]
 
 # 3. Remove global variable definitions in YAM_refactored.py

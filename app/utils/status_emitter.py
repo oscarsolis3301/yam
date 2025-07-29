@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import psutil
 
 # Import shared extensions (singletons)
-from extensions import db, socketio
+from app.extensions import db, socketio
 
 # Import the SQLAlchemy models – delayed import avoids circular deps
 from app.models import User, SearchHistory, Activity

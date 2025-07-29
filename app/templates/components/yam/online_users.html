@@ -1531,12 +1531,12 @@ window.yamOnlineUsers = {
             clearInterval(this.apiFallbackInterval);
         }
         
-        // Refresh every 30 seconds with persistent fallback
+        // Refresh every 2 minutes with persistent fallback (reduced frequency)
         this.apiFallbackInterval = setInterval(() => {
             if (!this.isLoading) {
                 this.loadUsersWithFallback();
             }
-        }, 30000);
+        }, 120000);
     },
     
     startHealthChecks() {
@@ -1545,10 +1545,10 @@ window.yamOnlineUsers = {
             clearInterval(this.healthCheckInterval);
         }
         
-        // Check health every 60 seconds
+        // Check health every 3 minutes (reduced frequency)
         this.healthCheckInterval = setInterval(() => {
             this.performHealthCheck();
-        }, 60000);
+        }, 180000);
     },
     
     performHealthCheck() {

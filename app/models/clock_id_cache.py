@@ -6,7 +6,7 @@ without requiring PowerShell scripts on every search.
 """
 
 from datetime import datetime
-from extensions import db
+from app.extensions import db
 import sqlite3
 from pathlib import Path
 import logging

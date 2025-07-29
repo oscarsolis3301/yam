@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from flask import current_app
-from extensions import db
+from app.extensions import db
 from app.models import User, ChatQA
 
 logger = logging.getLogger('spark')

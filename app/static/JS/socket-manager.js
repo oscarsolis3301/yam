@@ -26,19 +26,19 @@ if (typeof window.yamSocketManager !== 'undefined') {
         this.hasUserInteracted = false;
         this.isInitialized = false;
         
-        // Enhanced configuration
+        // Enhanced configuration - OPTIMIZED FOR PERFORMANCE
         this.config = {
-            heartbeatInterval: 45000,   // 45 seconds (increased from 30)
-            activityInterval: 60000,    // 1 minute
+            heartbeatInterval: 120000,  // 2 minutes (increased from 45 seconds)
+            activityInterval: 300000,   // 5 minutes (increased from 1 minute)
             inactivityTimeout: 600000,  // 10 minutes (increased from 5)
             reconnectDelay: 1000,       // 1 second
             maxReconnectAttempts: 15,   // More attempts (increased from 10)
             activityTimeout: 600000,    // 10 minutes (increased from 5)
-            visibilityHeartbeat: 15000  // 15 seconds when page visible (increased from 10)
+            visibilityHeartbeat: 60000  // 1 minute when page visible (increased from 15 seconds)
         };
         
-        // Activity types to track
-        this.activityTypes = ['click', 'keydown', 'mousemove', 'scroll', 'touchstart', 'focus'];
+        // Activity types to track - OPTIMIZED (removed mousemove to reduce spam)
+        this.activityTypes = ['click', 'keydown', 'scroll', 'touchstart', 'focus'];
         this.lastActivityType = null;
         this.activityCount = 0;
         

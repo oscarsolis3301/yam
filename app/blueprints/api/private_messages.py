@@ -7,7 +7,7 @@ import logging
 from datetime import datetime
 from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
-from extensions import db
+from app.extensions import db
 from app.models.private_messages import (
     PrivateMessage, PrivateMessageSession,
     get_conversation_messages, get_user_conversations,

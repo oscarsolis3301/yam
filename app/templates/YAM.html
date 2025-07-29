@@ -1,6 +1,55 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Cache Busting for Session Monitor Fix -->
+<script>
+// Force refresh of cached JavaScript files - Session Monitor Fix v1.1
+if (navigator.serviceWorker) {
+    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) {
+            registration.unregister();
+        }
+    });
+}
+// Clear any existing session activity throttles
+if (window.YAM_SESSION_ACTIVITY_THROTTLE) {
+    window.YAM_SESSION_ACTIVITY_THROTTLE = null;
+}
+
+// GLOBAL EMERGENCY OVERRIDE - Block ALL session activity spam
+window.YAM_EMERGENCY_THROTTLE = {
+    lastCall: 0,
+    callCount: 0,
+    blocked: 0
+};
+
+// Override fetch to block excessive session activity calls
+const originalFetch = window.fetch;
+window.fetch = function(url, options) {
+    if (url && url.includes('/api/session/activity')) {
+        const now = Date.now();
+        const throttle = window.YAM_EMERGENCY_THROTTLE;
+        
+        // Allow maximum 1 call per 10 minutes
+        if ((now - throttle.lastCall) < 600000) {
+            throttle.blocked++;
+            console.debug(`🚫 Blocked session activity call #${throttle.blocked} - throttling active`);
+            return Promise.resolve(new Response('{"success":true,"throttled":true}', {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' }
+            }));
+        }
+        
+        throttle.lastCall = now;
+        throttle.callCount++;
+        console.log(`✅ Allowing session activity call #${throttle.callCount}`);
+    }
+    return originalFetch.apply(this, arguments);
+};
+
+console.log('YAM: Cleared cache, session activity throttles, and installed emergency override');
+</script>
+
 <!-- Include all styles -->
 {% include 'components/yam/yam_dashboard_styles.html' %}
 

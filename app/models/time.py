@@ -5,5 +5,5 @@ without introducing a second table definition.
 """
 
 from app.models.base import TimeEntry  # noqa: F401
-from extensions import db
+from app.extensions import db
 __all__ = ["TimeEntry"] 
