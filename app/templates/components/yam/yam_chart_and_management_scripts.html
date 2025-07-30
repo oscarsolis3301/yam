@@ -1,11 +1,13 @@
 <script>
-// Chart update function
+// STATIC CHART UPDATE FUNCTION - Works with cached data only
 function updateOutageChart(outages, period, customStart = null, customEnd = null) {
     // Check if chart is initialized
     if (!outageChart) {
         console.warn('Outage chart not initialized yet');
         return;
     }
+
+    console.log('📊 Updating outage chart with static data - no API calls');
 
     const now = new Date();
     const labels = [];
@@ -104,7 +106,7 @@ function updateOutageChart(outages, period, customStart = null, customEnd = null
         data.push(outagesInPeriod.length);
     }
     
-    // Update chart data
+    // STATIC CHART UPDATE - No animations, immediate update
     outageChart.data.labels = labels;
     outageChart.data.datasets[0].data = data;
     
@@ -141,9 +143,10 @@ function updateOutageChart(outages, period, customStart = null, customEnd = null
         }
     };
     
-    outageChart.update('active');
+    // STATIC UPDATE - No animations, immediate render
+    outageChart.update('none');
     
-    console.log('Outage chart updated with', outages.length, 'outages for period', period);
+    console.log('✅ Static outage chart updated with', outages.length, 'outages for period', period);
 }
 
 // Helper function to get day suffix (1st, 2nd, 3rd, etc.)

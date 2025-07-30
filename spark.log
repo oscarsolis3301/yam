@@ -799,3 +799,18 @@ with app.app_context(). See the documentation for more information.
 2025-07-30 07:50:30,461 - spark - WARNING -    🎫 Tickets closed: 2
 2025-07-30 07:50:30,462 - spark - WARNING -    🔍 Add to IDs.txt: 'Unknown User 18013191685 - 18013191685' or create local user
 2025-07-30 07:50:30,472 - spark - INFO - ✅ Enhanced daily closures synced successfully for 2025-07-30 - 45 tickets processed with numbers
+2025-07-30 08:55:51,779 - spark - ERROR - ❌ Error ensuring database exists: app
+2025-07-30 08:55:52,003 - spark - INFO - ✅ Found legacy record for AJ on 2025-07-30: 1 tickets
+2025-07-30 08:55:52,008 - spark - INFO - ✅ Found 3 legacy records for AJ during week: 48 tickets
+2025-07-30 08:55:52,009 - spark - ERROR - ❌ Error getting database info: app
+2025-07-30 09:30:00,885 - spark - INFO - 🔄 Getting closures for period: yesterday
+2025-07-30 09:30:00,886 - spark - ERROR - ❌ Error ensuring database exists: Working outside of application context.
+
+This typically means that you attempted to use functionality that needed
+the current application. To solve this, set up an application context
+with app.app_context(). See the documentation for more information.
+2025-07-30 09:30:00,886 - spark - INFO - 📅 Target date: 2025-07-30
+2025-07-30 09:30:00,886 - spark - INFO - 📊 Getting yesterday's closures
+2025-07-30 09:30:00,887 - spark - ERROR - ❌ No Flask app context available
+2025-07-30 14:11:52,779 - spark - INFO - ✅ Ticket closure database tables verified/created
+2025-07-30 14:11:52,784 - spark - INFO - ✅ Found legacy record for Nick on 2025-07-29: 35 tickets

@@ -606,9 +606,10 @@ window.yamModals = {
                     }
                     break;
                 case 'recentActivityModal':
-                    if (window.recentActivity && window.recentActivity.init) {
-                        window.recentActivity.init();
-                    }
+                    // DISABLED: Using enhanced instant loader instead
+                    // if (window.recentActivity && window.recentActivity.init) {
+                    //     window.recentActivity.init();
+                    // }
                     break;
                 case 'activityTrackerModal':
                     if (window.userActivityTracker && window.userActivityTracker.init) {

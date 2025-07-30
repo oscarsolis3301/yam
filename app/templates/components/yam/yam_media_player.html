@@ -99,7 +99,7 @@
     width: 100%;
     box-sizing: border-box;
     /* Make the widget match the left container height */
-    min-height: 520px; /* Match user profile height */
+    min-height: 480px; /* Reduced to match user profile height */
     display: flex;
     flex-direction: column;
 }
@@ -123,15 +123,15 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 420px; /* Reduced minimum content height */
+    min-height: 380px; /* Reduced minimum content height */
 }
 
 .now-playing {
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 1.5rem;
-    padding: 1rem;
+    margin-bottom: 1.2rem; /* Reduced margin */
+    padding: 0.9rem; /* Slightly reduced padding */
     background: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -187,7 +187,7 @@
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.2rem; /* Reduced margin */
 }
 
 .control-btn {
@@ -227,7 +227,7 @@
     display: flex;
     align-items: center;
     gap: 0.8rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem; /* Reduced margin */
 }
 
 .time-current, .time-total {
@@ -328,7 +328,7 @@
 /* Reduced spacing to minimize excess space */
 .media-player-spacer {
     flex: 1;
-    min-height: 20px; /* Significantly reduced spacer height */
+    min-height: 10px; /* Further reduced spacer height */
 }
 
 /* Playlist Modal Styles */

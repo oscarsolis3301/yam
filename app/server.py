@@ -239,7 +239,7 @@ def clear_all_sessions():
                     'message': 'Server is shutting down. All users must re-authenticate.',
                     'timestamp': datetime.utcnow().isoformat(),
                     'require_relogin': True
-                }, broadcast=True)
+                })
                 
                 logger.info("  [OK] Logout broadcast sent to all clients")
             except Exception as e:
@@ -2795,6 +2795,9 @@ if __name__ == '__main__':
             # Initialize file monitor
             app_dir = (current_dir.parent / 'app').resolve()
             file_monitor = DebuggerFileMonitor(app_dir)
+        except ImportError:
+            logger.error("Could not initialize debugger mode: No module named 'debugger_server'")
+            file_monitor = None
             
             # Add file change callback for browser refresh
             def on_file_change(file_path, file_type):
@@ -2822,18 +2825,20 @@ if __name__ == '__main__':
                 except Exception as e:
                     logger.error(f"Error handling file change: {e}")
             
-            # Register the callback
-            file_monitor.add_change_callback(on_file_change)
+            # Register the callback if file_monitor is available
+            if file_monitor:
+                file_monitor.add_change_callback(on_file_change)
+            
             # Add debugger routes
             @yam_app.route('/debugger/status')
             def debugger_status():
                 """Get debugger server status."""
                 return jsonify({
-                    'status': 'running',
+                    'status': 'running' if file_monitor else 'limited',
                     'mode': 'debugger',
-                    'real_time_updates': True,
+                    'real_time_updates': file_monitor is not None,
                     'file_monitoring': file_monitor.monitoring if file_monitor else False,
-                    'browser_auto_refresh': True,
+                    'browser_auto_refresh': file_monitor is not None,
                     'template_hot_reload': True,
                     'static_hot_reload': True,
                     'timestamp': datetime.now().isoformat()
@@ -2843,7 +2848,13 @@ if __name__ == '__main__':
             def debugger_files():
                 """Get list of monitored files."""
                 if not file_monitor:
-                    return jsonify({'error': 'File monitor not initialized'})
+                    return jsonify({
+                        'error': 'File monitor not available',
+                        'message': 'Debugger server module not found',
+                        'files': [],
+                        'count': 0,
+                        'timestamp': datetime.now().isoformat()
+                    })
                     
                 files = []
                 for file_key, file_hash in file_monitor.file_hashes.items():
@@ -2979,9 +2990,12 @@ if __name__ == '__main__':
                     except Exception as e:
                         logger.error(f"Error sending file update: {e}")
             
-            # Start file monitoring
-            file_monitor.start_monitoring()
-            logger.info("Debugger mode initialized with file monitoring and browser auto-refresh")
+            # Start file monitoring only if file_monitor is available
+            if file_monitor:
+                file_monitor.start_monitoring()
+                logger.info("Debugger mode initialized with file monitoring and browser auto-refresh")
+            else:
+                logger.info("Debugger mode initialized with limited functionality (no file monitoring)")
             
         except ImportError as e:
             logger.error(f"Could not initialize debugger mode: {e}")

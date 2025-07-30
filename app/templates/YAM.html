@@ -1,8 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- STATIC OUTAGES CHART - Load once from database, remain constant -->
 <!-- Cache Busting for Session Monitor Fix -->
 <script>
+// STATIC OUTAGES CONFIGURATION - Chart loads once and stays constant
+window.YAM_STATIC_OUTAGES = {
+    enabled: true,
+    loaded: false,
+    data: null,
+    lastLoad: 0
+};
+
 // Force refresh of cached JavaScript files - Session Monitor Fix v1.1
 if (navigator.serviceWorker) {
     navigator.serviceWorker.getRegistrations().then(function(registrations) {
@@ -47,7 +56,7 @@ window.fetch = function(url, options) {
     return originalFetch.apply(this, arguments);
 };
 
-console.log('YAM: Cleared cache, session activity throttles, and installed emergency override');
+console.log('YAM: Static outages enabled, cache cleared, session activity throttles installed');
 
 // ENHANCED CHART STABILITY: Global chart monitoring for YAM dashboard
 window.YAM_CHART_STABILITY = {
@@ -130,6 +139,7 @@ console.log('YAM: Chart stability monitoring initialized');
 {% include 'components/yam/yam_outage_detail_modal.html' %}
 {% include 'components/yam/yam_custom_date_modal.html' %}
 {% include 'components/yam/yam_outages_management_modal.html' %}
+<!-- User Ticket Details Modal is included in yam_user_tickets_section.html -->
 
 <!-- Include all JavaScript -->
 {% include 'components/yam/yam_core_scripts.html' %}

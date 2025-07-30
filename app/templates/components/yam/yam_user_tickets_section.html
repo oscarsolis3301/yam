@@ -4,6 +4,7 @@
         <h2 class="card-title">Daily Ticket Closures</h2>
         <div class="time-controls">
             <button class="time-btn active" data-period="today">Today</button>
+            <button class="time-btn" data-period="yesterday">Yesterday</button>
             <button class="time-btn" data-period="week">This Week</button>
             <button class="time-btn" data-period="month">This Month</button>
             {% if current_user.role != 'user' %}
@@ -23,7 +24,7 @@
         <canvas id="userTicketsChart" class="chart-canvas"></canvas>
     </div>
     
-    <!-- Enhanced Daily Stats Grid - Only show today's closures -->
+    <!-- Enhanced Daily Stats Grid - Dynamic label based on selected period -->
     <div class="user-tickets-stats">
         <div class="stat-item clickable" id="ticketsClosedTodayStat" onclick="openDailyPerformanceModal()">
             <div class="stat-icon">
@@ -31,7 +32,7 @@
             </div>
             <div class="stat-content">
                 <div class="stat-number" id="ticketsClosedToday">-</div>
-                <div class="stat-label">Closed Today</div>
+                <div class="stat-label" id="ticketsClosedLabel">Closed Today</div>
             </div>
         </div>
         <div class="stat-item">
@@ -52,6 +53,7 @@
             <div class="user-tickets-filters">
                 <select class="user-tickets-filter" onchange="filterDailyClosures(this.value)">
                     <option value="today">Today</option>
+                    <option value="yesterday">Yesterday</option>
                     <option value="week">This Week</option>
                     <option value="month">This Month</option>
                 </select>
@@ -101,6 +103,7 @@
             <div class="user-tickets-filters">
                 <select class="user-tickets-filter" onchange="filterDailyClosures(this.value)">
                     <option value="today">Today</option>
+                    <option value="yesterday">Yesterday</option>
                     <option value="week">This Week</option>
                     <option value="month">This Month</option>
                 </select>

@@ -92,14 +92,20 @@ def get_period_closures():
         logger.info(f"Fetching ticket closures for period: {period}")
         
         # Use the enhanced ticket closure service
-        result = ticket_closure_service.get_closures_for_period(period)
-        
-        if result and result.get('success'):
-            logger.info(f"✅ Retrieved {result.get('total_closed', 0)} tickets for period {period}")
-            return jsonify(result)
-        else:
-            logger.error(f"❌ Failed to get closures for period {period}")
-            return jsonify({'success': False, 'error': 'Failed to retrieve data'}), 500
+        try:
+            result = ticket_closure_service.get_closures_for_period(period)
+            
+            if result and result.get('success'):
+                logger.info(f"✅ Retrieved {result.get('total_closed', 0)} tickets for period {period}")
+                return jsonify(result)
+            else:
+                logger.error(f"❌ Failed to get closures for period {period}")
+                return jsonify({'success': False, 'error': 'Failed to retrieve data'}), 500
+        except Exception as e:
+            logger.error(f"❌ Exception in ticket closure service: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return jsonify({'success': False, 'error': f'Service error: {str(e)}'}), 500
         
     except Exception as e:
         logger.error(f"Error fetching period closures: {e}")
@@ -667,6 +673,19 @@ def test_database():
             week_ago = today - timedelta(days=7)
             recent_closures = TicketClosure.query.filter(TicketClosure.date >= week_ago).all()
             
+            # Get database info from service
+            db_info = ticket_closure_service.get_database_info()
+            
+            # Test period data
+            week_data = ticket_closure_service.get_closures_for_period('week')
+            month_data = ticket_closure_service.get_closures_for_period('month')
+            
+            # Test new tables
+            from app.models.base import TicketClosureHistory, TicketClosureDaily, TicketSyncMetadata
+            history_count = TicketClosureHistory.query.count()
+            daily_count = TicketClosureDaily.query.count()
+            metadata_count = TicketSyncMetadata.query.count()
+            
             return jsonify({
                 'success': True,
                 'database_status': {
@@ -677,11 +696,21 @@ def test_database():
                     'total_tables': len(tables),
                     'available_tables': tables
                 },
+                'service_info': db_info,
                 'data_counts': {
                     'total_closures': total_closures,
                     'total_users': total_users,
                     'today_closures': len(today_closures),
-                    'recent_closures': len(recent_closures)
+                    'recent_closures': len(recent_closures),
+                    'history_records': history_count,
+                    'daily_records': daily_count,
+                    'metadata_records': metadata_count
+                },
+                'period_test': {
+                    'week_data_available': week_data is not None and week_data.get('success'),
+                    'month_data_available': month_data is not None and month_data.get('success'),
+                    'week_total': week_data.get('total_closed', 0) if week_data and week_data.get('success') else 0,
+                    'month_total': month_data.get('total_closed', 0) if month_data and month_data.get('success') else 0
                 },
                 'today_data': [
                     {
@@ -884,29 +913,45 @@ def get_user_ticket_details(username):
     """Get detailed ticket information for a specific user on a specific date using enhanced service"""
     try:
         target_date_str = request.args.get('date', date.today().isoformat())
+        period = request.args.get('period', 'today')
         
         try:
             target_date = datetime.strptime(target_date_str, '%Y-%m-%d').date()
         except ValueError:
             return jsonify({'success': False, 'error': 'Invalid date format. Use YYYY-MM-DD'}), 400
         
-        logger.info(f"Fetching ticket details for user {username} on {target_date}")
+        logger.info(f"Fetching ticket details for user {username} on {target_date} (period: {period})")
         
-        # Use the enhanced ticket closure service
-        result = ticket_closure_service.get_user_ticket_details(username, target_date)
+        # Use the enhanced ticket closure service with period context
+        if period in ['week', 'month']:
+            # For period views, get aggregated data
+            logger.info(f"Getting period data for {username} (period: {period})")
+            result = ticket_closure_service.get_user_ticket_details_for_period(username, period)
+        elif period == 'yesterday':
+            # For yesterday, the target_date parameter already contains yesterday's date
+            # (frontend calculates it correctly), so use it directly
+            logger.info(f"Getting yesterday data for {username} on {target_date}")
+            result = ticket_closure_service.get_user_ticket_details(username, target_date)
+        else:
+            # For daily views (today), get specific date data
+            logger.info(f"Getting daily data for {username} on {target_date}")
+            result = ticket_closure_service.get_user_ticket_details(username, target_date)
         
         if result and result.get('success'):
-            logger.info(f"✅ Retrieved ticket details for {username}: {result.get('total_tickets', 0)} tickets")
+            total_tickets = result.get('total_tickets', 0)
+            logger.info(f"✅ Retrieved ticket details for {username}: {total_tickets} tickets")
             return jsonify(result)
         else:
-            logger.warning(f"No ticket details found for {username} on {target_date}")
+            logger.warning(f"No ticket details found for {username} on {target_date} (period: {period})")
+            # Return empty result with proper structure
             return jsonify({
                 'success': True,
                 'user': {'username': username, 'role': 'User', 'profile_picture': 'default.png'},
                 'tickets': [],
                 'total_tickets': 0,
                 'summary': {'total_closed': 0, 'total_open': 0, 'high_priority': 0},
-                'date': target_date.isoformat()
+                'date': target_date.isoformat(),
+                'period': period
             })
         
     except Exception as e:

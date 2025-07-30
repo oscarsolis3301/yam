@@ -1,8 +1,23 @@
 <script>
+// STATIC OUTAGES DATA - Load once from database, never auto-refresh
+let staticOutagesData = null; // Global cache for outages data
+let outagesDataLoaded = false; // Flag to prevent multiple loads
+
 // Data loading functions
 const currentUserRole = '{{ current_user.role }}';
+
+// STATIC OUTAGES LOADING - Load once, stay constant
 function loadOutagesData(period = '7d', customStart = null, customEnd = null) {
-    console.log('Loading outages data for period:', period);
+    // If data already loaded, use cached data
+    if (outagesDataLoaded && staticOutagesData) {
+        console.log('Using cached static outages data - no API calls');
+        updateOutageStats(staticOutagesData);
+        updateCurrentOutages(staticOutagesData);
+        updateOutageChart(staticOutagesData, period, customStart, customEnd);
+        return;
+    }
+    
+    console.log('Loading outages data from database (one-time load)...');
     
     fetch('/api/admin/outages?all=true')
         .then(response => {
@@ -12,7 +27,7 @@ function loadOutagesData(period = '7d', customStart = null, customEnd = null) {
             return response.json();
         })
         .then(outages => {
-            console.log('Received outages data:', outages);
+            console.log('Received outages data from database:', outages);
             
             // Ensure outages is an array
             if (!Array.isArray(outages)) {
@@ -26,6 +41,12 @@ function loadOutagesData(period = '7d', customStart = null, customEnd = null) {
                 start_time: new Date(outage.start_time).toISOString(),
                 end_time: outage.end_time ? new Date(outage.end_time).toISOString() : null
             }));
+            
+            // Store data globally - this will be used for all future requests
+            staticOutagesData = processedOutages;
+            outagesDataLoaded = true;
+            
+            console.log('✅ Outages data cached - chart will remain static until manual refresh');
             
             updateOutageStats(processedOutages);
             updateCurrentOutages(processedOutages);
@@ -44,30 +65,83 @@ function loadOutagesData(period = '7d', customStart = null, customEnd = null) {
         });
 }
 
-function loadUserActivity() {
-    // Fetch the full activity log for the current user then show the latest 5
-    fetch('/api/activity/all')
-        .then(response => response.json())
-        .then(result => {
-            const activities = (result.activities || []).slice(0, 5); // only latest 5 for sidebar widget
-            updateRecentActivity(activities);
-        })
-        .catch(error => {
-            console.error('Error loading activity:', error);
-            document.getElementById('recentActivity').innerHTML = '<div class="no-data">Error loading activity</div>';
-        });
+// STATIC REFRESH FUNCTION - Only called manually
+function refreshOutagesData() {
+    console.log('🔄 Manual refresh requested - clearing cache and reloading...');
+    
+    // Clear the cache to force a fresh load
+    staticOutagesData = null;
+    outagesDataLoaded = false;
+    
+    // Get current period
+    const activeButton = document.querySelector('.time-btn.active');
+    const period = activeButton ? activeButton.dataset.period : '14d';
+    
+    // Load fresh data
+    loadOutagesData(period);
+    
+    // Show success message
+    if (typeof showToast === 'function') {
+        showToast('Outages data refreshed from database', 'success');
+    }
 }
 
+// STATIC LOAD FUNCTION - Load once on page load
+function loadOutagesDataOnce() {
+    if (!outagesDataLoaded) {
+        console.log('📊 Loading outages data once from database...');
+        loadOutagesData('14d'); // Default to 14 days
+    } else {
+        console.log('📊 Using cached outages data - no database calls');
+    }
+}
+
+function loadUserActivity() {
+    // Skip this - the new enhanced activity loading in yam_user_profile.html handles this
+    console.log('🚫 Skipping old loadUserActivity - using enhanced activity loader instead');
+    return;
+}
+
+// Generate fallback activities when API fails
+function generateFallbackActivities() {
+    const now = new Date();
+    const actions = ['login', 'page_view', 'search', 'settings_changed'];
+    const details = [
+        'YAM Dashboard',
+        'Outages Page', 
+        'User Management',
+        'Settings Page',
+        'Knowledge Base'
+    ];
+    
+    return Array.from({length: 5}, (_, i) => ({
+        id: `fallback-${i}`,
+        user: '{{ current_user.username }}',
+        action: actions[i % actions.length],
+        details: details[i % details.length],
+        timestamp: new Date(now.getTime() - (i * 300000)).toISOString() // 5 minutes apart
+    }));
+}
+
+// STATIC OUTAGES FOR MANAGEMENT - Uses cached data
 function loadOutagesForManagement() {
-    fetch('/api/admin/outages?all=true')
-        .then(response => response.json())
-        .then(outages => {
-            updateOutagesList(outages);
-        })
-        .catch(error => {
-            console.error('Error loading outages for management:', error);
-            document.getElementById('currentOutagesList').innerHTML = '<div class="no-data">Error loading outages</div>';
-        });
+    if (staticOutagesData) {
+        console.log('Using cached outages data for management');
+        updateOutagesList(staticOutagesData);
+    } else {
+        console.log('No cached outages data, loading fresh...');
+        fetch('/api/admin/outages?all=true')
+            .then(response => response.json())
+            .then(outages => {
+                staticOutagesData = outages;
+                outagesDataLoaded = true;
+                updateOutagesList(outages);
+            })
+            .catch(error => {
+                console.error('Error loading outages for management:', error);
+                document.getElementById('currentOutagesList').innerHTML = '<div class="no-data">Error loading outages</div>';
+            });
+    }
 }
 
 // Update functions
@@ -162,33 +236,9 @@ function updateCurrentOutages(outages) {
 }
 
 function updateRecentActivity(activities) {
-    const container = document.getElementById('recentActivity');
-
-    // Filter activities for current user and limit to 5
-    const userActivities = activities.filter(a => a.user === '{{ current_user.username }}').slice(0, 5);
-
-    if (userActivities.length === 0) {
-        container.innerHTML = '<div class="no-data">No recent activity</div>';
-        return;
-    }
-
-    container.innerHTML = userActivities.map(activity => {
-        const time = new Date(activity.timestamp);
-        const timeAgo = getTimeAgo(time);
-        const icon = getActivityIcon(activity.action);
-
-        const description = formatActivityType(activity.action, activity.details);
-
-        return `
-            <div class="activity-item">
-                <div class="activity-icon">${icon}</div>
-                <div class="activity-content">
-                    <div class="activity-desc">${description}</div>
-                    <div class="activity-time">${timeAgo}</div>
-                </div>
-            </div>
-        `;
-    }).join('');
+    // DISABLED: Enhanced activity loader in yam_user_profile.html has taken over
+    console.log('🚫 OLD updateRecentActivity called but disabled - enhanced loader active');
+    return;
 }
 
 // Utility functions
@@ -221,9 +271,39 @@ function formatActivityType(action, details = '') {
 
     let text = baseMap[action] || action.replace('_', ' ').toUpperCase();
 
-    // Add details for page views and searches to make the feed meaningful
+    // Add page path for page views to show actual navigation
     if (action === 'page_view' && details) {
-        text = `${text} ${details}`;
+        // Simplify the page path for display
+        let pageName = details;
+        
+        // Map common paths to friendly names
+        if (details === '/' || details === 'Home (/)') {
+            pageName = 'Home (/)';
+        } else if (details.includes('/oralyzer')) {
+            pageName = 'Oralyzer';
+        } else if (details.includes('/admin')) {
+            pageName = 'Admin';
+        } else if (details.includes('/tickets')) {
+            pageName = 'Tickets';
+        } else if (details.includes('/outages')) {
+            pageName = 'Outages';
+        } else if (details.includes('/kb')) {
+            pageName = 'Knowledge Base';
+        } else if (details.includes('/profile')) {
+            pageName = 'Profile';
+        } else if (details.includes('/settings')) {
+            pageName = 'Settings';
+        } else {
+            // For other pages, extract the path name
+            const pathParts = details.split('/').filter(part => part.length > 0);
+            if (pathParts.length > 0) {
+                pageName = pathParts[0].charAt(0).toUpperCase() + pathParts[0].slice(1);
+            } else {
+                pageName = 'Home (/)';
+            }
+        }
+        
+        text = `${text} ${pageName}`;
     } else if (action === 'search' && details) {
         text = `${text} "${details}"`;
     }
@@ -233,15 +313,44 @@ function formatActivityType(action, details = '') {
 
 function getTimeAgo(date) {
     const now = new Date();
-    const diffMs = now - date;
+    let activityDate;
+    
+    // Handle different date formats and ensure proper parsing
+    if (typeof date === 'string') {
+        // If the date string doesn't have timezone info, treat it as local time
+        if (date.includes('T') && !date.includes('Z') && !date.includes('+') && !date.includes('-', date.indexOf('T'))) {
+            // Add 'Z' to make it UTC if it looks like ISO format without timezone
+            activityDate = new Date(date + 'Z');
+        } else {
+            activityDate = new Date(date);
+        }
+    } else {
+        activityDate = new Date(date);
+    }
+    
+    // Validate the date
+    if (isNaN(activityDate.getTime())) {
+        console.warn('Invalid date received:', date);
+        return 'Unknown time';
+    }
+    
+    const diffMs = now - activityDate;
+    const diffSecs = Math.floor(diffMs / 1000);
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
     
-    if (diffMins < 1) return 'Just now';
+    // Handle negative values (future dates) 
+    if (diffMs < 0) {
+        return 'Just now';
+    }
+    
+    if (diffSecs < 30) return 'Just now';
+    if (diffSecs < 60) return `${diffSecs}s ago`;
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
-    return `${diffDays}d ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return `${Math.floor(diffDays / 7)}w ago`;
 }
 
 function getDuration(startTime) {
@@ -353,8 +462,8 @@ function loadOutagesDataOnce() {
 
 // Initialize data loading when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    // Initial activity fetch
-    loadUserActivity();
+    // Initial activity fetch - DISABLED: Using enhanced loader in yam_user_profile.html
+    // loadUserActivity();
 
     // Load outages data once after a short delay
     setTimeout(loadOutagesDataOnce, 1000);
@@ -412,32 +521,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
-// Socket.io integration for outage notifications (optional - only if admin creates new outages)
-if (typeof window.yamSocketManager !== 'undefined' && window.yamSocketManager.socket) {
-    const socket = window.yamSocketManager.socket;
-    
-    socket.on('outage_update', (data) => {
-        console.log('Received outage update notification:', data);
-        // Only refresh if user is actively viewing the page and wants updates
-        // For now, we'll just log the notification without auto-refreshing
-        if (typeof showToast === 'function') {
-            showToast('Outage data has been updated', 'info');
-        }
-    });
-    
-    socket.on('new_outage', (data) => {
-        console.log('Received new outage notification:', data);
-        // Only refresh if user is actively viewing the page and wants updates
-        // For now, we'll just log the notification without auto-refreshing
-        if (typeof showToast === 'function') {
-            showToast('New outage has been created', 'warning');
-        }
-    });
-}
+// STATIC OUTAGES - No real-time updates, completely static
+// Socket.io integration removed to prevent any auto-refresh or real-time updates
+console.log('✅ Outages are now completely static - no real-time updates');
 
-// Manual refresh function for outages data
+// STATIC MANUAL REFRESH FUNCTION - Only called when user explicitly requests it
 function refreshOutagesData() {
-    console.log('Manual refresh of outages data requested');
+    console.log('🔄 Manual refresh of outages data requested - clearing cache and reloading from database');
     const activeBtn = document.querySelector('.time-btn.active');
     const period = activeBtn ? activeBtn.dataset.period : '14d';
     
@@ -453,12 +543,14 @@ function refreshOutagesData() {
         }
     }
     
-    // Load fresh data
+    // Clear cache and load fresh data from database
+    staticOutagesData = null;
+    outagesDataLoaded = false;
     loadOutagesData(period);
     
     // Show success message
     if (typeof showToast === 'function') {
-        showToast('Outages data refreshed', 'success');
+        showToast('Outages data refreshed from database', 'success');
     }
 }
 
@@ -468,9 +560,9 @@ window.updateOutageChart = updateOutageChart;
 window.loadOutagesDataOnce = loadOutagesDataOnce;
 window.refreshOutagesData = refreshOutagesData;
 
-// Test function to verify chart functionality
+// STATIC TEST FUNCTION - Verify outages chart is working with static data
 window.testOutageChart = function() {
-    console.log('Testing outage chart functionality...');
+    console.log('🧪 Testing static outage chart functionality...');
     
     // Test data
     const testOutages = [
@@ -501,7 +593,22 @@ window.testOutageChart = function() {
     updateCurrentOutages(testOutages);
     updateOutageChart(testOutages, '7d');
     
-    console.log('Test completed. Check the chart and stats for test data.');
+    console.log('✅ Static test completed. Chart should remain constant until manual refresh.');
+};
+
+// STATIC STATUS CHECK FUNCTION
+window.checkStaticOutagesStatus = function() {
+    console.log('📊 Static Outages Status Check:');
+    console.log('- Static data loaded:', outagesDataLoaded);
+    console.log('- Cached data available:', staticOutagesData ? 'Yes' : 'No');
+    console.log('- Chart initialized:', outageChart ? 'Yes' : 'No');
+    console.log('- Auto-refresh disabled:', 'Yes');
+    console.log('- Real-time updates disabled:', 'Yes');
+    
+    if (staticOutagesData) {
+        console.log('- Cached outages count:', staticOutagesData.length);
+        console.log('- Active outages:', staticOutagesData.filter(o => o.status === 'active').length);
+    }
 };
 
 // Add a function to check chart status
@@ -551,5 +658,66 @@ document.addEventListener('keydown', function(e) {
             modal.classList.remove('show');
         }
     }
+});
+
+// Auto-update timestamps every 30 seconds
+function updateActivityTimestamps() {
+    const activityItems = document.querySelectorAll('#recentActivity .activity-item');
+    activityItems.forEach(item => {
+        const timeElement = item.querySelector('.activity-time');
+        if (timeElement) {
+            const timestamp = timeElement.getAttribute('data-timestamp');
+            if (timestamp) {
+                const time = new Date(timestamp);
+                timeElement.textContent = getTimeAgo(time);
+            }
+        }
+    });
+}
+
+// Start timestamp updates
+function startTimestampUpdates() {
+    // Update immediately
+    updateActivityTimestamps();
+    // Then update every 30 seconds
+    setInterval(updateActivityTimestamps, 30000);
+}
+
+// Enhanced YAM Dashboard Initialization
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('YAM Dashboard Enhanced - Loaded');
+    
+    // Initialize all components
+    if (typeof loadReminders === 'function') {
+        loadReminders();
+    }
+    
+    if (typeof loadCalendarEvents === 'function') {
+        loadCalendarEvents();
+    }
+    
+    if (typeof renderCalendar === 'function') {
+        renderCalendar();
+    }
+    
+    if (typeof renderExpandedReminders === 'function') {
+        renderExpandedReminders();
+    }
+    
+    // Load user activity - DISABLED: Using enhanced loader in yam_user_profile.html
+    // loadUserActivity();
+    
+    // Start timestamp updates
+    startTimestampUpdates();
+    
+    // Add smooth scroll behavior
+    document.documentElement.style.scrollBehavior = 'smooth';
+    
+    // Show welcome message
+    setTimeout(() => {
+        if (typeof showToast === 'function') {
+            showToast('Welcome to your enhanced YAM Dashboard!', 'success');
+        }
+    }, 1000);
 });
 </script> 

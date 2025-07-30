@@ -9,6 +9,59 @@ let ticketDataCache = {
     cacheDuration: 300000 // 5 minutes cache
 };
 
+// Global period tracking for accurate data display
+let currentPeriod = 'today';
+
+// Global debug function for troubleshooting period issues
+window.debugYAMPeriod = function() {
+    console.log('🔍 YAM Period Debug Info:');
+    console.log(`📅 Global currentPeriod: ${currentPeriod}`);
+    console.log(`🔍 Active time button:`, document.querySelector('.time-btn.active')?.getAttribute('data-period'));
+    console.log(`📊 Chart data:`, userTicketsChart?.data);
+    console.log(`📊 Chart labels:`, userTicketsChart?.data?.labels);
+    console.log(`📊 Chart dataset:`, userTicketsChart?.data?.datasets?.[0]?.data);
+    return {
+        currentPeriod: currentPeriod,
+        activeButton: document.querySelector('.time-btn.active')?.getAttribute('data-period'),
+        chartData: userTicketsChart?.data
+    };
+};
+
+// Global test function for testing user ticket details API
+window.testUserTicketDetails = function(username, period = 'today') {
+    console.log(`🧪 Testing user ticket details for ${username} with period ${period}`);
+    
+    const today = new Date();
+    let targetDate;
+    
+    if (period === 'today') {
+        targetDate = today.toISOString().split('T')[0];
+    } else if (period === 'yesterday') {
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        targetDate = yesterday.toISOString().split('T')[0];
+    } else {
+        targetDate = today.toISOString().split('T')[0];
+    }
+    
+    const apiUrl = `/api/tickets/user-details/${encodeURIComponent(username)}?date=${targetDate}&period=${period}`;
+    console.log(`🌐 Testing API call: ${apiUrl}`);
+    
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            console.log(`📊 API Response for ${username} (${period}):`, data);
+            if (data.success) {
+                console.log(`✅ Found ${data.total_tickets} tickets for ${username} in ${period}`);
+            } else {
+                console.log(`❌ API Error: ${data.error}`);
+            }
+        })
+        .catch(error => {
+            console.error(`❌ Fetch Error:`, error);
+        });
+};
+
 // Preload data immediately when script loads
 let preloadedData = null;
 let chartInitialized = false;
@@ -452,6 +505,7 @@ function initializeDailyClosuresChart() {
                     const ticketCount = this.data.datasets[0].data[element.index];
                     
                     console.log(`🎯 User clicked on ${username} with ${ticketCount} tickets`);
+                    console.log(`📅 Current period when clicked: ${currentPeriod}`);
                     showUserTicketDetails(username, ticketCount);
                 }
             }
@@ -597,7 +651,7 @@ function updateChartWithData(data) {
 function updateDailyClosuresData() {
     // Check cache first
     const now = Date.now();
-    const period = getCurrentPeriod() || 'today';
+    const period = currentPeriod || getCurrentPeriod() || 'today';
     
     // Use cached data if available and not expired
     if (ticketDataCache.data && 
@@ -696,7 +750,7 @@ function loadFallbackData() {
     console.warn('Loading fallback dummy data due to API error');
     
     // Generate fallback data
-    const fallbackData = generateDailyClosuresDataForPeriod(getCurrentPeriod() || 'today');
+    const fallbackData = generateDailyClosuresDataForPeriod(currentPeriod || getCurrentPeriod() || 'today');
     
     if (userTicketsChart) {
         userTicketsChart.data.labels = fallbackData.labels;
@@ -705,10 +759,10 @@ function loadFallbackData() {
     }
     
     updateTopPerformers(fallbackData);
-    updateDailyClosuresStatsForPeriod(getCurrentPeriod() || 'today');
+    updateDailyClosuresStatsForPeriod(currentPeriod || getCurrentPeriod() || 'today');
 }
 
-function updateDailyClosuresStatsFromData(data) {
+function updateDailyClosuresStatsFromData(data, period = 'today') {
     const totalClosed = data.total_closed || 0;
     const topPerformer = data.top_performer;
     
@@ -727,6 +781,21 @@ function updateDailyClosuresStatsFromData(data) {
     // Update sync status if available
     if (data.sync_status) {
         updateSyncStatusDisplay(data.sync_status);
+    }
+    
+    console.log(`📊 Updated stats for period ${period}: Total=${totalClosed}, Top=${topPerformer?.username || 'None'}`);
+}
+
+function clearDailyClosuresStats() {
+    const totalElement = document.getElementById('ticketsClosedToday');
+    const topCloserElement = document.getElementById('topCloserToday');
+    
+    if (totalElement) {
+        totalElement.textContent = '-';
+    }
+    
+    if (topCloserElement) {
+        topCloserElement.textContent = '-';
     }
 }
 
@@ -866,7 +935,13 @@ function updateDailyClosuresStats() {
 }
 
 function getCurrentPeriod() {
-    const periodButtons = document.querySelectorAll('.period-filter-btn');
+    // First try to get from global variable (most reliable)
+    if (currentPeriod) {
+        return currentPeriod;
+    }
+    
+    // Fallback: look for active time button
+    const periodButtons = document.querySelectorAll('.time-btn');
     for (const button of periodButtons) {
         if (button.classList.contains('active')) {
             return button.getAttribute('data-period');
@@ -878,6 +953,10 @@ function getCurrentPeriod() {
 function filterDailyClosures(period) {
     console.log(`🔄 Filtering daily closures for period: ${period}`);
     
+    // Update global period tracking
+    currentPeriod = period;
+    console.log(`📅 Global period updated to: ${currentPeriod}`);
+    
     // Update the chart dataset label
     const periodLabel = period === 'today' ? 'Closed Today' :
                        period === 'yesterday' ? 'Closed Yesterday' :
@@ -885,6 +964,12 @@ function filterDailyClosures(period) {
     
     if (userTicketsChart) {
         userTicketsChart.data.datasets[0].label = periodLabel;
+    }
+    
+    // Update the stats label dynamically
+    const statsLabel = document.getElementById('ticketsClosedLabel');
+    if (statsLabel) {
+        statsLabel.textContent = periodLabel;
     }
     
     // Update time control buttons
@@ -931,8 +1016,8 @@ function filterDailyClosures(period) {
                 // Update top performers
                 updateTopPerformers(data);
                 
-                // Update stats display
-                updateDailyClosuresStatsFromData(data);
+                // Update stats display with proper period context
+                updateDailyClosuresStatsFromData(data, period);
                 
                 console.log(`✅ Successfully updated chart for period ${period}`);
             } else {
@@ -943,6 +1028,8 @@ function filterDailyClosures(period) {
                     userTicketsChart.data.datasets[0].data = [];
                     userTicketsChart.update('none');
                 }
+                // Clear stats
+                clearDailyClosuresStats();
             }
         })
         .catch(error => {
@@ -953,6 +1040,8 @@ function filterDailyClosures(period) {
                 userTicketsChart.data.datasets[0].data = [];
                 userTicketsChart.update('none');
             }
+            // Clear stats
+            clearDailyClosuresStats();
         })
         .finally(() => {
             // Hide loading overlay
@@ -1588,21 +1677,53 @@ function showUserTicketDetails(username, ticketCount) {
                 <p>Loading ticket details for ${username}...</p>
             </div>
         `;
+        console.log('✅ Modal opened and loading state set');
+    } else {
+        console.error('❌ Modal element not found!');
+        return;
     }
     
-    // Get current period for the API call
-    const period = getCurrentPeriod() || 'today';
-    const targetDate = new Date().toISOString().split('T')[0]; // Today's date
+    // Get current period for the API call - use global variable for accuracy
+    const period = currentPeriod || getCurrentPeriod() || 'today';
+    console.log(`📅 Current period: ${period} (from global: ${currentPeriod})`);
     
-    // Fetch ticket details from API
-    fetch(`/api/tickets/user-details/${encodeURIComponent(username)}?date=${targetDate}`)
+    // Calculate target date based on period
+    let targetDate;
+    const today = new Date();
+    
+    if (period === 'today') {
+        targetDate = today.toISOString().split('T')[0];
+    } else if (period === 'yesterday') {
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        targetDate = yesterday.toISOString().split('T')[0];
+    } else if (period === 'week') {
+        // For week view, show today's data but indicate it's aggregated
+        targetDate = today.toISOString().split('T')[0];
+    } else if (period === 'month') {
+        // For month view, show today's data but indicate it's aggregated
+        targetDate = today.toISOString().split('T')[0];
+    } else {
+        targetDate = today.toISOString().split('T')[0];
+    }
+    
+    console.log(`📅 Target date: ${targetDate} for period: ${period}`);
+    
+    // Fetch ticket details from API with period context
+    const apiUrl = `/api/tickets/user-details/${encodeURIComponent(username)}?date=${targetDate}&period=${period}`;
+    console.log(`🌐 Fetching from: ${apiUrl}`);
+    console.log(`📊 API call details: username=${username}, date=${targetDate}, period=${period}`);
+    
+    fetch(apiUrl)
         .then(response => {
+            console.log(`📡 API Response status: ${response.status}`);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             return response.json();
         })
         .then(data => {
+            console.log(`📊 API Response data:`, data);
             if (data.success) {
                 displayUserTicketDetails(data, username, ticketCount);
                 
@@ -1633,20 +1754,40 @@ function showUserTicketDetails(username, ticketCount) {
 }
 
 function displayUserTicketDetails(data, username, ticketCount) {
-    const { user, tickets, total_tickets, summary, date } = data;
+    console.log(`📋 Displaying ticket details for ${username}:`, data);
+    
+    const { user, tickets, total_tickets, summary, date, period, start_date, end_date } = data;
+    
+    console.log(`📊 Ticket data breakdown:`, {
+        user,
+        ticketsCount: tickets.length,
+        total_tickets,
+        summary,
+        date,
+        period,
+        start_date,
+        end_date
+    });
     
     let ticketsHtml = '';
     
     if (tickets.length === 0) {
+        const dateText = period && (period === 'week' || period === 'month') 
+            ? `during the ${period} period (${new Date(start_date).toLocaleDateString()} - ${new Date(end_date).toLocaleDateString()})`
+            : `on ${new Date(date).toLocaleDateString()}`;
+            
         ticketsHtml = `
             <div class="no-tickets">
                 <i class="bi bi-inbox"></i>
                 <h4>No Tickets Found</h4>
-                <p>No tickets were found for ${username} on ${new Date(date).toLocaleDateString()}</p>
+                <p>No tickets were found for ${username} ${dateText}</p>
             </div>
         `;
+        console.log(`📭 No tickets found for ${username} ${dateText}`);
     } else {
-        tickets.forEach(ticket => {
+        console.log(`🎫 Found ${tickets.length} tickets for ${username}`);
+        tickets.forEach((ticket, index) => {
+            console.log(`🎫 Ticket ${index + 1}:`, ticket);
             const statusClass = getStatusClass(ticket.status);
             const priorityClass = getPriorityClass(ticket.priority);
             const urgencyClass = getUrgencyClass(ticket.urgency);
@@ -1695,6 +1836,10 @@ function displayUserTicketDetails(data, username, ticketCount) {
         });
     }
     
+    const dateText = period && (period === 'week' || period === 'month') 
+        ? `${period.charAt(0).toUpperCase() + period.slice(1)} Period (${new Date(start_date).toLocaleDateString()} - ${new Date(end_date).toLocaleDateString()})`
+        : new Date(date).toLocaleDateString();
+        
     const summaryHtml = `
         <div class="user-summary">
             <div class="user-info">
@@ -1704,7 +1849,7 @@ function displayUserTicketDetails(data, username, ticketCount) {
                 <div class="user-details">
                     <h3>${username}</h3>
                     <p class="user-role">${user.role || 'User'}</p>
-                    <p class="user-date">${new Date(date).toLocaleDateString()}</p>
+                    <p class="user-date">${dateText}</p>
                 </div>
             </div>
             <div class="summary-stats">
@@ -1728,7 +1873,11 @@ function displayUserTicketDetails(data, username, ticketCount) {
         </div>
     `;
     
-    document.getElementById('userTicketDetailsContent').innerHTML = summaryHtml + ticketsHtml;
+    const finalHtml = summaryHtml + ticketsHtml;
+    console.log(`📝 Final HTML length: ${finalHtml.length} characters`);
+    
+    document.getElementById('userTicketDetailsContent').innerHTML = finalHtml;
+    console.log('✅ Ticket details displayed successfully');
 }
 
 function closeUserTicketDetailsModal() {

@@ -28,13 +28,67 @@ class TicketClosureService:
     """Enhanced service for ticket closure tracking with historical data"""
     
     def __init__(self):
-        self.app = create_app()
+        """Initialize the ticket closure service"""
+        self.db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'db', 'ticket_closure_tracking.db')
+        self._initialized = False
+        # Initialize freshworks service
+        from app.utils.freshworks_service import freshworks_service
         self.freshworks_service = freshworks_service
+    
+    def _ensure_initialized(self):
+        """Ensure the service is properly initialized with database access"""
+        if not self._initialized:
+            self.ensure_database_exists()
+            self._initialized = True
+    
+    def ensure_database_exists(self):
+        """Ensure the database and tables exist"""
+        try:
+            # Import here to avoid circular imports
+            from app.extensions import db
+            from app.models.base import TicketClosureHistory, TicketClosureDaily, TicketSyncMetadata
+            
+            # Create tables if they don't exist
+            # Use current_app instead of db.app to avoid circular import issues
+            from flask import current_app
+            with current_app.app_context():
+                db.create_all()
+                logger.info("✅ Ticket closure database tables verified/created")
+        except Exception as e:
+            logger.error(f"❌ Error ensuring database exists: {e}")
+    
+    def get_database_info(self):
+        """Get basic database information for debugging"""
+        self._ensure_initialized()
+        try:
+            from app.extensions import db
+            from app.models.base import TicketClosureHistory, TicketClosureDaily, TicketSyncMetadata, TicketClosure
+            
+            # Use current_app instead of db.app to avoid circular import issues
+            from flask import current_app
+            with current_app.app_context():
+                history_count = TicketClosureHistory.query.count()
+                daily_count = TicketClosureDaily.query.count()
+                legacy_count = TicketClosure.query.count()
+                metadata_count = TicketSyncMetadata.query.count()
+                
+                return {
+                    'history_records': history_count,
+                    'daily_records': daily_count,
+                    'legacy_records': legacy_count,
+                    'metadata_records': metadata_count,
+                    'database_path': self.db_path
+                }
+        except Exception as e:
+            logger.error(f"❌ Error getting database info: {e}")
+            return {'error': str(e)}
     
     def sync_hourly_closures(self, target_date=None, target_hour=None):
         """
         Sync ticket closures for a specific hour with historical tracking
         """
+        self._ensure_initialized()
+        
         if target_date is None:
             target_date = date.today()
         if target_hour is None:
@@ -210,17 +264,26 @@ class TicketClosureService:
         """
         Get ticket closures for a specific time period
         """
+        logger.info(f"🔄 Getting closures for period: {period}")
+        self._ensure_initialized()
+        
         if target_date is None:
             target_date = date.today()
         
+        logger.info(f"📅 Target date: {target_date}")
+        
         try:
             if period == 'today':
+                logger.info("📊 Getting today's closures")
                 return self._get_daily_closures(target_date)
             elif period == 'yesterday':
+                logger.info("📊 Getting yesterday's closures")
                 return self._get_daily_closures(target_date - timedelta(days=1))
             elif period == 'week':
+                logger.info("📊 Getting week's closures")
                 return self._get_period_closures(target_date - timedelta(days=7), target_date)
             elif period == 'month':
+                logger.info("📊 Getting month's closures")
                 return self._get_period_closures(target_date - timedelta(days=30), target_date)
             else:
                 logger.error(f"Invalid period: {period}")
@@ -228,13 +291,23 @@ class TicketClosureService:
                 
         except Exception as e:
             logger.error(f"❌ Error getting closures for period {period}: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
             return None
     
     def _get_daily_closures(self, target_date):
         """Get daily closures for a specific date"""
         try:
+            # Ensure we have a Flask app context
+            from flask import current_app
+            if not current_app:
+                logger.error("❌ No Flask app context available")
+                return None
+                
             # Try daily aggregated data first
+            logger.info(f"🔍 Querying TicketClosureDaily for date: {target_date}")
             daily_records = TicketClosureDaily.query.filter_by(date=target_date).join(User).all()
+            logger.info(f"📊 Found {len(daily_records)} daily records")
             
             if daily_records:
                 users_details = []
@@ -264,7 +337,9 @@ class TicketClosureService:
                 }
             
             # Fallback to legacy TicketClosure table
+            logger.info(f"🔍 Querying legacy TicketClosure for date: {target_date}")
             legacy_records = TicketClosure.query.filter_by(date=target_date).join(User).all()
+            logger.info(f"📊 Found {len(legacy_records)} legacy records")
             
             if legacy_records:
                 users_details = []
@@ -291,6 +366,7 @@ class TicketClosureService:
                     'source': 'legacy'
                 }
             
+            logger.info("📊 No data found, returning empty result")
             return {
                 'success': True,
                 'date': target_date.isoformat(),
@@ -304,11 +380,19 @@ class TicketClosureService:
             
         except Exception as e:
             logger.error(f"❌ Error getting daily closures: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
             return None
     
     def _get_period_closures(self, start_date, end_date):
         """Get closures for a date range"""
         try:
+            # Ensure we have a Flask app context
+            from flask import current_app
+            if not current_app:
+                logger.error("❌ No Flask app context available")
+                return None
+                
             # Get daily records for the period
             daily_records = TicketClosureDaily.query.filter(
                 and_(
@@ -342,6 +426,31 @@ class TicketClosureService:
                     except:
                         pass
             
+            # If no data in new table, try legacy table
+            if not daily_records:
+                logger.info(f"📊 No data in TicketClosureDaily for period {start_date} to {end_date}, trying legacy table")
+                legacy_records = TicketClosure.query.filter(
+                    and_(
+                        TicketClosure.date >= start_date,
+                        TicketClosure.date <= end_date
+                    )
+                ).join(User).all()
+                
+                for record in legacy_records:
+                    user_key = record.user_id
+                    user_totals[user_key]['username'] = record.user.username
+                    user_totals[user_key]['role'] = record.user.role
+                    user_totals[user_key]['profile_picture'] = record.user.profile_picture
+                    user_totals[user_key]['user_id'] = record.user_id
+                    user_totals[user_key]['tickets_closed'] += record.tickets_closed
+                    
+                    if record.ticket_numbers:
+                        try:
+                            numbers = json.loads(record.ticket_numbers)
+                            user_totals[user_key]['ticket_numbers'].extend(numbers)
+                        except:
+                            pass
+            
             # Convert to list and sort
             users_details = list(user_totals.values())
             users_details.sort(key=lambda x: x['tickets_closed'], reverse=True)
@@ -364,30 +473,53 @@ class TicketClosureService:
     
     def get_user_ticket_details(self, username, target_date=None):
         """Get detailed ticket information for a specific user and date"""
+        self._ensure_initialized()
+        
         if target_date is None:
             target_date = date.today()
         
         try:
             user = User.query.filter_by(username=username).first()
             if not user:
+                logger.warning(f"User not found: {username}")
                 return None
             
-            # Get daily record
+            # Try daily record first
             daily_record = TicketClosureDaily.query.filter_by(
                 user_id=user.id,
                 date=target_date
             ).first()
             
-            if not daily_record:
-                return None
-            
-            # Get ticket numbers
             ticket_numbers = []
-            if daily_record.ticket_numbers:
-                try:
-                    ticket_numbers = json.loads(daily_record.ticket_numbers)
-                except:
-                    pass
+            tickets_closed = 0
+            
+            if daily_record:
+                # Get ticket numbers from daily record
+                if daily_record.ticket_numbers:
+                    try:
+                        ticket_numbers = json.loads(daily_record.ticket_numbers)
+                    except:
+                        pass
+                tickets_closed = daily_record.tickets_closed
+                logger.info(f"✅ Found daily record for {username} on {target_date}: {tickets_closed} tickets")
+            else:
+                # Fallback to legacy TicketClosure table
+                legacy_record = TicketClosure.query.filter_by(
+                    user_id=user.id,
+                    date=target_date
+                ).first()
+                
+                if legacy_record:
+                    if legacy_record.ticket_numbers:
+                        try:
+                            ticket_numbers = json.loads(legacy_record.ticket_numbers)
+                        except:
+                            pass
+                    tickets_closed = legacy_record.tickets_closed
+                    logger.info(f"✅ Found legacy record for {username} on {target_date}: {tickets_closed} tickets")
+                else:
+                    logger.warning(f"No ticket data found for {username} on {target_date}")
+                    return None
             
             # Create ticket details from stored numbers
             tickets = []
@@ -417,7 +549,7 @@ class TicketClosureService:
                 'tickets': tickets,
                 'total_tickets': len(tickets),
                 'summary': {
-                    'total_closed': daily_record.tickets_closed,
+                    'total_closed': tickets_closed,
                     'total_open': 0,
                     'high_priority': 0
                 },
@@ -428,8 +560,116 @@ class TicketClosureService:
             logger.error(f"❌ Error getting user ticket details: {e}")
             return None
     
+    def get_user_ticket_details_for_period(self, username, period):
+        """Get detailed ticket information for a specific user for a period (week/month)"""
+        self._ensure_initialized()
+        
+        try:
+            user = User.query.filter_by(username=username).first()
+            if not user:
+                logger.warning(f"User not found: {username}")
+                return None
+            
+            # Calculate date range based on period
+            today = date.today()
+            if period == 'week':
+                start_date = today - timedelta(days=7)
+                end_date = today
+            elif period == 'month':
+                start_date = today - timedelta(days=30)
+                end_date = today
+            else:
+                logger.error(f"Invalid period: {period}")
+                return None
+            
+            # Get daily records for the period (try new table first)
+            daily_records = TicketClosureDaily.query.filter(
+                and_(
+                    TicketClosureDaily.user_id == user.id,
+                    TicketClosureDaily.date >= start_date,
+                    TicketClosureDaily.date <= end_date
+                )
+            ).all()
+            
+            # Aggregate ticket numbers
+            all_ticket_numbers = []
+            total_tickets = 0
+            
+            if daily_records:
+                for record in daily_records:
+                    total_tickets += record.tickets_closed
+                    if record.ticket_numbers:
+                        try:
+                            numbers = json.loads(record.ticket_numbers)
+                            all_ticket_numbers.extend(numbers)
+                        except:
+                            pass
+                logger.info(f"✅ Found {len(daily_records)} daily records for {username} during {period}: {total_tickets} tickets")
+            else:
+                # Fallback to legacy TicketClosure table
+                legacy_records = TicketClosure.query.filter(
+                    and_(
+                        TicketClosure.user_id == user.id,
+                        TicketClosure.date >= start_date,
+                        TicketClosure.date <= end_date
+                    )
+                ).all()
+                
+                for record in legacy_records:
+                    total_tickets += record.tickets_closed
+                    if record.ticket_numbers:
+                        try:
+                            numbers = json.loads(record.ticket_numbers)
+                            all_ticket_numbers.extend(numbers)
+                        except:
+                            pass
+                logger.info(f"✅ Found {len(legacy_records)} legacy records for {username} during {period}: {total_tickets} tickets")
+            
+            # Create ticket details from stored numbers
+            tickets = []
+            for ticket_id in all_ticket_numbers:
+                tickets.append({
+                    'id': ticket_id,
+                    'ticket_number': f"INC-{ticket_id}",
+                    'subject': f"Ticket #{ticket_id}",
+                    'description': f"Ticket closed by {username} during {period} period",
+                    'status': 4,  # Assume closed
+                    'priority': 2,  # Default to medium
+                    'urgency': 2,   # Default to medium
+                    'created_at': start_date.isoformat(),
+                    'updated_at': end_date.isoformat(),
+                    'resolved_at': end_date.isoformat(),
+                    'tags': ['closed', f'{period}-closure'],
+                    'type': 'incident'
+                })
+            
+            return {
+                'success': True,
+                'user': {
+                    'username': username,
+                    'role': user.role,
+                    'profile_picture': user.profile_picture
+                },
+                'tickets': tickets,
+                'total_tickets': total_tickets,
+                'summary': {
+                    'total_closed': total_tickets,
+                    'total_open': 0,
+                    'high_priority': 0
+                },
+                'start_date': start_date.isoformat(),
+                'end_date': end_date.isoformat(),
+                'period': period
+            }
+            
+        except Exception as e:
+            logger.error(f"❌ Error getting user ticket details for period: {e}")
+            return None
+    
     def get_database_stats(self):
         """Get comprehensive database statistics"""
+        self._ensure_initialized()
+        
         try:
             today = date.today()
             
@@ -476,5 +716,15 @@ class TicketClosureService:
             logger.error(f"❌ Error getting database stats: {e}")
             return None
 
-# Global instance
-ticket_closure_service = TicketClosureService() 
+# Global instance - lazy initialization
+_ticket_closure_service_instance = None
+
+def get_ticket_closure_service():
+    """Get the global ticket closure service instance with lazy initialization"""
+    global _ticket_closure_service_instance
+    if _ticket_closure_service_instance is None:
+        _ticket_closure_service_instance = TicketClosureService()
+    return _ticket_closure_service_instance
+
+# For backward compatibility
+ticket_closure_service = get_ticket_closure_service() 

@@ -64,21 +64,27 @@ document.addEventListener('DOMContentLoaded', function() {
         console.warn('Outage chart canvas not found');
     }
 
-    // Load real data
-    console.log('Loading initial outages data...');
-    if (typeof loadOutagesData === 'function') {
-        loadOutagesData('14d'); // Changed default from 7d to 14d
+    // STATIC DATA LOADING - Load once from database, never auto-refresh
+    console.log('Loading static outages data from database (one-time load)...');
+    if (typeof loadOutagesDataOnce === 'function') {
+        loadOutagesDataOnce(); // Use the static loading function
     } else {
-        console.warn('loadOutagesData function not available');
+        console.warn('loadOutagesDataOnce function not available, falling back to regular load');
+        if (typeof loadOutagesData === 'function') {
+            loadOutagesData('14d'); // Changed default from 7d to 14d
+        } else {
+            console.warn('loadOutagesData function not available');
+        }
     }
     
-    if (typeof loadUserActivity === 'function') {
-        loadUserActivity();
-    } else {
-        console.warn('loadUserActivity function not available');
-    }
+    // DISABLED: Using enhanced activity loader in yam_user_profile.html instead
+    // if (typeof loadUserActivity === 'function') {
+    //     loadUserActivity();
+    // } else {
+    //     console.warn('loadUserActivity function not available');
+    // }
 
-    // Time period controls
+    // STATIC TIME PERIOD CONTROLS - No auto-refresh, only manual changes
     const timeButtons = document.querySelectorAll('.time-btn');
     console.log('Found', timeButtons.length, 'time period buttons');
     
@@ -97,7 +103,9 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             
+            // Use cached data for time period changes - no API calls
             if (typeof loadOutagesData === 'function') {
+                console.log('Changing time period using cached data - no database calls');
                 loadOutagesData(this.dataset.period);
             } else {
                 console.warn('loadOutagesData function not available');
@@ -105,9 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Removed automatic polling - data is now loaded once on page load only
-    // Users can manually refresh by clicking time period buttons if needed
-    
-    console.log('YAM Core Scripts: Initialization complete');
+    // COMPLETELY REMOVED AUTO-REFRESH - Chart is now static
+    console.log('✅ YAM Core Scripts: Static initialization complete - no auto-refresh');
 });
 </script> 

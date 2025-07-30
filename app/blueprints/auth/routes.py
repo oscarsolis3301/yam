@@ -369,7 +369,7 @@ def logout():
             from flask_socketio import emit
             from app.extensions import socketio
             users_list = presence_service.get_online_users(include_details=True)
-            socketio.emit('online_users_update', users_list, broadcast=True)
+            socketio.emit('online_users_update', users_list)
             current_app.logger.info(f"User {username} marked offline and broadcast sent")
         except Exception as e:
             current_app.logger.error(f"Error marking user offline on logout: {e}")

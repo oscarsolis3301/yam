@@ -733,7 +733,6 @@ class AllowedWindowsUser(db.Model):
 class TicketClosure(db.Model):
     """Track daily ticket closures by user for persistent storage and reporting"""
     __tablename__ = 'ticket_closure'
-    __table_args__ = {'extend_existing': True}
     
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

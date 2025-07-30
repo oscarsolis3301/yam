@@ -139,8 +139,8 @@ window.recentActivity = {
     setupSocketListener() {
         // Listen for new activities from socket
         window.addEventListener('onlineUsersUpdate', (event) => {
-            // Refresh activities when users come online/offline
-            setTimeout(() => this.loadActivities(), 1000);
+            // Refresh activities when users come online/offline - DISABLED for instant loading
+            // setTimeout(() => this.loadActivities(), 1000);
         });
     },
     
@@ -178,10 +178,10 @@ window.recentActivity = {
     }
 };
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.recentActivity.init();
-});
+// Initialize when DOM is loaded - DISABLED: Using enhanced instant loader in yam_user_profile.html
+// document.addEventListener('DOMContentLoaded', () => {
+//     window.recentActivity.init();
+// });
 </script>
 
 <style>

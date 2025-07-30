@@ -343,3 +343,6 @@ Traceback (most recent call last):
 Exception: Missing user_loader or request_loader. Refer to http://flask-login.readthedocs.io/#how-it-works for more info.
 2025-07-29 15:23:22,140 - werkzeug - INFO - 127.0.0.1 - - [29/Jul/2025 15:23:22] "[35m[1mGET /api/activity/all HTTP/1.1[0m" 500 -
 2025-07-29 15:23:22,400 - werkzeug - INFO - 127.0.0.1 - - [29/Jul/2025 15:23:22] "[33mGET /api/admin/outages?all=true HTTP/1.1[0m" 404 -
+2025-07-30 08:55:51,983 - app - WARNING - Blueprint registration failed: name 'tickets_api_bp' is not defined
+2025-07-30 14:10:31,685 - app - WARNING - Blueprint registration failed: name 'tickets_api_bp' is not defined
+2025-07-30 14:11:52,775 - app - WARNING - Blueprint registration failed: name 'tickets_api_bp' is not defined
