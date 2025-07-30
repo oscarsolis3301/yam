@@ -108,6 +108,7 @@ console.log('YAM: Cleared cache, session activity throttles, and installed emerg
 .dashboard-grid {
     gap: 0.8rem; /* Reduced gap */
     min-height: auto; /* Remove fixed height */
+    align-items: stretch; /* Ensure containers stretch to match */
 }
 
 .yam-main-content {
@@ -118,6 +119,19 @@ console.log('YAM: Cleared cache, session activity throttles, and installed emerg
 .charts-grid {
     gap: 0.8rem; /* Reduced gap */
     margin-bottom: 0.8rem; /* Reduced margin */
+}
+
+/* Ensure sidebar and main content are properly aligned */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.sidebar-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Responsive optimizations */
