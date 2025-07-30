@@ -450,7 +450,7 @@ window.showToast = function(message, type = 'info') {
             characterData: true
         });
     }
-    setInterval(positionOutageBannerYAM, 2000);
+    // Removed setInterval - positioning is now handled by MutationObserver only
 })();
 </script>
 {% endmacro %} 

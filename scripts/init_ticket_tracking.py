@@ -46,7 +46,7 @@ def main():
             for sync_date in dates_to_sync:
                 print(f"🔄 Syncing data for {sync_date}...")
                 try:
-                    success = freshworks_service.sync_daily_closures(sync_date, force_sync=True)
+                    success = freshworks_service.sync_daily_closures_with_tickets(sync_date, force_sync=True)
                     if success:
                         print(f"✅ Successfully synced data for {sync_date}")
                     else:

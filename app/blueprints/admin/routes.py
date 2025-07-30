@@ -43,11 +43,30 @@ def _get_chat_history_cached() -> list:
     if _CHAT_HISTORY_CACHE is not None and (now - _CHAT_HISTORY_CACHE_TS) < CHAT_HISTORY_TTL:
         return _CHAT_HISTORY_CACHE  # Return cached copy
 
-    # Cache miss or expired – fetch from DB
-    history = ChatQA.query.order_by(ChatQA.timestamp.desc()).all()
-    _CHAT_HISTORY_CACHE = history
-    _CHAT_HISTORY_CACHE_TS = now
-    return history
+    # Cache miss or expired – fetch from DB with retry logic
+    max_retries = 3
+    retry_delay = 0.1
+    
+    for attempt in range(max_retries):
+        try:
+            history = ChatQA.query.order_by(ChatQA.timestamp.desc()).all()
+            _CHAT_HISTORY_CACHE = history
+            _CHAT_HISTORY_CACHE_TS = now
+            return history
+        except Exception as e:
+            if "QueuePool limit" in str(e) and attempt < max_retries - 1:
+                # Database connection pool exhausted, wait and retry
+                import time
+                time.sleep(retry_delay * (attempt + 1))  # Exponential backoff
+                logger.warning(f"Database pool exhausted, retrying chat history cache (attempt {attempt + 1})")
+                continue
+            else:
+                logger.error(f"Error fetching chat history: {e}")
+                # Return empty list if database is unavailable
+                return []
+    
+    # If all retries failed, return empty list
+    return []
 
 @bp.route('/')
 @login_required
@@ -749,21 +768,34 @@ def _prewarm_chat_history_cache():
             if not has_app_context():
                 return  # No app context available
                 
-            # Test database connectivity before attempting cache operations
-            try:
-                # Check if db is properly initialized
-                if not hasattr(db, 'engine') or db.engine is None:
-                    return  # Database not initialized yet
-                    
-                db.session.execute(text('SELECT 1'))
-                # Only proceed if database is accessible
-                _ensure_cache_loaded()
-            except Exception as db_err:
-                # Database not ready yet, skip cache warming
-                # Only log at debug level to reduce noise
-                if current_app.debug:
-                    current_app.logger.debug(f"Database not ready for cache warming: {db_err}")
-                return
+                            # Test database connectivity before attempting cache operations with retry logic
+                max_retries = 3
+                retry_delay = 0.1
+                
+                for attempt in range(max_retries):
+                    try:
+                        # Check if db is properly initialized
+                        if not hasattr(db, 'engine') or db.engine is None:
+                            return  # Database not initialized yet
+                            
+                        db.session.execute(text('SELECT 1'))
+                        # Only proceed if database is accessible
+                        _ensure_cache_loaded()
+                        break  # Success, exit retry loop
+                    except Exception as db_err:
+                        if "QueuePool limit" in str(db_err) and attempt < max_retries - 1:
+                            # Database connection pool exhausted, wait and retry
+                            import time
+                            time.sleep(retry_delay * (attempt + 1))  # Exponential backoff
+                            if current_app.debug:
+                                current_app.logger.debug(f"Database pool exhausted, retrying cache warming (attempt {attempt + 1})")
+                            continue
+                        else:
+                            # Database not ready yet, skip cache warming
+                            # Only log at debug level to reduce noise
+                            if current_app.debug:
+                                current_app.logger.debug(f"Database not ready for cache warming: {db_err}")
+                            return
                 
     except Exception as e:
         # Log the error but don't fail the request

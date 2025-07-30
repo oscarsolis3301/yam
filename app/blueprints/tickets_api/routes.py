@@ -2,6 +2,7 @@ from flask import jsonify, request
 from datetime import datetime, date, timedelta
 from . import tickets_api_bp
 from app.utils.freshworks_service import freshworks_service
+from app.utils.ticket_closure_service import ticket_closure_service
 from app.models.base import TicketClosure, User, FreshworksUserMapping, TicketSyncMetadata
 from app.extensions import db
 from app.utils.logger import setup_logging
@@ -27,7 +28,7 @@ def get_todays_closures():
             
             if can_sync:
                 logger.info("No closure data found for today, syncing from Freshworks...")
-                success = freshworks_service.sync_daily_closures(today)
+                success = freshworks_service.sync_daily_closures_with_tickets(today)
                 if success:
                     closures = TicketClosure.query.filter_by(date=today).join(User).all()
                     logger.info(f"After sync: found {len(closures)} closure records")
@@ -85,87 +86,20 @@ def get_todays_closures():
 
 @tickets_api_bp.route('/api/tickets/closures/period', methods=['GET'])
 def get_period_closures():
-    """Get ticket closures for a specific period (today, yesterday, week, month)"""
+    """Get ticket closures for a specific period (today, yesterday, week, month) using enhanced service"""
     try:
         period = request.args.get('period', 'today')
+        logger.info(f"Fetching ticket closures for period: {period}")
         
-        if period == 'today':
-            target_date = date.today()
-            start_date = end_date = target_date
-        elif period == 'yesterday':
-            target_date = date.today() - timedelta(days=1)
-            start_date = end_date = target_date
-        elif period == 'week':
-            end_date = date.today()
-            start_date = end_date - timedelta(days=7)
-        elif period == 'month':
-            end_date = date.today()
-            start_date = end_date - timedelta(days=30)
+        # Use the enhanced ticket closure service
+        result = ticket_closure_service.get_closures_for_period(period)
+        
+        if result and result.get('success'):
+            logger.info(f"✅ Retrieved {result.get('total_closed', 0)} tickets for period {period}")
+            return jsonify(result)
         else:
-            return jsonify({'success': False, 'error': 'Invalid period'}), 400
-        
-        if period in ['today', 'yesterday']:
-            # Single day data
-            closures = TicketClosure.query.filter_by(date=target_date).join(User).all()
-            
-            if not closures and period == 'today':
-                # Check if we can sync today's data
-                can_sync, time_until_next = freshworks_service._check_sync_availability(target_date)
-                if can_sync:
-                    success = freshworks_service.sync_daily_closures(target_date)
-                    if success:
-                        closures = TicketClosure.query.filter_by(date=target_date).join(User).all()
-            
-            users_details = []
-            
-            for closure in closures:
-                users_details.append({
-                    'username': closure.user.username,
-                    'tickets_closed': closure.tickets_closed,
-                    'role': closure.user.role,
-                    'profile_picture': closure.user.profile_picture
-                })
-            
-            # Sort by tickets closed (descending)
-            users_details.sort(key=lambda x: x['tickets_closed'], reverse=True)
-            
-            # Extract labels and data in sorted order
-            labels = [user['username'] for user in users_details]
-            data = [user['tickets_closed'] for user in users_details]
-        else:
-            # Period data (sum over multiple days)
-            user_totals = freshworks_service.get_closure_data_for_period(start_date, end_date)
-            
-            labels = list(user_totals.keys())
-            data = list(user_totals.values())
-            
-            # Get user details
-            users_details = []
-            for username, total in user_totals.items():
-                user = User.query.filter_by(username=username).first()
-                if user:
-                    users_details.append({
-                        'username': username,
-                        'tickets_closed': total,
-                        'role': user.role,
-                        'profile_picture': user.profile_picture
-                    })
-        
-        # Calculate statistics
-        total_closed = sum(data) if data else 0
-        top_performer = max(users_details, key=lambda x: x['tickets_closed']) if users_details else None
-        
-        return jsonify({
-            'success': True,
-            'period': period,
-            'start_date': start_date.isoformat(),
-            'end_date': end_date.isoformat(),
-            'labels': labels,
-            'data': data,
-            'total_closed': total_closed,
-            'top_performer': top_performer,
-            'users': users_details
-        })
+            logger.error(f"❌ Failed to get closures for period {period}")
+            return jsonify({'success': False, 'error': 'Failed to retrieve data'}), 500
         
     except Exception as e:
         logger.error(f"Error fetching period closures: {e}")
@@ -203,7 +137,7 @@ def sync_ticket_data():
                 }), 429
         
         # Perform sync
-        success = freshworks_service.sync_daily_closures(target_date, force_sync=force_sync)
+        success = freshworks_service.sync_daily_closures_with_tickets(target_date, force_sync=force_sync)
         
         if success:
             # Get updated data
@@ -552,6 +486,46 @@ def get_admin_stats():
         logger.error(f"Error fetching admin stats: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@tickets_api_bp.route('/api/tickets/hourly-sync', methods=['POST'])
+def hourly_sync():
+    """
+    Trigger hourly ticket closure sync with historical tracking
+    """
+    try:
+        from flask_login import current_user
+        
+        # Check if user has admin privileges
+        if not current_user.is_authenticated or current_user.role != 'admin':
+            return jsonify({'success': False, 'error': 'Unauthorized - Admin access required'}), 403
+        
+        target_date = request.json.get('date', date.today().isoformat())
+        target_hour = request.json.get('hour', datetime.now().hour)
+        
+        try:
+            target_date = datetime.strptime(target_date, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({'success': False, 'error': 'Invalid date format. Use YYYY-MM-DD'}), 400
+        
+        # Perform hourly sync
+        success = ticket_closure_service.sync_hourly_closures(target_date, target_hour)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': f'Hourly sync completed for {target_date} at hour {target_hour}',
+                'date': target_date.isoformat(),
+                'hour': target_hour
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Hourly sync failed'
+            }), 500
+        
+    except Exception as e:
+        logger.error(f"Error during hourly sync: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @tickets_api_bp.route('/api/tickets/force-sync', methods=['POST'])
 def force_sync():
     """Force sync ticket data (bypasses rate limiting)"""
@@ -570,7 +544,7 @@ def force_sync():
             return jsonify({'success': False, 'error': 'Invalid date format. Use YYYY-MM-DD'}), 400
         
         # Force sync (bypasses rate limiting)
-        success = freshworks_service.sync_daily_closures(target_date, force_sync=True)
+        success = freshworks_service.sync_daily_closures_with_tickets(target_date, force_sync=True)
         
         if success:
             # Get updated data
@@ -907,147 +881,36 @@ def delete_user_mapping(freshworks_id):
 
 @tickets_api_bp.route('/api/tickets/user-details/<username>', methods=['GET'])
 def get_user_ticket_details(username):
-    """Get detailed ticket information for a specific user on a specific date"""
+    """Get detailed ticket information for a specific user on a specific date using enhanced service"""
     try:
-        target_date_str = request.args.get('date')
-        if target_date_str:
-            try:
-                target_date = datetime.strptime(target_date_str, '%Y-%m-%d').date()
-            except ValueError:
-                return jsonify({'success': False, 'error': 'Invalid date format. Use YYYY-MM-DD'}), 400
+        target_date_str = request.args.get('date', date.today().isoformat())
+        
+        try:
+            target_date = datetime.strptime(target_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({'success': False, 'error': 'Invalid date format. Use YYYY-MM-DD'}), 400
+        
+        logger.info(f"Fetching ticket details for user {username} on {target_date}")
+        
+        # Use the enhanced ticket closure service
+        result = ticket_closure_service.get_user_ticket_details(username, target_date)
+        
+        if result and result.get('success'):
+            logger.info(f"✅ Retrieved ticket details for {username}: {result.get('total_tickets', 0)} tickets")
+            return jsonify(result)
         else:
-            target_date = date.today()
-        
-        logger.info(f"Fetching ticket details for user '{username}' on {target_date}")
-        
-        # Find the user mapping
-        user = User.query.filter_by(username=username).first()
-        if not user:
-            return jsonify({'success': False, 'error': 'User not found'}), 404
-        
-        # Find the Freshworks mapping for this user
-        mapping = FreshworksUserMapping.query.filter_by(user_id=user.id).first()
-        if not mapping:
-            return jsonify({'success': False, 'error': 'User not mapped to Freshworks'}), 404
-        
-        freshworks_user_id = mapping.freshworks_user_id
-        
-        # First, try to get stored ticket numbers from the database
-        closure_record = TicketClosure.query.filter_by(
-            user_id=user.id,
-            date=target_date
-        ).first()
-        
-        if closure_record and closure_record.ticket_numbers:
-            # Use stored ticket numbers from database - NO API CALLS
-            import json
-            try:
-                stored_ticket_ids = json.loads(closure_record.ticket_numbers)
-                logger.info(f"Found {len(stored_ticket_ids)} stored ticket IDs for {username} on {target_date}")
-                
-                # Create basic ticket information from stored IDs without API calls
-                tickets = []
-                for ticket_id in stored_ticket_ids:
-                    # Create basic ticket info from stored ID only
-                    basic_ticket = {
-                        'id': ticket_id,
-                        'ticket_number': f"INC-{ticket_id}",
-                        'subject': f"Ticket #{ticket_id}",
-                        'description': f"Ticket closed by {username} on {target_date}",
-                        'status': 4,  # Assume closed since these are closure records
-                        'priority': 2,  # Default to medium priority
-                        'urgency': 2,   # Default to medium urgency
-                        'created_at': target_date.isoformat(),
-                        'updated_at': target_date.isoformat(),
-                        'resolved_at': target_date.isoformat(),
-                        'tags': ['closed', 'daily-closure'],
-                        'type': 'incident'
-                    }
-                    tickets.append(basic_ticket)
-                
-                logger.info(f"Created {len(tickets)} basic ticket records from stored IDs")
-                
-            except (json.JSONDecodeError, TypeError) as e:
-                logger.warning(f"Error parsing stored ticket numbers: {e}")
-                tickets = []
-        else:
-            # No stored ticket numbers found - return empty list
-            logger.info(f"No stored ticket numbers found for user {username} on {target_date}")
-            tickets = []
-        
-        if not tickets:
+            logger.warning(f"No ticket details found for {username} on {target_date}")
             return jsonify({
                 'success': True,
-                'user': {
-                    'username': username,
-                    'freshworks_id': freshworks_user_id,
-                    'freshworks_name': mapping.freshworks_username
-                },
-                'date': target_date.isoformat(),
+                'user': {'username': username, 'role': 'User', 'profile_picture': 'default.png'},
                 'tickets': [],
                 'total_tickets': 0,
-                'summary': {
-                    'total_closed': 0,
-                    'total_open': 0,
-                    'high_priority': 0,
-                    'urgent': 0
-                },
-                'message': f'No tickets found for {username} on {target_date}'
+                'summary': {'total_closed': 0, 'total_open': 0, 'high_priority': 0},
+                'date': target_date.isoformat()
             })
-        
-        # Format ticket data
-        formatted_tickets = []
-        for ticket in tickets:
-            formatted_ticket = {
-                'id': ticket.get('id'),
-                'ticket_number': f"INC-{ticket.get('id')}",
-                'subject': ticket.get('subject', 'No Subject'),
-                'description': ticket.get('description_text', ''),
-                'status': ticket.get('status'),
-                'priority': ticket.get('priority'),
-                'source': ticket.get('source'),
-                'category': ticket.get('category'),
-                'sub_category': ticket.get('sub_category'),
-                'created_at': ticket.get('created_at'),
-                'updated_at': ticket.get('updated_at'),
-                'resolved_at': ticket.get('resolved_at'),
-                'due_by': ticket.get('due_by'),
-                'group_id': ticket.get('group_id'),
-                'responder_id': ticket.get('responder_id'),
-                'requester_id': ticket.get('requester_id'),
-                'tags': ticket.get('tags', []),
-                'type': ticket.get('type'),
-                'urgency': ticket.get('urgency')
-            }
-            formatted_tickets.append(formatted_ticket)
-        
-        # Sort tickets by updated_at (most recent first)
-        formatted_tickets.sort(key=lambda x: x['updated_at'] or '', reverse=True)
-        
-        return jsonify({
-            'success': True,
-            'user': {
-                'username': username,
-                'freshworks_id': freshworks_user_id,
-                'freshworks_name': mapping.freshworks_username,
-                'role': user.role,
-                'profile_picture': user.profile_picture
-            },
-            'date': target_date.isoformat(),
-            'tickets': formatted_tickets,
-            'total_tickets': len(formatted_tickets),
-            'summary': {
-                'total_closed': len([t for t in formatted_tickets if t['status'] == 4]),
-                'total_open': len([t for t in formatted_tickets if t['status'] != 4]),
-                'high_priority': len([t for t in formatted_tickets if t['priority'] in [1, 2]]),
-                'urgent': len([t for t in formatted_tickets if t['urgency'] == 4])
-            }
-        })
         
     except Exception as e:
         logger.error(f"Error fetching user ticket details: {e}")
-        import traceback
-        logger.error(f"Traceback: {traceback.format_exc()}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 def get_sync_status_info(target_date):

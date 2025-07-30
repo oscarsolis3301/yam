@@ -26,7 +26,7 @@ def force_sync_today():
     today = date.today()
     
     # Force sync today's data
-    success = freshworks_service.sync_daily_closures(today, force_sync=True)
+    success = freshworks_service.sync_daily_closures_with_tickets(today, force_sync=True)
     
     if success:
         print("✅ Force sync completed successfully!")

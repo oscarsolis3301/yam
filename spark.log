@@ -761,3 +761,41 @@ with app.app_context(). See the documentation for more information.
 2025-07-29 14:11:33,269 - spark - INFO - ✅ Enhanced daily closures synced successfully for 2025-07-29 - 172 tickets processed with numbers
 2025-07-29 15:34:55,511 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
 2025-07-29 16:00:59,262 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-30 07:50:19,320 - spark - INFO - 🔄 Starting enhanced sync for 2025-07-30 with ticket tracking...
+2025-07-30 07:50:19,322 - spark - INFO - 🎫 Fetching daily closures with ticket numbers for 2025-07-30
+2025-07-30 07:50:19,834 - spark - INFO - Fetching page 1... Status: 200
+2025-07-30 07:50:20,423 - spark - INFO - Fetching page 2... Status: 200
+2025-07-30 07:50:21,418 - spark - INFO - Fetching page 3... Status: 200
+2025-07-30 07:50:22,307 - spark - INFO - Fetching page 4... Status: 200
+2025-07-30 07:50:22,951 - spark - INFO - Fetching page 5... Status: 200
+2025-07-30 07:50:23,796 - spark - INFO - Fetching page 6... Status: 200
+2025-07-30 07:50:24,273 - spark - INFO - Fetching page 7... Status: 200
+2025-07-30 07:50:24,849 - spark - INFO - Fetching page 8... Status: 200
+2025-07-30 07:50:25,373 - spark - INFO - Fetching page 9... Status: 200
+2025-07-30 07:50:25,961 - spark - INFO - Fetching page 10... Status: 200
+2025-07-30 07:50:26,800 - spark - INFO - Fetching page 11... Status: 200
+2025-07-30 07:50:27,436 - spark - INFO - Fetching page 12... Status: 200
+2025-07-30 07:50:27,938 - spark - INFO - Fetching page 13... Status: 200
+2025-07-30 07:50:28,487 - spark - INFO - Fetching page 14... Status: 200
+2025-07-30 07:50:29,398 - spark - INFO - Fetching page 15... Status: 200
+2025-07-30 07:50:30,117 - spark - INFO - Fetching page 16... Status: 200
+2025-07-30 07:50:30,352 - spark - INFO - Fetching page 17... Status: 200
+2025-07-30 07:50:30,355 - spark - INFO - 📊 Found 13 users with closures, 45 total tickets
+2025-07-30 07:50:30,364 - spark - INFO - 🔄 Updated: Jarrod Woodson - 6 tickets with numbers
+2025-07-30 07:50:30,374 - spark - INFO - 🔄 Updated: Mayra Lopez - 3 tickets with numbers
+2025-07-30 07:50:30,381 - spark - INFO - ➕ Created new entry for Rylan Knightstep: 2 tickets on 2025-07-30
+2025-07-30 07:50:30,392 - spark - INFO - 🔄 Updated: Staci Valko - 4 tickets with numbers
+2025-07-30 07:50:30,402 - spark - INFO - 🔄 Updated: Doug Spohn - 2 tickets with numbers
+2025-07-30 07:50:30,409 - spark - INFO - 🔄 Updated: Nick Gutierrez - 6 tickets with numbers
+2025-07-30 07:50:30,417 - spark - INFO - 🔄 Updated: Anthony Risker - 8 tickets with numbers
+2025-07-30 07:50:30,424 - spark - INFO - 🔄 Updated: Ralph Rosalin - 3 tickets with numbers
+2025-07-30 07:50:30,430 - spark - INFO - 🔄 Updated: Pietro Vue - 5 tickets with numbers
+2025-07-30 07:50:30,436 - spark - INFO - 🔄 Updated: JZ - 2 tickets with numbers
+2025-07-30 07:50:30,442 - spark - INFO - 🔄 Updated: Christopher Bush - 1 tickets with numbers
+2025-07-30 07:50:30,451 - spark - INFO - 🔄 Updated: AJ - 1 tickets with numbers
+2025-07-30 07:50:30,459 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-30 07:50:30,460 - spark - WARNING - ⚠️ No user mapping found for Freshworks user ID: 18013191685
+2025-07-30 07:50:30,461 - spark - WARNING -    📝 Name from IDs.txt: Unknown User 18013191685
+2025-07-30 07:50:30,461 - spark - WARNING -    🎫 Tickets closed: 2
+2025-07-30 07:50:30,462 - spark - WARNING -    🔍 Add to IDs.txt: 'Unknown User 18013191685 - 18013191685' or create local user
+2025-07-30 07:50:30,472 - spark - INFO - ✅ Enhanced daily closures synced successfully for 2025-07-30 - 45 tickets processed with numbers

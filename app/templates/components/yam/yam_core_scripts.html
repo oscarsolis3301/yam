@@ -105,18 +105,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Refresh data every 30 seconds
-    setInterval(() => {
-        const activeBtn = document.querySelector('.time-btn.active');
-        if (activeBtn && activeBtn.id !== 'customDateBtn') {
-            if (typeof loadOutagesData === 'function') {
-                loadOutagesData(activeBtn.dataset.period);
-            }
-        }
-        if (typeof loadUserActivity === 'function') {
-            loadUserActivity();
-        }
-    }, 30000);
+    // Removed automatic polling - data is now loaded once on page load only
+    // Users can manually refresh by clicking time period buttons if needed
     
     console.log('YAM Core Scripts: Initialization complete');
 });

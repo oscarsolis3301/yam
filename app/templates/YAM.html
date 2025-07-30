@@ -48,6 +48,47 @@ window.fetch = function(url, options) {
 };
 
 console.log('YAM: Cleared cache, session activity throttles, and installed emergency override');
+
+// ENHANCED CHART STABILITY: Global chart monitoring for YAM dashboard
+window.YAM_CHART_STABILITY = {
+    // Manual chart recovery function accessible globally
+    forceRecovery: function() {
+        if (typeof forceChartRecovery === 'function') {
+            forceChartRecovery();
+        } else {
+            console.log('📊 Chart recovery function not available yet');
+        }
+    },
+    
+    // Chart health check function accessible globally
+    checkHealth: function() {
+        if (typeof checkChartHealth === 'function') {
+            return checkChartHealth();
+        } else {
+            console.log('📊 Chart health check function not available yet');
+            return false;
+        }
+    },
+    
+    // Manual refresh function accessible globally
+    refreshData: function() {
+        if (typeof refreshTicketData === 'function') {
+            refreshTicketData();
+        } else {
+            console.log('📊 Chart refresh function not available yet');
+        }
+    }
+};
+
+// Add keyboard shortcut for chart recovery (Ctrl+Shift+R)
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+        console.log('⌨️ Chart recovery shortcut triggered');
+        window.YAM_CHART_STABILITY.forceRecovery();
+    }
+});
+
+console.log('YAM: Chart stability monitoring initialized');
 </script>
 
 <!-- Include all styles -->

@@ -58,7 +58,10 @@ class UserPresenceService:
             yield session
         except Exception as e:
             if session:
-                session.rollback()
+                try:
+                    session.rollback()
+                except Exception:
+                    pass  # Ignore rollback errors
             logger.error(f"Database session error: {e}")
             raise
         finally:
@@ -67,7 +70,10 @@ class UserPresenceService:
                 try:
                     session.commit()
                 except Exception:
-                    session.rollback()
+                    try:
+                        session.rollback()
+                    except Exception:
+                        pass  # Ignore rollback errors
     
     def mark_user_online(self, user_id: int, session_data: Optional[Dict] = None) -> bool:
         """
@@ -93,27 +99,38 @@ class UserPresenceService:
                     'is_online': True
                 }
                 
-                # Update database with optimized connection management
-                try:
-                    with self._get_db_session() as session:
-                        user = session.get(User, user_id)
-                        if user:
-                            user.is_online = True
-                            user.last_seen = datetime.utcnow()
-                            session.commit()
-                            
-                            logger.info(f"Marked user {user_id} ({user.username}) as online")
-                            
-                            # Broadcast update
-                            self._broadcast_presence_update()
-                            return True
+                # Update database with optimized connection management and retry logic
+                max_retries = 3
+                retry_delay = 0.1
+                
+                for attempt in range(max_retries):
+                    try:
+                        with self._get_db_session() as session:
+                            user = session.get(User, user_id)
+                            if user:
+                                user.is_online = True
+                                user.last_seen = datetime.utcnow()
+                                session.commit()
+                                
+                                logger.info(f"Marked user {user_id} ({user.username}) as online")
+                                
+                                # Broadcast update
+                                self._broadcast_presence_update()
+                                return True
+                            else:
+                                logger.warning(f"User {user_id} not found when marking online")
+                                return False
+                    except Exception as db_error:
+                        if "QueuePool limit" in str(db_error) and attempt < max_retries - 1:
+                            # Database connection pool exhausted, wait and retry
+                            import time
+                            time.sleep(retry_delay * (attempt + 1))  # Exponential backoff
+                            logger.warning(f"Database pool exhausted, retrying user {user_id} online marking (attempt {attempt + 1})")
+                            continue
                         else:
-                            logger.warning(f"User {user_id} not found when marking online")
-                            return False
-                except Exception as db_error:
-                    logger.error(f"Database error marking user {user_id} online: {db_error}")
-                    # Still update memory state even if database fails
-                    return True
+                            logger.error(f"Database error marking user {user_id} online: {db_error}")
+                            # Still update memory state even if database fails
+                            return True
                     
         except Exception as e:
             logger.error(f"Error marking user {user_id} online: {e}")
@@ -170,22 +187,33 @@ class UserPresenceService:
                     # User not in active sessions, mark them online
                     return self.mark_user_online(user_id)
                 
-                # Update database with optimized connection management
-                try:
-                    with self._get_db_session() as session:
-                        user = session.get(User, user_id)
-                        if user:
-                            user.last_seen = datetime.utcnow()
-                            user.is_online = True  # Ensure they're marked online
-                            session.commit()
-                            return True
+                # Update database with optimized connection management and retry logic
+                max_retries = 3
+                retry_delay = 0.1
+                
+                for attempt in range(max_retries):
+                    try:
+                        with self._get_db_session() as session:
+                            user = session.get(User, user_id)
+                            if user:
+                                user.last_seen = datetime.utcnow()
+                                user.is_online = True  # Ensure they're marked online
+                                session.commit()
+                                return True
+                            else:
+                                logger.warning(f"User {user_id} not found during heartbeat")
+                                return False
+                    except Exception as db_error:
+                        if "QueuePool limit" in str(db_error) and attempt < max_retries - 1:
+                            # Database connection pool exhausted, wait and retry
+                            import time
+                            time.sleep(retry_delay * (attempt + 1))  # Exponential backoff
+                            logger.warning(f"Database pool exhausted, retrying heartbeat for user {user_id} (attempt {attempt + 1})")
+                            continue
                         else:
-                            logger.warning(f"User {user_id} not found during heartbeat")
-                            return False
-                except Exception as db_error:
-                    logger.error(f"Database error updating heartbeat for user {user_id}: {db_error}")
-                    # Still update memory state even if database fails
-                    return True
+                            logger.error(f"Database error updating heartbeat for user {user_id}: {db_error}")
+                            # Still update memory state even if database fails
+                            return True
                     
         except Exception as e:
             logger.error(f"Error updating heartbeat for user {user_id}: {e}")
@@ -218,26 +246,39 @@ class UserPresenceService:
                     if self._mark_offline_immediately(user_id):
                         cleaned_count += 1
                 
-                # Clean up database entries that may have been missed with optimized connection management
-                try:
-                    with self._get_db_session() as session:
-                        db_stale_users = session.query(User).filter(
-                            User.is_online == True,
-                            User.last_seen < cutoff_time
-                        ).all()
-                        
-                        for user in db_stale_users:
-                            if user.id not in self._active_sessions:  # Not in memory, clean up
-                                user.is_online = False
-                                cleaned_count += 1
-                                logger.info(f"Cleaned up stale database entry for user {user.id} ({user.username})")
-                        
-                        if cleaned_count > 0:
-                            session.commit()
-                            self._broadcast_presence_update()
-                            logger.info(f"Cleaned up {cleaned_count} stale users")
-                except Exception as db_error:
-                    logger.error(f"Database error during stale user cleanup: {db_error}")
+                # Clean up database entries that may have been missed with optimized connection management and retry logic
+                max_retries = 3
+                retry_delay = 0.1
+                
+                for attempt in range(max_retries):
+                    try:
+                        with self._get_db_session() as session:
+                            db_stale_users = session.query(User).filter(
+                                User.is_online == True,
+                                User.last_seen < cutoff_time
+                            ).all()
+                            
+                            for user in db_stale_users:
+                                if user.id not in self._active_sessions:  # Not in memory, clean up
+                                    user.is_online = False
+                                    cleaned_count += 1
+                                    logger.info(f"Cleaned up stale database entry for user {user.id} ({user.username})")
+                            
+                            if cleaned_count > 0:
+                                session.commit()
+                                self._broadcast_presence_update()
+                                logger.info(f"Cleaned up {cleaned_count} stale users")
+                            break  # Success, exit retry loop
+                    except Exception as db_error:
+                        if "QueuePool limit" in str(db_error) and attempt < max_retries - 1:
+                            # Database connection pool exhausted, wait and retry
+                            import time
+                            time.sleep(retry_delay * (attempt + 1))  # Exponential backoff
+                            logger.warning(f"Database pool exhausted, retrying stale user cleanup (attempt {attempt + 1})")
+                            continue
+                        else:
+                            logger.error(f"Database error during stale user cleanup: {db_error}")
+                            break  # Exit retry loop on non-connection errors
                     
             self._last_cleanup = datetime.utcnow()
             return cleaned_count
@@ -261,41 +302,52 @@ class UserPresenceService:
             if (datetime.utcnow() - self._last_cleanup).total_seconds() > self.STALE_CLEANUP_INTERVAL:
                 self.cleanup_stale_users()
             
-            # Use optimized database connection management
-            try:
-                with self._get_db_session() as session:
-                    # Get all online users from database
-                    online_users = session.query(User).filter(User.is_online == True).all()
-                    
-                    # Create result list
-                    result = []
-                    for user in online_users:
-                        user_data = {
-                            'id': user.id,
-                            'username': user.username,
-                            'email': user.email,
-                            'is_online': user.is_online,
-                            'last_seen': user.last_seen.isoformat() if user.last_seen else None,
-                            'status': 'Online'
-                        }
+            # Use optimized database connection management with retry logic
+            max_retries = 3
+            retry_delay = 0.1
+            
+            for attempt in range(max_retries):
+                try:
+                    with self._get_db_session() as session:
+                        # Get all online users from database
+                        online_users = session.query(User).filter(User.is_online == True).all()
                         
-                        # Add session details if requested
-                        if include_details and user.id in self._active_sessions:
-                            session_info = self._active_sessions[user.id]
-                            user_data.update({
-                                'session_data': session_info.get('session_data', {}),
-                                'connection_count': session_info.get('connection_count', 1),
-                                'last_seen_formatted': self._format_last_seen(user.last_seen)
-                            })
+                        # Create result list
+                        result = []
+                        for user in online_users:
+                            user_data = {
+                                'id': user.id,
+                                'username': user.username,
+                                'email': user.email,
+                                'is_online': user.is_online,
+                                'last_seen': user.last_seen.isoformat() if user.last_seen else None,
+                                'status': 'Online'
+                            }
+                            
+                            # Add session details if requested
+                            if include_details and user.id in self._active_sessions:
+                                session_info = self._active_sessions[user.id]
+                                user_data.update({
+                                    'session_data': session_info.get('session_data', {}),
+                                    'connection_count': session_info.get('connection_count', 1),
+                                    'last_seen_formatted': self._format_last_seen(user.last_seen)
+                                })
+                            
+                            result.append(user_data)
                         
-                        result.append(user_data)
-                    
-                    return result
-                    
-            except Exception as db_error:
-                logger.error(f"Database error in get_online_users: {db_error}")
-                # Return cached users as fallback
-                return self._get_cached_users_list()
+                        return result
+                        
+                except Exception as db_error:
+                    if "QueuePool limit" in str(db_error) and attempt < max_retries - 1:
+                        # Database connection pool exhausted, wait and retry
+                        import time
+                        time.sleep(retry_delay * (attempt + 1))  # Exponential backoff
+                        logger.warning(f"Database pool exhausted, retrying get_online_users (attempt {attempt + 1})")
+                        continue
+                    else:
+                        logger.error(f"Database error in get_online_users: {db_error}")
+                        # Return cached users as fallback
+                        return self._get_cached_users_list()
                 
         except Exception as e:
             logger.error(f"Error getting online users: {e}")
@@ -335,36 +387,51 @@ class UserPresenceService:
                 }
                 return status
             
-            # Fallback to database query with connection management
-            with self._get_db_session() as session:
-                user = session.get(User, user_id)
-                if not user:
-                    return {'error': 'User not found'}
-                now = datetime.utcnow()
-                is_online = user.is_online
-                if user.last_seen:
-                    time_diff = (now - user.last_seen).total_seconds()
-                    is_online = is_online and time_diff < self.ACTIVITY_TIMEOUT
-                status = {
-                    'id': user.id,
-                    'username': user.username,
-                    'email': user.email,
-                    'is_online': is_online,
-                    'last_seen': user.last_seen.isoformat() if user.last_seen else None,
-                    'last_seen_human': self._format_last_seen(user.last_seen) if user.last_seen else 'Never',
-                    'role': getattr(user, 'role', 'user'),
-                    'profile_picture': getattr(user, 'profile_picture', 'default.png'),
-                    'status_updated': now.isoformat()
-                }
-                # Add session details if available
-                if user_id in self._active_sessions:
-                    session_info = self._active_sessions[user_id]
-                    status['session_details'] = {
-                        'connection_count': session_info.get('connection_count', 0),
-                        'last_heartbeat': session_info['last_seen'].isoformat(),
-                        'session_data': session_info.get('session_data', {})
-                    }
-                return status
+            # Fallback to database query with connection management and retry logic
+            max_retries = 3
+            retry_delay = 0.1
+            
+            for attempt in range(max_retries):
+                try:
+                    with self._get_db_session() as session:
+                        user = session.get(User, user_id)
+                        if not user:
+                            return {'error': 'User not found'}
+                        now = datetime.utcnow()
+                        is_online = user.is_online
+                        if user.last_seen:
+                            time_diff = (now - user.last_seen).total_seconds()
+                            is_online = is_online and time_diff < self.ACTIVITY_TIMEOUT
+                        status = {
+                            'id': user.id,
+                            'username': user.username,
+                            'email': user.email,
+                            'is_online': is_online,
+                            'last_seen': user.last_seen.isoformat() if user.last_seen else None,
+                            'last_seen_human': self._format_last_seen(user.last_seen) if user.last_seen else 'Never',
+                            'role': getattr(user, 'role', 'user'),
+                            'profile_picture': getattr(user, 'profile_picture', 'default.png'),
+                            'status_updated': now.isoformat()
+                        }
+                        # Add session details if available
+                        if user_id in self._active_sessions:
+                            session_info = self._active_sessions[user_id]
+                            status['session_details'] = {
+                                'connection_count': session_info.get('connection_count', 0),
+                                'last_heartbeat': session_info['last_seen'].isoformat(),
+                                'session_data': session_info.get('session_data', {})
+                            }
+                        return status
+                except Exception as db_error:
+                    if "QueuePool limit" in str(db_error) and attempt < max_retries - 1:
+                        # Database connection pool exhausted, wait and retry
+                        import time
+                        time.sleep(retry_delay * (attempt + 1))  # Exponential backoff
+                        logger.warning(f"Database pool exhausted, retrying get_user_status for user {user_id} (attempt {attempt + 1})")
+                        continue
+                    else:
+                        logger.error(f"Database error getting status for user {user_id}: {db_error}")
+                        return {'error': str(db_error)}
             
         except Exception as e:
             logger.error(f"Error getting status for user {user_id}: {e}")
@@ -428,15 +495,28 @@ class UserPresenceService:
             cleared_count = len(self._active_sessions)
             self._active_sessions.clear()
             
-            # Mark all users offline in database
-            try:
-                with self._get_db_session() as session:
-                    # Update all users to offline
-                    session.query(User).update({User.is_online: False})
-                    session.commit()
-                    logger.info("All users marked as offline in database")
-            except Exception as e:
-                logger.warning(f"Could not update database for all users: {e}")
+            # Mark all users offline in database with retry logic
+            max_retries = 3
+            retry_delay = 0.1
+            
+            for attempt in range(max_retries):
+                try:
+                    with self._get_db_session() as session:
+                        # Update all users to offline
+                        session.query(User).update({User.is_online: False})
+                        session.commit()
+                        logger.info("All users marked as offline in database")
+                        break  # Success, exit retry loop
+                except Exception as e:
+                    if "QueuePool limit" in str(e) and attempt < max_retries - 1:
+                        # Database connection pool exhausted, wait and retry
+                        import time
+                        time.sleep(retry_delay * (attempt + 1))  # Exponential backoff
+                        logger.warning(f"Database pool exhausted, retrying clear all users (attempt {attempt + 1})")
+                        continue
+                    else:
+                        logger.warning(f"Could not update database for all users: {e}")
+                        break  # Exit retry loop on non-connection errors
             
             # Broadcast update to all clients
             self._broadcast_presence_update()
@@ -459,14 +539,30 @@ class UserPresenceService:
             # Use cached data if available to avoid database connection issues
             online_users = [u for u in self.get_online_users() if u['is_online']]
             
-            # Get total users count with connection management
+            # Get total users count with connection management and retry logic
             total_users = 0
-            try:
-                with self._get_db_session() as session:
-                    total_users = session.query(User).count()
-            except Exception as e:
-                logger.error(f"Error getting total users count for stats: {e}")
-                total_users = 0
+            max_retries = 3
+            retry_delay = 0.1
+            
+            for attempt in range(max_retries):
+                try:
+                    with self._get_db_session() as session:
+                        total_users = session.query(User).count()
+                        break  # Success, exit retry loop
+                except Exception as e:
+                    if "QueuePool limit" in str(e) and attempt < max_retries - 1:
+                        # Database connection pool exhausted, wait and retry
+                        import time
+                        time.sleep(retry_delay * (attempt + 1))  # Exponential backoff
+                        logger.warning(f"Database pool exhausted, retrying total users count (attempt {attempt + 1})")
+                        continue
+                    else:
+                        logger.error(f"Error getting total users count for stats: {e}")
+                        total_users = 0
+                        break  # Exit retry loop on non-connection errors
+            
+            # Get database pool statistics if available
+            pool_stats = self._get_db_pool_stats()
             
             return {
                 'total_users': total_users,
@@ -474,7 +570,8 @@ class UserPresenceService:
                 'active_sessions': len(self._active_sessions),
                 'pending_disconnects': len(self._disconnect_timers),
                 'last_cleanup': self._last_cleanup.isoformat(),
-                'uptime_seconds': (datetime.utcnow() - self._last_cleanup).total_seconds()
+                'uptime_seconds': (datetime.utcnow() - self._last_cleanup).total_seconds(),
+                'db_pool_stats': pool_stats
             }
             
         except Exception as e:
@@ -501,28 +598,39 @@ class UserPresenceService:
             # Remove from active sessions
             self._active_sessions.pop(user_id, None)
             
-            # Update database with optimized connection management
-            try:
-                with self._get_db_session() as session:
-                    user = session.get(User, user_id)
-                    if user:
-                        user.is_online = False
-                        # Don't update last_seen on disconnect - keep it as their actual last activity
-                        session.commit()
-                        
-                        logger.info(f"Marked user {user_id} ({user.username}) as offline")
-                        
-                        # Broadcast update
-                        self._broadcast_presence_update()
-                        return True
+            # Update database with optimized connection management and retry logic
+            max_retries = 3
+            retry_delay = 0.1
+            
+            for attempt in range(max_retries):
+                try:
+                    with self._get_db_session() as session:
+                        user = session.get(User, user_id)
+                        if user:
+                            user.is_online = False
+                            # Don't update last_seen on disconnect - keep it as their actual last activity
+                            session.commit()
+                            
+                            logger.info(f"Marked user {user_id} ({user.username}) as offline")
+                            
+                            # Broadcast update
+                            self._broadcast_presence_update()
+                            return True
+                        else:
+                            logger.warning(f"User {user_id} not found when marking offline")
+                            return False
+                except Exception as db_error:
+                    if "QueuePool limit" in str(db_error) and attempt < max_retries - 1:
+                        # Database connection pool exhausted, wait and retry
+                        import time
+                        time.sleep(retry_delay * (attempt + 1))  # Exponential backoff
+                        logger.warning(f"Database pool exhausted, retrying offline marking for user {user_id} (attempt {attempt + 1})")
+                        continue
                     else:
-                        logger.warning(f"User {user_id} not found when marking offline")
-                        return False
-            except Exception as db_error:
-                logger.error(f"Database error marking user {user_id} offline immediately: {db_error}")
-                # Still remove from active sessions even if database fails
-                self._active_sessions.pop(user_id, None)
-                return True  # Return True since we updated memory state
+                        logger.error(f"Database error marking user {user_id} offline immediately: {db_error}")
+                        # Still remove from active sessions even if database fails
+                        self._active_sessions.pop(user_id, None)
+                        return True  # Return True since we updated memory state
                 
         except Exception as e:
             logger.error(f"Error marking user {user_id} offline immediately: {e}")
@@ -603,27 +711,40 @@ class UserPresenceService:
                 }
                 users_list.append(user_data)
             
-            # If no users in active sessions, try to get at least one user from database
+            # If no users in active sessions, try to get at least one user from database with retry logic
             if not users_list:
-                try:
-                    with self._get_db_session() as session:
-                        # Get just one user to show that the system is working
-                        user = session.query(User).first()
-                        if user:
-                            user_data = {
-                                'id': user.id,
-                                'username': user.username,
-                                'email': user.email,
-                                'is_online': user.is_online,
-                                'last_seen': user.last_seen.isoformat() if user.last_seen else None,
-                                'last_seen_human': self._format_last_seen(user.last_seen) if user.last_seen else 'Never',
-                                'role': getattr(user, 'role', 'user'),
-                                'profile_picture': getattr(user, 'profile_picture', 'default.png')
-                            }
-                            users_list.append(user_data)
-                            logger.info(f"Retrieved fallback user: {user.username}")
-                except Exception as e:
-                    logger.warning(f"Could not get fallback user from database: {e}")
+                max_retries = 3
+                retry_delay = 0.1
+                
+                for attempt in range(max_retries):
+                    try:
+                        with self._get_db_session() as session:
+                            # Get just one user to show that the system is working
+                            user = session.query(User).first()
+                            if user:
+                                user_data = {
+                                    'id': user.id,
+                                    'username': user.username,
+                                    'email': user.email,
+                                    'is_online': user.is_online,
+                                    'last_seen': user.last_seen.isoformat() if user.last_seen else None,
+                                    'last_seen_human': self._format_last_seen(user.last_seen) if user.last_seen else 'Never',
+                                    'role': getattr(user, 'role', 'user'),
+                                    'profile_picture': getattr(user, 'profile_picture', 'default.png')
+                                }
+                                users_list.append(user_data)
+                                logger.info(f"Retrieved fallback user: {user.username}")
+                            break  # Success, exit retry loop
+                    except Exception as e:
+                        if "QueuePool limit" in str(e) and attempt < max_retries - 1:
+                            # Database connection pool exhausted, wait and retry
+                            import time
+                            time.sleep(retry_delay * (attempt + 1))  # Exponential backoff
+                            logger.warning(f"Database pool exhausted, retrying fallback user retrieval (attempt {attempt + 1})")
+                            continue
+                        else:
+                            logger.warning(f"Could not get fallback user from database: {e}")
+                            break  # Exit retry loop on non-connection errors
             
             # If still no users, create a dummy user to show the system is working
             if not users_list:
@@ -655,6 +776,29 @@ class UserPresenceService:
                 'role': 'admin',
                 'profile_picture': 'default.png'
             }]
+    
+    def _get_db_pool_stats(self) -> Dict[str, Any]:
+        """
+        Get database connection pool statistics for monitoring
+        
+        Returns:
+            Dictionary with pool statistics
+        """
+        try:
+            if hasattr(db, 'engine') and db.engine is not None:
+                pool = db.engine.pool
+                return {
+                    'pool_size': pool.size(),
+                    'checked_in': pool.checkedin(),
+                    'checked_out': pool.checkedout(),
+                    'overflow': pool.overflow(),
+                    'invalid': pool.invalid(),
+                    'utilization_percent': round((pool.checkedout() / pool.size()) * 100, 2) if pool.size() > 0 else 0
+                }
+            else:
+                return {'error': 'Database engine not available'}
+        except Exception as e:
+            return {'error': f'Could not get pool stats: {str(e)}'}
 
 
 # Global instance

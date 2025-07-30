@@ -865,6 +865,102 @@ class TicketSyncMetadata(db.Model):
         db.session.commit()
         return metadata
 
+class TicketClosureHistory(db.Model):
+    """Track historical ticket closures with hourly updates and time markers"""
+    __tablename__ = 'ticket_closure_history'
+    __table_args__ = {'extend_existing': True}
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    freshworks_user_id = db.Column(db.Integer, nullable=True)  # Freshworks responder ID
+    date = db.Column(db.Date, nullable=False, default=datetime.utcnow().date)
+    hour = db.Column(db.Integer, nullable=False, default=datetime.utcnow().hour)  # Hour of the day (0-23)
+    tickets_closed = db.Column(db.Integer, nullable=False, default=0)
+    ticket_numbers = db.Column(db.Text, nullable=True)  # JSON string of ticket IDs that were closed
+    sync_timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Add a unique constraint to prevent duplicate entries for the same user/date/hour
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'date', 'hour', name='unique_user_date_hour_closure'),
+        {'extend_existing': True}
+    )
+    
+    # Relationship
+    user = db.relationship('User', backref='ticket_closure_history')
+    
+    def to_dict(self):
+        import json
+        ticket_numbers_list = []
+        if self.ticket_numbers:
+            try:
+                ticket_numbers_list = json.loads(self.ticket_numbers)
+            except (json.JSONDecodeError, TypeError):
+                ticket_numbers_list = []
+        
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'username': self.user.username if self.user else None,
+            'freshworks_user_id': self.freshworks_user_id,
+            'date': self.date.isoformat(),
+            'hour': self.hour,
+            'tickets_closed': self.tickets_closed,
+            'ticket_numbers': ticket_numbers_list,
+            'sync_timestamp': self.sync_timestamp.isoformat(),
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+
+class TicketClosureDaily(db.Model):
+    """Daily aggregated ticket closures for quick access"""
+    __tablename__ = 'ticket_closure_daily'
+    __table_args__ = {'extend_existing': True}
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    freshworks_user_id = db.Column(db.Integer, nullable=True)  # Freshworks responder ID
+    date = db.Column(db.Date, nullable=False, default=datetime.utcnow().date)
+    tickets_closed = db.Column(db.Integer, nullable=False, default=0)
+    ticket_numbers = db.Column(db.Text, nullable=True)  # JSON string of all ticket IDs for the day
+    last_sync_hour = db.Column(db.Integer, nullable=True)  # Last hour when data was synced
+    sync_count = db.Column(db.Integer, nullable=False, default=0)  # Number of syncs for this day
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Add a unique constraint to prevent duplicate entries for the same user/date
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'date', name='unique_user_date_daily_closure'),
+        {'extend_existing': True}
+    )
+    
+    # Relationship
+    user = db.relationship('User', backref='ticket_closure_daily')
+    
+    def to_dict(self):
+        import json
+        ticket_numbers_list = []
+        if self.ticket_numbers:
+            try:
+                ticket_numbers_list = json.loads(self.ticket_numbers)
+            except (json.JSONDecodeError, TypeError):
+                ticket_numbers_list = []
+        
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'username': self.user.username if self.user else None,
+            'freshworks_user_id': self.freshworks_user_id,
+            'date': self.date.isoformat(),
+            'tickets_closed': self.tickets_closed,
+            'ticket_numbers': ticket_numbers_list,
+            'last_sync_hour': self.last_sync_hour,
+            'sync_count': self.sync_count,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+
 def init_db():
     # Create all tables
     # db.create_all()

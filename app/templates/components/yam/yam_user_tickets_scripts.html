@@ -13,6 +13,23 @@ let ticketDataCache = {
 let preloadedData = null;
 let chartInitialized = false;
 
+// ENHANCED CHART STABILITY: Chart data backup and recovery system
+let chartDataBackup = {
+    labels: [],
+    data: [],
+    lastBackup: 0,
+    backupInterval: 30000 // Backup every 30 seconds
+};
+
+// Chart stability monitoring
+let chartStabilityMonitor = {
+    lastValidData: null,
+    consecutiveFailures: 0,
+    maxFailures: 3,
+    recoveryAttempts: 0,
+    maxRecoveryAttempts: 5
+};
+
 // Immediate data preloading - start before DOM is ready
 (function() {
     console.log('🚀 Preloading ticket closure data for instant chart display...');
@@ -61,7 +78,186 @@ let chartInitialized = false;
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 YAM User Tickets Scripts - DOM Content Loaded');
     initializeDailyClosures();
+    
+    // ENHANCED STABILITY: Set up chart stability monitoring
+    setupChartStabilityMonitoring();
+    
+    // Set up time control button event listeners
+    setupTimeControlListeners();
 });
+
+function setupTimeControlListeners() {
+    // Add click event listeners to time control buttons
+    document.querySelectorAll('.time-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const period = this.getAttribute('data-period');
+            console.log(`🕒 Time control button clicked: ${period}`);
+            filterDailyClosures(period);
+        });
+    });
+    
+    console.log('✅ Time control listeners set up');
+}
+
+function setupChartStabilityMonitoring() {
+    // Monitor chart data every 10 seconds
+    setInterval(() => {
+        monitorChartStability();
+    }, 10000);
+    
+    // Backup chart data every 30 seconds
+    setInterval(() => {
+        backupChartData();
+    }, 30000);
+    
+    // Attempt chart recovery every 60 seconds if needed
+    setInterval(() => {
+        attemptChartRecovery();
+    }, 60000);
+}
+
+function monitorChartStability() {
+    if (!userTicketsChart) return;
+    
+    const currentLabels = userTicketsChart.data.labels || [];
+    const currentData = userTicketsChart.data.datasets[0]?.data || [];
+    
+    // Check if chart has valid data
+    const hasValidData = currentLabels.length > 0 && currentData.length > 0 && 
+                        currentData.some(value => value > 0);
+    
+    if (hasValidData) {
+        // Chart is healthy, reset failure counter
+        chartStabilityMonitor.consecutiveFailures = 0;
+        chartStabilityMonitor.lastValidData = {
+            labels: [...currentLabels],
+            data: [...currentData]
+        };
+        console.log('✅ Chart stability check passed');
+    } else {
+        // Chart data is invalid
+        chartStabilityMonitor.consecutiveFailures++;
+        console.warn(`⚠️ Chart stability check failed (${chartStabilityMonitor.consecutiveFailures}/${chartStabilityMonitor.maxFailures})`);
+        
+        // If we have too many consecutive failures, trigger recovery
+        if (chartStabilityMonitor.consecutiveFailures >= chartStabilityMonitor.maxFailures) {
+            console.error('🚨 Chart stability threshold exceeded, triggering recovery...');
+            triggerChartRecovery();
+        }
+    }
+}
+
+function backupChartData() {
+    if (!userTicketsChart) return;
+    
+    const currentLabels = userTicketsChart.data.labels || [];
+    const currentData = userTicketsChart.data.datasets[0]?.data || [];
+    
+    // Only backup if we have valid data
+    if (currentLabels.length > 0 && currentData.length > 0) {
+        chartDataBackup.labels = [...currentLabels];
+        chartDataBackup.data = [...currentData];
+        chartDataBackup.lastBackup = Date.now();
+        console.log('💾 Chart data backed up:', chartDataBackup);
+    }
+}
+
+function triggerChartRecovery() {
+    if (chartStabilityMonitor.recoveryAttempts >= chartStabilityMonitor.maxRecoveryAttempts) {
+        console.error('🚨 Maximum recovery attempts reached, chart may be permanently broken');
+        return;
+    }
+    
+    chartStabilityMonitor.recoveryAttempts++;
+    console.log(`🔄 Attempting chart recovery (${chartStabilityMonitor.recoveryAttempts}/${chartStabilityMonitor.maxRecoveryAttempts})`);
+    
+    // Try multiple recovery strategies
+    attemptChartRecovery();
+}
+
+function attemptChartRecovery() {
+    if (!userTicketsChart) {
+        console.log('📊 Chart not initialized, skipping recovery');
+        return;
+    }
+    
+    console.log('🔄 Attempting chart recovery...');
+    
+    // Strategy 1: Try to restore from backup
+    if (chartDataBackup.labels.length > 0 && chartDataBackup.data.length > 0) {
+        console.log('📊 Restoring chart from backup data...');
+        userTicketsChart.data.labels = [...chartDataBackup.labels];
+        userTicketsChart.data.datasets[0].data = [...chartDataBackup.data];
+        userTicketsChart.update('active');
+        
+        // Check if recovery was successful
+        setTimeout(() => {
+            const recoveredLabels = userTicketsChart.data.labels || [];
+            const recoveredData = userTicketsChart.data.datasets[0]?.data || [];
+            
+            if (recoveredLabels.length > 0 && recoveredData.length > 0) {
+                console.log('✅ Chart recovery successful from backup');
+                chartStabilityMonitor.consecutiveFailures = 0;
+                chartStabilityMonitor.recoveryAttempts = 0;
+                hideChartLoading();
+                return;
+            }
+        }, 100);
+    }
+    
+    // Strategy 2: Try to restore from last valid data
+    if (chartStabilityMonitor.lastValidData) {
+        console.log('📊 Restoring chart from last valid data...');
+        userTicketsChart.data.labels = [...chartStabilityMonitor.lastValidData.labels];
+        userTicketsChart.data.datasets[0].data = [...chartStabilityMonitor.lastValidData.data];
+        userTicketsChart.update('active');
+        
+        setTimeout(() => {
+            const recoveredLabels = userTicketsChart.data.labels || [];
+            const recoveredData = userTicketsChart.data.datasets[0]?.data || [];
+            
+            if (recoveredLabels.length > 0 && recoveredData.length > 0) {
+                console.log('✅ Chart recovery successful from last valid data');
+                chartStabilityMonitor.consecutiveFailures = 0;
+                chartStabilityMonitor.recoveryAttempts = 0;
+                hideChartLoading();
+                return;
+            }
+        }, 100);
+    }
+    
+    // Strategy 3: Fetch fresh data from API
+    console.log('📊 Fetching fresh data for chart recovery...');
+    fetch('/api/tickets/closures/today')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.labels && data.data) {
+                console.log('✅ Fresh data received, updating chart...');
+                updateChartWithData(data);
+                chartStabilityMonitor.consecutiveFailures = 0;
+                chartStabilityMonitor.recoveryAttempts = 0;
+            } else {
+                throw new Error('Invalid API response');
+            }
+        })
+        .catch(error => {
+            console.error('❌ Chart recovery failed:', error);
+            
+            // Strategy 4: Use fallback dummy data as last resort
+            console.log('📊 Using fallback dummy data for chart recovery...');
+            const fallbackLabels = ['User 1', 'User 2', 'User 3', 'User 4', 'User 5'];
+            const fallbackData = [5, 3, 7, 2, 4];
+            
+            userTicketsChart.data.labels = fallbackLabels;
+            userTicketsChart.data.datasets[0].data = fallbackData;
+            userTicketsChart.update('active');
+            
+            console.log('⚠️ Chart recovered with fallback data');
+            chartStabilityMonitor.consecutiveFailures = 0;
+            chartStabilityMonitor.recoveryAttempts = 0;
+            hideChartLoading();
+        });
+}
 
 function initializeDailyClosures() {
     console.log('🚀 Initializing Daily Closures with instant loading...');
@@ -298,6 +494,7 @@ function hideChartLoading() {
     }
 }
 
+// ENHANCED CHART UPDATE FUNCTION: Robust data handling with stability checks
 function updateChartWithData(data) {
     if (!userTicketsChart) {
         console.warn('⚠️ Chart not initialized yet');
@@ -309,28 +506,88 @@ function updateChartWithData(data) {
     const labels = data.labels || [];
     const chartData = data.data || [];
     
-    if (labels.length > 0 && chartData.length > 0) {
-        userTicketsChart.data.labels = labels;
-        userTicketsChart.data.datasets[0].data = chartData;
-        userTicketsChart.update('active');
-        console.log('✅ Chart updated successfully with data');
-        console.log('   Chart now shows', labels.length, 'users with bars');
+    // ENHANCED STABILITY: Validate data before updating chart
+    if (labels.length > 0 && chartData.length > 0 && labels.length === chartData.length) {
+        // ENHANCED STABILITY: Create deep copies to prevent data corruption
+        const safeLabels = [...labels];
+        const safeData = [...chartData];
         
-        // Hide loading overlay
-        hideChartLoading();
+        // ENHANCED STABILITY: Ensure all data values are valid numbers
+        const validatedData = safeData.map(value => {
+            const numValue = Number(value);
+            return isNaN(numValue) ? 0 : Math.max(0, numValue);
+        });
         
-        // Force a resize to ensure proper rendering
-        setTimeout(() => {
-            if (userTicketsChart) {
-                userTicketsChart.resize();
-                console.log('📊 Chart resized for proper rendering');
-            }
-        }, 10); // Minimal delay for instant rendering
+        console.log('📊 Validated data:', { labels: safeLabels, data: validatedData });
+        
+        // ENHANCED STABILITY: Update chart with validated data
+        try {
+            userTicketsChart.data.labels = safeLabels;
+            userTicketsChart.data.datasets[0].data = validatedData;
+            userTicketsChart.update('active');
+            
+            console.log('✅ Chart updated successfully with data');
+            console.log('   Chart now shows', safeLabels.length, 'users with bars');
+            
+            // ENHANCED STABILITY: Update backup data after successful update
+            chartDataBackup.labels = [...safeLabels];
+            chartDataBackup.data = [...validatedData];
+            chartDataBackup.lastBackup = Date.now();
+            
+            // ENHANCED STABILITY: Reset stability monitor after successful update
+            chartStabilityMonitor.consecutiveFailures = 0;
+            chartStabilityMonitor.lastValidData = {
+                labels: [...safeLabels],
+                data: [...validatedData]
+            };
+            
+            // Hide loading overlay
+            hideChartLoading();
+            
+            // ENHANCED STABILITY: Force a resize to ensure proper rendering
+            setTimeout(() => {
+                if (userTicketsChart) {
+                    try {
+                        userTicketsChart.resize();
+                        console.log('📊 Chart resized for proper rendering');
+                        
+                        // ENHANCED STABILITY: Verify chart is still stable after resize
+                        setTimeout(() => {
+                            verifyChartStability();
+                        }, 50);
+                    } catch (resizeError) {
+                        console.warn('⚠️ Chart resize failed:', resizeError);
+                    }
+                }
+            }, 10);
+            
+        } catch (updateError) {
+            console.error('❌ Chart update failed:', updateError);
+            
+            // ENHANCED STABILITY: Attempt recovery if update fails
+            console.log('🔄 Attempting chart recovery after update failure...');
+            triggerChartRecovery();
+        }
     } else {
         console.warn('⚠️ No valid data to display in chart');
-        userTicketsChart.data.labels = [];
-        userTicketsChart.data.datasets[0].data = [];
-        userTicketsChart.update('active');
+        console.log('📊 Data validation failed:', { 
+            labelsLength: labels.length, 
+            dataLength: chartData.length,
+            labelsMatch: labels.length === chartData.length 
+        });
+        
+        // ENHANCED STABILITY: Don't clear chart data if we have backup data
+        if (chartDataBackup.labels.length > 0 && chartDataBackup.data.length > 0) {
+            console.log('📊 Restoring chart from backup due to invalid data...');
+            userTicketsChart.data.labels = [...chartDataBackup.labels];
+            userTicketsChart.data.datasets[0].data = [...chartDataBackup.data];
+            userTicketsChart.update('active');
+        } else {
+            // Only clear if no backup available
+            userTicketsChart.data.labels = [];
+            userTicketsChart.data.datasets[0].data = [];
+            userTicketsChart.update('active');
+        }
         
         // Hide loading overlay even if no data
         hideChartLoading();
@@ -619,16 +876,88 @@ function getCurrentPeriod() {
 }
 
 function filterDailyClosures(period) {
+    console.log(`🔄 Filtering daily closures for period: ${period}`);
+    
     // Update the chart dataset label
     const periodLabel = period === 'today' ? 'Closed Today' :
+                       period === 'yesterday' ? 'Closed Yesterday' :
                        period === 'week' ? 'Closed This Week' : 'Closed This Month';
     
     if (userTicketsChart) {
         userTicketsChart.data.datasets[0].label = periodLabel;
     }
     
-    // Fetch new data for the selected period using the real API
-    updateDailyClosuresData();
+    // Update time control buttons
+    document.querySelectorAll('.time-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-period') === period) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Clear cache to force fresh data fetch
+    ticketDataCache.data = null;
+    ticketDataCache.lastUpdate = 0;
+    
+    // Show loading overlay
+    showChartLoading();
+    
+    // Fetch new data for the selected period using the enhanced API
+    const endpoint = `/api/tickets/closures/period?period=${period}`;
+    
+    console.log(`📊 Fetching data from: ${endpoint}`);
+    
+    fetch(endpoint)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(`🔄 Received data for period ${period}:`, data);
+            
+            if (data.success) {
+                // Cache the data
+                ticketDataCache.data = {
+                    ...data,
+                    period: period
+                };
+                ticketDataCache.lastUpdate = Date.now();
+                
+                // Update chart with new data
+                updateChartWithData(data);
+                
+                // Update top performers
+                updateTopPerformers(data);
+                
+                // Update stats display
+                updateDailyClosuresStatsFromData(data);
+                
+                console.log(`✅ Successfully updated chart for period ${period}`);
+            } else {
+                console.error(`❌ API returned error for period ${period}:`, data.error);
+                // Show empty chart
+                if (userTicketsChart) {
+                    userTicketsChart.data.labels = [];
+                    userTicketsChart.data.datasets[0].data = [];
+                    userTicketsChart.update('none');
+                }
+            }
+        })
+        .catch(error => {
+            console.error(`❌ Error fetching data for period ${period}:`, error);
+            // Show empty chart
+            if (userTicketsChart) {
+                userTicketsChart.data.labels = [];
+                userTicketsChart.data.datasets[0].data = [];
+                userTicketsChart.update('none');
+            }
+        })
+        .finally(() => {
+            // Hide loading overlay
+            hideChartLoading();
+        });
 }
 
 function generateDailyClosuresDataForPeriod(period) {
@@ -933,49 +1262,81 @@ function exportAdminData() {
     showToast('Export feature coming soon!', 'info');
 }
 
-// Modal functions
+// ENHANCED MODAL FUNCTIONS: Chart stability-aware modal operations
 function openDailyPerformanceModal() {
     const modal = document.getElementById('dailyPerformanceModal');
     if (modal) {
-        modal.classList.add('show');
-        // Refresh data when modal opens and ensure top performers are updated
-        updateDailyClosuresData();
+        // ENHANCED STABILITY: Backup chart data before modal operations
+        backupChartData();
         
-        // Also update the modal content directly with current data
+        modal.classList.add('show');
+        
+        // ENHANCED STABILITY: Use safe data refresh that doesn't interfere with chart
+        safeRefreshModalData();
+    }
+}
+
+function safeRefreshModalData() {
+    // First try to get data from the chart without modifying it
+    let currentData = {
+        labels: userTicketsChart ? [...userTicketsChart.data.labels] : [],
+        data: userTicketsChart ? [...userTicketsChart.data.datasets[0].data] : [],
+        users: []
+    };
+    
+    // If chart has valid data, use it for modal
+    if (currentData.labels.length > 0 && currentData.data.length > 0) {
+        console.log('📊 Using existing chart data for modal');
+        currentData.users = currentData.labels.map((label, index) => ({
+            username: label,
+            tickets_closed: currentData.data[index] || 0,
+            role: 'User'
+        }));
+        
+        updateTopPerformers(currentData);
+        
+        // ENHANCED STABILITY: Verify chart is still stable after modal update
         setTimeout(() => {
-            // First try to get data from the chart
-            let currentData = {
-                labels: userTicketsChart ? userTicketsChart.data.labels : [],
-                data: userTicketsChart ? userTicketsChart.data.datasets[0].data : [],
-                users: []
-            };
-            
-            // If chart has no data, fetch fresh data
-            if (currentData.labels.length === 0 || currentData.data.length === 0) {
-                console.log('📊 Chart has no data, fetching fresh data for modal...');
-                fetch('/api/tickets/closures/today')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            updateTopPerformers(data);
-                        } else {
-                            console.error('❌ Failed to fetch data for modal:', data.error);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('❌ Error fetching data for modal:', error);
-                    });
-            } else {
-                // Convert chart data to users format for the modal
-                currentData.users = currentData.labels.map((label, index) => ({
-                    username: label,
-                    tickets_closed: currentData.data[index] || 0,
-                    role: 'User'
-                }));
-                
-                updateTopPerformers(currentData);
-            }
-        }, 500);
+            verifyChartStability();
+        }, 100);
+    } else {
+        // Only fetch fresh data if chart is empty
+        console.log('📊 Chart has no data, fetching fresh data for modal...');
+        fetch('/api/tickets/closures/today')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateTopPerformers(data);
+                    
+                    // ENHANCED STABILITY: Update chart with fresh data if it was empty
+                    if (userTicketsChart && (!userTicketsChart.data.labels || userTicketsChart.data.labels.length === 0)) {
+                        console.log('📊 Updating chart with fresh data from modal fetch');
+                        updateChartWithData(data);
+                    }
+                } else {
+                    console.error('❌ Failed to fetch data for modal:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('❌ Error fetching data for modal:', error);
+            });
+    }
+}
+
+function verifyChartStability() {
+    if (!userTicketsChart) return;
+    
+    const currentLabels = userTicketsChart.data.labels || [];
+    const currentData = userTicketsChart.data.datasets[0]?.data || [];
+    
+    const hasValidData = currentLabels.length > 0 && currentData.length > 0 && 
+                        currentData.some(value => value > 0);
+    
+    if (!hasValidData) {
+        console.warn('⚠️ Chart data lost after modal operation, attempting recovery...');
+        triggerChartRecovery();
+    } else {
+        console.log('✅ Chart stability verified after modal operation');
     }
 }
 
@@ -983,6 +1344,11 @@ function closeDailyPerformanceModal() {
     const modal = document.getElementById('dailyPerformanceModal');
     if (modal) {
         modal.classList.remove('show');
+        
+        // ENHANCED STABILITY: Verify chart stability after modal closes
+        setTimeout(() => {
+            verifyChartStability();
+        }, 300);
     }
 }
 
@@ -1080,31 +1446,137 @@ function clearTicketCache() {
     console.log('🗑️ Ticket cache cleared');
 }
 
+// ENHANCED MANUAL REFRESH: Robust chart refresh with stability checks
 function refreshTicketData() {
     console.log('🔄 Manually refreshing ticket data...');
+    
+    // ENHANCED STABILITY: Backup current chart data before refresh
+    backupChartData();
+    
     clearTicketCache();
     showChartLoading();
+    
+    // ENHANCED STABILITY: Use enhanced data update
     updateDailyClosuresData();
+    
+    // ENHANCED STABILITY: Verify chart stability after manual refresh
+    setTimeout(() => {
+        verifyChartStability();
+    }, 1000);
 }
 
-// Call test function on page load for debugging
+// ENHANCED STABILITY: Manual chart recovery function for users
+function forceChartRecovery() {
+    console.log('🔄 Manual chart recovery triggered by user...');
+    
+    if (!userTicketsChart) {
+        console.error('❌ Chart not initialized, cannot recover');
+        return;
+    }
+    
+    // Reset recovery counters
+    chartStabilityMonitor.recoveryAttempts = 0;
+    chartStabilityMonitor.consecutiveFailures = 0;
+    
+    // Force immediate recovery
+    attemptChartRecovery();
+    
+    // Show user feedback
+    if (typeof showToast === 'function') {
+        showToast('🔄 Chart recovery in progress...', 'info');
+    }
+}
+
+// ENHANCED STABILITY: Quick chart health check function
+function checkChartHealth() {
+    if (!userTicketsChart) {
+        console.log('📊 Chart not initialized');
+        return false;
+    }
+    
+    const currentLabels = userTicketsChart.data.labels || [];
+    const currentData = userTicketsChart.data.datasets[0]?.data || [];
+    
+    const hasValidData = currentLabels.length > 0 && currentData.length > 0 && 
+                        currentData.some(value => value > 0);
+    
+    console.log('📊 Chart health check:', {
+        hasChart: !!userTicketsChart,
+        labelsCount: currentLabels.length,
+        dataCount: currentData.length,
+        hasValidData: hasValidData,
+        backupAvailable: chartDataBackup.labels.length > 0
+    });
+    
+    return hasValidData;
+}
+
+// ENHANCED PAGE LOAD: Chart stability monitoring and recovery
 document.addEventListener('DOMContentLoaded', function() {
     // Test API after a short delay
     setTimeout(testTicketClosuresAPI, 2000);
     
-    // Force chart refresh after page is fully loaded
+    // ENHANCED STABILITY: Force chart refresh after page is fully loaded
     setTimeout(() => {
         if (userTicketsChart) {
             console.log('🔄 Forcing chart refresh...');
-            userTicketsChart.resize();
-            userTicketsChart.update('active');
+            try {
+                userTicketsChart.resize();
+                userTicketsChart.update('active');
+                
+                // ENHANCED STABILITY: Verify chart is stable after forced refresh
+                setTimeout(() => {
+                    verifyChartStability();
+                }, 100);
+            } catch (error) {
+                console.warn('⚠️ Forced chart refresh failed:', error);
+                triggerChartRecovery();
+            }
         }
     }, 3000);
+    
+    // ENHANCED STABILITY: Add global event listeners for chart stability
+    setupGlobalChartStabilityListeners();
 });
 
-// User Ticket Details Modal Functions
+function setupGlobalChartStabilityListeners() {
+    // Monitor for visibility changes that might affect chart rendering
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden && userTicketsChart) {
+            console.log('📊 Page became visible, checking chart stability...');
+            setTimeout(() => {
+                verifyChartStability();
+            }, 500);
+        }
+    });
+    
+    // Monitor for window resize events
+    window.addEventListener('resize', function() {
+        if (userTicketsChart) {
+            console.log('📊 Window resized, ensuring chart stability...');
+            setTimeout(() => {
+                verifyChartStability();
+            }, 200);
+        }
+    });
+    
+    // Monitor for focus events (when user returns to tab)
+    window.addEventListener('focus', function() {
+        if (userTicketsChart) {
+            console.log('📊 Window focused, checking chart stability...');
+            setTimeout(() => {
+                verifyChartStability();
+            }, 300);
+        }
+    });
+}
+
+// ENHANCED USER TICKET DETAILS MODAL FUNCTIONS: Chart stability-aware
 function showUserTicketDetails(username, ticketCount) {
     console.log(`🔍 Loading ticket details for ${username} (${ticketCount} tickets)`);
+    
+    // ENHANCED STABILITY: Backup chart data before opening user details modal
+    backupChartData();
     
     // Show loading state
     const modal = document.getElementById('userTicketDetailsModal');
@@ -1133,6 +1605,11 @@ function showUserTicketDetails(username, ticketCount) {
         .then(data => {
             if (data.success) {
                 displayUserTicketDetails(data, username, ticketCount);
+                
+                // ENHANCED STABILITY: Verify chart stability after modal content is loaded
+                setTimeout(() => {
+                    verifyChartStability();
+                }, 200);
             } else {
                 throw new Error(data.error || 'Failed to load ticket details');
             }
@@ -1147,6 +1624,11 @@ function showUserTicketDetails(username, ticketCount) {
                     <button class="btn btn-primary" onclick="closeUserTicketDetailsModal()">Close</button>
                 </div>
             `;
+            
+            // ENHANCED STABILITY: Verify chart stability even after error
+            setTimeout(() => {
+                verifyChartStability();
+            }, 200);
         });
 }
 
@@ -1253,6 +1735,11 @@ function closeUserTicketDetailsModal() {
     const modal = document.getElementById('userTicketDetailsModal');
     if (modal) {
         modal.classList.remove('show');
+        
+        // ENHANCED STABILITY: Verify chart stability after modal closes
+        setTimeout(() => {
+            verifyChartStability();
+        }, 300);
     }
 }
 

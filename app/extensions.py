@@ -42,8 +42,17 @@ class Config:
     SQLALCHEMY_DATABASE_URI = get_database_uri()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
-        'pool_pre_ping': True,
-        'pool_recycle': 300,
+        'pool_size': 50,  # Increased pool size for better concurrency
+        'pool_timeout': 60,  # Increased timeout to handle connection delays
+        'pool_recycle': 3600,  # Recycle connections every hour
+        'pool_pre_ping': True,  # Verify connections before use
+        'max_overflow': 50,  # Increased overflow limit
+        'echo': False,  # Set to True for SQL debugging
+        'connect_args': {
+            'timeout': 30,  # SQLite connection timeout
+            'check_same_thread': False,  # Allow multi-threaded access
+            'isolation_level': None  # Autocommit mode for better performance
+        }
     }
     SESSION_TYPE = 'filesystem'
     PERMANENT_SESSION_LIFETIME = 7200  # 2 hours

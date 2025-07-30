@@ -213,6 +213,34 @@ body {
     box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2);
 }
 
+/* Refresh Button Styles */
+.refresh-btn {
+    padding: 0.5rem;
+    background: rgba(40, 167, 69, 0.1);
+    border: 1px solid rgba(40, 167, 69, 0.3);
+    border-radius: 10px;
+    color: #28a745;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+}
+
+.refresh-btn:hover {
+    background: rgba(40, 167, 69, 0.2);
+    border-color: #28a745;
+    transform: translateY(-1px) rotate(180deg);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+}
+
+.refresh-btn:active {
+    transform: translateY(0) rotate(180deg);
+}
+
 /* Enhanced Chart Container - Optimized */
 .outage-chart {
     height: 220px; /* Reduced from 250px */

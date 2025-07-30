@@ -340,33 +340,24 @@ function openCustomDateModal() {
     // You can implement a modal for date selection
 }
 
-// Real-time update functionality
-let outageUpdateInterval;
+// Outage data loading - Load once on page load only
+// Removed automatic polling since outages don't change frequently
 
-function startOutageUpdates() {
-    // Update outages every 30 seconds
-    outageUpdateInterval = setInterval(() => {
-        loadOutagesData();
-    }, 30000);
-    
-    console.log('Started real-time outage updates');
+function loadOutagesDataOnce() {
+    // Load outages data once when page loads
+    const activeBtn = document.querySelector('.time-btn.active');
+    const period = activeBtn ? activeBtn.dataset.period : '14d';
+    loadOutagesData(period);
+    console.log('Loaded outages data once on page load');
 }
 
-function stopOutageUpdates() {
-    if (outageUpdateInterval) {
-        clearInterval(outageUpdateInterval);
-        outageUpdateInterval = null;
-        console.log('Stopped real-time outage updates');
-    }
-}
-
-// Initialize real-time updates when page loads
+// Initialize data loading when page loads
 document.addEventListener('DOMContentLoaded', function() {
     // Initial activity fetch
     loadUserActivity();
 
-    // Start outage polling after a short delay
-    setTimeout(startOutageUpdates, 2000);
+    // Load outages data once after a short delay
+    setTimeout(loadOutagesDataOnce, 1000);
 
     // Live activity updates via Socket.IO
     if (typeof window.yamSocketManager !== 'undefined' && window.yamSocketManager.socket) {
@@ -419,42 +410,63 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Clean up on page unload
-    window.addEventListener('beforeunload', stopOutageUpdates);
 });
 
-// Socket.io integration for real-time updates (if available)
+// Socket.io integration for outage notifications (optional - only if admin creates new outages)
 if (typeof window.yamSocketManager !== 'undefined' && window.yamSocketManager.socket) {
     const socket = window.yamSocketManager.socket;
     
     socket.on('outage_update', (data) => {
-        console.log('Received real-time outage update:', data);
-        // Refresh outages data immediately
-        const activeBtn = document.querySelector('.time-btn.active');
-        if (activeBtn && activeBtn.id !== 'customDateBtn') {
-            loadOutagesData(activeBtn.dataset.period);
-        } else {
-            loadOutagesData('7d');
+        console.log('Received outage update notification:', data);
+        // Only refresh if user is actively viewing the page and wants updates
+        // For now, we'll just log the notification without auto-refreshing
+        if (typeof showToast === 'function') {
+            showToast('Outage data has been updated', 'info');
         }
     });
     
     socket.on('new_outage', (data) => {
         console.log('Received new outage notification:', data);
-        // Refresh outages data immediately
-        const activeBtn = document.querySelector('.time-btn.active');
-        if (activeBtn && activeBtn.id !== 'customDateBtn') {
-            loadOutagesData(activeBtn.dataset.period);
-        } else {
-            loadOutagesData('7d');
+        // Only refresh if user is actively viewing the page and wants updates
+        // For now, we'll just log the notification without auto-refreshing
+        if (typeof showToast === 'function') {
+            showToast('New outage has been created', 'warning');
         }
     });
+}
+
+// Manual refresh function for outages data
+function refreshOutagesData() {
+    console.log('Manual refresh of outages data requested');
+    const activeBtn = document.querySelector('.time-btn.active');
+    const period = activeBtn ? activeBtn.dataset.period : '14d';
+    
+    // Show loading state
+    const refreshBtn = document.querySelector('.refresh-btn');
+    if (refreshBtn) {
+        const icon = refreshBtn.querySelector('i');
+        if (icon) {
+            icon.style.transform = 'rotate(360deg)';
+            setTimeout(() => {
+                icon.style.transform = 'rotate(0deg)';
+            }, 1000);
+        }
+    }
+    
+    // Load fresh data
+    loadOutagesData(period);
+    
+    // Show success message
+    if (typeof showToast === 'function') {
+        showToast('Outages data refreshed', 'success');
+    }
 }
 
 // Export functions for global access
 window.loadOutagesData = loadOutagesData;
 window.updateOutageChart = updateOutageChart;
-window.startOutageUpdates = startOutageUpdates;
-window.stopOutageUpdates = stopOutageUpdates;
+window.loadOutagesDataOnce = loadOutagesDataOnce;
+window.refreshOutagesData = refreshOutagesData;
 
 // Test function to verify chart functionality
 window.testOutageChart = function() {

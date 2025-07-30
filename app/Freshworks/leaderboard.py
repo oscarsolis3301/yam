@@ -13,6 +13,7 @@ from app import create_app
 from app.models.base import TicketClosure, FreshworksUserMapping, User, TicketSyncMetadata
 from app.extensions import db
 from app.utils.freshworks_service import freshworks_service
+from app.utils.ticket_closure_service import ticket_closure_service
 
 load_dotenv()
 
@@ -88,14 +89,17 @@ def link_users_to_mappings():
         print(f"❌ Error linking users: {e}")
 
 def sync_ticket_closures_to_db(tickets, id_name_map):
-    """Sync ticket closure data to the database using the service with enhanced ticket tracking"""
-    print("🔄 Syncing ticket closures to database with ticket numbers...")
+    """Sync ticket closure data to the database using the enhanced service with historical tracking"""
+    print("🔄 Syncing ticket closures to database with historical tracking...")
     
-    # Use the service to sync daily closures with ticket number tracking
-    success = freshworks_service.sync_daily_closures_with_tickets()
+    # Use the enhanced service to sync hourly closures
+    today = datetime.now().date()
+    current_hour = datetime.now().hour
+    
+    success = ticket_closure_service.sync_hourly_closures(today, current_hour)
     
     if success:
-        print("✅ Ticket closures synced successfully with ticket numbers")
+        print("✅ Ticket closures synced successfully with historical tracking")
         return True
     else:
         print("❌ Failed to sync ticket closures")

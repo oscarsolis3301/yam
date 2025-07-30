@@ -35,7 +35,7 @@ def sync_daily_closures():
             
             can_sync_today = TicketSyncMetadata.can_sync_now(today)
             if can_sync_today:
-                sync_result = freshworks_service.sync_daily_closures(today)
+                sync_result = freshworks_service.sync_daily_closures_with_tickets(today)
                 if sync_result:
                     print(f"✅ Successfully synced closures for {today}")
                 else:
@@ -49,7 +49,7 @@ def sync_daily_closures():
             
             can_sync_yesterday = TicketSyncMetadata.can_sync_now(yesterday)
             if can_sync_yesterday:
-                sync_result = freshworks_service.sync_daily_closures(yesterday)
+                sync_result = freshworks_service.sync_daily_closures_with_tickets(yesterday)
                 if sync_result:
                     print(f"✅ Successfully synced closures for {yesterday}")
                 else:

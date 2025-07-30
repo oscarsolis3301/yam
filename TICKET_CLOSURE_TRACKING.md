@@ -129,7 +129,7 @@ from app.utils.freshworks_service import freshworks_service
 from datetime import date
 
 # Sync specific date
-freshworks_service.sync_daily_closures(date(2025, 1, 15))
+freshworks_service.sync_daily_closures_with_tickets(date(2025, 1, 15))
 
 # Sync user mappings
 freshworks_service.sync_user_mappings()

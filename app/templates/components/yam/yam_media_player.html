@@ -51,7 +51,7 @@
             <span class="volume-value" id="volumeValue">75%</span>
         </div>
         
-        <!-- Additional spacing to fill the gap -->
+        <!-- Reduced spacing to minimize excess space -->
         <div class="media-player-spacer"></div>
     </div>
 </div>
@@ -98,8 +98,8 @@
     overflow: hidden;
     width: 100%;
     box-sizing: border-box;
-    /* Make the widget taller to match the left container */
-    min-height: 600px; /* Match user profile height */
+    /* Make the widget match the left container height */
+    min-height: 520px; /* Match user profile height */
     display: flex;
     flex-direction: column;
 }
@@ -118,12 +118,12 @@
 }
 
 .media-content {
-    padding: 1.5rem;
+    padding: 1.5rem 1.5rem 1rem 1.5rem; /* Reduced bottom padding */
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 500px; /* Ensure minimum content height */
+    min-height: 420px; /* Reduced minimum content height */
 }
 
 .now-playing {
@@ -325,10 +325,10 @@
     min-width: 35px;
 }
 
-/* Additional spacing to fill the gap */
+/* Reduced spacing to minimize excess space */
 .media-player-spacer {
     flex: 1;
-    min-height: 78px;
+    min-height: 20px; /* Significantly reduced spacer height */
 }
 
 /* Playlist Modal Styles */

@@ -26,6 +26,8 @@ from .base import (
     AllowedWindowsUser,
     FreshworksUserMapping,
     TicketClosure,
+    TicketClosureHistory,
+    TicketClosureDaily,
     init_db
 )
 from .chat import (

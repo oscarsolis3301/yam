@@ -100,15 +100,15 @@
 
 /* Enhanced Profile Avatar */
 .profile-avatar {
-    width: 100px;
-    height: 100px;
+    width: 90px; /* Slightly smaller avatar */
+    height: 90px; /* Slightly smaller avatar */
     border-radius: 50%;
-    margin: 0 auto 1.5rem;
+    margin: 0 auto 1rem; /* Reduced bottom margin */
     background: linear-gradient(135deg, #00d4ff, #0099cc);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.5rem;
+    font-size: 2.2rem; /* Slightly smaller font */
     font-weight: 800;
     border: 4px solid rgba(255, 255, 255, 0.1);
     overflow: hidden;
@@ -132,7 +132,7 @@
 
 .profile-fallback {
     color: #ffffff;
-    font-size: 2.5rem;
+    font-size: 2.2rem; /* Match the smaller avatar size */
     font-weight: 800;
     display: flex;
     align-items: center;
@@ -146,14 +146,14 @@
     font-size: 1.3rem;
     font-weight: 700;
     text-align: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.3rem; /* Reduced bottom margin */
 }
 
 .profile-role {
     color: #cccccc;
     font-size: 1rem;
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem; /* Reduced bottom margin */
     padding: 0.5rem 1rem;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 20px;
@@ -631,10 +631,10 @@
     }
     
     .profile-avatar {
-        width: 80px;
-        height: 80px;
-        font-size: 2rem;
-        margin-bottom: 1rem;
+        width: 70px; /* Smaller on mobile */
+        height: 70px; /* Smaller on mobile */
+        font-size: 1.8rem; /* Smaller font on mobile */
+        margin-bottom: 0.8rem; /* Reduced margin on mobile */
     }
     
     .reminder-widget-sidebar .widget-header {
@@ -1016,10 +1016,10 @@
     backdrop-filter: blur(20px);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
-    padding: 2rem 1.5rem;
+    padding: 1.5rem 1.5rem 1rem 1.5rem; /* Reduced bottom padding */
     display: flex;
     flex-direction: column;
-    min-height: 600px; /* Match media player height */
+    min-height: 520px; /* Reduced height to remove excess space */
 }
 
 .user-profile:hover {
@@ -1034,13 +1034,14 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    margin-top: 1.5rem;
+    margin-top: 1rem; /* Reduced top margin */
+    min-height: 300px; /* Ensure minimum height for activity section */
 }
 
 .recent-activity h4 {
     color: #ffffff; 
     font-weight: 600; 
-    margin-bottom: 1rem; 
+    margin-bottom: 0.8rem; /* Reduced margin */
     text-align: center;
 }
 
@@ -1049,7 +1050,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 0.5rem;
-    margin-bottom: 1rem; /* Space for button */
+    margin-bottom: 0.8rem; /* Reduced space for button */
 }
 
 #recentActivity::-webkit-scrollbar {

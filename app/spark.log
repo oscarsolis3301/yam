@@ -4111,3 +4111,259 @@
 2025-07-29 23:36:19,293 - spark - INFO - Returning ticket closure data: 172 total tickets, 15 users
 2025-07-29 23:36:19,813 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753857378941_or7x6wiky
 2025-07-29 23:36:19,821 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:02:57,639 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-30 07:03:04,324 - spark - INFO - Fetching ticket closures for date: 2025-07-30
+2025-07-30 07:03:04,324 - spark - INFO - Found 0 closure records in database for 2025-07-30
+2025-07-30 07:03:04,324 - spark - INFO - Can sync: True, time until next: 0
+2025-07-30 07:03:04,324 - spark - INFO - No closure data found for today, syncing from Freshworks...
+2025-07-30 07:03:04,324 - spark - INFO - 🔄 Starting sync for 2025-07-30...
+2025-07-30 07:03:04,399 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753884184089_oa0q14vb6
+2025-07-30 07:03:04,399 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:03:04,406 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:03:05,377 - spark - INFO - Fetching page 1... Status: 200
+2025-07-30 07:03:05,935 - spark - INFO - Fetching page 2... Status: 200
+2025-07-30 07:03:06,428 - spark - INFO - Fetching page 3... Status: 200
+2025-07-30 07:03:07,375 - spark - INFO - Fetching page 4... Status: 200
+2025-07-30 07:03:08,308 - spark - INFO - Fetching page 5... Status: 200
+2025-07-30 07:03:08,886 - spark - INFO - Fetching page 6... Status: 200
+2025-07-30 07:03:09,428 - spark - INFO - Fetching page 7... Status: 200
+2025-07-30 07:03:10,386 - spark - INFO - Fetching page 8... Status: 200
+2025-07-30 07:03:11,259 - spark - INFO - Fetching page 9... Status: 200
+2025-07-30 07:03:12,152 - spark - INFO - Fetching page 10... Status: 200
+2025-07-30 07:03:12,973 - spark - INFO - Fetching page 11... Status: 200
+2025-07-30 07:03:13,514 - spark - INFO - Fetching page 12... Status: 200
+2025-07-30 07:03:14,319 - spark - INFO - Fetching page 13... Status: 200
+2025-07-30 07:03:15,080 - spark - INFO - Fetching page 14... Status: 200
+2025-07-30 07:03:15,668 - spark - INFO - Fetching page 15... Status: 200
+2025-07-30 07:03:15,670 - spark - INFO - 📊 Found 11 responders with resolved tickets for 2025-07-30
+2025-07-30 07:03:15,671 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-30 07:03:15,678 - spark - INFO - ➕ Created new entry for Doug Spohn: 1 tickets on 2025-07-30
+2025-07-30 07:03:15,685 - spark - INFO - ➕ Created new entry for Jarrod Woodson: 5 tickets on 2025-07-30
+2025-07-30 07:03:15,691 - spark - INFO - ➕ Created new entry for Staci Valko: 3 tickets on 2025-07-30
+2025-07-30 07:03:15,697 - spark - INFO - ➕ Created new entry for Mayra Lopez: 2 tickets on 2025-07-30
+2025-07-30 07:03:15,702 - spark - INFO - ➕ Created new entry for Nick Gutierrez: 6 tickets on 2025-07-30
+2025-07-30 07:03:15,708 - spark - INFO - ➕ Created new entry for Anthony Risker: 8 tickets on 2025-07-30
+2025-07-30 07:03:15,713 - spark - INFO - ➕ Created new entry for Ralph Rosalin: 3 tickets on 2025-07-30
+2025-07-30 07:03:15,718 - spark - INFO - ➕ Created new entry for Pietro Vue: 5 tickets on 2025-07-30
+2025-07-30 07:03:15,723 - spark - INFO - ➕ Created new entry for JZ: 2 tickets on 2025-07-30
+2025-07-30 07:03:15,729 - spark - INFO - ➕ Created new entry for Christopher Bush: 1 tickets on 2025-07-30
+2025-07-30 07:03:15,734 - spark - INFO - ➕ Created new entry for AJ: 1 tickets on 2025-07-30
+2025-07-30 07:03:15,744 - spark - INFO - ✅ Daily closures synced successfully for 2025-07-30 - 37 tickets processed
+2025-07-30 07:03:15,745 - spark - INFO - After sync: found 11 closure records
+2025-07-30 07:03:15,750 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:03:15.739345
+2025-07-30 07:03:15,752 - spark - INFO -    ⏱️ Time since last sync: 0 minutes
+2025-07-30 07:03:15,752 - spark - INFO -    ⏳ Time until next sync: 59 minutes
+2025-07-30 07:03:15,753 - spark - INFO - Returning ticket closure data: 37 total tickets, 11 users
+2025-07-30 07:03:16,061 - spark - INFO - Fetching ticket closures for date: 2025-07-30
+2025-07-30 07:03:16,062 - spark - INFO - Found 11 closure records in database for 2025-07-30
+2025-07-30 07:03:16,067 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:03:15.739345
+2025-07-30 07:03:16,068 - spark - INFO -    ⏱️ Time since last sync: 0 minutes
+2025-07-30 07:03:16,068 - spark - INFO -    ⏳ Time until next sync: 59 minutes
+2025-07-30 07:03:16,069 - spark - INFO - Returning ticket closure data: 37 total tickets, 11 users
+2025-07-30 07:03:16,387 - spark - INFO - Fetching ticket closures for date: 2025-07-30
+2025-07-30 07:03:16,388 - spark - INFO - Found 11 closure records in database for 2025-07-30
+2025-07-30 07:03:16,393 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:03:15.739345
+2025-07-30 07:03:16,393 - spark - INFO -    ⏱️ Time since last sync: 0 minutes
+2025-07-30 07:03:16,394 - spark - INFO -    ⏳ Time until next sync: 59 minutes
+2025-07-30 07:03:16,395 - spark - INFO - Returning ticket closure data: 37 total tickets, 11 users
+2025-07-30 07:03:27,777 - spark - INFO - Fetching ticket details for user 'Mayra' on 2025-07-30
+2025-07-30 07:03:27,792 - spark - INFO - No stored ticket numbers found for user Mayra on 2025-07-30
+2025-07-30 07:03:59,057 - spark - INFO - Fetching ticket details for user 'Anthony' on 2025-07-30
+2025-07-30 07:03:59,059 - spark - INFO - No stored ticket numbers found for user Anthony on 2025-07-30
+2025-07-30 07:05:15,485 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:05:15,487 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:05:15,880 - spark - INFO - Loaded 25523 devices from cache
+2025-07-30 07:05:19,496 - spark - INFO - Fetching ticket closures for date: 2025-07-30
+2025-07-30 07:05:19,498 - spark - INFO - Found 11 closure records in database for 2025-07-30
+2025-07-30 07:05:19,524 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:03:15.739345
+2025-07-30 07:05:19,525 - spark - INFO -    ⏱️ Time since last sync: 2 minutes
+2025-07-30 07:05:19,525 - spark - INFO -    ⏳ Time until next sync: 57 minutes
+2025-07-30 07:05:19,526 - spark - INFO - Returning ticket closure data: 37 total tickets, 11 users
+2025-07-30 07:05:19,817 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753884319181_uwldwgfu9
+2025-07-30 07:05:19,819 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:05:19,826 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:05:21,220 - spark - INFO - Fetching ticket closures for date: 2025-07-30
+2025-07-30 07:05:21,222 - spark - INFO - Found 11 closure records in database for 2025-07-30
+2025-07-30 07:05:21,226 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:03:15.739345
+2025-07-30 07:05:21,227 - spark - INFO -    ⏱️ Time since last sync: 2 minutes
+2025-07-30 07:05:21,227 - spark - INFO -    ⏳ Time until next sync: 57 minutes
+2025-07-30 07:05:21,228 - spark - INFO - Returning ticket closure data: 37 total tickets, 11 users
+2025-07-30 07:06:10,164 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:06:10,166 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:06:11,784 - spark - INFO - Fetching ticket closures for date: 2025-07-30
+2025-07-30 07:06:11,785 - spark - INFO - Found 11 closure records in database for 2025-07-30
+2025-07-30 07:06:11,793 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:03:15.739345
+2025-07-30 07:06:11,793 - spark - INFO -    ⏱️ Time since last sync: 2 minutes
+2025-07-30 07:06:11,794 - spark - INFO -    ⏳ Time until next sync: 57 minutes
+2025-07-30 07:06:11,794 - spark - INFO - Returning ticket closure data: 37 total tickets, 11 users
+2025-07-30 07:06:11,812 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753884371509_7lpgbhews
+2025-07-30 07:06:11,814 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:06:11,821 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:06:14,157 - spark - INFO - Fetching ticket closures for date: 2025-07-30
+2025-07-30 07:06:14,158 - spark - INFO - Found 11 closure records in database for 2025-07-30
+2025-07-30 07:06:14,162 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:03:15.739345
+2025-07-30 07:06:14,163 - spark - INFO -    ⏱️ Time since last sync: 2 minutes
+2025-07-30 07:06:14,163 - spark - INFO -    ⏳ Time until next sync: 57 minutes
+2025-07-30 07:06:14,165 - spark - INFO - Returning ticket closure data: 37 total tickets, 11 users
+2025-07-30 07:08:13,047 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:08:13,049 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:08:14,756 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753884494474_0r20mcr39
+2025-07-30 07:08:14,758 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:08:14,768 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:08:15,451 - spark - ERROR - Failed to initialise CloudAIModel: type object 'Config' has no attribute 'USE_CLOUD_AI'
+2025-07-30 07:08:17,384 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:08:17,386 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:08:26,504 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753884505872_dx4vkpc7z
+2025-07-30 07:08:26,506 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:08:26,513 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:08:31,980 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:08:31,982 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:08:34,007 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753884513420_9dhy9nn91
+2025-07-30 07:08:34,010 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:08:34,021 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:10:16,375 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:10:16,378 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:10:18,345 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753884617725_bgsz9uxi5
+2025-07-30 07:10:18,347 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:10:18,377 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:10:36,069 - spark - INFO - Fetching ticket closures for date: 2025-07-30
+2025-07-30 07:10:36,071 - spark - INFO - Found 11 closure records in database for 2025-07-30
+2025-07-30 07:10:36,076 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:03:15.739345
+2025-07-30 07:10:36,077 - spark - INFO -    ⏱️ Time since last sync: 7 minutes
+2025-07-30 07:10:36,077 - spark - INFO -    ⏳ Time until next sync: 52 minutes
+2025-07-30 07:10:36,078 - spark - INFO - Returning ticket closure data: 37 total tickets, 11 users
+2025-07-30 07:10:36,424 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753884635809_n1vjgdjlb
+2025-07-30 07:10:36,428 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:10:36,443 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:10:38,178 - spark - INFO - Fetching ticket closures for date: 2025-07-30
+2025-07-30 07:10:38,180 - spark - INFO - Found 11 closure records in database for 2025-07-30
+2025-07-30 07:10:38,185 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:03:15.739345
+2025-07-30 07:10:38,186 - spark - INFO -    ⏱️ Time since last sync: 7 minutes
+2025-07-30 07:10:38,186 - spark - INFO -    ⏳ Time until next sync: 52 minutes
+2025-07-30 07:10:38,187 - spark - INFO - Returning ticket closure data: 37 total tickets, 11 users
+2025-07-30 07:11:12,002 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:11:12,005 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:11:13,677 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753884673373_mygc2dfs0
+2025-07-30 07:11:13,679 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:11:13,688 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:12:57,275 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:12:57,277 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:13:30,183 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753884809864_jdyf9mrks
+2025-07-30 07:13:30,186 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:13:30,207 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:13:35,078 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:13:35,080 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:13:36,704 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753884816686_67l3pxf41
+2025-07-30 07:13:36,706 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:13:36,715 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:13:37,669 - spark - INFO - Loaded 0 articles. Statuses: 
+2025-07-30 07:13:37,956 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=unknown
+2025-07-30 07:13:37,960 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:13:37,971 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:15:19,172 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:15:19,173 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:15:19,174 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:15:19,175 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:15:21,208 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753884920923_z85k7sl7c
+2025-07-30 07:15:21,210 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:15:21,219 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:15:29,597 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:15:29,601 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:15:30,968 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753884930658_fdib3475y
+2025-07-30 07:15:30,970 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:15:30,981 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:15:39,010 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:15:39,012 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:15:41,639 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753884941335_xi7sfwkuf
+2025-07-30 07:15:41,642 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:15:41,663 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:16:01,522 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:16:01,524 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:16:03,513 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753884963210_6aooudfq1
+2025-07-30 07:16:03,516 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:16:03,524 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:16:06,170 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:16:06,172 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:16:07,844 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753884967525_zt6c26ngj
+2025-07-30 07:16:07,847 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:16:07,860 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:16:37,696 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:16:37,698 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:16:39,440 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753884999135_m0golmwxn
+2025-07-30 07:16:39,442 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:16:39,465 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:17:01,916 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:17:01,918 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:17:03,594 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753885023287_11a9mjdt0
+2025-07-30 07:17:03,596 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:17:03,610 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:17:04,209 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-07-30 07:17:04,837 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:17:04,838 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:17:07,048 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753885026419_vj5oa2ehi
+2025-07-30 07:17:07,052 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:17:07,068 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:17:08,323 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:17:08,325 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:17:10,004 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753885029687_ncu2xc86w
+2025-07-30 07:17:10,005 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:17:10,016 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:19:23,412 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-07-30 07:19:23,414 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-07-30 07:19:24,805 - spark - INFO - Fetching ticket closures for date: 2025-07-30
+2025-07-30 07:19:24,810 - spark - INFO - Found 11 closure records in database for 2025-07-30
+2025-07-30 07:19:24,819 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:03:15.739345
+2025-07-30 07:19:24,820 - spark - INFO -    ⏱️ Time since last sync: 16 minutes
+2025-07-30 07:19:24,821 - spark - INFO -    ⏳ Time until next sync: 43 minutes
+2025-07-30 07:19:24,822 - spark - INFO - Returning ticket closure data: 37 total tickets, 11 users
+2025-07-30 07:19:24,827 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753885164522_tuw2wo3kb
+2025-07-30 07:19:24,832 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:19:24,844 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:19:27,500 - spark - INFO - Fetching ticket closures for date: 2025-07-30
+2025-07-30 07:19:27,502 - spark - INFO - Found 11 closure records in database for 2025-07-30
+2025-07-30 07:19:27,510 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:03:15.739345
+2025-07-30 07:19:27,511 - spark - INFO -    ⏱️ Time since last sync: 16 minutes
+2025-07-30 07:19:27,511 - spark - INFO -    ⏳ Time until next sync: 43 minutes
+2025-07-30 07:19:27,513 - spark - INFO - Returning ticket closure data: 37 total tickets, 11 users
+2025-07-30 07:30:36,469 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:03:15.739345
+2025-07-30 07:30:36,474 - spark - INFO -    ⏱️ Time since last sync: 27 minutes
+2025-07-30 07:30:36,475 - spark - INFO -    ⏳ Time until next sync: 32 minutes
+2025-07-30 07:39:25,680 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:03:15.739345
+2025-07-30 07:39:25,681 - spark - INFO -    ⏱️ Time since last sync: 36 minutes
+2025-07-30 07:39:25,682 - spark - INFO -    ⏳ Time until next sync: 23 minutes
+2025-07-30 07:47:10,820 - spark - INFO - Fetching ticket details for user 'JZ' on 2025-07-30
+2025-07-30 07:47:10,824 - spark - INFO - No stored ticket numbers found for user JZ on 2025-07-30
+2025-07-30 07:50:36,478 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:50:30.465122
+2025-07-30 07:50:36,481 - spark - INFO -    ⏱️ Time since last sync: 0 minutes
+2025-07-30 07:50:36,483 - spark - INFO -    ⏳ Time until next sync: 59 minutes
+2025-07-30 07:53:33,657 - spark - INFO - Scheduled periodic presence cleanup task
+2025-07-30 07:53:36,391 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753887181612_s7c1472g3
+2025-07-30 07:53:36,394 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:53:36,403 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:53:44,485 - spark - INFO - Fetching ticket closures for date: 2025-07-30
+2025-07-30 07:53:44,486 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1753887224161_k69crr2xc
+2025-07-30 07:53:44,491 - spark - INFO - Found 12 closure records in database for 2025-07-30
+2025-07-30 07:53:44,491 - spark - INFO - [socketio] marking user 1 online
+2025-07-30 07:53:44,519 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-07-30 07:53:44,531 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:50:30.465122
+2025-07-30 07:53:44,532 - spark - INFO -    ⏱️ Time since last sync: 3 minutes
+2025-07-30 07:53:44,532 - spark - INFO -    ⏳ Time until next sync: 56 minutes
+2025-07-30 07:53:44,534 - spark - INFO - Returning ticket closure data: 43 total tickets, 12 users
+2025-07-30 07:53:46,898 - spark - INFO - Fetching ticket details for user 'Doug' on 2025-07-30
+2025-07-30 07:53:46,903 - spark - INFO - Found 2 stored ticket IDs for Doug on 2025-07-30
+2025-07-30 07:53:46,904 - spark - INFO - Created 2 basic ticket records from stored IDs
+2025-07-30 07:53:47,115 - spark - INFO - Fetching ticket closures for date: 2025-07-30
+2025-07-30 07:53:47,116 - spark - INFO - Found 12 closure records in database for 2025-07-30
+2025-07-30 07:53:47,121 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:50:30.465122
+2025-07-30 07:53:47,122 - spark - INFO -    ⏱️ Time since last sync: 3 minutes
+2025-07-30 07:53:47,123 - spark - INFO -    ⏳ Time until next sync: 56 minutes
+2025-07-30 07:53:47,124 - spark - INFO - Returning ticket closure data: 43 total tickets, 12 users
+2025-07-30 08:10:36,460 - spark - INFO - Fetching ticket closures for date: 2025-07-30
+2025-07-30 08:10:36,461 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:50:30.465122
+2025-07-30 08:10:36,462 - spark - INFO - Found 12 closure records in database for 2025-07-30
+2025-07-30 08:10:36,463 - spark - INFO -    ⏱️ Time since last sync: 20 minutes
+2025-07-30 08:10:36,464 - spark - INFO -    ⏳ Time until next sync: 39 minutes
+2025-07-30 08:10:36,471 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-07-30 14:50:30.465122
+2025-07-30 08:10:36,471 - spark - INFO -    ⏱️ Time since last sync: 20 minutes
+2025-07-30 08:10:36,472 - spark - INFO -    ⏳ Time until next sync: 39 minutes
+2025-07-30 08:10:36,473 - spark - INFO - Returning ticket closure data: 43 total tickets, 12 users

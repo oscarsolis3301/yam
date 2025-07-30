@@ -1,0 +1,16 @@
+-- Ticket Closure Tracking Database
+-- This database stores historical ticket closure data with hourly updates and time markers
+-- Created: 2025-01-29
+-- Purpose: Track daily ticket closures by user with historical data for time period filtering
+
+-- This is a placeholder file. The actual database will be created by SQLAlchemy models.
+-- The database file will be located at: app/db/ticket_closure_tracking.db
+
+-- Tables that will be created:
+-- 1. ticket_closure_history - Hourly tracking with time markers
+-- 2. ticket_closure_daily - Daily aggregated data for quick access
+-- 3. ticket_closure - Legacy table (maintained for backward compatibility)
+-- 4. freshworks_user_mapping - User mappings
+-- 5. ticket_sync_metadata - Sync tracking
+
+-- The database will be automatically initialized when the application starts. 
