@@ -1,0 +1,452 @@
+<!-- Unified Chart Container Styles - Fixes uniformity issues -->
+<style>
+/* UNIFIED CHART CONTAINER STYLES - Ensures both chart containers are identical */
+
+/* 1. UNIFIED CARD STYLES - Both containers use identical styling */
+.outages-card,
+.user-tickets-card {
+    background: rgba(15, 15, 15, 0.95);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.outages-card:hover,
+.user-tickets-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* 2. UNIFIED HEADER STYLES - Identical title and controls */
+.outages-card .card-header,
+.user-tickets-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.outages-card .card-title,
+.user-tickets-card .card-title {
+    color: #ffffff;
+    margin: 0;
+    font-size: 1.4rem; /* UNIFIED FONT SIZE */
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.outages-card .card-title::before,
+.user-tickets-card .card-title::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: linear-gradient(135deg, #8B5CF6, #A855F7);
+    border-radius: 2px;
+}
+
+/* 3. UNIFIED TIME CONTROLS - Identical button styling */
+.outages-card .time-controls,
+.user-tickets-card .time-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.outages-card .time-btn,
+.user-tickets-card .time-btn {
+    background: rgba(255, 255, 255, 0.05); /* UNIFIED LIGHT THEME */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #cccccc;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.outages-card .time-btn:hover,
+.user-tickets-card .time-btn:hover {
+    background: rgba(139, 92, 246, 0.1);
+    color: #ffffff;
+    border-color: rgba(139, 92, 246, 0.3);
+}
+
+.outages-card .time-btn.active,
+.user-tickets-card .time-btn.active {
+    background: linear-gradient(135deg, #8B5CF6, #A855F7);
+    color: #ffffff;
+    border-color: #8B5CF6;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+/* 4. UNIFIED CHART CONTAINERS - Identical dimensions and styling */
+.outage-chart.enhanced,
+.user-tickets-chart.enhanced {
+    height: 400px; /* UNIFIED HEIGHT */
+    margin-bottom: 1.5rem;
+    background: rgba(20, 20, 20, 0.5); /* UNIFIED BACKGROUND */
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    /* Ensure stable chart rendering - fixed dimensions prevent zoom */
+    min-height: 400px !important;
+    max-height: 400px !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    /* Prevent any transform changes that could cause zoom */
+    transform: none !important;
+    transform-origin: center center !important;
+}
+
+/* 5. UNIFIED STATS GRID - Identical layout and positioning */
+.outage-stats,
+.user-tickets-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* UNIFIED 2-COLUMN LAYOUT */
+    gap: 1rem;
+    margin-bottom: 1rem; /* UNIFIED MARGIN */
+    flex-shrink: 0;
+}
+
+.outage-stats .stat-item,
+.user-tickets-stats .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem;
+    background: rgba(25, 25, 25, 0.8);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    height: 80px; /* UNIFIED HEIGHT FOR PERFECT ALIGNMENT */
+    box-sizing: border-box;
+}
+
+.outage-stats .stat-item.clickable,
+.user-tickets-stats .stat-item.clickable {
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.outage-stats .stat-item.clickable::before,
+.user-tickets-stats .stat-item.clickable::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.outage-stats .stat-item.clickable:hover::before,
+.user-tickets-stats .stat-item.clickable:hover::before {
+    left: 100%;
+}
+
+.outage-stats .stat-item.clickable:hover,
+.user-tickets-stats .stat-item.clickable:hover {
+    background: rgba(30, 30, 30, 0.9);
+    border-color: rgba(139, 92, 246, 0.3) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2) !important;
+}
+
+/* 6. UNIFIED STAT ICONS - Identical styling */
+.outage-stats .stat-icon,
+.user-tickets-stats .stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(139, 92, 246, 0.2) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    color: #8B5CF6 !important;
+    border: 1px solid rgba(139, 92, 246, 0.3) !important;
+    flex-shrink: 0;
+}
+
+/* 7. UNIFIED STAT CONTENT - Identical text styling */
+.outage-stats .stat-content,
+.user-tickets-stats .stat-content {
+    flex: 1;
+}
+
+.outage-stats .stat-number,
+.user-tickets-stats .stat-number {
+    font-size: 1.6rem; /* UNIFIED FONT SIZE */
+    font-weight: 800;
+    color: #8B5CF6 !important;
+    margin-bottom: 0.2rem;
+    text-shadow: 0 0 10px rgba(139, 92, 246, 0.3) !important;
+}
+
+.outage-stats .stat-label,
+.user-tickets-stats .stat-label {
+    font-size: 0.8rem; /* UNIFIED FONT SIZE */
+    color: #cccccc;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* 8. UNIFIED REFRESH BUTTON - Matches other time control buttons */
+.refresh-btn {
+    background: rgba(255, 255, 255, 0.05); /* Match time-btn styling */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #cccccc;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+}
+
+.refresh-btn:hover {
+    background: rgba(139, 92, 246, 0.1);
+    color: #ffffff;
+    border-color: rgba(139, 92, 246, 0.3);
+    transform: translateY(-1px); /* Removed spin animation */
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2) !important;
+}
+
+/* 9. UNIFIED CUSTOM DATE BUTTON - Matches other time control buttons */
+.custom-date-btn {
+    background: rgba(255, 255, 255, 0.05) !important; /* Match time-btn styling */
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #cccccc !important;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.custom-date-btn:hover, 
+.custom-date-btn.active {
+    background: rgba(139, 92, 246, 0.1) !important;
+    color: #ffffff !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2) !important;
+}
+
+/* 10. UNIFIED ADMIN STATS BUTTON - Identical styling */
+.user-tickets-card .admin-stats-btn {
+    background: rgba(139, 92, 246, 0.1) !important;
+    border: 1px solid rgba(139, 92, 246, 0.3) !important;
+    color: #8B5CF6 !important;
+    padding: 0.6rem;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.5rem;
+}
+
+.user-tickets-card .admin-stats-btn:hover {
+    background: rgba(139, 92, 246, 0.2) !important;
+    color: #A855F7 !important;
+    border-color: #A855F7 !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2) !important;
+}
+
+/* 11. UNIFIED CHART CANVAS - Identical styling */
+.outage-chart.enhanced canvas,
+.user-tickets-chart.enhanced canvas {
+    filter: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    pointer-events: auto !important;
+    cursor: crosshair !important;
+    transform: none !important;
+    transform-origin: center center !important;
+}
+
+/* 12. UNIFIED CHART LOADING OVERLAY - Identical styling */
+.chart-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 15, 15, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    backdrop-filter: blur(5px);
+    transition: opacity 0.3s ease;
+}
+
+.chart-loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.chart-loading-overlay .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(139, 92, 246, 0.3);
+    border-top: 3px solid #8B5CF6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+.chart-loading-overlay p {
+    color: #cccccc;
+    font-size: 0.9rem;
+    margin: 0;
+    text-align: center;
+}
+
+/* 13. UNIFIED RESPONSIVE DESIGN - Identical breakpoints */
+@media (max-width: 1200px) {
+    .outage-stats,
+    .user-tickets-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .outage-chart.enhanced,
+    .user-tickets-chart.enhanced {
+        height: 300px;
+        min-height: 300px !important;
+        max-height: 300px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .outage-stats,
+    .user-tickets-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .outage-chart.enhanced,
+    .user-tickets-chart.enhanced {
+        height: 250px;
+        min-height: 250px !important;
+        max-height: 250px !important;
+    }
+    
+    .outages-card .card-header,
+    .user-tickets-card .card-header {
+        flex-direction: column;
+        gap: 0.8rem;
+        align-items: stretch;
+    }
+    
+    .outages-card .time-controls,
+    .user-tickets-card .time-controls {
+        justify-content: center;
+    }
+}
+
+/* 14. UNIFIED ANIMATIONS - Identical keyframes */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* 15. UNIFIED FLEX LAYOUT - Ensure both containers stretch equally */
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: stretch;
+}
+
+.outages-card,
+.user-tickets-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* 16. UNIFIED SPACING - Ensure consistent internal spacing */
+.outages-card > *:last-child,
+.user-tickets-card > *:last-child {
+    margin-bottom: 0;
+}
+
+/* 17. UNIFIED HOVER EFFECTS - Identical interactions */
+.outages-card:hover .card-title,
+.user-tickets-card:hover .card-title {
+    color: #ffffff;
+}
+
+/* 18. UNIFIED FOCUS STATES - Identical accessibility */
+.outages-card .time-btn:focus,
+.user-tickets-card .time-btn:focus,
+.refresh-btn:focus,
+.user-tickets-card .admin-stats-btn:focus {
+    outline: 2px solid #8B5CF6;
+    outline-offset: 2px;
+}
+
+/* 19. UNIFIED TRANSITIONS - Identical animation timing */
+.outages-card *,
+.user-tickets-card * {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 20. UNIFIED SHADOWS - Identical depth and color */
+.outages-card,
+.user-tickets-card {
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.outages-card:hover,
+.user-tickets-card:hover {
+    box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+</style> 

@@ -1,10 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- STATIC OUTAGES CHART - Load once from database, remain constant -->
-<!-- Cache Busting for Session Monitor Fix -->
+<!-- MODULAR YAM DASHBOARD - Clean and Organized -->
 <script>
-// STATIC OUTAGES CONFIGURATION - Chart loads once and stays constant
+// CRITICAL: Static outages configuration
 window.YAM_STATIC_OUTAGES = {
     enabled: true,
     loaded: false,
@@ -12,20 +11,7 @@ window.YAM_STATIC_OUTAGES = {
     lastLoad: 0
 };
 
-// Force refresh of cached JavaScript files - Session Monitor Fix v1.1
-if (navigator.serviceWorker) {
-    navigator.serviceWorker.getRegistrations().then(function(registrations) {
-        for(let registration of registrations) {
-            registration.unregister();
-        }
-    });
-}
-// Clear any existing session activity throttles
-if (window.YAM_SESSION_ACTIVITY_THROTTLE) {
-    window.YAM_SESSION_ACTIVITY_THROTTLE = null;
-}
-
-// GLOBAL EMERGENCY OVERRIDE - Block ALL session activity spam
+// CRITICAL: Global emergency throttle for session activity
 window.YAM_EMERGENCY_THROTTLE = {
     lastCall: 0,
     callCount: 0,
@@ -39,7 +25,6 @@ window.fetch = function(url, options) {
         const now = Date.now();
         const throttle = window.YAM_EMERGENCY_THROTTLE;
         
-        // Allow maximum 1 call per 10 minutes
         if ((now - throttle.lastCall) < 600000) {
             throttle.blocked++;
             console.debug(`🚫 Blocked session activity call #${throttle.blocked} - throttling active`);
@@ -56,77 +41,30 @@ window.fetch = function(url, options) {
     return originalFetch.apply(this, arguments);
 };
 
-console.log('YAM: Static outages enabled, cache cleared, session activity throttles installed');
-
-// ENHANCED CHART STABILITY: Global chart monitoring for YAM dashboard
-window.YAM_CHART_STABILITY = {
-    // Manual chart recovery function accessible globally
-    forceRecovery: function() {
-        if (typeof forceChartRecovery === 'function') {
-            forceChartRecovery();
-        } else {
-            console.log('📊 Chart recovery function not available yet');
-        }
-    },
-    
-    // Chart health check function accessible globally
-    checkHealth: function() {
-        if (typeof checkChartHealth === 'function') {
-            return checkChartHealth();
-        } else {
-            console.log('📊 Chart health check function not available yet');
-            return false;
-        }
-    },
-    
-    // Manual refresh function accessible globally
-    refreshData: function() {
-        if (typeof refreshTicketData === 'function') {
-            refreshTicketData();
-        } else {
-            console.log('📊 Chart refresh function not available yet');
-        }
-    }
-};
-
-// Add keyboard shortcut for chart recovery (Ctrl+Shift+R)
-document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && e.shiftKey && e.key === 'R') {
-        console.log('⌨️ Chart recovery shortcut triggered');
-        window.YAM_CHART_STABILITY.forceRecovery();
-    }
-});
-
-console.log('YAM: Chart stability monitoring initialized');
+console.log('YAM: Enhanced session management initialized');
 </script>
 
-<!-- Include all styles -->
-{% include 'components/yam/yam_dashboard_styles.html' %}
-
+<!-- DASHBOARD LAYOUT -->
 <div class="dashboard-container">
     <!-- Welcome Header -->
     {% include 'components/yam/yam_welcome_header.html' %}
 
-    <!-- Main Dashboard Grid - Optimized Layout -->
+    <!-- Main Dashboard Grid -->
     <div class="dashboard-grid">
-        <!-- Sidebar (left side) - Enhanced with Expanded Reminders -->
+        <!-- Sidebar -->
         <div class="sidebar">
-            <!-- Enhanced User Profile with Expanded Reminders Above -->
             {% include 'components/yam/yam_user_profile.html' %}
         </div>
 
-        <!-- Main Content (right side) - Optimized -->
+        <!-- Main Content -->
         <div class="yam-main-content">
-            <!-- Charts Grid - Side by Side Layout -->
+            <!-- Charts Grid -->
             <div class="charts-grid">
-                <!-- Outages Section -->
                 {% include 'components/yam/yam_outages_section.html' %}
-                
-                <!-- User Tickets Section -->
                 {% include 'components/yam/yam_user_tickets_section.html' %}
             </div>
             
-            <!-- Dashboard Widgets - Media Player replaces Calendar -->
+            <!-- Dashboard Widgets -->
             {% include 'components/yam/yam_dashboard_widgets.html' %}
         </div>
     </div>
@@ -135,13 +73,252 @@ console.log('YAM: Chart stability monitoring initialized');
     {% include 'components/yam/yam_navigation_directory.html' %}
 </div>
 
-<!-- Modals -->
+<!-- MODALS -->
 {% include 'components/yam/yam_outage_detail_modal.html' %}
 {% include 'components/yam/yam_custom_date_modal.html' %}
 {% include 'components/yam/yam_outages_management_modal.html' %}
-<!-- User Ticket Details Modal is included in yam_user_tickets_section.html -->
 
-<!-- Include all JavaScript -->
+<!-- STYLES - IN CORRECT ORDER -->
+{% include 'components/yam/yam_dashboard_styles.html' %}
+{% include 'components/yam/yam_unified_chart_styles.html' %}
+{% include 'components/yam/yam_modal_styles.html' %}
+
+<!-- CRITICAL: Override all modal styles for true full-screen coverage -->
+<style>
+/* UNIVERSAL ACTIVITY MODAL SYSTEM - OVERRIDE ALL OTHER MODAL CSS */
+.widget-modal,
+.yam-modal-overlay,
+.custom-date-modal,
+.performance-modal,
+.admin-sync-modal,
+.user-ticket-details-modal,
+.reminder-modal,
+#calendarModal,
+#calendarEventModal,
+#playlistModal,
+#reminderModal {
+    display: none !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(0, 0, 0, 0.85) !important;
+    backdrop-filter: blur(20px) !important;
+    z-index: 999999999 !important;
+    animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    right: auto !important;
+    bottom: auto !important;
+    min-width: auto !important;
+    min-height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    transform: none !important;
+}
+
+.widget-modal.show,
+.yam-modal-overlay.show,
+.custom-date-modal.show,
+.performance-modal.show,
+.admin-sync-modal.show,
+.user-ticket-details-modal.show,
+.reminder-modal.show,
+#calendarModal.show,
+#calendarEventModal.show,
+#playlistModal.show,
+#reminderModal.show {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* PERFECT MODAL CENTERING AND SIZING */
+.widget-modal-content,
+.yam-modal-container,
+.custom-date-content,
+.performance-modal-content,
+.admin-sync-modal-content,
+.user-ticket-details-modal-content,
+.reminder-modal-content,
+.calendar-modal-content {
+    background: rgba(15, 15, 15, 0.98) !important;
+    border-radius: 24px !important;
+    width: 90% !important;
+    max-width: 900px !important;
+    max-height: 90vh !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(30px) !important;
+    overflow: hidden !important;
+    animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    min-width: auto !important;
+    min-height: auto !important;
+    height: auto !important;
+    flex-direction: column !important;
+    display: flex !important;
+    /* Perfect centering */
+    align-self: center !important;
+    justify-self: center !important;
+}
+
+/* EXACT ACTIVITY MODAL HEADER AND BODY STYLING */
+.widget-modal-header,
+.yam-modal-header,
+.custom-date-header,
+.performance-modal-header,
+.admin-sync-modal-header,
+.user-ticket-details-modal-header,
+.reminder-modal-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 1.5rem 2rem !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    flex-shrink: 0 !important;
+}
+
+.widget-modal-header h3,
+.yam-modal-header h3,
+.custom-date-header h3,
+.performance-modal-header h3,
+.admin-sync-modal-header h3,
+.user-ticket-details-modal-header h3,
+.reminder-modal-header h3 {
+    color: #ffffff !important;
+    margin: 0 !important;
+    font-size: 1.3rem !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.8rem !important;
+}
+
+.widget-modal-close,
+.yam-modal-close,
+.custom-date-close,
+.performance-modal-close,
+.admin-sync-modal-close,
+.user-ticket-details-modal-close,
+.reminder-modal-close {
+    background: none !important;
+    border: none !important;
+    color: #888888 !important;
+    font-size: 1.2rem !important;
+    cursor: pointer !important;
+    padding: 0.5rem !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+}
+
+.widget-modal-close:hover,
+.yam-modal-close:hover,
+.custom-date-close:hover,
+.performance-modal-close:hover,
+.admin-sync-modal-close:hover,
+.user-ticket-details-modal-close:hover,
+.reminder-modal-close:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    transform: scale(1.1) !important;
+}
+
+.widget-modal-body,
+.yam-modal-body,
+.custom-date-body,
+.performance-modal-body,
+.admin-sync-modal-body,
+.user-ticket-details-modal-body,
+.reminder-modal-body {
+    padding: 2rem !important;
+    max-height: calc(90vh - 120px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    flex: 1 !important;
+    margin: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    /* Custom scrollbar for modal content */
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent !important;
+}
+
+/* Custom scrollbar styling for modal body */
+.widget-modal-body::-webkit-scrollbar,
+.yam-modal-body::-webkit-scrollbar,
+.custom-date-body::-webkit-scrollbar,
+.performance-modal-body::-webkit-scrollbar,
+.admin-sync-modal-body::-webkit-scrollbar,
+.user-ticket-details-modal-body::-webkit-scrollbar,
+.reminder-modal-body::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+.widget-modal-body::-webkit-scrollbar-track,
+.yam-modal-body::-webkit-scrollbar-track,
+.custom-date-body::-webkit-scrollbar-track,
+.performance-modal-body::-webkit-scrollbar-track,
+.admin-sync-modal-body::-webkit-scrollbar-track,
+.user-ticket-details-modal-body::-webkit-scrollbar-track,
+.reminder-modal-body::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+.widget-modal-body::-webkit-scrollbar-thumb,
+.yam-modal-body::-webkit-scrollbar-thumb,
+.custom-date-body::-webkit-scrollbar-thumb,
+.performance-modal-body::-webkit-scrollbar-thumb,
+.admin-sync-modal-body::-webkit-scrollbar-thumb,
+.user-ticket-details-modal-body::-webkit-scrollbar-thumb,
+.reminder-modal-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3) !important;
+    border-radius: 3px !important;
+}
+
+.widget-modal-body::-webkit-scrollbar-thumb:hover,
+.yam-modal-body::-webkit-scrollbar-thumb:hover,
+.custom-date-body::-webkit-scrollbar-thumb:hover,
+.performance-modal-body::-webkit-scrollbar-thumb:hover,
+.admin-sync-modal-body::-webkit-scrollbar-thumb:hover,
+.user-ticket-details-modal-body::-webkit-scrollbar-thumb:hover,
+.reminder-modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* DASHBOARD SCALING COMPENSATION */
+.dashboard-container {
+    transform: scale(0.8);
+    transform-origin: center top;
+    width: 125%;
+    height: 125%;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%) scale(0.8);
+}
+</style>
+
+<!-- JAVASCRIPT - IN CORRECT ORDER -->
 {% include 'components/yam/yam_core_scripts.html' %}
 {% include 'components/yam/yam_modal_scripts.html' %}
 {% include 'components/yam/yam_data_scripts.html' %}
@@ -150,145 +327,243 @@ console.log('YAM: Chart stability monitoring initialized');
 {% include 'components/yam/yam_widget_scripts.html' %}
 {% include 'components/yam/yam_user_tickets_scripts.html' %}
 
+<!-- EXACT ACTIVITY MODAL ANIMATIONS -->
 <style>
-/* YAM Layout Enhancements - Optimized Flow */
-.dashboard-container {
-    gap: 0.8rem; /* Reduced gap for tighter layout */
-}
-
-.dashboard-grid {
-    gap: 0.8rem; /* Reduced gap */
-    min-height: auto; /* Remove fixed height */
-    align-items: stretch; /* Ensure containers stretch to match */
-}
-
-.yam-main-content {
-    gap: 0.8rem; /* Reduced gap */
-    height: auto; /* Remove fixed height */
-}
-
-.charts-grid {
-    gap: 0.8rem; /* Reduced gap */
-    margin-bottom: 0.8rem; /* Reduced margin */
-}
-
-/* Ensure sidebar and main content are properly aligned */
-.sidebar {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-.sidebar-content {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-/* PERMANENT 80% ZOOM EFFECT - Scale entire dashboard to match 80% zoom appearance */
-.dashboard-container {
-    transform: scale(0.8);
-    transform-origin: center top;
-    width: 125%; /* Compensate for the 0.8 scale to maintain full width */
-    height: 125%; /* Compensate for the 0.8 scale to maintain full height */
-    /*margin: .1% auto 0 auto;*/ /* Adjusted vertical margin to account for sidebar banner */
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%) scale(0.8);
-}
-
-/* Ensure the body and html can accommodate the scaled content */
-body, html {
-    overflow-x: auto;
-    overflow-y: auto;
-    min-height: 100vh;
-}
-
-/* Responsive optimizations */
-@media (max-width: 1200px) {
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-        gap: 0.6rem;
+@keyframes modalFadeIn {
+    from { 
+        opacity: 0; 
+        backdrop-filter: blur(0px);
     }
-    
-    .sidebar {
-        order: -1; /* Keep reminders at top on mobile */
-    }
-    
-    .charts-grid {
-        grid-template-columns: 1fr;
-        gap: 0.6rem;
+    to { 
+        opacity: 1; 
+        backdrop-filter: blur(20px);
     }
 }
 
-@media (max-width: 768px) {
-    .dashboard-container {
-        gap: 0.5rem;
-        padding: 0.5rem;
-        /* Adjust scaling for mobile devices */
-        transform: scale(0.9);
-        width: 111.11%;
-        height: 111.11%;
-        margin: -5% 0 0 -5%;
+@keyframes modalSlideIn {
+    from { 
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
     }
-    
-    .dashboard-grid {
-        gap: 0.5rem;
+    to { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
-    
-    .yam-main-content {
-        gap: 0.5rem;
-    }
-    
-    .charts-grid {
-        gap: 0.5rem;
-        margin-bottom: 0.5rem;
-    }
+}
+
+/* FORCE ALL MODALS TO USE ACTIVITY MODAL BEHAVIOR */
+.widget-modal,
+.yam-modal-overlay,
+.custom-date-modal,
+.performance-modal,
+.admin-sync-modal,
+.user-ticket-details-modal,
+.reminder-modal,
+#calendarModal,
+#calendarEventModal,
+#playlistModal,
+#reminderModal {
+    /* Override any conflicting CSS from other files */
+    background-color: rgba(0, 0, 0, 0.85) !important;
+    background-image: none !important;
+    background: rgba(0, 0, 0, 0.85) !important;
+}
+
+/* Ensure content doesn't get full width/height overrides */
+.widget-modal-content,
+.yam-modal-container,
+.custom-date-content,
+.performance-modal-content,
+.admin-sync-modal-content,
+.user-ticket-details-modal-content,
+.reminder-modal-content,
+.calendar-modal-content {
+    /* Force Activity Modal dimensions */
+    width: 90% !important;
+    height: auto !important;
+    max-width: 900px !important;
+    max-height: 90vh !important;
+    min-width: auto !important;
+    min-height: auto !important;
+}
+
+/* IMPROVED CALENDAR STYLING */
+.calendar-container {
+    width: 100% !important;
+    height: auto !important;
+    padding: 1rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+}
+
+.calendar-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 1rem !important;
+    padding: 0 0.5rem !important;
+}
+
+.calendar-header h4 {
+    color: #ffffff !important;
+    font-size: 1.2rem !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+}
+
+.calendar-nav-btn {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: none !important;
+    color: #ffffff !important;
+    padding: 0.5rem !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    width: 36px !important;
+    height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.calendar-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    transform: scale(1.1) !important;
+}
+
+/* PERFECT CALENDAR GRID */
+.calendar-grid {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 2px !important;
+    width: 100% !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 12px !important;
+    padding: 8px !important;
+}
+
+/* DAY HEADER STYLING */
+.calendar-grid > div:nth-child(-n+7) {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #cccccc !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    text-align: center !important;
+    padding: 0.75rem 0.5rem !important;
+    border-radius: 6px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* CALENDAR DAY CELLS */
+.calendar-day {
+    aspect-ratio: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(25, 25, 25, 0.8) !important;
+    border-radius: 8px !important;
+    color: #ffffff !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    position: relative !important;
+    min-height: 42px !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.calendar-day:hover {
+    background: rgba(0, 212, 255, 0.15) !important;
+    border-color: rgba(0, 212, 255, 0.3) !important;
+    transform: scale(1.02) !important;
+    box-shadow: 0 2px 8px rgba(0, 212, 255, 0.2) !important;
+}
+
+.calendar-day.today {
+    background: linear-gradient(135deg, #00d4ff, #0099cc) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.calendar-day.other-month {
+    color: #666666 !important;
+    background: rgba(15, 15, 15, 0.4) !important;
+    border-color: transparent !important;
+}
+
+.calendar-day.other-month:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #888888 !important;
+}
+
+/* CALENDAR QUICK ACTIONS */
+.calendar-quick-actions {
+    display: flex !important;
+    gap: 1rem !important;
+    margin-top: 1.5rem !important;
+    padding: 0 0.5rem !important;
+}
+
+.calendar-quick-actions button {
+    flex: 1 !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 12px !important;
+    border: none !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    transform: translateY(-1px) !important;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #00d4ff, #0099cc) !important;
+    color: #ffffff !important;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #00c4ef, #0088bb) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3) !important;
 }
 </style>
 
+<!-- Simple JavaScript matching Activity Modal -->
 <script>
-// Enhanced YAM Dashboard Initialization
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('YAM Dashboard Enhanced - Loaded');
-    
-    // Initialize all components
-    if (typeof loadReminders === 'function') {
-        loadReminders();
-    }
-    
-    if (typeof loadCalendarEvents === 'function') {
-        loadCalendarEvents();
-    }
-    
-    if (typeof renderCalendar === 'function') {
-        renderCalendar();
-    }
-    
-    if (typeof renderExpandedReminders === 'function') {
-        renderExpandedReminders();
-    }
-    
-    // Add smooth scroll behavior
-    document.documentElement.style.scrollBehavior = 'smooth';
-    
-    // Show welcome message
-    setTimeout(() => {
-        if (typeof showToast === 'function') {
-            showToast('Welcome to your enhanced YAM Dashboard!', 'success');
-        }
-    }, 1000);
-});
 
-// Enhanced calendar modal opening from reminders widget
+// ENHANCED MODAL FUNCTIONS WITH BODY SCROLL LOCK
 function openCalendarModal() {
     const modal = document.getElementById('calendarModal');
     if (modal) {
+        // Lock body scrolling
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+        
         modal.classList.add('show');
-        // Ensure calendar is rendered when modal opens
-        if (typeof renderCalendar === 'function') {
-            renderCalendar();
-        }
+        // Render calendar content
+        setTimeout(() => {
+            if (typeof renderCalendarForModal === 'function') {
+                renderCalendarForModal();
+            } else if (typeof renderCalendar === 'function') {
+                renderCalendar();
+            }
+        }, 50);
     }
 }
 
@@ -296,7 +571,108 @@ function closeCalendarModal() {
     const modal = document.getElementById('calendarModal');
     if (modal) {
         modal.classList.remove('show');
+        // Restore body scrolling
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
     }
 }
+
+function openCalendarEventModal() {
+    const modal = document.getElementById('calendarEventModal');
+    if (modal) {
+        // Lock body scrolling
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+        
+        modal.classList.add('show');
+        // Set today's date as default
+        const today = new Date();
+        const eventStartDate = document.getElementById('eventStartDate');
+        const eventEndDate = document.getElementById('eventEndDate');
+        
+        if (eventStartDate) eventStartDate.value = today.toISOString().split('T')[0];
+        if (eventEndDate) eventEndDate.value = today.toISOString().split('T')[0];
+    }
+}
+
+function closeCalendarEventModal() {
+    const modal = document.getElementById('calendarEventModal');
+    if (modal) {
+        modal.classList.remove('show');
+        // Restore body scrolling
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+        // Reset the form
+        const form = document.getElementById('calendarForm');
+        if (form) form.reset();
+    }
+}
+
+function openReminderModal() {
+    // Use calendar event modal for reminders
+    openCalendarEventModal();
+}
+
+function openPlaylistModal() {
+    const modal = document.getElementById('playlistModal');
+    if (modal) {
+        // Lock body scrolling
+        document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
+        modal.classList.add('show');
+    }
+}
+
+function closePlaylistModal() {
+    const modal = document.getElementById('playlistModal');
+    if (modal) {
+        modal.classList.remove('show');
+        // Restore body scrolling
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+    }
+}
+
+// Enhanced initialization with ESC key support and cleanup
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('YAM Dashboard: Enhanced modal system loaded');
+    
+    // Ensure no modals are open on load and restore scrolling
+    const allModals = document.querySelectorAll('.widget-modal, .yam-modal-overlay, .custom-date-modal, .reminder-modal, #calendarModal, #calendarEventModal, #playlistModal, #reminderModal');
+    allModals.forEach(modal => modal.classList.remove('show'));
+    
+    // Restore body scrolling on page load
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+    
+    // ESC key support for closing modals
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            // Find any open modal
+            const openModal = document.querySelector('.widget-modal.show, .yam-modal-overlay.show, .custom-date-modal.show, .reminder-modal.show, #calendarModal.show, #calendarEventModal.show, #playlistModal.show, #reminderModal.show');
+            if (openModal) {
+                // Close the appropriate modal
+                if (openModal.id === 'calendarModal') {
+                    closeCalendarModal();
+                } else if (openModal.id === 'calendarEventModal') {
+                    closeCalendarEventModal();
+                } else if (openModal.id === 'playlistModal') {
+                    closePlaylistModal();
+                } else {
+                    // Generic close
+                    openModal.classList.remove('show');
+                    document.body.style.overflow = '';
+                    document.documentElement.style.overflow = '';
+                }
+            }
+        }
+    });
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', function() {
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+    });
+});
 </script>
 {% endblock %}

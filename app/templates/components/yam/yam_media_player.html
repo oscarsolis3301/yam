@@ -483,6 +483,90 @@
         height: 52px;
     }
 }
+
+/* Media Player Buttons and Icons - Default Styles */
+.media-player-widget .widget-action-btn,
+.media-player-widget .control-btn,
+.media-player-widget .play-pause-btn,
+.media-player-widget .album-art {
+    background: rgba(0,0,0,0.9) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    box-shadow: none !important;
+}
+
+.media-player-widget .widget-action-btn.active,
+.media-player-widget .widget-action-btn:active,
+.media-player-widget .control-btn.active,
+.media-player-widget .control-btn:active,
+.media-player-widget .play-pause-btn.active,
+.media-player-widget .play-pause-btn:active,
+.media-player-widget .album-art.active,
+.media-player-widget .album-art:active {
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED) !important;
+    color: #fff !important;
+    border-color: #8B5CF6 !important;
+    box-shadow: 0 0 8px 2px rgba(139,92,246,0.2) !important;
+}
+
+/* Media Player Buttons and Icons - Purple Hover Effects */
+.media-player-widget .widget-action-btn:hover,
+.media-player-widget .control-btn:hover,
+.media-player-widget .play-pause-btn:hover {
+    background: rgba(139, 92, 246, 0.1) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+    color: #fff !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2) !important;
+}
+
+/* Volume Slider - Purple Theme */
+.volume-slider {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    background: #8B5CF6 !important;
+    box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3) !important;
+}
+
+.volume-slider::-moz-range-thumb {
+    background: #8B5CF6 !important;
+    box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Progress Bar - Purple Theme */
+.progress-fill {
+    background: linear-gradient(135deg, #8B5CF6, #A855F7) !important;
+}
+
+.progress-handle {
+    background: #8B5CF6 !important;
+    box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Album Art - Purple Theme */
+.album-art {
+    background: linear-gradient(135deg, #8B5CF6, #A855F7) !important;
+    color: #ffffff !important;
+    border: 2px solid rgba(139, 92, 246, 0.3) !important;
+}
+
+.album-art:hover {
+    background: linear-gradient(135deg, #A855F7, #C084FC) !important;
+    border-color: #8B5CF6 !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Remove any remaining blue hover effects */
+.control-btn:hover,
+.play-pause-btn:hover,
+.widget-action-btn:hover {
+    background: rgba(139, 92, 246, 0.1) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2) !important;
+}
 </style>
 
 <script>

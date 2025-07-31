@@ -43,11 +43,11 @@
 </div>
 
 <!-- Calendar Event Modal -->
-<div id="calendarModal" class="widget-modal">
+<div id="calendarEventModal" class="widget-modal">
     <div class="widget-modal-content">
         <div class="widget-modal-header">
             <h3><i class="bi bi-calendar-plus-fill"></i> Add Event</h3>
-            <button class="widget-modal-close" onclick="closeCalendarModal()">
+            <button class="widget-modal-close" onclick="closeCalendarEventModal()">
                 <i class="bi bi-x-lg"></i>
             </button>
         </div>
@@ -169,10 +169,10 @@
 }
 
 .widget-action-btn:hover {
-    background: rgba(40, 167, 69, 0.2);
-    border-color: rgba(40, 167, 69, 0.4);
-    color: #28a745;
-    transform: scale(1.1);
+    background: rgba(139, 92, 246, 0.2) !important;
+    border-color: rgba(139, 92, 246, 0.4) !important;
+    color: #8B5CF6 !important;
+    transform: scale(1.1) !important;
 }
 
 .widget-content {
@@ -224,9 +224,9 @@
 }
 
 .calendar-nav-btn:hover {
-    background: rgba(40, 167, 69, 0.2);
-    border-color: rgba(40, 167, 69, 0.4);
-    color: #28a745;
+    background: rgba(139, 92, 246, 0.2) !important;
+    border-color: rgba(139, 92, 246, 0.4) !important;
+    color: #8B5CF6 !important;
 }
 
 .calendar-grid {
@@ -254,14 +254,14 @@
 }
 
 .calendar-day:hover {
-    background: rgba(40, 167, 69, 0.2);
-    border-color: rgba(40, 167, 69, 0.4);
-    transform: scale(1.05);
+    background: rgba(139, 92, 246, 0.2) !important;
+    border-color: rgba(139, 92, 246, 0.4) !important;
+    transform: scale(1.05) !important;
 }
 
 .calendar-day.today {
-    background: linear-gradient(135deg, #28a745, #20c997);
-    color: #ffffff;
+    background: linear-gradient(135deg, #8B5CF6, #A855F7) !important;
+    color: #ffffff !important;
     font-weight: 700;
 }
 
@@ -277,7 +277,7 @@
     right: 2px;
     width: 6px;
     height: 6px;
-    background: #28a745;
+    background: #8B5CF6 !important;
     border-radius: 50%;
 }
 
@@ -294,7 +294,7 @@
     width: 32px;
     height: 32px;
     border: 3px solid rgba(255, 255, 255, 0.1);
-    border-top: 3px solid #28a745;
+    border-top: 3px solid #8B5CF6 !important;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 1rem;
@@ -305,83 +305,122 @@
     100% { transform: rotate(360deg); }
 }
 
-/* Widget Modal Styles */
+/* Modal animations */
+@keyframes modalFadeIn {
+    from { 
+        opacity: 0; 
+        backdrop-filter: blur(0px);
+    }
+    to { 
+        opacity: 1; 
+        backdrop-filter: blur(15px);
+    }
+}
+
+@keyframes modalSlideIn {
+    from { 
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Widget Modal Styles - Full Screen and Centered */
 .widget-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(20px);
-    z-index: 999999999;
-    animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(0, 0, 0, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    z-index: 2147483647 !important; /* Maximum possible z-index */
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    transform: none !important;
+    transform-origin: center center !important;
+    animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    pointer-events: auto !important;
 }
 
 .widget-modal.show {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex !important;
 }
 
 .widget-modal-content {
-    background: rgba(15, 15, 15, 0.98);
-    border-radius: 24px;
-    width: 90%;
-    max-width: 500px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 
-        0 25px 50px rgba(0, 0, 0, 0.6),
-        0 0 0 1px rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(30px);
-    overflow: hidden;
-    animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(15, 15, 15, 0.98) !important;
+    border-radius: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: blur(25px) !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    z-index: 2147483647 !important; /* Maximum possible z-index */
 }
 
 .widget-modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.02);
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 1.5rem 2rem !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(139, 92, 246, 0.1) !important;
+    flex-shrink: 0 !important;
 }
 
 .widget-modal-header h3 {
-    color: #ffffff;
-    margin: 0;
-    font-size: 1.3rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
+    color: #ffffff !important;
+    margin: 0 !important;
+    font-size: 1.4rem !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.8rem !important;
 }
 
 .widget-modal-close {
-    background: none;
-    border: none;
-    color: #888888;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 50% !important;
+    color: #ffffff !important;
+    font-size: 1.2rem !important;
+    cursor: pointer !important;
+    padding: 0.5rem !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
 }
 
 .widget-modal-close:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    transform: scale(1.1);
+    background: rgba(139, 92, 246, 0.3) !important;
+    border-color: #8B5CF6 !important;
+    color: #8B5CF6 !important;
+    transform: scale(1.1) !important;
 }
 
 .widget-modal-body {
-    padding: 2rem;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding: 2rem !important;
+    color: #ffffff !important;
 }
 
 /* Form Styles */
@@ -479,13 +518,13 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #00d4ff, #0099cc);
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED);
     color: white;
 }
 
 .btn-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
 .btn-secondary {
@@ -567,6 +606,22 @@
     .calendar-day {
         font-size: 0.8rem;
     }
+    
+    /* Mobile modal adjustments */
+    .widget-modal-content {
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        border-radius: 0 !important;
+    }
+    
+    .widget-modal-header {
+        padding: 1rem 1.5rem !important;
+    }
+    
+    .widget-modal-body {
+        padding: 1.5rem !important;
+    }
 }
 
 /* Fix for very small screens */
@@ -576,16 +631,25 @@
     }
 }
 
-/* Calendar Modal Styles */
+/* Calendar Modal Styles - Full Screen */
 .calendar-modal-content {
-    max-width: 600px;
-    width: 90%;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
 }
 
 .calendar-container {
     width: 100%;
+    height: 100%;
     overflow: hidden;
     margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .calendar-quick-actions {
@@ -610,10 +674,13 @@
 .widget-modal .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
+    gap: 0.25rem; /* Smaller gap for original feel */
     width: 100%;
     overflow: hidden;
     margin-top: 1rem;
+    flex: 1;
+    max-width: 800px; /* Limit calendar width */
+    margin: 1rem auto 0 auto; /* Center the calendar */
 }
 
 .widget-modal .calendar-day {
@@ -624,13 +691,14 @@
     background: rgba(25, 25, 25, 0.6);
     border-radius: 8px;
     color: #ffffff;
-    font-size: 0.9rem;
+    font-size: 0.85rem; /* Smaller font size for original feel */
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    min-height: 40px;
+    min-height: 32px; /* Smaller height for original feel */
+    max-height: 48px; /* Smaller max height */
 }
 
 .widget-modal .calendar-day:hover {
@@ -877,18 +945,33 @@ function goToToday() {
 }
 
 function openCalendarEventModal() {
-    closeCalendarModal();
     // Set today's date as default
     const today = new Date();
-    document.getElementById('eventStartDate').value = today.toISOString().split('T')[0];
-    document.getElementById('eventEndDate').value = today.toISOString().split('T')[0];
+    const eventStartDate = document.getElementById('eventStartDate');
+    const eventEndDate = document.getElementById('eventEndDate');
+    
+    if (eventStartDate) eventStartDate.value = today.toISOString().split('T')[0];
+    if (eventEndDate) eventEndDate.value = today.toISOString().split('T')[0];
     
     // Open the event modal
-    const eventModal = document.getElementById('calendarModal');
+    const eventModal = document.getElementById('calendarEventModal');
     if (eventModal) {
-        const existingEventModal = document.getElementById('calendarEventModal');
-        if (existingEventModal) {
-            existingEventModal.classList.add('show');
+        eventModal.classList.add('show');
+        document.body.classList.add('modal-open');
+        document.documentElement.classList.add('modal-open');
+    }
+}
+
+function closeCalendarEventModal() {
+    const eventModal = document.getElementById('calendarEventModal');
+    if (eventModal) {
+        eventModal.classList.remove('show');
+        document.body.classList.remove('modal-open');
+        document.documentElement.classList.remove('modal-open');
+        // Reset the form
+        const form = document.getElementById('calendarForm');
+        if (form) {
+            form.reset();
         }
     }
 }

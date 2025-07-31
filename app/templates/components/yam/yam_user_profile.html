@@ -247,9 +247,10 @@
 }
 
 .reminder-widget-sidebar .widget-action-btn:hover {
-    background: rgba(0, 212, 255, 0.2);
-    border-color: #00d4ff;
-    transform: scale(1.1);
+    background: rgba(139, 92, 246, 0.2) !important;
+    border-color: #8B5CF6 !important;
+    color: #8B5CF6 !important;
+    transform: scale(1.1) !important;
 }
 
 .reminder-widget-sidebar .widget-content {
@@ -391,28 +392,58 @@
     box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
 }
 
-/* View All Activity Button */
+/* View All Activity Button - Larger and Purple Theme */
 .view-all-activity-btn {
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 153, 204, 0.1));
-    border: 1px solid rgba(0, 212, 255, 0.3);
-    color: #00d4ff;
-    padding: 0.6rem 1rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
+    background: rgba(0,0,0,0.9) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: #fff !important;
+    padding: 1rem 1.5rem !important; /* Larger padding */
+    font-size: 1rem !important; /* Larger font */
+    border-radius: 20px !important;
+    transition: all 0.3s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    text-decoration: none !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
 }
 
 .view-all-activity-btn:hover {
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 153, 204, 0.2));
-    border-color: #00d4ff;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2);
+    background: rgba(139, 92, 246, 0.1) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+    color: #fff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2) !important;
+}
+
+.view-all-activity-btn:active,
+.view-all-activity-btn.active {
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED) !important;
+    border-color: #8B5CF6 !important;
+    color: #fff !important;
+    box-shadow: 0 0 8px 2px rgba(139,92,246,0.2) !important;
+}
+
+/* Quick Navigation Items - Purple Theme */
+.reminder-widget-expanded .widget-action-btn:hover {
+    background: rgba(139, 92, 246, 0.1) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+    color: #fff !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2) !important;
+}
+
+/* Recent Activity Eye Icon - Purple Hover */
+#recentActivity .activity-item:hover .activity-icon {
+    background: rgba(139, 92, 246, 0.1) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+    color: #fff !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2) !important;
 }
 
 /* Activity Modal Styles */
@@ -789,25 +820,16 @@
 }
 
 .reminder-widget-expanded .widget-action-btn {
-    background: rgba(0, 212, 255, 0.1);
-    border: 1px solid rgba(0, 212, 255, 0.3);
-    color: #00d4ff;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.9rem;
-    backdrop-filter: blur(10px);
+    background: rgba(0,0,0,0.9) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: #fff !important;
 }
-
-.reminder-widget-expanded .widget-action-btn.calendar-btn {
-    background: rgba(52, 199, 89, 0.1);
-    border-color: rgba(52, 199, 89, 0.3);
-    color: #34c759;
+.reminder-widget-expanded .widget-action-btn.active,
+.reminder-widget-expanded .widget-action-btn:active {
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED) !important;
+    border-color: #8B5CF6 !important;
+    color: #fff !important;
+    box-shadow: 0 0 8px 2px rgba(139,92,246,0.2);
 }
 
 .reminder-widget-expanded .widget-action-btn:hover {
@@ -1183,22 +1205,33 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: rgba(0, 212, 255, 0.15);
+    background: rgba(0,0,0,0.9) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    transition: background 0.2s, color 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-right: 0.8rem;
     font-size: 0.8rem;
-    color: #00d4ff;
-    border: 1px solid rgba(0, 212, 255, 0.3);
     flex-shrink: 0;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #recentActivity .activity-item:hover .activity-icon {
     transform: scale(1.1);
-    background: rgba(0, 212, 255, 0.25);
-    box-shadow: 0 0 12px rgba(0, 212, 255, 0.3);
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED) !important;
+    color: #fff !important;
+    border-color: #8B5CF6 !important;
+    box-shadow: 0 0 8px 2px rgba(139,92,246,0.2);
+}
+
+#recentActivity .activity-item:active .activity-icon,
+#recentActivity .activity-item.active .activity-icon {
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED) !important;
+    color: #fff !important;
+    border-color: #8B5CF6 !important;
+    box-shadow: 0 0 8px 2px rgba(139,92,246,0.2);
 }
 
 #recentActivity .activity-content {
@@ -1311,22 +1344,16 @@
 
 /* View All Activity Button - Always visible at bottom */
 .view-all-activity-btn {
-    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 153, 204, 0.1));
-    border: 1px solid rgba(0, 212, 255, 0.3);
-    color: #00d4ff;
-    padding: 0.8rem 1.2rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    width: 100%;
-    box-sizing: border-box;
+    background: rgba(0,0,0,0.9) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: #fff !important;
+}
+.view-all-activity-btn:active,
+.view-all-activity-btn.active {
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED) !important;
+    border-color: #8B5CF6 !important;
+    color: #fff !important;
+    box-shadow: 0 0 8px 2px rgba(139,92,246,0.2);
 }
 
 .view-all-activity-btn:hover {

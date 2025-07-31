@@ -241,7 +241,7 @@ function attemptChartRecovery() {
         console.log('📊 Restoring chart from backup data...');
         userTicketsChart.data.labels = [...chartDataBackup.labels];
         userTicketsChart.data.datasets[0].data = [...chartDataBackup.data];
-        userTicketsChart.update('active');
+        userTicketsChart.update('none'); // Use 'none' to prevent zoom changes
         
         // Check if recovery was successful
         setTimeout(() => {
@@ -263,7 +263,7 @@ function attemptChartRecovery() {
         console.log('📊 Restoring chart from last valid data...');
         userTicketsChart.data.labels = [...chartStabilityMonitor.lastValidData.labels];
         userTicketsChart.data.datasets[0].data = [...chartStabilityMonitor.lastValidData.data];
-        userTicketsChart.update('active');
+        userTicketsChart.update('none'); // Use 'none' to prevent zoom changes
         
         setTimeout(() => {
             const recoveredLabels = userTicketsChart.data.labels || [];
@@ -303,7 +303,7 @@ function attemptChartRecovery() {
             
             userTicketsChart.data.labels = fallbackLabels;
             userTicketsChart.data.datasets[0].data = fallbackData;
-            userTicketsChart.update('active');
+            userTicketsChart.update('none'); // Use 'none' to prevent zoom changes
             
             console.log('⚠️ Chart recovered with fallback data');
             chartStabilityMonitor.consecutiveFailures = 0;
@@ -395,9 +395,23 @@ function initializeDailyClosuresChart() {
     // Ensure canvas has proper dimensions
     const container = canvas.parentElement;
     if (container) {
-        canvas.style.width = '100%';
-        canvas.style.height = '100%';
-        console.log('📊 Chart container dimensions:', container.offsetWidth, 'x', container.offsetHeight);
+        // Set fixed dimensions to prevent zoom changes
+        const containerWidth = container.offsetWidth || 800;
+        const containerHeight = container.offsetHeight || 400;
+        
+        // Set fixed canvas dimensions to prevent resizing
+        canvas.style.width = containerWidth + 'px';
+        canvas.style.height = containerHeight + 'px';
+        canvas.style.maxWidth = containerWidth + 'px';
+        canvas.style.maxHeight = containerHeight + 'px';
+        canvas.style.minWidth = containerWidth + 'px';
+        canvas.style.minHeight = containerHeight + 'px';
+        
+        // Set canvas resolution to match display size
+        canvas.width = containerWidth;
+        canvas.height = containerHeight;
+        
+        console.log('📊 Chart container dimensions:', containerWidth, 'x', containerHeight);
         
         // Ensure container is visible and has dimensions
         if (container.offsetWidth === 0 || container.offsetHeight === 0) {
@@ -426,24 +440,36 @@ function initializeDailyClosuresChart() {
             datasets: [{
                 label: 'Closed Today',
                 data: initialData.today,
-                backgroundColor: 'rgba(40, 167, 69, 0.8)',
-                borderColor: '#28a745',
-                borderWidth: 2,
-                borderRadius: 8,
+                backgroundColor: 'rgba(139, 92, 246, 0.9)',
+                borderColor: 'rgba(139, 92, 246, 0.9)',
+                borderWidth: 0,
+                borderRadius: 6,
                 borderSkipped: false,
-                hoverBackgroundColor: 'rgba(40, 167, 69, 1)',
-                hoverBorderColor: '#ffffff',
-                hoverBorderWidth: 3,
+                hoverBackgroundColor: 'rgba(139, 92, 246, 1)',
+                hoverBorderColor: 'rgba(139, 92, 246, 1)',
+                hoverBorderWidth: 0,
             }]
         },
         options: {
-            responsive: true,
+            responsive: false, // Prevent automatic resizing that causes zoom changes
             maintainAspectRatio: false,
             indexAxis: 'x', // Ensure horizontal bar chart
+            layout: {
+                padding: {
+                    top: 10,
+                    bottom: 10,
+                    left: 10,
+                    right: 10
+                }
+            },
             elements: {
                 bar: {
-                    borderWidth: 2,
+                    borderWidth: 0,
                 }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
             },
             plugins: {
                 legend: {
@@ -487,7 +513,7 @@ function initializeDailyClosuresChart() {
                 y: {
                     beginAtZero: true,
                     grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
+                        color: 'rgba(255, 255, 255, 0.05)'
                     },
                     ticks: {
                         color: '#666666',
@@ -514,6 +540,16 @@ function initializeDailyClosuresChart() {
     
     chartInitialized = true;
     console.log('✅ Chart initialized successfully');
+    
+    // Prevent automatic resizing that causes zoom changes
+    if (userTicketsChart.resize) {
+        const originalResize = userTicketsChart.resize;
+        userTicketsChart.resize = function() {
+            console.log('🚫 Chart resize blocked to prevent zoom changes');
+            // Don't call the original resize function
+            return;
+        };
+    }
     
     // If we have preloaded data, update immediately
     if (preloadedData) {
@@ -578,7 +614,7 @@ function updateChartWithData(data) {
         try {
             userTicketsChart.data.labels = safeLabels;
             userTicketsChart.data.datasets[0].data = validatedData;
-            userTicketsChart.update('active');
+            userTicketsChart.update('none'); // Use 'none' to prevent animations that cause zoom
             
             console.log('✅ Chart updated successfully with data');
             console.log('   Chart now shows', safeLabels.length, 'users with bars');
@@ -598,19 +634,20 @@ function updateChartWithData(data) {
             // Hide loading overlay
             hideChartLoading();
             
-            // ENHANCED STABILITY: Force a resize to ensure proper rendering
+            // ENHANCED STABILITY: Update chart without unnecessary resizing
             setTimeout(() => {
                 if (userTicketsChart) {
                     try {
-                        userTicketsChart.resize();
-                        console.log('📊 Chart resized for proper rendering');
+                        // Only update the chart data, don't resize unnecessarily
+                        userTicketsChart.update('none'); // Use 'none' to prevent animation
+                        console.log('📊 Chart updated without resizing');
                         
-                        // ENHANCED STABILITY: Verify chart is still stable after resize
+                        // ENHANCED STABILITY: Verify chart is still stable
                         setTimeout(() => {
                             verifyChartStability();
                         }, 50);
-                    } catch (resizeError) {
-                        console.warn('⚠️ Chart resize failed:', resizeError);
+                    } catch (updateError) {
+                        console.warn('⚠️ Chart update failed:', updateError);
                     }
                 }
             }, 10);
@@ -894,7 +931,7 @@ function updateTopPerformers(data) {
         
         listItem.innerHTML = `
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <div class="performer-avatar" style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: linear-gradient(135deg, #28a745, #20c997); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.8rem; border: 2px solid rgba(40, 167, 69, 0.3);">
+                <div class="performer-avatar" style="width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: linear-gradient(135deg, #8B5CF6, #A855F7); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.8rem; border: 2px solid rgba(139, 92, 246, 0.3);">
                     ${getUserProfileImage(performer, performer.username)}
                 </div>
                 <span class="performer-name" style="color: #ffffff; font-weight: 500;">
@@ -903,7 +940,7 @@ function updateTopPerformers(data) {
                     <small style="color: rgba(255, 255, 255, 0.6); margin-left: 0.5rem;">(${performer.role})</small>
                 </span>
             </div>
-            <span class="ticket-count" style="background: #28a745; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 600;">${performer.tickets_closed}</span>
+            <span class="ticket-count" style="background: #8B5CF6; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 600;">${performer.tickets_closed}</span>
         `;
         
         performersList.appendChild(listItem);
@@ -1492,7 +1529,7 @@ function testTicketClosuresAPI() {
                     if (userTicketsChart) {
                         userTicketsChart.data.labels = data.labels;
                         userTicketsChart.data.datasets[0].data = data.data;
-                        userTicketsChart.update('active');
+                        userTicketsChart.update('none'); // Use 'none' to prevent zoom changes
                         console.log('✅ Chart updated with test data');
                     } else {
                         console.error('❌ Chart not initialized yet');
@@ -1520,7 +1557,7 @@ function testChartWithDummyData() {
         
         userTicketsChart.data.labels = dummyLabels;
         userTicketsChart.data.datasets[0].data = dummyData;
-        userTicketsChart.update('active');
+        userTicketsChart.update('none'); // Use 'none' to prevent zoom changes
         console.log('✅ Chart updated with dummy data');
     } else {
         console.error('❌ Chart not initialized yet');
@@ -1605,20 +1642,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Test API after a short delay
     setTimeout(testTicketClosuresAPI, 2000);
     
-    // ENHANCED STABILITY: Force chart refresh after page is fully loaded
+    // ENHANCED STABILITY: Ensure chart stability after page is fully loaded
     setTimeout(() => {
         if (userTicketsChart) {
-            console.log('🔄 Forcing chart refresh...');
+            console.log('🔄 Ensuring chart stability...');
             try {
-                userTicketsChart.resize();
-                userTicketsChart.update('active');
+                // Only update data, don't resize to prevent zoom changes
+                userTicketsChart.update('none');
                 
-                // ENHANCED STABILITY: Verify chart is stable after forced refresh
+                // ENHANCED STABILITY: Verify chart is stable after update
                 setTimeout(() => {
                     verifyChartStability();
                 }, 100);
             } catch (error) {
-                console.warn('⚠️ Forced chart refresh failed:', error);
+                console.warn('⚠️ Chart stability check failed:', error);
                 triggerChartRecovery();
             }
         }
