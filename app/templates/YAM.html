@@ -185,6 +185,25 @@ console.log('YAM: Chart stability monitoring initialized');
     flex-direction: column;
 }
 
+/* PERMANENT 80% ZOOM EFFECT - Scale entire dashboard to match 80% zoom appearance */
+.dashboard-container {
+    transform: scale(0.8);
+    transform-origin: center top;
+    width: 125%; /* Compensate for the 0.8 scale to maintain full width */
+    height: 125%; /* Compensate for the 0.8 scale to maintain full height */
+    /*margin: .1% auto 0 auto;*/ /* Adjusted vertical margin to account for sidebar banner */
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%) scale(0.8);
+}
+
+/* Ensure the body and html can accommodate the scaled content */
+body, html {
+    overflow-x: auto;
+    overflow-y: auto;
+    min-height: 100vh;
+}
+
 /* Responsive optimizations */
 @media (max-width: 1200px) {
     .dashboard-grid {
@@ -206,6 +225,11 @@ console.log('YAM: Chart stability monitoring initialized');
     .dashboard-container {
         gap: 0.5rem;
         padding: 0.5rem;
+        /* Adjust scaling for mobile devices */
+        transform: scale(0.9);
+        width: 111.11%;
+        height: 111.11%;
+        margin: -5% 0 0 -5%;
     }
     
     .dashboard-grid {
