@@ -147,9 +147,11 @@ console.log('YAM: Enhanced session management initialized');
 .calendar-modal-content {
     background: rgba(15, 15, 15, 0.98) !important;
     border-radius: 24px !important;
-    width: 90% !important;
-    max-width: 900px !important;
+    width: 92% !important;
+    max-width: 1000px !important;
     max-height: 90vh !important;
+    min-height: auto !important;
+    height: auto !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     box-shadow: 
         0 25px 50px rgba(0, 0, 0, 0.6),
@@ -162,12 +164,10 @@ console.log('YAM: Enhanced session management initialized');
     left: auto !important;
     right: auto !important;
     bottom: auto !important;
-    transform: none !important;
+    transform: translateY(-22vh) !important;
     margin: 0 auto !important;
     padding: 0 !important;
     min-width: auto !important;
-    min-height: auto !important;
-    height: auto !important;
     flex-direction: column !important;
     display: flex !important;
     /* Perfect centering */
@@ -251,9 +251,10 @@ console.log('YAM: Enhanced session management initialized');
 .admin-sync-modal-body,
 .user-ticket-details-modal-body,
 .reminder-modal-body {
-    padding: 2rem !important;
-    max-height: calc(90vh - 120px) !important;
-    overflow-y: auto !important;
+    padding: 0.8rem !important;
+    max-height: calc(90vh - 80px) !important;
+    height: auto !important;
+    overflow-y: visible !important;
     overflow-x: hidden !important;
     flex: 1 !important;
     margin: 0 !important;
@@ -343,11 +344,11 @@ console.log('YAM: Enhanced session management initialized');
 @keyframes modalSlideIn {
     from { 
         opacity: 0;
-        transform: translateY(-20px) scale(0.95);
+        transform: translateY(-42vh) scale(0.95);
     }
     to { 
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: translateY(-22vh) scale(1);
     }
 }
 
@@ -378,31 +379,40 @@ console.log('YAM: Enhanced session management initialized');
 .user-ticket-details-modal-content,
 .reminder-modal-content,
 .calendar-modal-content {
-    /* Force Activity Modal dimensions */
-    width: 90% !important;
+    /* Force Activity Modal dimensions with proper centering */
+    width: 92% !important;
     height: auto !important;
-    max-width: 900px !important;
+    max-width: 1000px !important;
     max-height: 90vh !important;
-    min-width: auto !important;
     min-height: auto !important;
+    min-width: auto !important;
+    transform: translateY(-22vh) !important;
+    overflow: hidden !important;
 }
 
 /* IMPROVED CALENDAR STYLING */
 .calendar-container {
     width: 100% !important;
     height: auto !important;
-    padding: 1rem !important;
+    padding: 0.5rem !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 1rem !important;
+    gap: 0.8rem !important;
+    min-height: auto !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
 }
 
 .calendar-header {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    margin-bottom: 1rem !important;
+    margin-bottom: 0.8rem !important;
     padding: 0 0.5rem !important;
+    width: 100% !important;
+    max-width: 650px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
 
 .calendar-header h4 {
@@ -425,6 +435,7 @@ console.log('YAM: Enhanced session management initialized');
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    font-size: 1rem !important;
 }
 
 .calendar-nav-btn:hover {
@@ -436,11 +447,17 @@ console.log('YAM: Enhanced session management initialized');
 .calendar-grid {
     display: grid !important;
     grid-template-columns: repeat(7, 1fr) !important;
-    gap: 2px !important;
+    gap: 6px !important;
     width: 100% !important;
+    max-width: 650px !important;
     background: rgba(255, 255, 255, 0.05) !important;
     border-radius: 12px !important;
-    padding: 8px !important;
+    padding: 12px !important;
+    aspect-ratio: 7/6.5 !important;
+    min-height: 320px !important;
+    margin: 0 auto !important;
+    align-items: center !important;
+    justify-items: center !important;
 }
 
 /* DAY HEADER STYLING */
@@ -448,44 +465,56 @@ console.log('YAM: Enhanced session management initialized');
     background: rgba(255, 255, 255, 0.1) !important;
     color: #cccccc !important;
     font-weight: 600 !important;
-    font-size: 0.85rem !important;
+    font-size: 0.8rem !important;
     text-align: center !important;
-    padding: 0.75rem 0.5rem !important;
+    padding: 0 !important;
     border-radius: 6px !important;
     text-transform: uppercase !important;
     letter-spacing: 0.5px !important;
+    width: 100% !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
 }
 
 /* CALENDAR DAY CELLS */
 .calendar-day {
-    aspect-ratio: 1 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     background: rgba(25, 25, 25, 0.8) !important;
-    border-radius: 8px !important;
+    border-radius: 6px !important;
     color: #ffffff !important;
-    font-size: 0.9rem !important;
-    font-weight: 500 !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
     cursor: pointer !important;
     transition: all 0.2s ease !important;
     position: relative !important;
+    width: 100% !important;
+    height: 42px !important;
     min-height: 42px !important;
+    max-height: 42px !important;
     border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .calendar-day:hover {
-    background: rgba(0, 212, 255, 0.15) !important;
-    border-color: rgba(0, 212, 255, 0.3) !important;
+    background: rgba(138, 43, 226, 0.15) !important;
+    border-color: rgba(138, 43, 226, 0.3) !important;
     transform: scale(1.02) !important;
-    box-shadow: 0 2px 8px rgba(0, 212, 255, 0.2) !important;
+    box-shadow: 0 2px 8px rgba(138, 43, 226, 0.2) !important;
 }
 
 .calendar-day.today {
-    background: linear-gradient(135deg, #00d4ff, #0099cc) !important;
+    background: linear-gradient(135deg, #8a2be2, #6a1b9a) !important;
     color: #ffffff !important;
     font-weight: 700 !important;
-    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(138, 43, 226, 0.4) !important;
     border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
@@ -503,23 +532,29 @@ console.log('YAM: Enhanced session management initialized');
 /* CALENDAR QUICK ACTIONS */
 .calendar-quick-actions {
     display: flex !important;
-    gap: 1rem !important;
-    margin-top: 1.5rem !important;
+    gap: 0.8rem !important;
+    margin-top: 1rem !important;
     padding: 0 0.5rem !important;
+    width: 100% !important;
+    max-width: 650px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
 
 .calendar-quick-actions button {
     flex: 1 !important;
-    padding: 0.75rem 1rem !important;
-    border-radius: 12px !important;
+    padding: 0.6rem 0.8rem !important;
+    border-radius: 8px !important;
     border: none !important;
     font-weight: 600 !important;
+    font-size: 0.8rem !important;
     cursor: pointer !important;
     transition: all 0.3s ease !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 0.5rem !important;
+    gap: 0.3rem !important;
+    min-height: 36px !important;
 }
 
 .btn-secondary {
@@ -533,14 +568,14 @@ console.log('YAM: Enhanced session management initialized');
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #00d4ff, #0099cc) !important;
+    background: linear-gradient(135deg, #8a2be2, #6a1b9a) !important;
     color: #ffffff !important;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #00c4ef, #0088bb) !important;
+    background: linear-gradient(135deg, #7b27d1, #5a1788) !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3) !important;
+    box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3) !important;
 }
 </style>
 
@@ -556,6 +591,7 @@ function openCalendarModal() {
         document.documentElement.style.overflow = 'hidden';
         
         modal.classList.add('show');
+        
         // Render calendar content
         setTimeout(() => {
             if (typeof renderCalendarForModal === 'function') {
@@ -571,9 +607,12 @@ function closeCalendarModal() {
     const modal = document.getElementById('calendarModal');
     if (modal) {
         modal.classList.remove('show');
-        // Restore body scrolling
-        document.body.style.overflow = '';
-        document.documentElement.style.overflow = '';
+        // Restore body scrolling - force enable
+        document.body.style.overflow = 'auto';
+        document.documentElement.style.overflow = 'auto';
+        // Remove any potential scroll lock classes
+        document.body.classList.remove('modal-open');
+        document.documentElement.classList.remove('modal-open');
     }
 }
 
@@ -585,6 +624,7 @@ function openCalendarEventModal() {
         document.documentElement.style.overflow = 'hidden';
         
         modal.classList.add('show');
+        
         // Set today's date as default
         const today = new Date();
         const eventStartDate = document.getElementById('eventStartDate');
@@ -599,9 +639,12 @@ function closeCalendarEventModal() {
     const modal = document.getElementById('calendarEventModal');
     if (modal) {
         modal.classList.remove('show');
-        // Restore body scrolling
-        document.body.style.overflow = '';
-        document.documentElement.style.overflow = '';
+        // Restore body scrolling - force enable
+        document.body.style.overflow = 'auto';
+        document.documentElement.style.overflow = 'auto';
+        // Remove any potential scroll lock classes
+        document.body.classList.remove('modal-open');
+        document.documentElement.classList.remove('modal-open');
         // Reset the form
         const form = document.getElementById('calendarForm');
         if (form) form.reset();
@@ -627,13 +670,16 @@ function closePlaylistModal() {
     const modal = document.getElementById('playlistModal');
     if (modal) {
         modal.classList.remove('show');
-        // Restore body scrolling
-        document.body.style.overflow = '';
-        document.documentElement.style.overflow = '';
+        // Restore body scrolling - force enable
+        document.body.style.overflow = 'auto';
+        document.documentElement.style.overflow = 'auto';
+        // Remove any potential scroll lock classes
+        document.body.classList.remove('modal-open');
+        document.documentElement.classList.remove('modal-open');
     }
 }
 
-// Enhanced initialization with ESC key support and cleanup
+// Enhanced initialization with ESC key support, click-outside, and cleanup
 document.addEventListener('DOMContentLoaded', function() {
     console.log('YAM Dashboard: Enhanced modal system loaded');
     
@@ -642,8 +688,34 @@ document.addEventListener('DOMContentLoaded', function() {
     allModals.forEach(modal => modal.classList.remove('show'));
     
     // Restore body scrolling on page load
-    document.body.style.overflow = '';
-    document.documentElement.style.overflow = '';
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.overflow = 'auto';
+    document.body.classList.remove('modal-open');
+    document.documentElement.classList.remove('modal-open');
+    
+    // Add click-outside-to-close functionality
+    allModals.forEach(modal => {
+        modal.addEventListener('click', function(event) {
+            // Only close if clicking the modal overlay (not the content)
+            if (event.target === modal) {
+                // Close the appropriate modal with proper scroll restoration
+                if (modal.id === 'calendarModal') {
+                    closeCalendarModal();
+                } else if (modal.id === 'calendarEventModal') {
+                    closeCalendarEventModal();
+                } else if (modal.id === 'playlistModal') {
+                    closePlaylistModal();
+                } else {
+                    // Generic close with scroll restoration
+                    modal.classList.remove('show');
+                    document.body.style.overflow = 'auto';
+                    document.documentElement.style.overflow = 'auto';
+                    document.body.classList.remove('modal-open');
+                    document.documentElement.classList.remove('modal-open');
+                }
+            }
+        });
+    });
     
     // ESC key support for closing modals
     document.addEventListener('keydown', function(event) {
@@ -661,8 +733,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     // Generic close
                     openModal.classList.remove('show');
-                    document.body.style.overflow = '';
-                    document.documentElement.style.overflow = '';
+                    document.body.style.overflow = 'auto';
+                    document.documentElement.style.overflow = 'auto';
+                    document.body.classList.remove('modal-open');
+                    document.documentElement.classList.remove('modal-open');
                 }
             }
         }
@@ -670,8 +744,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Cleanup on page unload
     window.addEventListener('beforeunload', function() {
-        document.body.style.overflow = '';
-        document.documentElement.style.overflow = '';
+        document.body.style.overflow = 'auto';
+        document.documentElement.style.overflow = 'auto';
+        document.body.classList.remove('modal-open');
+        document.documentElement.classList.remove('modal-open');
     });
 });
 </script>
