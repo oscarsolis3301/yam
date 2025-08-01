@@ -6,6 +6,72 @@ let outageChart;
 document.addEventListener('DOMContentLoaded', function() {
     console.log('YAM Core Scripts: DOM Content Loaded');
     
+    // Start the persistent leaderboard timer service
+    startLeaderboardTimerService();
+    
+    // PERSISTENT LEADERBOARD TIMER SERVICE
+    function startLeaderboardTimerService() {
+        console.log('🕐 Starting persistent leaderboard timer service...');
+        
+        // Start the timer service with 60-minute interval
+        fetch('/api/timer/start', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ interval_minutes: 60 })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('✅ Timer service started:', data.message);
+                // Start the countdown display
+                startTimerCountdown();
+            } else {
+                console.error('❌ Failed to start timer service:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('❌ Error starting timer service:', error);
+        });
+    }
+    
+    function startTimerCountdown() {
+        // Update countdown every 30 seconds
+        setInterval(updateTimerCountdown, 30000);
+        
+        // Initial update
+        updateTimerCountdown();
+    }
+    
+    function updateTimerCountdown() {
+        fetch('/api/timer/status')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data) {
+                const status = data.data;
+                const timeLeft = status.time_until_next;
+                
+                if (timeLeft.total_seconds > 0) {
+                    // Log countdown to console every 5 minutes
+                    if (timeLeft.total_seconds % 300 === 0) {
+                        console.log(`🕐 Next leaderboard sync in: ${timeLeft.formatted} (${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s)`);
+                    }
+                    
+                    // Log when getting close to sync time
+                    if (timeLeft.total_seconds <= 300) { // 5 minutes or less
+                        console.log(`⚠️ Leaderboard sync in ${timeLeft.minutes}m ${timeLeft.seconds}s`);
+                    }
+                } else {
+                    console.log('🔄 Leaderboard sync due now');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('❌ Error getting timer status:', error);
+        });
+    }
+    
     // Initialize chart
     const ctx = document.getElementById('outageChart');
     if (ctx) {
@@ -85,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // }
 
     // STATIC TIME PERIOD CONTROLS - No auto-refresh, only manual changes
-    const timeButtons = document.querySelectorAll('.time-btn');
+    const timeButtons = document.querySelectorAll('.outages-card .time-btn');
     console.log('Found', timeButtons.length, 'time period buttons');
     
     timeButtons.forEach(btn => {
@@ -100,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+            timeButtons.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             
             // Use cached data for time period changes - no API calls

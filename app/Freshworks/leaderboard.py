@@ -1,9 +1,10 @@
 import requests
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 from dotenv import load_dotenv
+import time
 
 # Add the app directory to the Python path so we can import our models
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -205,6 +206,31 @@ def main():
                 print("📊 Data is now available in the YAM Dashboard Daily Ticket Closures graph")
                 print("🎫 Ticket numbers are now stored and can be viewed in user detail modals")
                 
+                # Invalidate frontend cache to ensure fresh data is displayed
+                try:
+                    import requests
+                    # Clear the ticket closure cache to force fresh data fetch
+                    cache_clear_response = requests.post('http://localhost:5000/api/tickets/invalidate-cache', 
+                                                       timeout=5)
+                    if cache_clear_response.status_code == 200:
+                        print("✅ Frontend cache invalidated - fresh data will be displayed")
+                    else:
+                        print("⚠️ Cache invalidation failed, but data sync was successful")
+                except Exception as e:
+                    print(f"⚠️ Cache invalidation error (non-critical): {e}")
+                
+                # Emit WebSocket event to notify frontend of sync completion
+                try:
+                    socket_emit_response = requests.post('http://localhost:5000/api/tickets/emit-sync-complete', 
+                                                       json={'sync_type': 'leaderboard', 'timestamp': datetime.now().isoformat()},
+                                                       timeout=5)
+                    if socket_emit_response.status_code == 200:
+                        print("✅ WebSocket event emitted - frontend notified of sync completion")
+                    else:
+                        print("⚠️ WebSocket emit failed, but data sync was successful")
+                except Exception as e:
+                    print(f"⚠️ WebSocket emit error (non-critical): {e}")
+                
                 # Show current sync status
                 print("\n📈 Current Sync Status:")
                 print("=" * 50)
@@ -236,5 +262,31 @@ def main():
     except Exception as e:
         print(f"❌ Unexpected error: {e}")
 
+def loop(interval_minutes=60):
+    """Continuously run the leaderboard sync every `interval_minutes`. Displays a live countdown in the terminal."""
+    while True:
+        start_time = datetime.now()
+        main()
+        # Calculate how long the sync took and determine remaining time until next run
+        elapsed = (datetime.now() - start_time).total_seconds()
+        sleep_time = max(0, interval_minutes * 60 - elapsed)
+        next_run = datetime.now() + timedelta(seconds=sleep_time)
+        print(f"\n⏰ Next sync scheduled at {next_run.strftime('%Y-%m-%d %H:%M:%S')} (in {int(sleep_time)} seconds)")
+
+        # Live countdown
+        for remaining in range(int(sleep_time), 0, -1):
+            hrs, rem = divmod(remaining, 3600)
+            mins, secs = divmod(rem, 60)
+            print(f"\r⏳ Next sync in {hrs:02d}:{mins:02d}:{secs:02d}", end='', flush=True)
+            time.sleep(1)
+        print()  # ensure newline after countdown completes
+
 if __name__ == "__main__":
-    main()
+    import argparse
+    parser = argparse.ArgumentParser(description="Freshworks Leaderboard Sync - Continuous")
+    parser.add_argument('--interval', type=int, default=60, help='Interval between syncs in minutes (default: 60)')
+    args = parser.parse_args()
+    try:
+        loop(args.interval)
+    except KeyboardInterrupt:
+        print("\n👋 Exiting leaderboard sync loop.")

@@ -16,13 +16,13 @@ let currentPeriod = 'today';
 window.debugYAMPeriod = function() {
     console.log('🔍 YAM Period Debug Info:');
     console.log(`📅 Global currentPeriod: ${currentPeriod}`);
-    console.log(`🔍 Active time button:`, document.querySelector('.time-btn.active')?.getAttribute('data-period'));
+    console.log(`🔍 Active time button:`, document.querySelector('.user-tickets-card .time-btn.active')?.getAttribute('data-period'));
     console.log(`📊 Chart data:`, userTicketsChart?.data);
     console.log(`📊 Chart labels:`, userTicketsChart?.data?.labels);
     console.log(`📊 Chart dataset:`, userTicketsChart?.data?.datasets?.[0]?.data);
     return {
         currentPeriod: currentPeriod,
-        activeButton: document.querySelector('.time-btn.active')?.getAttribute('data-period'),
+        activeButton: document.querySelector('.user-tickets-card .time-btn.active')?.getAttribute('data-period'),
         chartData: userTicketsChart?.data
     };
 };
@@ -83,9 +83,37 @@ let chartStabilityMonitor = {
     maxRecoveryAttempts: 5
 };
 
+// Cache invalidation function
+function invalidateTicketCache() {
+    console.log('🔄 Invalidating ticket closure cache...');
+    localStorage.removeItem('yam_ticket_closures_cache');
+    localStorage.removeItem('yam_ticket_closures_cache_previous');
+    ticketDataCache.data = null;
+    ticketDataCache.lastUpdate = 0;
+    console.log('✅ Ticket closure cache cleared');
+}
+
 // Immediate data preloading - start before DOM is ready
 (function() {
     console.log('🚀 Preloading ticket closure data for instant chart display...');
+    
+    // Check if cache was recently invalidated by leaderboard sync
+    const lastInvalidation = localStorage.getItem('yam_cache_last_invalidation');
+    const now = Date.now();
+    if (lastInvalidation && (now - parseInt(lastInvalidation)) < 60000) { // Within last minute
+        console.log('🔄 Cache recently invalidated by leaderboard sync, fetching fresh data');
+        invalidateTicketCache();
+    }
+    
+    // Check if we're near the top of the hour (when leaderboard sync runs)
+    const currentMinute = new Date().getMinutes();
+    if (currentMinute >= 0 && currentMinute <= 2) {
+        console.log('🔄 Near leaderboard sync time, ensuring fresh data');
+        // Force fresh data fetch if we're near sync time
+        setTimeout(() => {
+            updateDailyClosuresData();
+        }, 1000); // Wait 1 second then fetch fresh data
+    }
     
     // Try to get cached data from localStorage first
     const cachedData = localStorage.getItem('yam_ticket_closures_cache');
@@ -94,8 +122,8 @@ let chartStabilityMonitor = {
             const parsed = JSON.parse(cachedData);
             const cacheAge = Date.now() - parsed.timestamp;
             
-            // Use cache if it's less than 5 minutes old
-            if (cacheAge < 300000) {
+            // Use cache if it's less than 30 seconds old (much shorter to prevent stale data)
+            if (cacheAge < 30000) {
                 preloadedData = parsed.data;
                 console.log('✅ Using cached data for instant display:', preloadedData);
             }
@@ -121,6 +149,31 @@ let chartStabilityMonitor = {
                 if (chartInitialized && userTicketsChart) {
                     updateChartWithData(data);
                 }
+                
+                // Check if this data is significantly different from cached data
+                const cachedData = localStorage.getItem('yam_ticket_closures_cache_previous');
+                if (cachedData) {
+                    try {
+                        const previous = JSON.parse(cachedData);
+                        if (previous.data && previous.data.total_closed !== data.total_closed) {
+                            console.log('🔄 Data has changed, forcing chart update');
+                            // Force immediate chart update with new data
+                            setTimeout(() => {
+                                if (userTicketsChart) {
+                                    updateChartWithData(data);
+                                }
+                            }, 100);
+                        }
+                    } catch (e) {
+                        console.log('⚠️ Error comparing cached data:', e);
+                    }
+                }
+                
+                // Store current data as previous for next comparison
+                localStorage.setItem('yam_ticket_closures_cache_previous', JSON.stringify({
+                    data: data,
+                    timestamp: Date.now()
+                }));
             }
         })
         .catch(error => {
@@ -137,11 +190,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Set up time control button event listeners
     setupTimeControlListeners();
+    
+    // Set up WebSocket listener for leaderboard sync events
+    setupLeaderboardSyncListener();
 });
 
 function setupTimeControlListeners() {
     // Add click event listeners to time control buttons
-    document.querySelectorAll('.time-btn').forEach(btn => {
+    document.querySelectorAll('.user-tickets-card .time-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const period = this.getAttribute('data-period');
             console.log(`🕒 Time control button clicked: ${period}`);
@@ -150,6 +206,41 @@ function setupTimeControlListeners() {
     });
     
     console.log('✅ Time control listeners set up');
+}
+
+function setupLeaderboardSyncListener() {
+    // Check if SocketIO is available
+    if (typeof io !== 'undefined') {
+        try {
+            const socket = io();
+            
+            // Listen for leaderboard sync completion events
+            socket.on('leaderboard_sync_complete', function(data) {
+                console.log('🔄 Leaderboard sync completed, invalidating cache...');
+                invalidateTicketCache();
+                updateDailyClosuresData(); // Force fresh data fetch
+                
+                // Hide sync indicator
+                hideSyncIndicator();
+                
+                // Show notification to user
+                showToast('🔄 Ticket data updated from leaderboard sync!', 'success');
+            });
+            
+            // Listen for cache invalidation events
+            socket.on('ticket_cache_invalidated', function(data) {
+                console.log('🔄 Cache invalidation event received...');
+                invalidateTicketCache();
+                updateDailyClosuresData(); // Force fresh data fetch
+            });
+            
+            console.log('✅ WebSocket listener for leaderboard sync events set up');
+        } catch (e) {
+            console.log('⚠️ WebSocket setup failed, using polling fallback:', e);
+        }
+    } else {
+        console.log('⚠️ SocketIO not available, using polling for cache invalidation');
+    }
 }
 
 function setupChartStabilityMonitoring() {
@@ -347,6 +438,12 @@ function initializeDailyClosures() {
     setInterval(updateDailyClosuresData, 3600000); // Update every 60 minutes
     setInterval(updateDailyClosuresStats, 7200000); // Update stats every 2 hours
     setInterval(checkSyncStatus, 1200000); // Check sync status every 20 minutes
+    
+    // Check for cache invalidation every 30 seconds
+    setInterval(checkForCacheInvalidation, 30000);
+    
+    // Start persistent timer countdown display
+    startPersistentTimerCountdown();
 }
 
 function loadRealUsers() {
@@ -690,10 +787,10 @@ function updateDailyClosuresData() {
     const now = Date.now();
     const period = currentPeriod || getCurrentPeriod() || 'today';
     
-    // Use cached data if available and not expired
+    // Use cached data if available and not expired (reduced cache duration to prevent stale data)
     if (ticketDataCache.data && 
         ticketDataCache.data.period === period && 
-        (now - ticketDataCache.lastUpdate) < ticketDataCache.cacheDuration) {
+        (now - ticketDataCache.lastUpdate) < 30000) { // 30 seconds instead of longer cache
         console.log('📊 Using cached ticket closure data');
         updateChartWithData(ticketDataCache.data);
         return;
@@ -882,6 +979,71 @@ function checkSyncStatus() {
         });
 }
 
+function checkForCacheInvalidation() {
+    // Check if we should invalidate cache based on leaderboard sync timing
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    
+    // Leaderboard sync runs every hour, so check if we're near the sync time
+    // and if our cache is older than the expected sync interval
+    const cachedData = localStorage.getItem('yam_ticket_closures_cache');
+    if (cachedData) {
+        try {
+            const parsed = JSON.parse(cachedData);
+            const cacheAge = Date.now() - parsed.timestamp;
+            
+            // If cache is older than 5 minutes and we're near the top of the hour,
+            // invalidate it to ensure fresh data
+            if (cacheAge > 300000 && currentMinute < 5) { // Cache > 5 min old and within first 5 minutes of hour
+                console.log('🔄 Cache is stale and near sync time, invalidating...');
+                invalidateTicketCache();
+                updateDailyClosuresData(); // Force fresh data fetch
+            }
+        } catch (e) {
+            console.log('⚠️ Error checking cache age:', e);
+        }
+    }
+    
+    // Check if leaderboard sync is likely running (around the top of the hour)
+    if (currentMinute >= 0 && currentMinute <= 2) {
+        // Show sync indicator
+        showSyncIndicator();
+    } else {
+        // Hide sync indicator
+        hideSyncIndicator();
+    }
+}
+
+function showSyncIndicator() {
+    const chartContainer = document.querySelector('.user-tickets-chart.enhanced');
+    if (chartContainer) {
+        let indicator = chartContainer.querySelector('.sync-indicator');
+        if (!indicator) {
+            indicator = document.createElement('div');
+            indicator.className = 'sync-indicator';
+            indicator.innerHTML = `
+                <div style="position: absolute; top: 10px; right: 10px; background: rgba(139, 92, 246, 0.9); color: white; padding: 8px 12px; border-radius: 6px; font-size: 12px; z-index: 1000;">
+                    🔄 Syncing data...
+                </div>
+            `;
+            chartContainer.style.position = 'relative';
+            chartContainer.appendChild(indicator);
+        }
+        indicator.style.display = 'block';
+    }
+}
+
+function hideSyncIndicator() {
+    const chartContainer = document.querySelector('.user-tickets-chart.enhanced');
+    if (chartContainer) {
+        const indicator = chartContainer.querySelector('.sync-indicator');
+        if (indicator) {
+            indicator.style.display = 'none';
+        }
+    }
+}
+
 function updateTopPerformers(data) {
     // Update both the hidden section and the modal content
     const topPerformersContainer = document.getElementById('topPerformers');
@@ -978,7 +1140,7 @@ function getCurrentPeriod() {
     }
     
     // Fallback: look for active time button
-    const periodButtons = document.querySelectorAll('.time-btn');
+    const periodButtons = document.querySelectorAll('.user-tickets-card .time-btn');
     for (const button of periodButtons) {
         if (button.classList.contains('active')) {
             return button.getAttribute('data-period');
@@ -1010,7 +1172,7 @@ function filterDailyClosures(period) {
     }
     
     // Update time control buttons
-    document.querySelectorAll('.time-btn').forEach(btn => {
+    document.querySelectorAll('.user-tickets-card .time-btn').forEach(btn => {
         btn.classList.remove('active');
         if (btn.getAttribute('data-period') === period) {
             btn.classList.add('active');
@@ -1585,6 +1747,8 @@ function refreshTicketData() {
     // ENHANCED STABILITY: Use enhanced data update
     updateDailyClosuresData();
     
+
+    
     // ENHANCED STABILITY: Verify chart stability after manual refresh
     setTimeout(() => {
         verifyChartStability();
@@ -2031,4 +2195,45 @@ function getUserProfileImage(user, username) {
     return `<img src="/static/images/avatars/default.png" alt="${username}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex';" />
             <span style="display: none;">${userInitial}</span>`;
 }
+
+// PERSISTENT TIMER COUNTDOWN FUNCTIONS
+function startPersistentTimerCountdown() {
+    console.log('🕐 Starting persistent timer countdown display...');
+    
+    // Update countdown every 30 seconds
+    setInterval(updatePersistentTimerCountdown, 30000);
+    
+    // Initial update
+    updatePersistentTimerCountdown();
+}
+
+function updatePersistentTimerCountdown() {
+    fetch('/api/timer/status')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.data) {
+            const status = data.data;
+            const timeLeft = status.time_until_next;
+            
+            if (timeLeft.total_seconds > 0) {
+                // Log countdown to console every 5 minutes
+                if (timeLeft.total_seconds % 300 === 0) {
+                    console.log(`🕐 Next leaderboard sync in: ${timeLeft.formatted} (${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s)`);
+                }
+                
+                // Log when getting close to sync time
+                if (timeLeft.total_seconds <= 300) { // 5 minutes or less
+                    console.log(`⚠️ Leaderboard sync in ${timeLeft.minutes}m ${timeLeft.seconds}s`);
+                }
+            } else {
+                console.log('🔄 Leaderboard sync due now');
+            }
+        }
+    })
+    .catch(error => {
+        console.error('❌ Error getting timer status:', error);
+    });
+}
+
+
 </script> 

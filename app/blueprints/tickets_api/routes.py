@@ -12,71 +12,85 @@ logger = setup_logging()
 
 @tickets_api_bp.route('/api/tickets/closures/today', methods=['GET'])
 def get_todays_closures():
-    """Get today's ticket closures by user with enhanced error handling"""
+    """Get today's ticket closures by user using the enhanced ticket closure service"""
     try:
-        today = date.today()
-        logger.info(f"Fetching ticket closures for date: {today}")
+        logger.info("Fetching today's ticket closures using enhanced service")
         
-        # Get from database first
-        closures = TicketClosure.query.filter_by(date=today).join(User).all()
-        logger.info(f"Found {len(closures)} closure records in database for {today}")
+        # Use the same enhanced ticket closure service as the period endpoint
+        # This ensures consistency and uses the most up-to-date data from TicketClosureDaily
+        result = ticket_closure_service.get_closures_for_period('today')
         
-        if not closures:
-            # If no data in database, check if we can sync
-            can_sync, time_until_next = freshworks_service._check_sync_availability(today)
-            logger.info(f"Can sync: {can_sync}, time until next: {time_until_next}")
+        if result and result.get('success'):
+            logger.info(f"✅ Retrieved {result.get('total_closed', 0)} tickets for today using enhanced service")
+            return jsonify(result)
+        else:
+            logger.warning("Enhanced service returned no data, falling back to legacy method")
             
-            if can_sync:
-                logger.info("No closure data found for today, syncing from Freshworks...")
-                success = freshworks_service.sync_daily_closures_with_tickets(today)
-                if success:
-                    closures = TicketClosure.query.filter_by(date=today).join(User).all()
-                    logger.info(f"After sync: found {len(closures)} closure records")
+            # Fallback to legacy method if enhanced service fails
+            today = date.today()
+            closures = TicketClosure.query.filter_by(date=today).join(User).all()
+            logger.info(f"Found {len(closures)} closure records in legacy database for {today}")
+            
+            if not closures:
+                # If no data in database, check if we can sync
+                can_sync, time_until_next = freshworks_service._check_sync_availability(today)
+                logger.info(f"Can sync: {can_sync}, time until next: {time_until_next}")
+                
+                if can_sync:
+                    logger.info("No closure data found for today, syncing from Freshworks...")
+                    success = freshworks_service.sync_daily_closures_with_tickets(today)
+                    if success:
+                        closures = TicketClosure.query.filter_by(date=today).join(User).all()
+                        logger.info(f"After sync: found {len(closures)} closure records")
+                    else:
+                        logger.warning("Failed to sync data from Freshworks")
                 else:
-                    logger.warning("Failed to sync data from Freshworks")
-            else:
-                minutes_left = int(time_until_next / 60)
-                logger.info(f"Rate limited - cannot sync yet. Next sync in {minutes_left} minutes.")
+                    minutes_left = int(time_until_next / 60)
+                    logger.info(f"Rate limited - cannot sync yet. Next sync in {minutes_left} minutes.")
+            
+            # Format data for the chart - sort by tickets closed (descending)
+            users_details = []
+            
+            for closure in closures:
+                users_details.append({
+                    'username': closure.user.username,
+                    'tickets_closed': closure.tickets_closed,
+                    'role': closure.user.role,
+                    'profile_picture': closure.user.profile_picture,
+                    'user_id': closure.user.id
+                })
+            
+            # Sort by tickets closed (descending) so highest performers appear first
+            users_details.sort(key=lambda x: x['tickets_closed'], reverse=True)
+            
+            # Extract labels and data in sorted order
+            labels = [user['username'] for user in users_details]
+            data = [user['tickets_closed'] for user in users_details]
+            
+            # Calculate total and top performer
+            total_closed = sum(data) if data else 0
+            top_performer = max(users_details, key=lambda x: x['tickets_closed']) if users_details else None
+            
+            # Get sync status
+            sync_status = get_sync_status_info(today)
+            
+            response_data = {
+                'success': True,
+                'date': today.isoformat(),
+                'labels': labels,
+                'data': data,
+                'total_closed': total_closed,
+                'top_performer': top_performer,
+                'users': users_details,
+                'sync_status': sync_status
+            }
+            
+            logger.info(f"Returning legacy ticket closure data: {total_closed} total tickets, {len(users_details)} users")
+            return jsonify(response_data)
         
-        # Format data for the chart - sort by tickets closed (descending)
-        users_details = []
-        
-        for closure in closures:
-            users_details.append({
-                'username': closure.user.username,
-                'tickets_closed': closure.tickets_closed,
-                'role': closure.user.role,
-                'profile_picture': closure.user.profile_picture,
-                'user_id': closure.user.id
-            })
-        
-        # Sort by tickets closed (descending) so highest performers appear first
-        users_details.sort(key=lambda x: x['tickets_closed'], reverse=True)
-        
-        # Extract labels and data in sorted order
-        labels = [user['username'] for user in users_details]
-        data = [user['tickets_closed'] for user in users_details]
-        
-        # Calculate total and top performer
-        total_closed = sum(data) if data else 0
-        top_performer = max(users_details, key=lambda x: x['tickets_closed']) if users_details else None
-        
-        # Get sync status
-        sync_status = get_sync_status_info(today)
-        
-        response_data = {
-            'success': True,
-            'date': today.isoformat(),
-            'labels': labels,
-            'data': data,
-            'total_closed': total_closed,
-            'top_performer': top_performer,
-            'users': users_details,
-            'sync_status': sync_status
-        }
-        
-        logger.info(f"Returning ticket closure data: {total_closed} total tickets, {len(users_details)} users")
-        return jsonify(response_data)
+        # If we get here, neither enhanced service nor fallback worked
+        logger.error("Enhanced service failed and no fallback data available")
+        return jsonify({'success': False, 'error': 'No data available'}), 404
         
     except Exception as e:
         logger.error(f"Error fetching today's closures: {e}")
@@ -906,6 +920,66 @@ def delete_user_mapping(freshworks_id):
         
     except Exception as e:
         logger.error(f"Error deleting user mapping: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@tickets_api_bp.route('/api/tickets/invalidate-cache', methods=['POST'])
+def invalidate_ticket_cache():
+    """Invalidate ticket closure cache to force fresh data fetch"""
+    try:
+        logger.info("🔄 Invalidating ticket closure cache")
+        
+        # Clear any server-side cache if needed
+        # (Currently using database queries, so no server cache to clear)
+        
+        # Emit WebSocket event to notify frontend
+        try:
+            from app import socketio
+            socketio.emit('ticket_cache_invalidated', {
+                'timestamp': datetime.now().isoformat(),
+                'message': 'Ticket closure cache invalidated'
+            })
+            logger.info("✅ WebSocket event emitted for cache invalidation")
+        except Exception as e:
+            logger.warning(f"⚠️ Failed to emit WebSocket event: {e}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Ticket closure cache invalidated',
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error invalidating ticket cache: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@tickets_api_bp.route('/api/tickets/emit-sync-complete', methods=['POST'])
+def emit_sync_complete():
+    """Emit WebSocket event to notify frontend of leaderboard sync completion"""
+    try:
+        data = request.get_json() or {}
+        sync_type = data.get('sync_type', 'leaderboard')
+        timestamp = data.get('timestamp', datetime.now().isoformat())
+        
+        logger.info(f"🔄 Emitting WebSocket event for {sync_type} sync completion")
+        
+        # Import socketio here to avoid circular imports
+        from app import socketio
+        
+        # Emit event to all connected clients
+        socketio.emit('leaderboard_sync_complete', {
+            'sync_type': sync_type,
+            'timestamp': timestamp,
+            'message': f'{sync_type.title()} sync completed successfully'
+        })
+        
+        return jsonify({
+            'success': True,
+            'message': 'WebSocket event emitted successfully',
+            'timestamp': timestamp
+        })
+        
+    except Exception as e:
+        logger.error(f"Error emitting WebSocket event: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @tickets_api_bp.route('/api/tickets/user-details/<username>', methods=['GET'])

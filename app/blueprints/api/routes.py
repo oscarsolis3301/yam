@@ -2993,3 +2993,109 @@ def session_heartbeat():
             'message': 'Heartbeat failed',
             'timestamp': datetime.utcnow().isoformat()
         }), 500
+
+# Import the timer service
+from app.services.leaderboard_timer_service import leaderboard_timer_service
+
+@bp.route('/timer/status', methods=['GET'])
+@login_required
+def get_timer_status():
+    """Get the current status of the leaderboard timer"""
+    try:
+        status = leaderboard_timer_service.get_timer_status()
+        if status:
+            return jsonify({
+                'success': True,
+                'data': status
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Timer not found'
+            }), 404
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@bp.route('/timer/start', methods=['POST'])
+@login_required
+def start_timer():
+    """Start the leaderboard timer service"""
+    try:
+        data = request.get_json()
+        interval_minutes = data.get('interval_minutes', 60) if data else 60
+        
+        leaderboard_timer_service.start_timer_service(interval_minutes)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Timer started with {interval_minutes} minute interval'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@bp.route('/timer/stop', methods=['POST'])
+@login_required
+def stop_timer():
+    """Stop the leaderboard timer service"""
+    try:
+        leaderboard_timer_service.stop_timer_service()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Timer stopped'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@bp.route('/timer/reset', methods=['POST'])
+@login_required
+def reset_timer():
+    """Reset the leaderboard timer with new interval"""
+    try:
+        data = request.get_json()
+        interval_minutes = data.get('interval_minutes', 60) if data else 60
+        
+        success = leaderboard_timer_service.reset_timer(interval_minutes)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': f'Timer reset with {interval_minutes} minute interval'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to reset timer'
+            }), 400
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@bp.route('/timer/run-now', methods=['POST'])
+@login_required
+def run_leaderboard_sync_now():
+    """Manually trigger the leaderboard sync immediately"""
+    try:
+        # This will run the sync immediately and update the timer
+        leaderboard_timer_service._run_leaderboard_sync()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Leaderboard sync triggered'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500

@@ -1,0 +1,4 @@
+2025-07-31 15:33:00,922 - app - WARNING - Failed to start leaderboard timer service: cannot import name 'leaderboard_timer_service' from partially initialized module 'app.services.leaderboard_timer_service' (most likely due to a circular import) (C:\Users\oscar.solis\Documents\yam\app\services\leaderboard_timer_service.py)
+2025-07-31 15:33:00,950 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-07-31 15:33:00,952 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-07-31 15:33:00,984 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined

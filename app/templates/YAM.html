@@ -83,9 +83,284 @@ console.log('YAM: Enhanced session management initialized');
 {% include 'components/yam/yam_unified_chart_styles.html' %}
 {% include 'components/yam/yam_modal_styles.html' %}
 
-<!-- CRITICAL: Override all modal styles for true full-screen coverage -->
+<!-- RESPONSIVE LAYOUT FIX - NO SCALING, NO GAPS -->
 <style>
-/* UNIVERSAL ACTIVITY MODAL SYSTEM - OVERRIDE ALL OTHER MODAL CSS */
+/* CRITICAL: Remove all scaling and implement responsive layout */
+.dashboard-container {
+    /* Remove all scaling - use natural dimensions */
+    transform: none !important;
+    transform-origin: initial !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    position: relative !important;
+    height: auto !important;
+    z-index: 1 !important;
+    
+    /* Ensure proper padding and spacing */
+    padding: 1rem !important;
+    box-sizing: border-box !important;
+    background: linear-gradient(135deg, #000000 0%, #0a0a0a 50%, #000000 100%) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+    min-height: 100vh !important;
+}
+
+/* RESPONSIVE GRID LAYOUT - NO GAPS */
+.dashboard-grid {
+    display: grid !important;
+    grid-template-columns: minmax(320px, 350px) 1fr !important;
+    gap: 1rem !important;
+    margin-bottom: 0 !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    align-items: start !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* SIDEBAR - FIXED WIDTH, NO GAPS */
+.sidebar {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+    height: 100% !important;
+    align-self: start !important;
+    width: 100% !important;
+    max-width: 350px !important;
+    min-width: 320px !important;
+    flex-shrink: 0 !important;
+}
+
+/* MAIN CONTENT - FLEXIBLE, NO GAPS */
+.yam-main-content {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 !important;
+}
+
+/* CHARTS GRID - RESPONSIVE, NO GAPS */
+.charts-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1rem !important;
+    margin-bottom: 0 !important;
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+/* ENSURE ALL CHART CONTAINERS MAINTAIN PRECISE MOUSE EVENTS */
+.charts-grid,
+.yam-outages-section,
+.yam-user-tickets-section,
+.dashboard-widgets {
+    /* Remove any transform interference */
+    transform: none !important;
+    transform-origin: initial !important;
+    
+    /* Ensure proper positioning */
+    position: relative !important;
+    z-index: 2 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* SPECIFIC CHART CONTAINER PRECISION */
+.chart-container,
+canvas,
+svg {
+    /* Ensure charts maintain precise mouse coordinates */
+    transform: none !important;
+    transform-origin: initial !important;
+    
+    /* Maintain proper positioning for tooltips and interactions */
+    position: relative !important;
+    z-index: 3 !important;
+    width: 100% !important;
+    height: auto !important;
+}
+
+/* RESPONSIVE BREAKPOINTS - MAINTAIN EXACT FORMATTING */
+@media (max-width: 1400px) {
+    .dashboard-grid {
+        grid-template-columns: minmax(300px, 320px) 1fr !important;
+        gap: 0.8rem !important;
+    }
+    
+    .sidebar {
+        max-width: 320px !important;
+        min-width: 300px !important;
+    }
+}
+
+@media (max-width: 1200px) {
+    .dashboard-grid {
+        grid-template-columns: minmax(280px, 300px) 1fr !important;
+        gap: 0.6rem !important;
+    }
+    
+    .sidebar {
+        max-width: 300px !important;
+        min-width: 280px !important;
+    }
+    
+    .charts-grid {
+        gap: 0.8rem !important;
+    }
+}
+
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: minmax(260px, 280px) 1fr !important;
+        gap: 0.5rem !important;
+    }
+    
+    .sidebar {
+        max-width: 280px !important;
+        min-width: 260px !important;
+    }
+    
+    .charts-grid {
+        gap: 0.6rem !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    
+    .sidebar {
+        max-width: 100% !important;
+        min-width: 100% !important;
+        order: 2 !important;
+    }
+    
+    .yam-main-content {
+        order: 1 !important;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .dashboard-container {
+        padding: 0.5rem !important;
+        gap: 0.8rem !important;
+    }
+    
+    .dashboard-grid {
+        gap: 0.8rem !important;
+    }
+    
+    .charts-grid {
+        gap: 0.8rem !important;
+    }
+    
+    .sidebar {
+        gap: 0.8rem !important;
+    }
+    
+    .yam-main-content {
+        gap: 0.8rem !important;
+    }
+}
+
+/* ENSURE NO HORIZONTAL SCROLLING */
+body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* ENSURE ALL CARDS AND WIDGETS FIT PROPERLY */
+.card,
+.outages-card,
+.user-profile,
+.welcome-header {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+}
+
+/* ENSURE CHARTS RESPOND PROPERLY */
+.chart-container {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 300px !important;
+    max-height: 500px !important;
+}
+
+/* ENSURE NAVIGATION DIRECTORY RESPONDS PROPERLY */
+.directory-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+    gap: 1rem !important;
+    margin-top: 0.5rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.directory-item {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+}
+
+/* RESPONSIVE NAVIGATION DIRECTORY BREAKPOINTS */
+@media (max-width: 1200px) {
+    .directory-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+        gap: 0.8rem !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .directory-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+        gap: 0.6rem !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .directory-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.8rem !important;
+    }
+    
+    .directory-item {
+        padding: 1.2rem !important;
+    }
+    
+    .directory-icon {
+        width: 40px !important;
+        height: 40px !important;
+        margin-right: 1rem !important;
+        font-size: 1.2rem !important;
+    }
+    
+    .directory-name {
+        font-size: 0.95rem !important;
+    }
+    
+    .directory-desc {
+        font-size: 0.75rem !important;
+    }
+}
+
+/* ENSURE MODALS WORK PROPERLY WITHOUT SCALING */
 .widget-modal,
 .yam-modal-overlay,
 .custom-date-modal,
@@ -143,8 +418,7 @@ console.log('YAM: Enhanced session management initialized');
 .performance-modal-content,
 .admin-sync-modal-content,
 .user-ticket-details-modal-content,
-.reminder-modal-content,
-.calendar-modal-content {
+.reminder-modal-content {
     background: rgba(15, 15, 15, 0.98) !important;
     border-radius: 24px !important;
     width: 92% !important;
@@ -164,7 +438,39 @@ console.log('YAM: Enhanced session management initialized');
     left: auto !important;
     right: auto !important;
     bottom: auto !important;
-    transform: translateY(-22vh) !important;
+    transform: translateY(-8vh) !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    min-width: auto !important;
+    flex-direction: column !important;
+    display: flex !important;
+    /* Perfect centering */
+    align-self: center !important;
+    justify-self: center !important;
+}
+
+/* ENHANCED CALENDAR MODAL - TALLER AND NO SCROLLING */
+.calendar-modal-content {
+    background: rgba(15, 15, 15, 0.98) !important;
+    border-radius: 24px !important;
+    width: 95% !important;
+    max-width: 1200px !important;
+    height: 95vh !important;
+    max-height: 95vh !important;
+    min-height: 95vh !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(30px) !important;
+    overflow: hidden !important;
+    animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: translateY(-8vh) !important;
     margin: 0 auto !important;
     padding: 0 !important;
     min-width: auto !important;
@@ -265,6 +571,20 @@ console.log('YAM: Enhanced session management initialized');
     scrollbar-color: rgba(255, 255, 255, 0.3) transparent !important;
 }
 
+/* ENHANCED CALENDAR MODAL BODY - FULL HEIGHT UTILIZATION */
+#calendarModal .widget-modal-body {
+    padding: 1rem !important;
+    max-height: calc(95vh - 100px) !important;
+    height: calc(95vh - 100px) !important;
+    overflow: hidden !important;
+    flex: 1 !important;
+    margin: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
 /* Custom scrollbar styling for modal body */
 .widget-modal-body::-webkit-scrollbar,
 .yam-modal-body::-webkit-scrollbar,
@@ -306,17 +626,6 @@ console.log('YAM: Enhanced session management initialized');
 .reminder-modal-body::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.5) !important;
 }
-
-/* DASHBOARD SCALING COMPENSATION */
-.dashboard-container {
-    transform: scale(0.8);
-    transform-origin: center top;
-    width: 125%;
-    height: 125%;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%) scale(0.8);
-}
 </style>
 
 <!-- JAVASCRIPT - IN CORRECT ORDER -->
@@ -327,6 +636,189 @@ console.log('YAM: Enhanced session management initialized');
 {% include 'components/yam/yam_outage_management_scripts.html' %}
 {% include 'components/yam/yam_widget_scripts.html' %}
 {% include 'components/yam/yam_user_tickets_scripts.html' %}
+
+<!-- ENHANCED CHART INTERACTIONS FOR RESPONSIVE LAYOUT -->
+<script>
+// Enhanced chart interactions for responsive dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('YAM: Initializing enhanced chart interactions for responsive layout');
+    
+    // Enhanced tooltip positioning for responsive charts
+    function enhanceChartTooltips() {
+        const charts = document.querySelectorAll('canvas');
+        charts.forEach(canvas => {
+            if (canvas.chart) {
+                const chart = canvas.chart;
+                const originalOptions = chart.options;
+                
+                // Ensure tooltip configuration exists
+                if (!originalOptions.plugins) originalOptions.plugins = {};
+                if (!originalOptions.plugins.tooltip) originalOptions.plugins.tooltip = {};
+                
+                // Enhanced tooltip callbacks for better data display
+                if (!originalOptions.plugins.tooltip.callbacks) {
+                    originalOptions.plugins.tooltip.callbacks = {};
+                }
+                
+                // Ensure tooltips show on hover
+                originalOptions.plugins.tooltip.enabled = true;
+                originalOptions.plugins.tooltip.intersect = true;
+                originalOptions.plugins.tooltip.mode = 'nearest';
+                
+                console.log(`✅ Enhanced tooltip for chart: ${chart.id || 'unnamed'}`);
+            }
+        });
+    }
+    
+    // Apply enhanced tooltip positioning after charts are rendered
+    setTimeout(enhanceChartTooltips, 1000);
+    
+    // Re-apply after any dynamic chart updates
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'childList') {
+                setTimeout(enhanceChartTooltips, 500);
+            }
+        });
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    // Monitor for chart updates and re-apply enhancements
+    const chartUpdateObserver = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'data-chart-updated') {
+                setTimeout(enhanceChartTooltips, 100);
+            }
+        });
+    });
+    
+    chartUpdateObserver.observe(document.body, { 
+        attributes: true, 
+        attributeFilter: ['data-chart-updated'],
+        subtree: true 
+    });
+    
+    console.log('YAM: Enhanced chart interactions initialized');
+    
+    // Specific enhancement for user tickets chart
+    function enhanceUserTicketsChart() {
+        const userTicketsCanvas = document.getElementById('userTicketsChart');
+        if (userTicketsCanvas && userTicketsCanvas.chart) {
+            const chart = userTicketsCanvas.chart;
+            
+            // Ensure the chart has proper interaction settings
+            if (chart.options) {
+                chart.options.onClick = function(event, elements) {
+                    if (elements.length > 0) {
+                        const element = elements[0];
+                        const username = this.data.labels[element.index];
+                        const ticketCount = this.data.datasets[0].data[element.index];
+                        
+                        console.log(`🎯 User clicked on ${username} with ${ticketCount} tickets`);
+                        if (typeof showUserTicketDetails === 'function') {
+                            showUserTicketDetails(username, ticketCount);
+                        }
+                    }
+                };
+                
+                // Ensure tooltips work properly
+                if (!chart.options.plugins) chart.options.plugins = {};
+                if (!chart.options.plugins.tooltip) chart.options.plugins.tooltip = {};
+                
+                chart.options.plugins.tooltip.enabled = true;
+                chart.options.plugins.tooltip.intersect = true;
+                chart.options.plugins.tooltip.mode = 'nearest';
+                
+                // Enhanced tooltip callbacks
+                if (!chart.options.plugins.tooltip.callbacks) {
+                    chart.options.plugins.tooltip.callbacks = {};
+                }
+                
+                chart.options.plugins.tooltip.callbacks.title = function(context) {
+                    return context[0].label; // Username
+                };
+                
+                chart.options.plugins.tooltip.callbacks.label = function(context) {
+                    const value = context.parsed.y;
+                    return `${value} ticket${value !== 1 ? 's' : ''}`;
+                };
+                
+                chart.options.plugins.tooltip.callbacks.afterLabel = function(context) {
+                    return 'Click to view details';
+                };
+                
+                console.log('✅ User tickets chart enhanced for responsive interactions');
+            }
+        }
+    }
+    
+    // Apply user tickets chart enhancement
+    setTimeout(enhanceUserTicketsChart, 1500);
+    
+    // Re-apply user tickets chart enhancement after updates
+    const userTicketsObserver = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'childList') {
+                setTimeout(enhanceUserTicketsChart, 500);
+            }
+        });
+    });
+    
+    userTicketsObserver.observe(document.body, { childList: true, subtree: true });
+    
+    // Responsive layout monitoring
+    function monitorResponsiveLayout() {
+        const dashboardContainer = document.querySelector('.dashboard-container');
+        const dashboardGrid = document.querySelector('.dashboard-grid');
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.yam-main-content');
+        
+        if (dashboardContainer && dashboardGrid && sidebar && mainContent) {
+            // Ensure no gaps by monitoring layout changes
+            const resizeObserver = new ResizeObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    const element = entry.target;
+                    
+                    // Ensure proper width constraints
+                    if (element.classList.contains('dashboard-container')) {
+                        element.style.width = '100%';
+                        element.style.maxWidth = '100%';
+                    }
+                    
+                    if (element.classList.contains('dashboard-grid')) {
+                        element.style.width = '100%';
+                        element.style.maxWidth = '100%';
+                    }
+                    
+                    if (element.classList.contains('sidebar')) {
+                        element.style.width = '100%';
+                        element.style.maxWidth = '350px';
+                        element.style.minWidth = '320px';
+                    }
+                    
+                    if (element.classList.contains('yam-main-content')) {
+                        element.style.width = '100%';
+                        element.style.minWidth = '0';
+                        element.style.flex = '1';
+                    }
+                });
+            });
+            
+            // Observe all layout elements
+            resizeObserver.observe(dashboardContainer);
+            resizeObserver.observe(dashboardGrid);
+            resizeObserver.observe(sidebar);
+            resizeObserver.observe(mainContent);
+            
+            console.log('✅ Responsive layout monitoring initialized');
+        }
+    }
+    
+    // Initialize responsive layout monitoring
+    setTimeout(monitorResponsiveLayout, 500);
+});
+</script>
 
 <!-- EXACT ACTIVITY MODAL ANIMATIONS -->
 <style>
@@ -348,7 +840,23 @@ console.log('YAM: Enhanced session management initialized');
     }
     to { 
         opacity: 1;
-        transform: translateY(-22vh) scale(1);
+        transform: translateY(-8vh) scale(1);
+    }
+}
+
+/* ENHANCED CALENDAR MODAL ANIMATION */
+#calendarModal .calendar-modal-content {
+    animation: calendarModalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+@keyframes calendarModalSlideIn {
+    from { 
+        opacity: 0;
+        transform: translateY(-8vh) scale(0.95);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(-8vh) scale(1);
     }
 }
 
@@ -386,14 +894,14 @@ console.log('YAM: Enhanced session management initialized');
     max-height: 90vh !important;
     min-height: auto !important;
     min-width: auto !important;
-    transform: translateY(-22vh) !important;
+    transform: translateY(-8vh) !important;
     overflow: hidden !important;
 }
 
 /* IMPROVED CALENDAR STYLING */
 .calendar-container {
     width: 100% !important;
-    height: auto !important;
+    height: 100% !important;
     padding: 0.5rem !important;
     display: flex !important;
     flex-direction: column !important;
@@ -401,6 +909,23 @@ console.log('YAM: Enhanced session management initialized');
     min-height: auto !important;
     align-items: center !important;
     justify-content: flex-start !important;
+    flex: 1 !important;
+    overflow: hidden !important;
+}
+
+/* ENHANCED CALENDAR CONTAINER FOR MODAL - FULL HEIGHT */
+#calendarModal .calendar-container {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0.5rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+    min-height: auto !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex: 1 !important;
+    overflow: hidden !important;
 }
 
 .calendar-header {
@@ -460,6 +985,25 @@ console.log('YAM: Enhanced session management initialized');
     justify-items: center !important;
 }
 
+/* ENHANCED CALENDAR GRID FOR MODAL - FULL HEIGHT UTILIZATION */
+#calendarModal .calendar-grid {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: 800px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 16px !important;
+    padding: 16px !important;
+    height: calc(100% - 120px) !important;
+    min-height: 400px !important;
+    margin: 0 auto !important;
+    align-items: center !important;
+    justify-items: center !important;
+    flex: 1 !important;
+    overflow: hidden !important;
+}
+
 /* DAY HEADER STYLING */
 .calendar-grid > div:nth-child(-n+7) {
     background: rgba(255, 255, 255, 0.1) !important;
@@ -475,6 +1019,27 @@ console.log('YAM: Enhanced session management initialized');
     height: 42px !important;
     min-height: 42px !important;
     max-height: 42px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+}
+
+/* ENHANCED DAY HEADER STYLING FOR MODAL */
+#calendarModal .calendar-grid > div:nth-child(-n+7) {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #cccccc !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    text-align: center !important;
+    padding: 0 !important;
+    border-radius: 8px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    width: 100% !important;
+    height: 50px !important;
+    min-height: 50px !important;
+    max-height: 50px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -503,18 +1068,40 @@ console.log('YAM: Enhanced session management initialized');
     padding: 0 !important;
 }
 
+/* ENHANCED CALENDAR DAY CELLS FOR MODAL - TALLER AND MORE SPACIOUS */
+#calendarModal .calendar-day {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(25, 25, 25, 0.8) !important;
+    border-radius: 8px !important;
+    color: #ffffff !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    position: relative !important;
+    width: 100% !important;
+    height: 60px !important;
+    min-height: 60px !important;
+    max-height: 60px !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
 .calendar-day:hover {
-    background: rgba(138, 43, 226, 0.15) !important;
-    border-color: rgba(138, 43, 226, 0.3) !important;
+    background: rgba(139, 92, 246, 0.15) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
     transform: scale(1.02) !important;
-    box-shadow: 0 2px 8px rgba(138, 43, 226, 0.2) !important;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2) !important;
 }
 
 .calendar-day.today {
-    background: linear-gradient(135deg, #8a2be2, #6a1b9a) !important;
+    background: linear-gradient(135deg, #8b5cf6, #8b5cf6) !important;
     color: #ffffff !important;
     font-weight: 700 !important;
-    box-shadow: 0 4px 12px rgba(138, 43, 226, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4) !important;
     border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
@@ -541,6 +1128,19 @@ console.log('YAM: Enhanced session management initialized');
     margin-right: auto !important;
 }
 
+/* ENHANCED CALENDAR QUICK ACTIONS FOR MODAL */
+#calendarModal .calendar-quick-actions {
+    display: flex !important;
+    gap: 1rem !important;
+    margin-top: 0.5rem !important;
+    padding: 0 0.5rem !important;
+    width: 100% !important;
+    max-width: 800px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    flex-shrink: 0 !important;
+}
+
 .calendar-quick-actions button {
     flex: 1 !important;
     padding: 0.6rem 0.8rem !important;
@@ -557,6 +1157,23 @@ console.log('YAM: Enhanced session management initialized');
     min-height: 36px !important;
 }
 
+/* ENHANCED CALENDAR QUICK ACTION BUTTONS FOR MODAL - BIGGER */
+#calendarModal .calendar-quick-actions button {
+    flex: 1 !important;
+    padding: 0.8rem 1.2rem !important;
+    border-radius: 12px !important;
+    border: none !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    min-height: 48px !important;
+}
+
 .btn-secondary {
     background: rgba(255, 255, 255, 0.1) !important;
     color: #ffffff !important;
@@ -568,14 +1185,14 @@ console.log('YAM: Enhanced session management initialized');
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #8a2be2, #6a1b9a) !important;
+    background: linear-gradient(135deg, #8b5cf6, #8b5cf6) !important;
     color: #ffffff !important;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #7b27d1, #5a1788) !important;
+    background: linear-gradient(135deg, #8b5cf6, #8b5cf6) !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3) !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;
 }
 </style>
 
@@ -586,9 +1203,10 @@ console.log('YAM: Enhanced session management initialized');
 function openCalendarModal() {
     const modal = document.getElementById('calendarModal');
     if (modal) {
-        // Lock body scrolling
+        // Lock body scrolling - disable page scrollbar
         document.body.style.overflow = 'hidden';
         document.documentElement.style.overflow = 'hidden';
+        document.body.style.paddingRight = '0px'; // Prevent layout shift
         
         modal.classList.add('show');
         
@@ -607,9 +1225,10 @@ function closeCalendarModal() {
     const modal = document.getElementById('calendarModal');
     if (modal) {
         modal.classList.remove('show');
-        // Restore body scrolling - force enable
-        document.body.style.overflow = 'auto';
-        document.documentElement.style.overflow = 'auto';
+        // Restore body scrolling - re-enable page scrollbar
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+        document.body.style.paddingRight = '';
         // Remove any potential scroll lock classes
         document.body.classList.remove('modal-open');
         document.documentElement.classList.remove('modal-open');
@@ -619,9 +1238,10 @@ function closeCalendarModal() {
 function openCalendarEventModal() {
     const modal = document.getElementById('calendarEventModal');
     if (modal) {
-        // Lock body scrolling
+        // Lock body scrolling - disable page scrollbar
         document.body.style.overflow = 'hidden';
         document.documentElement.style.overflow = 'hidden';
+        document.body.style.paddingRight = '0px'; // Prevent layout shift
         
         modal.classList.add('show');
         
@@ -639,9 +1259,10 @@ function closeCalendarEventModal() {
     const modal = document.getElementById('calendarEventModal');
     if (modal) {
         modal.classList.remove('show');
-        // Restore body scrolling - force enable
-        document.body.style.overflow = 'auto';
-        document.documentElement.style.overflow = 'auto';
+        // Restore body scrolling - re-enable page scrollbar
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+        document.body.style.paddingRight = '';
         // Remove any potential scroll lock classes
         document.body.classList.remove('modal-open');
         document.documentElement.classList.remove('modal-open');
@@ -659,9 +1280,10 @@ function openReminderModal() {
 function openPlaylistModal() {
     const modal = document.getElementById('playlistModal');
     if (modal) {
-        // Lock body scrolling
+        // Lock body scrolling - disable page scrollbar
         document.body.style.overflow = 'hidden';
         document.documentElement.style.overflow = 'hidden';
+        document.body.style.paddingRight = '0px'; // Prevent layout shift
         modal.classList.add('show');
     }
 }
@@ -670,9 +1292,10 @@ function closePlaylistModal() {
     const modal = document.getElementById('playlistModal');
     if (modal) {
         modal.classList.remove('show');
-        // Restore body scrolling - force enable
-        document.body.style.overflow = 'auto';
-        document.documentElement.style.overflow = 'auto';
+        // Restore body scrolling - re-enable page scrollbar
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+        document.body.style.paddingRight = '';
         // Remove any potential scroll lock classes
         document.body.classList.remove('modal-open');
         document.documentElement.classList.remove('modal-open');
@@ -688,8 +1311,9 @@ document.addEventListener('DOMContentLoaded', function() {
     allModals.forEach(modal => modal.classList.remove('show'));
     
     // Restore body scrolling on page load
-    document.body.style.overflow = 'auto';
-    document.documentElement.style.overflow = 'auto';
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+    document.body.style.paddingRight = '';
     document.body.classList.remove('modal-open');
     document.documentElement.classList.remove('modal-open');
     
@@ -708,8 +1332,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     // Generic close with scroll restoration
                     modal.classList.remove('show');
-                    document.body.style.overflow = 'auto';
-                    document.documentElement.style.overflow = 'auto';
+                    document.body.style.overflow = '';
+                    document.documentElement.style.overflow = '';
+                    document.body.style.paddingRight = '';
                     document.body.classList.remove('modal-open');
                     document.documentElement.classList.remove('modal-open');
                 }
@@ -733,8 +1358,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     // Generic close
                     openModal.classList.remove('show');
-                    document.body.style.overflow = 'auto';
-                    document.documentElement.style.overflow = 'auto';
+                    document.body.style.overflow = '';
+                    document.documentElement.style.overflow = '';
+                    document.body.style.paddingRight = '';
                     document.body.classList.remove('modal-open');
                     document.documentElement.classList.remove('modal-open');
                 }
@@ -744,8 +1370,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Cleanup on page unload
     window.addEventListener('beforeunload', function() {
-        document.body.style.overflow = 'auto';
-        document.documentElement.style.overflow = 'auto';
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+        document.body.style.paddingRight = '';
         document.body.classList.remove('modal-open');
         document.documentElement.classList.remove('modal-open');
     });

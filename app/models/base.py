@@ -5,6 +5,9 @@ from app.extensions import db
 import psutil
 import json
 
+# Import TimerState model
+from app.models.timer_state import TimerState
+
 
 class Outage(db.Model):
     __table_args__ = {'extend_existing': True}

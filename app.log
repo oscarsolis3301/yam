@@ -346,3 +346,42 @@ Exception: Missing user_loader or request_loader. Refer to http://flask-login.re
 2025-07-30 08:55:51,983 - app - WARNING - Blueprint registration failed: name 'tickets_api_bp' is not defined
 2025-07-30 14:10:31,685 - app - WARNING - Blueprint registration failed: name 'tickets_api_bp' is not defined
 2025-07-30 14:11:52,775 - app - WARNING - Blueprint registration failed: name 'tickets_api_bp' is not defined
+2025-07-31 15:31:12,219 - app - WARNING - Failed to start leaderboard timer service: cannot import name 'leaderboard_timer_service' from partially initialized module 'app.services.leaderboard_timer_service' (most likely due to a circular import) (C:\Users\oscar.solis\Documents\yam\app\services\leaderboard_timer_service.py)
+2025-07-31 15:31:12,247 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-07-31 15:31:12,250 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-07-31 15:31:12,285 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-07-31 15:32:47,783 - app - WARNING - Failed to start leaderboard timer service: cannot import name 'leaderboard_timer_service' from partially initialized module 'app.services.leaderboard_timer_service' (most likely due to a circular import) (C:\Users\oscar.solis\Documents\yam\app\services\leaderboard_timer_service.py)
+2025-07-31 15:32:47,810 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-07-31 15:32:47,814 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-07-31 15:32:47,842 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-07-31 15:32:47,864 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.20.44.45:5000
+2025-07-31 15:32:47,864 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-31 15:32:49,654 - app - WARNING - Failed to start leaderboard timer service: cannot import name 'leaderboard_timer_service' from partially initialized module 'app.services.leaderboard_timer_service' (most likely due to a circular import) (C:\Users\oscar.solis\Documents\yam\app\services\leaderboard_timer_service.py)
+2025-07-31 15:32:49,687 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-07-31 15:32:49,689 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-07-31 15:32:49,718 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-07-31 15:32:54,318 - werkzeug - INFO - 127.0.0.1 - - [31/Jul/2025 15:32:54] "GET /socket.io/?connection_id=socket_1754000976327_s2exhjmj8&timestamp=1754000976327&EIO=4&transport=polling&t=PXYdUtt HTTP/1.1" 200 -
+2025-07-31 15:32:54,563 - werkzeug - INFO - 127.0.0.1 - - [31/Jul/2025 15:32:54] "POST /socket.io/?connection_id=socket_1754000976327_s2exhjmj8&timestamp=1754000976327&EIO=4&transport=polling&t=PXYdUym&sid=I8bltH46XHA9eBM4AAAA HTTP/1.1" 200 -
+2025-07-31 15:32:54,627 - werkzeug - INFO - 127.0.0.1 - - [31/Jul/2025 15:32:54] "GET /socket.io/?connection_id=socket_1754000976327_s2exhjmj8&timestamp=1754000976327&EIO=4&transport=polling&t=PXYdUyn&sid=I8bltH46XHA9eBM4AAAA HTTP/1.1" 200 -
+2025-07-31 15:32:54,634 - werkzeug - INFO - 127.0.0.1 - - [31/Jul/2025 15:32:54] "GET /socket.io/?connection_id=socket_1754000976327_s2exhjmj8&timestamp=1754000976327&EIO=4&transport=polling&t=PXYdV1c&sid=I8bltH46XHA9eBM4AAAA HTTP/1.1" 200 -
+2025-07-31 15:32:54,937 - werkzeug - INFO - 127.0.0.1 - - [31/Jul/2025 15:32:54] "POST /socket.io/?connection_id=socket_1754000976327_s2exhjmj8&timestamp=1754000976327&EIO=4&transport=polling&t=PXYdV1c.0&sid=I8bltH46XHA9eBM4AAAA HTTP/1.1" 200 -
+2025-07-31 15:33:30,316 - werkzeug - INFO - 127.0.0.1 - - [31/Jul/2025 15:33:30] "[33mGET /api/tickets/closures/today HTTP/1.1[0m" 404 -
+2025-07-31 15:34:30,008 - werkzeug - INFO - 127.0.0.1 - - [31/Jul/2025 15:34:30] "[33mGET /api/tickets/closures/today HTTP/1.1[0m" 404 -
+2025-07-31 15:35:19,955 - app - WARNING - Failed to start leaderboard timer service: cannot import name 'leaderboard_timer_service' from partially initialized module 'app.services.leaderboard_timer_service' (most likely due to a circular import) (C:\Users\oscar.solis\Documents\yam\app\services\leaderboard_timer_service.py)
+2025-07-31 15:35:19,985 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-07-31 15:35:19,988 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-07-31 15:35:20,017 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-07-31 15:35:30,314 - werkzeug - INFO - 127.0.0.1 - - [31/Jul/2025 15:35:30] "[33mGET /api/tickets/closures/today HTTP/1.1[0m" 404 -
+2025-07-31 15:36:25,406 - app - WARNING - Failed to start leaderboard timer service: cannot import name 'leaderboard_timer_service' from partially initialized module 'app.services.leaderboard_timer_service' (most likely due to a circular import) (C:\Users\oscar.solis\Documents\yam\app\services\leaderboard_timer_service.py)
+2025-07-31 15:36:25,438 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-07-31 15:36:25,440 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-07-31 15:36:25,468 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-07-31 15:36:25,483 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.20.44.45:5000
+2025-07-31 15:36:25,484 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-31 15:36:30,015 - werkzeug - INFO - 127.0.0.1 - - [31/Jul/2025 15:36:30] "[33mGET /api/tickets/closures/today HTTP/1.1[0m" 404 -

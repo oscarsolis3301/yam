@@ -1082,7 +1082,7 @@
     padding: 1.5rem 1.5rem 1rem 1.5rem;
     display: flex;
     flex-direction: column;
-    min-height: 700px; /* Much larger height to accommodate extended activity section */
+    min-height: 500px; /* Adjusted to align with media player height */
 }
 
 .user-profile:hover {
@@ -1098,8 +1098,8 @@
     display: flex;
     flex-direction: column;
     margin-top: 0.8rem;
-    min-height: 520px; /* Even more increased minimum height */
-    max-height: 520px; /* Set maximum height to prevent overflow */
+    min-height: 430px; /* Reduced height for better alignment */
+    max-height: 430px; /* Adjusted height to allow space for button */
     position: relative;
 }
 
@@ -1123,12 +1123,13 @@
 }
 
 #recentActivity {
-    flex: 1;
+    flex: 1 1 auto;
     overflow-y: auto;
     overflow-x: hidden;
     padding: 0 0.5rem;
-    min-height: 420px; /* Adjusted for new header structure */
-    max-height: 420px; /* Adjusted for new header structure */
+    /* Grow to fill the remaining space */
+    min-height: 0;
+    max-height: none;
     position: relative;
     scroll-behavior: smooth;
     /* Hide scrollbar for webkit browsers */
@@ -1337,9 +1338,9 @@
 
 /* View All Activity Button Container - Positioned outside scrollable area */
 .view-all-activity-container {
-    margin-top: 1.2rem; /* Increased margin to push button further down */
+    margin-top: 0.5rem;
     text-align: center;
-    flex-shrink: 0; /* Prevent button from shrinking */
+    flex-shrink: 0;
 }
 
 /* View All Activity Button - Always visible at bottom */
@@ -2679,4 +2680,31 @@ function testActivityDisplay() {
 
 // Expose test function globally
 window.testActivityDisplay = testActivityDisplay;
-</script> 
+</script>
+
+<style>
+/* Override styles to extend Recent Activity container to the View All Activity button and enable scrolling */
+.user-profile .recent-activity {
+    flex: 1 1 auto;
+    min-height: 430px !important;
+    max-height: 430px !important;
+}
+
+/* Hide scrollbars but allow scrolling */
+#recentActivity {
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE 10+ */
+}
+
+#recentActivity::-webkit-scrollbar {
+    width: 0 !important;
+}
+
+#recentActivity::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+#recentActivity::-webkit-scrollbar-thumb {
+    background: transparent !important;
+}
+</style> 

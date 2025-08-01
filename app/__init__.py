@@ -354,6 +354,15 @@ def create_app(config_class=Config):
         # Initialize database
         db.create_all()
         
+        # Initialize persistent leaderboard timer service
+        try:
+            from app.services.leaderboard_timer_service import leaderboard_timer_service
+            # Start the timer service with 60-minute interval
+            leaderboard_timer_service.start_timer_service(60)
+            app.logger.info("✅ Persistent leaderboard timer service started")
+        except Exception as e:
+            app.logger.warning(f"Failed to start leaderboard timer service: {e}")
+        
         # Try to register blueprints if they exist
         try:
             # Register blueprints - auth first

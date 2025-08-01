@@ -325,6 +325,9 @@ class TicketClosureService:
                 # Sort by tickets closed (descending)
                 users_details.sort(key=lambda x: x['tickets_closed'], reverse=True)
                 
+                # Get sync status information
+                sync_status = self._get_sync_status_info(target_date)
+                
                 return {
                     'success': True,
                     'date': target_date.isoformat(),
@@ -333,7 +336,8 @@ class TicketClosureService:
                     'total_closed': sum([user['tickets_closed'] for user in users_details]),
                     'top_performer': max(users_details, key=lambda x: x['tickets_closed']) if users_details else None,
                     'users': users_details,
-                    'period': 'daily'
+                    'period': 'daily',
+                    'sync_status': sync_status
                 }
             
             # Fallback to legacy TicketClosure table
@@ -354,6 +358,9 @@ class TicketClosureService:
                 
                 users_details.sort(key=lambda x: x['tickets_closed'], reverse=True)
                 
+                # Get sync status information
+                sync_status = self._get_sync_status_info(target_date)
+                
                 return {
                     'success': True,
                     'date': target_date.isoformat(),
@@ -363,10 +370,14 @@ class TicketClosureService:
                     'top_performer': max(users_details, key=lambda x: x['tickets_closed']) if users_details else None,
                     'users': users_details,
                     'period': 'daily',
-                    'source': 'legacy'
+                    'source': 'legacy',
+                    'sync_status': sync_status
                 }
             
             logger.info("📊 No data found, returning empty result")
+            # Get sync status information
+            sync_status = self._get_sync_status_info(target_date)
+            
             return {
                 'success': True,
                 'date': target_date.isoformat(),
@@ -375,7 +386,8 @@ class TicketClosureService:
                 'total_closed': 0,
                 'top_performer': None,
                 'users': [],
-                'period': 'daily'
+                'period': 'daily',
+                'sync_status': sync_status
             }
             
         except Exception as e:
@@ -665,6 +677,31 @@ class TicketClosureService:
         except Exception as e:
             logger.error(f"❌ Error getting user ticket details for period: {e}")
             return None
+    
+    def _get_sync_status_info(self, target_date):
+        """Helper function to get sync status information"""
+        try:
+            can_sync, time_until_next = self.freshworks_service._check_sync_availability(target_date)
+            metadata = TicketSyncMetadata.query.filter_by(sync_date=target_date).first()
+            
+            return {
+                'can_sync_now': can_sync,
+                'time_until_next_sync': time_until_next,
+                'minutes_until_next': int(time_until_next / 60) if time_until_next > 0 else 0,
+                'last_sync_time': metadata.last_sync_time.isoformat() if metadata else None,
+                'sync_count_today': metadata.sync_count if metadata else 0,
+                'tickets_processed_today': metadata.tickets_processed if metadata else 0
+            }
+        except Exception as e:
+            logger.error(f"❌ Error getting sync status info: {e}")
+            return {
+                'can_sync_now': False,
+                'time_until_next_sync': 0,
+                'minutes_until_next': 0,
+                'last_sync_time': None,
+                'sync_count_today': 0,
+                'tickets_processed_today': 0
+            }
     
     def get_database_stats(self):
         """Get comprehensive database statistics"""
