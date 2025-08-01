@@ -912,6 +912,12 @@ function updateDailyClosuresStatsFromData(data, period = 'today') {
         topCloserElement.textContent = `${topPerformer.username} (${topPerformer.tickets_closed})`;
     }
     
+    // Update the total-tickets span to match the ticketsClosedToday element
+    const totalTicketsSpans = document.querySelectorAll('.total-tickets');
+    totalTicketsSpans.forEach(span => {
+        span.textContent = `Total: ${totalClosed} tickets`;
+    });
+    
     // Update sync status if available
     if (data.sync_status) {
         updateSyncStatusDisplay(data.sync_status);
@@ -931,6 +937,12 @@ function clearDailyClosuresStats() {
     if (topCloserElement) {
         topCloserElement.textContent = '-';
     }
+    
+    // Clear the total-tickets span as well
+    const totalTicketsSpans = document.querySelectorAll('.total-tickets');
+    totalTicketsSpans.forEach(span => {
+        span.textContent = 'Total: 0 tickets';
+    });
 }
 
 function updateSyncStatusDisplay(status = syncStatus) {
@@ -1286,7 +1298,9 @@ function updateTopPerformers(data) {
     }
     
     const users = data.users || [];
-    const totalClosed = data.total_closed || 0;
+    // Get the total from the ticketsClosedToday element to ensure consistency
+    const ticketsClosedElement = document.getElementById('ticketsClosedToday');
+    const totalClosed = ticketsClosedElement ? parseInt(ticketsClosedElement.textContent) || 0 : (data.total_closed || 0);
     
     if (users.length === 0) {
         const noDataHtml = '<div class="no-data">No ticket closure data available</div>';
@@ -1350,6 +1364,12 @@ function updateDailyClosuresStatsForPeriod(period) {
     if (topCloserElement) {
         topCloserElement.textContent = topCloserToday;
     }
+    
+    // Update the total-tickets span to match the ticketsClosedToday element
+    const totalTicketsSpans = document.querySelectorAll('.total-tickets');
+    totalTicketsSpans.forEach(span => {
+        span.textContent = `Total: ${total} tickets`;
+    });
 }
 
 // Manual sync function for admin use

@@ -596,20 +596,21 @@ body:has(#reminderModal.show) .widget.media-player-widget {
 #playlistModal.show,
 #reminderModal.show {
     display: flex !important;
-    align-items: center !important;
+    align-items: flex-start !important;
     justify-content: center !important;
     /* CRITICAL: Ensure complete isolation when modal is shown */
     position: fixed !important;
-    top: 80px !important; /* Move modals higher to cover more of the dashboard */
+    top: 200px !important; /* Move modals much lower to avoid banner */
     left: 0 !important;
     width: 100vw !important;
-    height: calc(100vh - 80px) !important; /* Adjust height to account for banner */
+    height: calc(100vh - 200px) !important; /* Adjust height to account for banner */
     background: rgba(0, 0, 0, 0.95) !important;
     backdrop-filter: blur(25px) !important;
     z-index: 2147483647 !important;
     pointer-events: auto !important;
     isolation: isolate !important;
     contain: layout style paint !important;
+    padding-top: 60px !important; /* Add more top padding for better positioning */
 }
 
 /* PERFECT MODAL CENTERING AND SIZING */
@@ -624,7 +625,7 @@ body:has(#reminderModal.show) .widget.media-player-widget {
     border-radius: 24px !important;
     width: 92% !important;
     max-width: 1000px !important;
-    max-height: calc(90vh - 80px) !important; /* Adjust for higher modal position */
+    max-height: calc(75vh - 200px) !important; /* Make modal shorter */
     min-height: auto !important;
     height: auto !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -639,7 +640,7 @@ body:has(#reminderModal.show) .widget.media-player-widget {
     left: auto !important;
     right: auto !important;
     bottom: auto !important;
-    transform: translateY(-4vh) !important; /* Move background higher for better positioning */
+    transform: translateY(-2vh) !important; /* Reduce transform for better positioning */
     margin: 0 auto !important;
     padding: 0 !important;
     min-width: auto !important;

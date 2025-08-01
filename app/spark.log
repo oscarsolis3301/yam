@@ -14879,3 +14879,831 @@
 2025-08-01 09:15:44,171 - spark - INFO - Getting daily data for Ralph on 2025-08-01
 2025-08-01 09:15:44,172 - spark - INFO - ✅ Found legacy record for Ralph on 2025-08-01: 17 tickets
 2025-08-01 09:15:44,173 - spark - INFO - ✅ Retrieved ticket details for Ralph: 17 tickets
+2025-08-01 09:16:40,121 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:16:40,122 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:16:40,122 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:16:40,123 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:16:40,123 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:16:40,124 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:16:40,125 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:16:40,126 - spark - INFO - 📊 Found 9 legacy records
+2025-08-01 09:16:40,132 - spark - INFO - ✅ Retrieved 51 tickets for today using enhanced service
+2025-08-01 09:16:50,750 - spark - INFO - Fetching ticket details for user Ralph on 2025-08-01 (period: today)
+2025-08-01 09:16:50,751 - spark - INFO - Getting daily data for Ralph on 2025-08-01
+2025-08-01 09:16:50,753 - spark - INFO - ✅ Found legacy record for Ralph on 2025-08-01: 17 tickets
+2025-08-01 09:16:50,753 - spark - INFO - ✅ Retrieved ticket details for Ralph: 17 tickets
+2025-08-01 09:17:40,105 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:17:40,106 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:17:40,106 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:17:40,107 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:17:40,107 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:17:40,108 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:17:40,109 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:17:40,109 - spark - INFO - 📊 Found 9 legacy records
+2025-08-01 09:17:40,113 - spark - INFO - ✅ Retrieved 51 tickets for today using enhanced service
+2025-08-01 09:18:40,699 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:18:40,700 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:18:40,700 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:18:40,701 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:18:40,701 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:18:40,702 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:18:40,702 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:18:40,703 - spark - INFO - 📊 Found 9 legacy records
+2025-08-01 09:18:40,707 - spark - INFO - ✅ Retrieved 51 tickets for today using enhanced service
+2025-08-01 09:19:40,500 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:19:40,500 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:19:40,500 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:19:40,502 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:19:40,502 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:19:40,503 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:19:40,503 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:19:40,504 - spark - INFO - 📊 Found 9 legacy records
+2025-08-01 09:19:40,507 - spark - INFO - ✅ Retrieved 51 tickets for today using enhanced service
+2025-08-01 09:20:40,501 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:20:40,502 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:20:40,503 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:20:40,503 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:20:40,503 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:20:40,504 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:20:40,504 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:20:40,506 - spark - INFO - 📊 Found 9 legacy records
+2025-08-01 09:20:40,510 - spark - INFO - ✅ Retrieved 51 tickets for today using enhanced service
+2025-08-01 09:20:57,104 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:20:57,105 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:20:57,106 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:20:57,107 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:20:57,108 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:20:57,110 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:20:57,110 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:20:57,111 - spark - INFO - 📊 Found 9 legacy records
+2025-08-01 09:20:57,117 - spark - INFO - ✅ Retrieved 51 tickets for today using enhanced service
+2025-08-01 09:20:59,787 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:20:59,787 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:20:59,788 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:20:59,788 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:20:59,788 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:20:59,790 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:20:59,791 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:20:59,792 - spark - INFO - 📊 Found 9 legacy records
+2025-08-01 09:20:59,796 - spark - INFO - ✅ Retrieved 51 tickets for today using enhanced service
+2025-08-01 09:21:01,971 - spark - INFO - Fetching ticket details for user Ralph on 2025-08-01 (period: today)
+2025-08-01 09:21:01,972 - spark - INFO - Getting daily data for Ralph on 2025-08-01
+2025-08-01 09:21:01,975 - spark - INFO - ✅ Found legacy record for Ralph on 2025-08-01: 17 tickets
+2025-08-01 09:21:01,976 - spark - INFO - ✅ Retrieved ticket details for Ralph: 17 tickets
+2025-08-01 09:21:10,788 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:21:10,792 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:21:10,794 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:21:10,795 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:21:10,797 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:21:10,799 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:21:10,800 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:21:10,802 - spark - INFO - 📊 Found 9 legacy records
+2025-08-01 09:21:10,808 - spark - INFO - ✅ Retrieved 51 tickets for today using enhanced service
+2025-08-01 09:21:13,459 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:21:13,460 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:21:13,460 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:21:13,460 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:21:13,461 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:21:13,462 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:21:13,462 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:21:13,463 - spark - INFO - 📊 Found 9 legacy records
+2025-08-01 09:21:13,469 - spark - INFO - ✅ Retrieved 51 tickets for today using enhanced service
+2025-08-01 09:22:11,460 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:22:11,462 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:22:11,463 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:22:11,463 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:22:11,464 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:22:11,465 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:22:11,465 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:22:11,466 - spark - INFO - 📊 Found 9 legacy records
+2025-08-01 09:22:11,470 - spark - INFO - ✅ Retrieved 51 tickets for today using enhanced service
+2025-08-01 09:23:11,496 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:23:11,496 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:23:11,497 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:23:11,497 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:23:11,498 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:23:11,499 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:23:11,500 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:23:11,502 - spark - INFO - 📊 Found 9 legacy records
+2025-08-01 09:23:11,505 - spark - INFO - ✅ Retrieved 51 tickets for today using enhanced service
+2025-08-01 09:24:07,468 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:24:07,468 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:24:07,469 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:24:07,469 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:24:07,469 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:24:07,470 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:24:07,471 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:24:07,472 - spark - INFO - 📊 Found 9 legacy records
+2025-08-01 09:24:07,476 - spark - INFO - ✅ Retrieved 51 tickets for today using enhanced service
+2025-08-01 09:24:09,928 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:24:09,928 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:24:09,929 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:24:09,930 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:24:09,930 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:24:09,931 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:24:09,932 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:24:09,932 - spark - INFO - 📊 Found 9 legacy records
+2025-08-01 09:24:09,937 - spark - INFO - ✅ Retrieved 51 tickets for today using enhanced service
+2025-08-01 09:24:17,784 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:24:17,784 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:24:17,785 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:24:17,786 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:24:17,787 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:24:17,789 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:24:17,790 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:24:17,791 - spark - INFO - 📊 Found 9 legacy records
+2025-08-01 09:24:17,796 - spark - INFO - ✅ Retrieved 51 tickets for today using enhanced service
+2025-08-01 09:24:20,479 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:24:20,480 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:24:20,480 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:24:20,480 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:24:20,481 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:24:20,481 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:24:20,482 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:24:20,483 - spark - INFO - 📊 Found 9 legacy records
+2025-08-01 09:24:20,487 - spark - INFO - ✅ Retrieved 51 tickets for today using enhanced service
+2025-08-01 09:25:18,479 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:25:18,480 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:25:18,481 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:25:18,482 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:25:18,482 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:25:18,484 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:25:18,484 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:25:18,485 - spark - INFO - 📊 Found 9 legacy records
+2025-08-01 09:25:18,490 - spark - INFO - ✅ Retrieved 51 tickets for today using enhanced service
+2025-08-01 09:25:47,849 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-08-01 09:25:47,862 - spark - INFO - ✅ User mappings synced successfully: 0 created, 0 updated
+2025-08-01 09:25:48,519 - spark - INFO - Fetching page 1... Status: 200
+2025-08-01 09:25:49,094 - spark - INFO - Fetching page 2... Status: 200
+2025-08-01 09:25:49,641 - spark - INFO - Fetching page 3... Status: 200
+2025-08-01 09:25:50,169 - spark - INFO - Fetching page 4... Status: 200
+2025-08-01 09:25:50,707 - spark - INFO - Fetching page 5... Status: 200
+2025-08-01 09:25:51,215 - spark - INFO - Fetching page 6... Status: 200
+2025-08-01 09:25:51,736 - spark - INFO - Fetching page 7... Status: 200
+2025-08-01 09:25:52,502 - spark - INFO - Fetching page 8... Status: 200
+2025-08-01 09:25:53,081 - spark - INFO - Fetching page 9... Status: 200
+2025-08-01 09:25:54,037 - spark - INFO - Fetching page 10... Status: 200
+2025-08-01 09:25:54,935 - spark - INFO - Fetching page 11... Status: 200
+2025-08-01 09:25:55,481 - spark - INFO - Fetching page 12... Status: 200
+2025-08-01 09:25:56,000 - spark - INFO - Fetching page 13... Status: 200
+2025-08-01 09:25:56,490 - spark - INFO - Fetching page 14... Status: 200
+2025-08-01 09:25:57,021 - spark - INFO - Fetching page 15... Status: 200
+2025-08-01 09:25:57,516 - spark - INFO - Fetching page 16... Status: 200
+2025-08-01 09:25:58,040 - spark - INFO - Fetching page 17... Status: 200
+2025-08-01 09:25:58,936 - spark - INFO - Fetching page 18... Status: 200
+2025-08-01 09:25:59,453 - spark - INFO - Fetching page 19... Status: 200
+2025-08-01 09:25:59,960 - spark - INFO - Fetching page 20... Status: 200
+2025-08-01 09:26:00,581 - spark - INFO - Fetching page 21... Status: 200
+2025-08-01 09:26:01,132 - spark - INFO - Fetching page 22... Status: 200
+2025-08-01 09:26:01,806 - spark - INFO - Fetching page 23... Status: 200
+2025-08-01 09:26:02,385 - spark - INFO - Fetching page 24... Status: 200
+2025-08-01 09:26:03,062 - spark - INFO - Fetching page 25... Status: 200
+2025-08-01 09:26:03,775 - spark - INFO - Fetching page 26... Status: 200
+2025-08-01 09:26:18,519 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:26:18,519 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:26:18,520 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:26:18,520 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:26:18,521 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:26:18,522 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:26:18,522 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:26:18,522 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:26:18,528 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:26:18,529 - spark - INFO -    ⏱️ Time since last sync: 0 minutes
+2025-08-01 09:26:18,529 - spark - INFO -    ⏳ Time until next sync: 59 minutes
+2025-08-01 09:26:18,530 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:26:38,791 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:26:38,792 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:26:38,792 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:26:38,793 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:26:38,793 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:26:38,794 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:26:38,794 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:26:38,795 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:26:38,802 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:26:38,802 - spark - INFO -    ⏱️ Time since last sync: 0 minutes
+2025-08-01 09:26:38,804 - spark - INFO -    ⏳ Time until next sync: 59 minutes
+2025-08-01 09:26:38,804 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:26:41,250 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:26:41,251 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:26:41,251 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:26:41,252 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:26:41,252 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:26:41,253 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:26:41,254 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:26:41,255 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:26:41,259 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:26:41,260 - spark - INFO -    ⏱️ Time since last sync: 0 minutes
+2025-08-01 09:26:41,260 - spark - INFO -    ⏳ Time until next sync: 59 minutes
+2025-08-01 09:26:41,261 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:26:46,606 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:26:46,607 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:26:46,607 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:26:46,608 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:26:46,608 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:26:46,609 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:26:46,610 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:26:46,611 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:26:46,616 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:26:46,617 - spark - INFO -    ⏱️ Time since last sync: 0 minutes
+2025-08-01 09:26:46,617 - spark - INFO -    ⏳ Time until next sync: 59 minutes
+2025-08-01 09:26:46,619 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:26:49,339 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:26:49,339 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:26:49,339 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:26:49,340 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:26:49,340 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:26:49,341 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:26:49,342 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:26:49,344 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:26:49,348 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:26:49,349 - spark - INFO -    ⏱️ Time since last sync: 0 minutes
+2025-08-01 09:26:49,349 - spark - INFO -    ⏳ Time until next sync: 59 minutes
+2025-08-01 09:26:49,350 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:27:04,191 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:27:04,192 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:27:04,192 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:27:04,193 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:27:04,193 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:27:04,194 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:27:04,194 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:27:04,195 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:27:04,202 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:27:04,204 - spark - INFO -    ⏱️ Time since last sync: 1 minutes
+2025-08-01 09:27:04,204 - spark - INFO -    ⏳ Time until next sync: 58 minutes
+2025-08-01 09:27:04,205 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:27:06,911 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:27:06,912 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:27:06,913 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:27:06,913 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:27:06,915 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:27:06,916 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:27:06,917 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:27:06,918 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:27:06,922 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:27:06,923 - spark - INFO -    ⏱️ Time since last sync: 1 minutes
+2025-08-01 09:27:06,923 - spark - INFO -    ⏳ Time until next sync: 58 minutes
+2025-08-01 09:27:06,924 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:28:04,914 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:28:04,914 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:28:04,915 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:28:04,915 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:28:04,916 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:28:04,916 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:28:04,917 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:28:04,918 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:28:04,922 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:28:04,922 - spark - INFO -    ⏱️ Time since last sync: 2 minutes
+2025-08-01 09:28:04,922 - spark - INFO -    ⏳ Time until next sync: 57 minutes
+2025-08-01 09:28:04,923 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:29:04,915 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:29:04,916 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:29:04,918 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:29:04,918 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:29:04,919 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:29:04,920 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:29:04,920 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:29:04,921 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:29:04,924 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:29:04,925 - spark - INFO -    ⏱️ Time since last sync: 3 minutes
+2025-08-01 09:29:04,926 - spark - INFO -    ⏳ Time until next sync: 56 minutes
+2025-08-01 09:29:04,927 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:30:05,515 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:30:05,516 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:30:05,516 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:30:05,517 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:30:05,517 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:30:05,518 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:30:05,519 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:30:05,520 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:30:05,524 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:30:05,524 - spark - INFO -    ⏱️ Time since last sync: 4 minutes
+2025-08-01 09:30:05,525 - spark - INFO -    ⏳ Time until next sync: 55 minutes
+2025-08-01 09:30:05,525 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:31:01,220 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:31:01,221 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:31:01,221 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:31:01,223 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:31:01,224 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:31:01,225 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:31:01,226 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:31:01,227 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:31:01,233 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:31:01,233 - spark - INFO -    ⏱️ Time since last sync: 4 minutes
+2025-08-01 09:31:01,233 - spark - INFO -    ⏳ Time until next sync: 55 minutes
+2025-08-01 09:31:01,236 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:31:03,700 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:31:03,700 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:31:03,701 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:31:03,701 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:31:03,702 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:31:03,702 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:31:03,703 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:31:03,703 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:31:03,707 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:31:03,708 - spark - INFO -    ⏱️ Time since last sync: 4 minutes
+2025-08-01 09:31:03,708 - spark - INFO -    ⏳ Time until next sync: 55 minutes
+2025-08-01 09:31:03,709 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:31:13,162 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:31:13,162 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:31:13,164 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:31:13,165 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:31:13,167 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:31:13,168 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:31:13,169 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:31:13,170 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:31:13,175 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:31:13,176 - spark - INFO -    ⏱️ Time since last sync: 5 minutes
+2025-08-01 09:31:13,176 - spark - INFO -    ⏳ Time until next sync: 54 minutes
+2025-08-01 09:31:13,177 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:31:15,856 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:31:15,857 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:31:15,858 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:31:15,858 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:31:15,859 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:31:15,860 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:31:15,860 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:31:15,861 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:31:15,867 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:31:15,868 - spark - INFO -    ⏱️ Time since last sync: 5 minutes
+2025-08-01 09:31:15,868 - spark - INFO -    ⏳ Time until next sync: 54 minutes
+2025-08-01 09:31:15,869 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:31:18,000 - spark - INFO - Fetching ticket details for user Oscar on 2025-08-01 (period: today)
+2025-08-01 09:31:18,001 - spark - INFO - Getting daily data for Oscar on 2025-08-01
+2025-08-01 09:31:18,003 - spark - INFO - ✅ Found legacy record for Oscar on 2025-08-01: 3 tickets
+2025-08-01 09:31:18,004 - spark - INFO - ✅ Retrieved ticket details for Oscar: 3 tickets
+2025-08-01 09:31:36,052 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:31:36,052 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:31:36,053 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:31:36,054 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:31:36,054 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:31:36,055 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:31:36,055 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:31:36,058 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:31:36,064 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:31:36,065 - spark - INFO -    ⏱️ Time since last sync: 5 minutes
+2025-08-01 09:31:36,066 - spark - INFO -    ⏳ Time until next sync: 54 minutes
+2025-08-01 09:31:36,066 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:31:38,717 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:31:38,718 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:31:38,718 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:31:38,719 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:31:38,719 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:31:38,720 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:31:38,720 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:31:38,721 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:31:38,726 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:31:38,727 - spark - INFO -    ⏱️ Time since last sync: 5 minutes
+2025-08-01 09:31:38,728 - spark - INFO -    ⏳ Time until next sync: 54 minutes
+2025-08-01 09:31:38,729 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:32:28,627 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:32:28,628 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:32:28,629 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:32:28,629 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:32:28,630 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:32:28,631 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:32:28,631 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:32:28,634 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:32:28,640 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:32:28,640 - spark - INFO -    ⏱️ Time since last sync: 6 minutes
+2025-08-01 09:32:28,641 - spark - INFO -    ⏳ Time until next sync: 53 minutes
+2025-08-01 09:32:28,641 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:32:31,049 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:32:31,050 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:32:31,050 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:32:31,051 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:32:31,051 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:32:31,053 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:32:31,053 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:32:31,054 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:32:31,059 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:32:31,059 - spark - INFO -    ⏱️ Time since last sync: 6 minutes
+2025-08-01 09:32:31,060 - spark - INFO -    ⏳ Time until next sync: 53 minutes
+2025-08-01 09:32:31,061 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:32:35,790 - spark - INFO - Fetching ticket details for user Ralph on 2025-08-01 (period: today)
+2025-08-01 09:32:35,790 - spark - INFO - Getting daily data for Ralph on 2025-08-01
+2025-08-01 09:32:35,793 - spark - INFO - ✅ Found legacy record for Ralph on 2025-08-01: 20 tickets
+2025-08-01 09:32:35,793 - spark - INFO - ✅ Retrieved ticket details for Ralph: 20 tickets
+2025-08-01 09:32:41,133 - spark - INFO - Fetching ticket details for user Ralph on 2025-08-01 (period: today)
+2025-08-01 09:32:41,134 - spark - INFO - Getting daily data for Ralph on 2025-08-01
+2025-08-01 09:32:41,137 - spark - INFO - ✅ Found legacy record for Ralph on 2025-08-01: 20 tickets
+2025-08-01 09:32:41,138 - spark - INFO - ✅ Retrieved ticket details for Ralph: 20 tickets
+2025-08-01 09:33:29,371 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:33:29,372 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:33:29,372 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:33:29,372 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:33:29,374 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:33:29,375 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:33:29,375 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:33:29,376 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:33:29,380 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:33:29,381 - spark - INFO -    ⏱️ Time since last sync: 7 minutes
+2025-08-01 09:33:29,382 - spark - INFO -    ⏳ Time until next sync: 52 minutes
+2025-08-01 09:33:29,383 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:34:02,681 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:34:02,683 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:34:02,685 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:34:02,685 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:34:02,686 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:34:02,687 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:34:02,688 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:34:02,689 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:34:02,696 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:34:02,696 - spark - INFO -    ⏱️ Time since last sync: 7 minutes
+2025-08-01 09:34:02,697 - spark - INFO -    ⏳ Time until next sync: 52 minutes
+2025-08-01 09:34:02,698 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:34:05,418 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:34:05,418 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:34:05,419 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:34:05,419 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:34:05,420 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:34:05,421 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:34:05,421 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:34:05,421 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:34:05,427 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:34:05,427 - spark - INFO -    ⏱️ Time since last sync: 8 minutes
+2025-08-01 09:34:05,427 - spark - INFO -    ⏳ Time until next sync: 51 minutes
+2025-08-01 09:34:05,428 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:34:10,418 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:34:10,419 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:34:10,420 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:34:10,422 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:34:10,422 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:34:10,424 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:34:10,425 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:34:10,426 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:34:10,433 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:34:10,434 - spark - INFO -    ⏱️ Time since last sync: 8 minutes
+2025-08-01 09:34:10,434 - spark - INFO -    ⏳ Time until next sync: 51 minutes
+2025-08-01 09:34:10,435 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:34:12,781 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:34:12,782 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:34:12,783 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:34:12,783 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:34:12,784 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:34:12,785 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:34:12,786 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:34:12,788 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:34:12,793 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:34:12,794 - spark - INFO -    ⏱️ Time since last sync: 8 minutes
+2025-08-01 09:34:12,794 - spark - INFO -    ⏳ Time until next sync: 51 minutes
+2025-08-01 09:34:12,795 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:34:17,137 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:34:17,138 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:34:17,140 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:34:17,142 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:34:17,143 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:34:17,145 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:34:17,147 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:34:17,148 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:34:17,156 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:34:17,157 - spark - INFO -    ⏱️ Time since last sync: 8 minutes
+2025-08-01 09:34:17,158 - spark - INFO -    ⏳ Time until next sync: 51 minutes
+2025-08-01 09:34:17,158 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:34:19,478 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:34:19,479 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:34:19,480 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:34:19,480 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:34:19,481 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:34:19,483 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:34:19,483 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:34:19,484 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:34:19,488 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:34:19,489 - spark - INFO -    ⏱️ Time since last sync: 8 minutes
+2025-08-01 09:34:19,489 - spark - INFO -    ⏳ Time until next sync: 51 minutes
+2025-08-01 09:34:19,490 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:35:17,494 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:35:17,495 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:35:17,495 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:35:17,496 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:35:17,497 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:35:17,498 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:35:17,499 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:35:17,501 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:35:17,507 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:35:17,507 - spark - INFO -    ⏱️ Time since last sync: 9 minutes
+2025-08-01 09:35:17,508 - spark - INFO -    ⏳ Time until next sync: 50 minutes
+2025-08-01 09:35:17,509 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:36:17,495 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:36:17,495 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:36:17,496 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:36:17,496 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:36:17,497 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:36:17,499 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:36:17,499 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:36:17,499 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:36:17,504 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:36:17,505 - spark - INFO -    ⏱️ Time since last sync: 10 minutes
+2025-08-01 09:36:17,505 - spark - INFO -    ⏳ Time until next sync: 49 minutes
+2025-08-01 09:36:17,506 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:37:17,483 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:37:17,484 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:37:17,486 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:37:17,486 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:37:17,486 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:37:17,487 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:37:17,488 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:37:17,488 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:37:17,493 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:37:17,494 - spark - INFO -    ⏱️ Time since last sync: 11 minutes
+2025-08-01 09:37:17,495 - spark - INFO -    ⏳ Time until next sync: 48 minutes
+2025-08-01 09:37:17,496 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:38:17,502 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:38:17,508 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:38:17,509 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:38:17,513 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:38:17,514 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:38:17,515 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:38:17,518 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:38:17,529 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:38:17,546 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:38:17,550 - spark - INFO -    ⏱️ Time since last sync: 12 minutes
+2025-08-01 09:38:17,553 - spark - INFO -    ⏳ Time until next sync: 47 minutes
+2025-08-01 09:38:17,554 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:39:17,501 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:39:17,502 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:39:17,503 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:39:17,504 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:39:17,504 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:39:17,505 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:39:17,505 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:39:17,506 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:39:17,510 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:39:17,510 - spark - INFO -    ⏱️ Time since last sync: 13 minutes
+2025-08-01 09:39:17,510 - spark - INFO -    ⏳ Time until next sync: 46 minutes
+2025-08-01 09:39:17,511 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:39:47,383 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:39:47,385 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:39:47,386 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:39:47,387 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:39:47,388 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:39:47,388 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:39:47,389 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:39:47,390 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:39:47,395 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:39:47,395 - spark - INFO -    ⏱️ Time since last sync: 13 minutes
+2025-08-01 09:39:47,396 - spark - INFO -    ⏳ Time until next sync: 46 minutes
+2025-08-01 09:39:47,397 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:39:50,187 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:39:50,188 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:39:50,188 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:39:50,189 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:39:50,189 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:39:50,189 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:39:50,189 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:39:50,190 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:39:50,198 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:39:50,199 - spark - INFO -    ⏱️ Time since last sync: 13 minutes
+2025-08-01 09:39:50,199 - spark - INFO -    ⏳ Time until next sync: 46 minutes
+2025-08-01 09:39:50,200 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:40:48,752 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:40:48,753 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:40:48,754 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:40:48,755 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:40:48,756 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:40:48,757 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:40:48,757 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:40:48,758 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:40:48,765 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:40:48,765 - spark - INFO -    ⏱️ Time since last sync: 14 minutes
+2025-08-01 09:40:48,765 - spark - INFO -    ⏳ Time until next sync: 45 minutes
+2025-08-01 09:40:48,766 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:41:22,169 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:41:22,170 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:41:22,171 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:41:22,171 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:41:22,172 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:41:22,173 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:41:22,173 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:41:22,174 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:41:22,179 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:41:22,180 - spark - INFO -    ⏱️ Time since last sync: 15 minutes
+2025-08-01 09:41:22,180 - spark - INFO -    ⏳ Time until next sync: 44 minutes
+2025-08-01 09:41:22,181 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:41:24,609 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:41:24,610 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:41:24,611 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:41:24,612 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:41:24,612 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:41:24,613 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:41:24,614 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:41:24,615 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:41:24,620 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:41:24,621 - spark - INFO -    ⏱️ Time since last sync: 15 minutes
+2025-08-01 09:41:24,622 - spark - INFO -    ⏳ Time until next sync: 44 minutes
+2025-08-01 09:41:24,623 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:41:28,391 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:41:28,393 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:41:28,394 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:41:28,395 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:41:28,397 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:41:28,399 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:41:28,399 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:41:28,400 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:41:28,405 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:41:28,406 - spark - INFO -    ⏱️ Time since last sync: 15 minutes
+2025-08-01 09:41:28,407 - spark - INFO -    ⏳ Time until next sync: 44 minutes
+2025-08-01 09:41:28,408 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:41:31,055 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:41:31,056 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:41:31,056 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:41:31,056 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:41:31,057 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:41:31,058 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:41:31,058 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:41:31,059 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:41:31,063 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:41:31,064 - spark - INFO -    ⏱️ Time since last sync: 15 minutes
+2025-08-01 09:41:31,064 - spark - INFO -    ⏳ Time until next sync: 44 minutes
+2025-08-01 09:41:31,065 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:41:51,002 - spark - INFO - Fetching ticket details for user Ralph on 2025-08-01 (period: today)
+2025-08-01 09:41:51,002 - spark - INFO - Getting daily data for Ralph on 2025-08-01
+2025-08-01 09:41:51,004 - spark - INFO - ✅ Found legacy record for Ralph on 2025-08-01: 20 tickets
+2025-08-01 09:41:51,004 - spark - INFO - ✅ Retrieved ticket details for Ralph: 20 tickets
+2025-08-01 09:42:04,506 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:42:04,507 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:42:04,509 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:42:04,510 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:42:04,511 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:42:04,512 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:42:04,513 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:42:04,514 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:42:04,519 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:42:04,520 - spark - INFO -    ⏱️ Time since last sync: 16 minutes
+2025-08-01 09:42:04,520 - spark - INFO -    ⏳ Time until next sync: 43 minutes
+2025-08-01 09:42:04,521 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:42:07,184 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:42:07,185 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:42:07,186 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:42:07,186 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:42:07,187 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:42:07,188 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:42:07,189 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:42:07,190 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:42:07,198 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:42:07,199 - spark - INFO -    ⏱️ Time since last sync: 16 minutes
+2025-08-01 09:42:07,199 - spark - INFO -    ⏳ Time until next sync: 43 minutes
+2025-08-01 09:42:07,200 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:42:09,359 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:42:09,362 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:42:09,363 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:42:09,366 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:42:09,367 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:42:09,368 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:42:09,369 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:42:09,370 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:42:09,375 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:42:09,376 - spark - INFO -    ⏱️ Time since last sync: 16 minutes
+2025-08-01 09:42:09,376 - spark - INFO -    ⏳ Time until next sync: 43 minutes
+2025-08-01 09:42:09,377 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:42:11,387 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:42:11,389 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:42:11,389 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:42:11,390 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:42:11,390 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:42:11,391 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:42:11,391 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:42:11,392 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:42:11,397 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:42:11,398 - spark - INFO -    ⏱️ Time since last sync: 16 minutes
+2025-08-01 09:42:11,398 - spark - INFO -    ⏳ Time until next sync: 43 minutes
+2025-08-01 09:42:11,399 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:43:09,702 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:43:09,703 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:43:09,703 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:43:09,704 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:43:09,704 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:43:09,705 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:43:09,706 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:43:09,707 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:43:09,714 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:43:09,714 - spark - INFO -    ⏱️ Time since last sync: 17 minutes
+2025-08-01 09:43:09,715 - spark - INFO -    ⏳ Time until next sync: 42 minutes
+2025-08-01 09:43:09,716 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:43:13,067 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:43:13,078 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:43:13,082 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:43:13,083 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:43:13,084 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:43:13,085 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:43:13,085 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:43:13,086 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:43:13,091 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:43:13,092 - spark - INFO -    ⏱️ Time since last sync: 17 minutes
+2025-08-01 09:43:13,092 - spark - INFO -    ⏳ Time until next sync: 42 minutes
+2025-08-01 09:43:13,093 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:43:15,476 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:43:15,477 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:43:15,478 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:43:15,479 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:43:15,479 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:43:15,480 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:43:15,481 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:43:15,482 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:43:15,487 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:43:15,488 - spark - INFO -    ⏱️ Time since last sync: 17 minutes
+2025-08-01 09:43:15,488 - spark - INFO -    ⏳ Time until next sync: 42 minutes
+2025-08-01 09:43:15,489 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:44:14,517 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:44:14,531 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:44:14,535 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:44:14,547 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:44:14,562 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:44:14,569 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:44:14,578 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:44:14,595 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:44:14,602 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:44:14,605 - spark - INFO -    ⏱️ Time since last sync: 18 minutes
+2025-08-01 09:44:14,606 - spark - INFO -    ⏳ Time until next sync: 41 minutes
+2025-08-01 09:44:14,607 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:44:57,654 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:44:57,658 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:44:57,660 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:44:57,662 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:44:57,664 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:44:57,665 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:44:57,666 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:44:57,667 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:44:57,671 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:44:57,672 - spark - INFO -    ⏱️ Time since last sync: 18 minutes
+2025-08-01 09:44:57,672 - spark - INFO -    ⏳ Time until next sync: 41 minutes
+2025-08-01 09:44:57,673 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:45:00,337 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:45:00,341 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:45:00,343 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:45:00,343 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:45:00,343 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:45:00,345 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:45:00,345 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:45:00,345 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:45:00,350 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:45:00,351 - spark - INFO -    ⏱️ Time since last sync: 18 minutes
+2025-08-01 09:45:00,351 - spark - INFO -    ⏳ Time until next sync: 41 minutes
+2025-08-01 09:45:00,352 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:45:05,448 - spark - INFO - Fetching ticket details for user Ralph on 2025-08-01 (period: today)
+2025-08-01 09:45:05,449 - spark - INFO - Getting daily data for Ralph on 2025-08-01
+2025-08-01 09:45:05,450 - spark - INFO - ✅ Found legacy record for Ralph on 2025-08-01: 20 tickets
+2025-08-01 09:45:05,451 - spark - INFO - ✅ Retrieved ticket details for Ralph: 20 tickets
+2025-08-01 09:45:58,337 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:45:58,338 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:45:58,338 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:45:58,339 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:45:58,339 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:45:58,340 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:45:58,341 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:45:58,342 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:45:58,346 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:45:58,346 - spark - INFO -    ⏱️ Time since last sync: 19 minutes
+2025-08-01 09:45:58,347 - spark - INFO -    ⏳ Time until next sync: 40 minutes
+2025-08-01 09:45:58,348 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:46:58,334 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:46:58,334 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:46:58,334 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:46:58,336 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:46:58,336 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:46:58,337 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:46:58,337 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:46:58,338 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:46:58,343 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:46:58,344 - spark - INFO -    ⏱️ Time since last sync: 20 minutes
+2025-08-01 09:46:58,345 - spark - INFO -    ⏳ Time until next sync: 39 minutes
+2025-08-01 09:46:58,345 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:47:44,464 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:47:44,465 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:47:44,466 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:47:44,467 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:47:44,468 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:47:44,469 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:47:44,469 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:47:44,470 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:47:44,475 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:47:44,475 - spark - INFO -    ⏱️ Time since last sync: 21 minutes
+2025-08-01 09:47:44,476 - spark - INFO -    ⏳ Time until next sync: 38 minutes
+2025-08-01 09:47:44,477 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:47:46,830 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:47:46,831 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:47:46,831 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:47:46,832 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:47:46,832 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:47:46,833 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:47:46,834 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:47:46,835 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:47:46,840 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:47:46,840 - spark - INFO -    ⏱️ Time since last sync: 21 minutes
+2025-08-01 09:47:46,841 - spark - INFO -    ⏳ Time until next sync: 38 minutes
+2025-08-01 09:47:46,842 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
+2025-08-01 09:48:23,931 - spark - INFO - Fetching ticket details for user Ralph on 2025-08-01 (period: today)
+2025-08-01 09:48:23,931 - spark - INFO - Getting daily data for Ralph on 2025-08-01
+2025-08-01 09:48:23,932 - spark - INFO - ✅ Found legacy record for Ralph on 2025-08-01: 20 tickets
+2025-08-01 09:48:23,933 - spark - INFO - ✅ Retrieved ticket details for Ralph: 20 tickets
+2025-08-01 09:48:45,140 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-01 09:48:45,141 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 09:48:45,141 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 09:48:45,142 - spark - INFO - 📊 Getting today's closures
+2025-08-01 09:48:45,143 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 09:48:45,144 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 09:48:45,145 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 09:48:45,147 - spark - INFO - 📊 Found 12 legacy records
+2025-08-01 09:48:45,151 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 16:26:04.198246
+2025-08-01 09:48:45,152 - spark - INFO -    ⏱️ Time since last sync: 22 minutes
+2025-08-01 09:48:45,152 - spark - INFO -    ⏳ Time until next sync: 37 minutes
+2025-08-01 09:48:45,153 - spark - INFO - ✅ Retrieved 76 tickets for today using enhanced service
