@@ -356,8 +356,9 @@ def create_app(config_class=Config):
         
         # Initialize persistent leaderboard timer service
         try:
-            from app.services.leaderboard_timer_service import leaderboard_timer_service
+            from app.services.leaderboard_timer_service import get_leaderboard_timer_service
             # Start the timer service with 60-minute interval
+            leaderboard_timer_service = get_leaderboard_timer_service()
             leaderboard_timer_service.start_timer_service(60)
             app.logger.info("✅ Persistent leaderboard timer service started")
         except Exception as e:

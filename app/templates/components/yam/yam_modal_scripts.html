@@ -1,6 +1,11 @@
 <script>
 // Custom date modal functions
 window.openCustomDateModal = function() {
+    // CRITICAL: Hide all non-modal elements and disable page scrollbar
+    if (typeof window.hideAllNonModalElements === 'function') {
+        window.hideAllNonModalElements();
+    }
+    
     const modal = document.getElementById('customDateModal');
     modal.style.display = 'block';
     modal.classList.add('show');
@@ -17,6 +22,11 @@ window.closeCustomDateModal = function() {
     const modal = document.getElementById('customDateModal');
     modal.style.display = 'none';
     modal.classList.remove('show');
+    
+    // CRITICAL: Show all non-modal elements and re-enable page scrollbar
+    if (typeof window.showAllNonModalElements === 'function') {
+        window.showAllNonModalElements();
+    }
 };
 
 window.applyCustomDate = function() {
@@ -44,10 +54,14 @@ window.applyCustomDate = function() {
 
 // Outages Management Modal Functions
 window.openOutagesManagementModal = function() {
+    // CRITICAL: Hide all non-modal elements and disable page scrollbar
+    if (typeof window.hideAllNonModalElements === 'function') {
+        window.hideAllNonModalElements();
+    }
+    
     const modal = document.getElementById('outagesManagementModal');
     modal.style.display = 'block';
     modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
     
     // Add entrance animation
     const content = modal.querySelector('.custom-date-content');
@@ -81,7 +95,11 @@ window.closeOutagesManagementModal = function() {
         modal.classList.remove('show');
         resetOutageForm();
         stopRealTimeUpdates();
-        document.body.style.overflow = '';
+        
+        // CRITICAL: Show all non-modal elements and re-enable page scrollbar
+        if (typeof window.showAllNonModalElements === 'function') {
+            window.showAllNonModalElements();
+        }
     }, 300);
 }
 
@@ -117,9 +135,13 @@ window.openOutageDetail = function(outage) {
         ${extraActions}
     `;
 
+    // CRITICAL: Hide all non-modal elements and disable page scrollbar
+    if (typeof window.hideAllNonModalElements === 'function') {
+        window.hideAllNonModalElements();
+    }
+    
     modal.style.display = 'block';
     modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
 };
 
 window.closeOutageDetailModal = function() {
@@ -127,7 +149,11 @@ window.closeOutageDetailModal = function() {
     if (!modal) return;
     modal.style.display = 'none';
     modal.classList.remove('show');
-    document.body.style.overflow = '';
+    
+    // CRITICAL: Show all non-modal elements and re-enable page scrollbar
+    if (typeof window.showAllNonModalElements === 'function') {
+        window.showAllNonModalElements();
+    }
 };
  
  // Close modal when clicking outside

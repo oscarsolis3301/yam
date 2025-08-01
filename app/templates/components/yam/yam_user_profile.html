@@ -1436,6 +1436,11 @@
 
 <script>
 function openActivityModal() {
+    // CRITICAL: Hide all non-modal elements and disable page scrollbar
+    if (typeof window.hideAllNonModalElements === 'function') {
+        window.hideAllNonModalElements();
+    }
+    
     const modal = document.getElementById('activityModal');
     modal.classList.add('show');
     loadFullActivityHistory();
@@ -1444,6 +1449,11 @@ function openActivityModal() {
 function closeActivityModal() {
     const modal = document.getElementById('activityModal');
     modal.classList.remove('show');
+    
+    // CRITICAL: Show all non-modal elements and re-enable page scrollbar
+    if (typeof window.showAllNonModalElements === 'function') {
+        window.showAllNonModalElements();
+    }
 }
 
 function loadFullActivityHistory() {

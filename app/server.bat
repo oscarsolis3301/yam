@@ -4,6 +4,7 @@ echo ========================================
 echo    YAM SERVER - NETWORK ACCESS MODE
 echo    WITH HOT RELOADING ENABLED
 echo    ENHANCED SESSION MANAGEMENT
+echo    AUTOMATIC LEADERBOARD TIMER
 echo ========================================
 echo.
 
@@ -190,6 +191,21 @@ echo [INFO] Multiple sessions from same user are now allowed
 echo [INFO] This prevents infinite loading errors after server restart
 echo.
 
+REM START LEADERBOARD TIMER AUTOMATICALLY
+echo [INFO] Starting automatic leaderboard timer with optimal settings...
+echo [INFO] Timer will run with 60-minute intervals for maximum efficiency
+echo [INFO] No user interaction required - timer starts automatically
+
+REM Start the leaderboard timer in background with optimal settings
+start "YAM Leaderboard Timer" /min cmd /c "cd /d %~dp0 && python Freshworks\leaderboard.py --interval 60"
+
+REM Wait a moment for timer to initialize
+timeout /t 2 /nobreak >nul
+echo [SUCCESS] Leaderboard timer started successfully in background
+echo [INFO] Timer will automatically sync ticket data every 60 minutes
+echo [INFO] Timer window is minimized - check taskbar for status
+echo.
+
 echo [INFO] Starting YAM server with network access and HOT RELOADING...
 echo [INFO] Server will be accessible from all devices on your network
 echo [INFO] Local access: http://127.0.0.1:5000
@@ -201,12 +217,14 @@ echo [INFO] Static file auto-reload: ENABLED
 echo [INFO] Browser auto-refresh: ENABLED
 echo [INFO] Multiple sessions: ALLOWED
 echo [INFO] Session conflict resolution: ENABLED
+echo [INFO] Leaderboard timer: AUTO-STARTED (60min intervals)
 echo.
 echo [TIP] Press Ctrl+C to stop the server gracefully
 echo [TIP] HTML changes will reload automatically in browser
 echo [TIP] CSS/JS changes will reload automatically in browser
 echo [TIP] Multiple browser tabs/windows can now be logged in simultaneously
 echo [TIP] Server restart will no longer cause infinite loading errors
+echo [TIP] Leaderboard timer runs automatically in background
 echo.
 
 REM Set environment variables for hot reloading and enhanced session management
@@ -255,7 +273,9 @@ timeout /t 3 /nobreak >nul
 
 echo [INFO] Server started successfully
 echo [INFO] Server window is now active - you can interact with it directly
+echo [INFO] Leaderboard timer is running in background with 60-minute intervals
 echo [INFO] To stop the server: Close the server window OR press Ctrl+C in the server window
+echo [INFO] To check timer status: Look for "YAM Leaderboard Timer" in taskbar
 echo.
 echo [INFO] This window will now wait for you to stop the server...
 echo [INFO] Press any key in this window to initiate cleanup and exit...
@@ -272,6 +292,10 @@ REM Kill the server process
 echo [INFO] Terminating server process...
 taskkill /FI "WINDOWTITLE eq YAM Server*" /F >nul 2>&1
 taskkill /FI "IMAGENAME eq python.exe" /F >nul 2>&1
+
+REM Kill the leaderboard timer process
+echo [INFO] Terminating leaderboard timer process...
+taskkill /FI "WINDOWTITLE eq YAM Leaderboard Timer*" /F >nul 2>&1
 
 REM Wait for processes to terminate
 timeout /t 2 /nobreak >nul
@@ -292,6 +316,7 @@ if exist "scripts\shutdown_handler.ps1" (
 
 echo.
 echo [INFO] Server shutdown completed successfully
+echo [INFO] Leaderboard timer has been stopped
 echo [INFO] All user sessions have been cleared
 echo [INFO] Users will need to re-authenticate on next server start
 echo [INFO] Multiple sessions will be allowed to prevent conflicts

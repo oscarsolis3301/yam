@@ -2,3 +2,11 @@
 2025-07-31 15:33:00,950 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
 2025-07-31 15:33:00,952 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
 2025-07-31 15:33:00,984 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:15:11,321 - app - WARNING - Failed to start leaderboard timer service: 'LeaderboardTimerService' object has no attribute 'app'
+2025-08-01 07:15:11,346 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:15:11,349 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:15:11,391 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:23:34,717 - app - WARNING - Failed to start leaderboard timer service: 'LeaderboardTimerService' object has no attribute 'app'
+2025-08-01 07:23:34,741 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:23:34,743 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:23:34,768 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined

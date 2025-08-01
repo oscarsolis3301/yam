@@ -5,6 +5,7 @@ from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 from dotenv import load_dotenv
 import time
+import json
 
 # Add the app directory to the Python path so we can import our models
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -58,8 +59,42 @@ def load_id_name_map(filepath):
     return id_name_map
 
 def get_todays_tickets():
-    """Get tickets updated today using the FreshworksService"""
-    return freshworks_service.get_tickets_for_date()
+    """Get tickets updated today using the FreshworksService with proper filtering"""
+    today = datetime.now().date()
+    print(f"🎯 Fetching tickets for date: {today}")
+    
+    # Get all tickets updated today
+    all_tickets = freshworks_service.get_tickets_for_date(today)
+    print(f"📊 Retrieved {len(all_tickets)} total tickets updated today")
+    
+    # Filter for resolved tickets from our specific group
+    filtered_tickets = []
+    for ticket in all_tickets:
+        if not isinstance(ticket, dict):
+            continue
+            
+        # Check if ticket is resolved
+        if ticket.get('status') != STATUS_RESOLVED:
+            continue
+            
+        # Check if ticket is from our group
+        if ticket.get('group_id') != GROUP_ID:
+            continue
+            
+        # Check if ticket was actually updated on today's date
+        updated_at_str = ticket.get('updated_at')
+        if not updated_at_str:
+            continue
+            
+        try:
+            updated_at = datetime.strptime(updated_at_str, "%Y-%m-%dT%H:%M:%SZ").date()
+            if updated_at == today:
+                filtered_tickets.append(ticket)
+        except ValueError:
+            print(f"⚠️ Could not parse updated_at for ticket {ticket.get('id')}: {updated_at_str}")
+    
+    print(f"✅ Filtered to {len(filtered_tickets)} resolved tickets from group {GROUP_ID} for {today}")
+    return filtered_tickets
 
 def sync_user_mappings_to_db(id_name_map):
     """Sync user mappings from IDs.txt to the database using the service"""
@@ -93,17 +128,113 @@ def sync_ticket_closures_to_db(tickets, id_name_map):
     """Sync ticket closure data to the database using the enhanced service with historical tracking"""
     print("🔄 Syncing ticket closures to database with historical tracking...")
     
-    # Use the enhanced service to sync hourly closures
-    today = datetime.now().date()
-    current_hour = datetime.now().hour
-    
-    success = ticket_closure_service.sync_hourly_closures(today, current_hour)
-    
-    if success:
-        print("✅ Ticket closures synced successfully with historical tracking")
+    if not tickets:
+        print("⚠️ No tickets to sync - skipping database sync")
         return True
-    else:
-        print("❌ Failed to sync ticket closures")
+    
+    # Use the enhanced service to sync the actual tickets found
+    today = datetime.now().date()
+    
+    # Process each ticket and create closure records
+    closure_count = 0
+    for ticket in tickets:
+        if not isinstance(ticket, dict):
+            continue
+            
+        responder_id = ticket.get('responder_id')
+        if not responder_id:
+            continue
+            
+        ticket_id = ticket.get('id')
+        if not ticket_id:
+            continue
+            
+        # Create or update ticket closure record
+        try:
+            # First, try to find a mapped user for this Freshworks ID
+            mapping = FreshworksUserMapping.query.filter_by(
+                freshworks_user_id=responder_id
+            ).first()
+            
+            user_id = None
+            if mapping and mapping.user_id:
+                user_id = mapping.user_id
+                print(f"✅ Found mapped user for Freshworks ID {responder_id}: {mapping.freshworks_username}")
+            else:
+                print(f"⚠️ No mapped user found for Freshworks ID {responder_id}")
+                # Skip tickets from unmapped users for now
+                continue
+            
+            # Check if closure already exists for this user and date
+            existing_closure = TicketClosure.query.filter_by(
+                user_id=user_id,
+                date=today
+            ).first()
+            
+            if existing_closure:
+                # Update existing closure with additional ticket
+                ticket_numbers = []
+                if existing_closure.ticket_numbers:
+                    try:
+                        ticket_numbers = json.loads(existing_closure.ticket_numbers)
+                    except:
+                        ticket_numbers = []
+                
+                if str(ticket_id) not in ticket_numbers:
+                    ticket_numbers.append(str(ticket_id))
+                    existing_closure.tickets_closed = len(ticket_numbers)
+                    existing_closure.ticket_numbers = json.dumps(ticket_numbers)
+                    existing_closure.updated_at = datetime.utcnow()
+                    closure_count += 1
+            else:
+                # Create new closure record
+                closure = TicketClosure(
+                    user_id=user_id,  # Use the mapped user ID
+                    freshworks_user_id=responder_id,
+                    date=today,
+                    tickets_closed=1,
+                    ticket_numbers=json.dumps([str(ticket_id)]),
+                    created_at=datetime.utcnow(),
+                    updated_at=datetime.utcnow()
+                )
+                db.session.add(closure)
+                closure_count += 1
+                
+        except Exception as e:
+            print(f"⚠️ Error processing ticket {ticket_id}: {e}")
+            continue
+    
+    # Note: User linking is now handled during ticket processing above
+    print(f"✅ User linking completed during ticket processing")
+    
+    # Commit all changes
+    try:
+        db.session.commit()
+        print(f"✅ Successfully synced {closure_count} ticket closures to database")
+        
+        # Update sync metadata
+        metadata = TicketSyncMetadata.query.filter_by(sync_date=today).first()
+        if metadata:
+            metadata.sync_count += 1
+            metadata.tickets_processed += len(tickets)
+            metadata.last_sync_time = datetime.utcnow()
+        else:
+            metadata = TicketSyncMetadata(
+                sync_date=today,
+                sync_count=1,
+                tickets_processed=len(tickets),
+                last_sync_time=datetime.utcnow()
+            )
+            db.session.add(metadata)
+        
+        db.session.commit()
+        print(f"✅ Updated sync metadata: {metadata.sync_count} syncs, {metadata.tickets_processed} tickets")
+        
+        return True
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"❌ Error committing ticket closures: {e}")
         return False
 
 def summarize_closed_by_responder(tickets, id_name_map):
@@ -179,6 +310,10 @@ def main():
         with app.app_context():
             print("🚀 Starting enhanced leaderboard sync with ticket tracking...")
             print("=" * 60)
+            print(f"📅 Target Date: {datetime.now().date()}")
+            print(f"🎯 Group ID: {GROUP_ID}")
+            print(f"✅ Status Resolved: {STATUS_RESOLVED}")
+            print("=" * 60)
             
             # Load user mappings
             script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -192,13 +327,29 @@ def main():
             link_users_to_mappings()
             
             # Get ticket data
+            print("\n🎟️ Fetching tickets from Freshworks API...")
             tickets = get_todays_tickets()
-            print(f"\n🎟️ Retrieved {len(tickets)} ticket(s) updated today.")
+            print(f"📊 Retrieved {len(tickets)} ticket(s) updated today.")
+            
+            if tickets:
+                print("📋 Sample tickets:")
+                for i, ticket in enumerate(tickets[:3]):  # Show first 3 tickets
+                    print(f"  {i+1}. Ticket ID: {ticket.get('id')}, Status: {ticket.get('status')}, Group: {ticket.get('group_id')}, Responder: {ticket.get('responder_id')}")
+                if len(tickets) > 3:
+                    print(f"  ... and {len(tickets) - 3} more tickets")
+            else:
+                print("⚠️ No tickets found - this might indicate:")
+                print("   - No tickets were updated today")
+                print("   - No tickets match the group ID or status criteria")
+                print("   - API connection issues")
+                print("   - Date/time zone issues")
             
             # Generate summary file (original functionality)
+            print("\n📝 Generating summary file...")
             summarize_closed_by_responder(tickets, id_name_map)
             
             # Sync to database for YAM dashboard with ticket numbers
+            print("\n💾 Syncing to database...")
             success = sync_ticket_closures_to_db(tickets, id_name_map)
             
             if success:
@@ -261,25 +412,65 @@ def main():
         print(f"❌ HTTP error: {e}")
     except Exception as e:
         print(f"❌ Unexpected error: {e}")
+        import traceback
+        traceback.print_exc()
 
 def loop(interval_minutes=60):
     """Continuously run the leaderboard sync every `interval_minutes`. Displays a live countdown in the terminal."""
+    print(f"🔄 Starting continuous sync loop with {interval_minutes}-minute intervals")
+    print("=" * 60)
+    
     while True:
-        start_time = datetime.now()
-        main()
-        # Calculate how long the sync took and determine remaining time until next run
-        elapsed = (datetime.now() - start_time).total_seconds()
-        sleep_time = max(0, interval_minutes * 60 - elapsed)
-        next_run = datetime.now() + timedelta(seconds=sleep_time)
-        print(f"\n⏰ Next sync scheduled at {next_run.strftime('%Y-%m-%d %H:%M:%S')} (in {int(sleep_time)} seconds)")
-
-        # Live countdown
-        for remaining in range(int(sleep_time), 0, -1):
-            hrs, rem = divmod(remaining, 3600)
-            mins, secs = divmod(rem, 60)
-            print(f"\r⏳ Next sync in {hrs:02d}:{mins:02d}:{secs:02d}", end='', flush=True)
-            time.sleep(1)
-        print()  # ensure newline after countdown completes
+        try:
+            start_time = datetime.now()
+            print(f"\n🚀 Starting sync at {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+            print("=" * 60)
+            
+            main()
+            
+            # Calculate how long the sync took and determine remaining time until next run
+            elapsed = (datetime.now() - start_time).total_seconds()
+            sleep_time = max(0, interval_minutes * 60 - elapsed)
+            next_run = datetime.now() + timedelta(seconds=sleep_time)
+            
+            print(f"\n⏰ Next sync scheduled at {next_run.strftime('%Y-%m-%d %H:%M:%S')}")
+            print(f"⏱️ Sync took {elapsed:.1f} seconds, waiting {int(sleep_time)} seconds until next sync")
+            print("=" * 60)
+            
+            # Enhanced live countdown with progress bar
+            if sleep_time > 0:
+                print("⏳ Live countdown to next sync:")
+                for remaining in range(int(sleep_time), 0, -1):
+                    hrs, rem = divmod(remaining, 3600)
+                    mins, secs = divmod(rem, 60)
+                    
+                    # Calculate progress percentage
+                    progress = ((interval_minutes * 60 - remaining) / (interval_minutes * 60)) * 100
+                    progress_bar_length = 30
+                    filled_length = int(progress_bar_length * progress / 100)
+                    bar = '█' * filled_length + '░' * (progress_bar_length - filled_length)
+                    
+                    # Clear line and show enhanced countdown
+                    print(f"\r⏳ [{bar}] {hrs:02d}:{mins:02d}:{secs:02d} remaining | {progress:.1f}% complete", end='', flush=True)
+                    
+                    # Add a small indicator every 10 seconds
+                    if remaining % 10 == 0:
+                        print(f" | ⏰ {next_run.strftime('%H:%M:%S')}", end='', flush=True)
+                    
+                    time.sleep(1)
+                
+                print()  # ensure newline after countdown completes
+                print("🔄 Starting next sync cycle...")
+            else:
+                print("⚡ No wait time - starting next sync immediately")
+                
+        except KeyboardInterrupt:
+            print("\n\n👋 Interrupted by user - exiting leaderboard sync loop.")
+            break
+        except Exception as e:
+            print(f"\n❌ Error in sync loop: {e}")
+            print("🔄 Retrying in 60 seconds...")
+            time.sleep(60)
 
 if __name__ == "__main__":
     import argparse

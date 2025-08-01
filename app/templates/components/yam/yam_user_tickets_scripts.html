@@ -1868,6 +1868,11 @@ function showUserTicketDetails(username, ticketCount) {
     // ENHANCED STABILITY: Backup chart data before opening user details modal
     backupChartData();
     
+    // CRITICAL: Hide all non-modal elements and disable page scrollbar
+    if (typeof window.hideAllNonModalElements === 'function') {
+        window.hideAllNonModalElements();
+    }
+    
     // Show loading state
     const modal = document.getElementById('userTicketDetailsModal');
     if (modal) {
@@ -2085,6 +2090,11 @@ function closeUserTicketDetailsModal() {
     const modal = document.getElementById('userTicketDetailsModal');
     if (modal) {
         modal.classList.remove('show');
+        
+        // CRITICAL: Show all non-modal elements and re-enable page scrollbar
+        if (typeof window.showAllNonModalElements === 'function') {
+            window.showAllNonModalElements();
+        }
         
         // ENHANCED STABILITY: Verify chart stability after modal closes
         setTimeout(() => {

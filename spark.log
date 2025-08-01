@@ -814,3 +814,195 @@ with app.app_context(). See the documentation for more information.
 2025-07-30 09:30:00,887 - spark - ERROR - ❌ No Flask app context available
 2025-07-30 14:11:52,779 - spark - INFO - ✅ Ticket closure database tables verified/created
 2025-07-30 14:11:52,784 - spark - INFO - ✅ Found legacy record for Nick on 2025-07-29: 35 tickets
+2025-08-01 07:14:37,848 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:14:47,317 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:14:56,517 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:15:05,449 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:15:14,715 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:15:24,357 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:15:34,148 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:15:43,140 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:15:52,428 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:16:01,021 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:16:07,152 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:16:13,635 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:16:20,185 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:16:26,747 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:16:33,270 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:16:40,316 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:24:17,227 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:24:24,295 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:24:31,178 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:24:37,871 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:24:44,617 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:24:51,312 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:24:58,156 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:25:04,724 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:25:11,743 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:25:18,486 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:25:25,731 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:25:32,715 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:25:39,476 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:25:46,313 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:25:53,259 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:25:59,927 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:26:06,814 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:26:14,379 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:26:21,736 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:26:29,073 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:26:36,476 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:26:43,830 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:26:50,815 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:26:58,088 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:27:05,478 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:27:12,796 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:27:19,890 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:27:27,703 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:27:35,185 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:27:42,035 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:27:49,563 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:27:56,658 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:28:03,391 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:28:10,666 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:28:17,277 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:28:23,533 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:28:29,750 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:28:36,061 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:28:42,427 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:28:48,700 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:28:54,869 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:29:00,905 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:29:06,926 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:29:12,990 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:29:19,066 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:29:25,312 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:29:31,718 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:29:38,321 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:29:44,549 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:29:50,837 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:29:56,973 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:30:03,366 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:30:09,541 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:30:15,602 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:30:21,998 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:30:28,506 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:30:34,829 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:30:40,859 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:30:47,110 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:30:53,140 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 07:35:36,470 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-08-01 07:35:36,478 - spark - INFO - ✅ User mappings synced successfully: 0 created, 0 updated
+2025-08-01 07:35:36,995 - spark - INFO - Fetching page 1... Status: 200
+2025-08-01 07:35:37,502 - spark - INFO - Fetching page 2... Status: 200
+2025-08-01 07:35:37,986 - spark - INFO - Fetching page 3... Status: 200
+2025-08-01 07:35:38,540 - spark - INFO - Fetching page 4... Status: 200
+2025-08-01 07:35:39,063 - spark - INFO - Fetching page 5... Status: 200
+2025-08-01 07:35:39,582 - spark - INFO - Fetching page 6... Status: 200
+2025-08-01 07:35:40,076 - spark - INFO - Fetching page 7... Status: 200
+2025-08-01 07:35:40,664 - spark - INFO - Fetching page 8... Status: 200
+2025-08-01 07:35:41,292 - spark - INFO - Fetching page 9... Status: 200
+2025-08-01 07:35:41,810 - spark - INFO - Fetching page 10... Status: 200
+2025-08-01 07:35:42,328 - spark - INFO - Fetching page 11... Status: 200
+2025-08-01 07:35:42,854 - spark - INFO - Fetching page 12... Status: 200
+2025-08-01 07:35:43,649 - spark - INFO - Fetching page 13... Status: 200
+2025-08-01 07:35:44,201 - spark - INFO - Fetching page 14... Status: 200
+2025-08-01 07:35:44,678 - spark - INFO - Fetching page 15... Status: 200
+2025-08-01 07:35:45,422 - spark - INFO - Fetching page 16... Status: 200
+2025-08-01 07:35:45,932 - spark - INFO - Fetching page 17... Status: 200
+2025-08-01 07:35:46,305 - spark - INFO - Fetching page 18... Status: 200
+2025-08-01 07:37:14,354 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-08-01 07:37:14,362 - spark - INFO - ✅ User mappings synced successfully: 0 created, 0 updated
+2025-08-01 07:37:14,890 - spark - INFO - Fetching page 1... Status: 200
+2025-08-01 07:37:15,420 - spark - INFO - Fetching page 2... Status: 200
+2025-08-01 07:37:15,878 - spark - INFO - Fetching page 3... Status: 200
+2025-08-01 07:37:16,372 - spark - INFO - Fetching page 4... Status: 200
+2025-08-01 07:37:16,951 - spark - INFO - Fetching page 5... Status: 200
+2025-08-01 07:37:17,538 - spark - INFO - Fetching page 6... Status: 200
+2025-08-01 07:37:18,117 - spark - INFO - Fetching page 7... Status: 200
+2025-08-01 07:37:18,994 - spark - INFO - Fetching page 8... Status: 200
+2025-08-01 07:37:19,699 - spark - INFO - Fetching page 9... Status: 200
+2025-08-01 07:37:20,248 - spark - INFO - Fetching page 10... Status: 200
+2025-08-01 07:37:20,799 - spark - INFO - Fetching page 11... Status: 200
+2025-08-01 07:37:21,368 - spark - INFO - Fetching page 12... Status: 200
+2025-08-01 07:37:21,933 - spark - INFO - Fetching page 13... Status: 200
+2025-08-01 07:37:22,413 - spark - INFO - Fetching page 14... Status: 200
+2025-08-01 07:37:22,910 - spark - INFO - Fetching page 15... Status: 200
+2025-08-01 07:37:24,007 - spark - INFO - Fetching page 16... Status: 200
+2025-08-01 07:37:24,518 - spark - INFO - Fetching page 17... Status: 200
+2025-08-01 07:37:25,153 - spark - INFO - Fetching page 18... Status: 200
+2025-08-01 07:39:52,667 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-01 07:39:52,670 - spark - INFO - ✅ Ticket closure database tables verified/created
+2025-08-01 07:39:52,671 - spark - INFO - 📅 Target date: 2025-08-01
+2025-08-01 07:39:52,671 - spark - INFO - 📊 Getting today's closures
+2025-08-01 07:39:52,672 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-01
+2025-08-01 07:39:52,675 - spark - INFO - 📊 Found 0 daily records
+2025-08-01 07:39:52,676 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-01
+2025-08-01 07:39:52,678 - spark - INFO - 📊 Found 9 legacy records
+2025-08-01 07:39:52,682 - spark - INFO - ⏰ Rate limiting active. Last sync: 2025-08-01 14:37:25.451528
+2025-08-01 07:39:52,682 - spark - INFO -    ⏱️ Time since last sync: 2 minutes
+2025-08-01 07:39:52,683 - spark - INFO -    ⏳ Time until next sync: 57 minutes
+2025-08-01 07:47:22,882 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-08-01 07:47:22,890 - spark - INFO - ✅ User mappings synced successfully: 0 created, 0 updated
+2025-08-01 07:47:23,799 - spark - INFO - Fetching page 1... Status: 200
+2025-08-01 07:47:24,461 - spark - INFO - Fetching page 2... Status: 200
+2025-08-01 07:47:24,960 - spark - INFO - Fetching page 3... Status: 200
+2025-08-01 07:47:25,554 - spark - INFO - Fetching page 4... Status: 200
+2025-08-01 07:47:26,171 - spark - INFO - Fetching page 5... Status: 200
+2025-08-01 07:47:26,655 - spark - INFO - Fetching page 6... Status: 200
+2025-08-01 07:47:27,142 - spark - INFO - Fetching page 7... Status: 200
+2025-08-01 07:47:28,067 - spark - INFO - Fetching page 8... Status: 200
+2025-08-01 07:47:28,655 - spark - INFO - Fetching page 9... Status: 200
+2025-08-01 07:47:29,180 - spark - INFO - Fetching page 10... Status: 200
+2025-08-01 07:47:30,086 - spark - INFO - Fetching page 11... Status: 200
+2025-08-01 07:47:30,637 - spark - INFO - Fetching page 12... Status: 200
+2025-08-01 07:47:31,093 - spark - INFO - Fetching page 13... Status: 200
+2025-08-01 07:47:31,614 - spark - INFO - Fetching page 14... Status: 200
+2025-08-01 07:47:32,097 - spark - INFO - Fetching page 15... Status: 200
+2025-08-01 07:47:32,806 - spark - INFO - Fetching page 16... Status: 200
+2025-08-01 07:47:33,694 - spark - INFO - Fetching page 17... Status: 200
+2025-08-01 07:47:34,569 - spark - INFO - Fetching page 18... Status: 200
+2025-08-01 07:47:35,035 - spark - INFO - Fetching page 19... Status: 200
+2025-08-01 07:52:24,504 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-08-01 07:52:24,510 - spark - INFO - ✅ User mappings synced successfully: 0 created, 0 updated
+2025-08-01 07:52:25,223 - spark - INFO - Fetching page 1... Status: 200
+2025-08-01 07:52:25,820 - spark - INFO - Fetching page 2... Status: 200
+2025-08-01 07:52:26,683 - spark - INFO - Fetching page 3... Status: 200
+2025-08-01 07:52:27,630 - spark - INFO - Fetching page 4... Status: 200
+2025-08-01 07:52:28,210 - spark - INFO - Fetching page 5... Status: 200
+2025-08-01 07:52:29,114 - spark - INFO - Fetching page 6... Status: 200
+2025-08-01 07:52:29,969 - spark - INFO - Fetching page 7... Status: 200
+2025-08-01 07:52:30,880 - spark - INFO - Fetching page 8... Status: 200
+2025-08-01 07:52:31,852 - spark - INFO - Fetching page 9... Status: 200
+2025-08-01 07:52:32,674 - spark - INFO - Fetching page 10... Status: 200
+2025-08-01 07:52:33,193 - spark - INFO - Fetching page 11... Status: 200
+2025-08-01 07:52:33,670 - spark - INFO - Fetching page 12... Status: 200
+2025-08-01 07:52:34,176 - spark - INFO - Fetching page 13... Status: 200
+2025-08-01 07:52:34,690 - spark - INFO - Fetching page 14... Status: 200
+2025-08-01 07:52:35,633 - spark - INFO - Fetching page 15... Status: 200
+2025-08-01 07:52:36,172 - spark - INFO - Fetching page 16... Status: 200
+2025-08-01 07:52:36,690 - spark - INFO - Fetching page 17... Status: 200
+2025-08-01 07:52:37,528 - spark - INFO - Fetching page 18... Status: 200
+2025-08-01 07:52:38,035 - spark - INFO - Fetching page 19... Status: 200
+2025-08-01 07:52:38,318 - spark - INFO - Fetching page 20... Status: 200
+2025-08-01 07:57:26,002 - spark - INFO - 📋 Loaded 18 user mappings from C:\Users\oscar.solis\Documents\yam\app\Freshworks\IDs.txt
+2025-08-01 07:57:26,008 - spark - INFO - ✅ User mappings synced successfully: 0 created, 0 updated
+2025-08-01 07:57:26,544 - spark - INFO - Fetching page 1... Status: 200
+2025-08-01 07:57:27,136 - spark - INFO - Fetching page 2... Status: 200
+2025-08-01 07:57:27,610 - spark - INFO - Fetching page 3... Status: 200
+2025-08-01 07:57:28,139 - spark - INFO - Fetching page 4... Status: 200
+2025-08-01 07:57:28,621 - spark - INFO - Fetching page 5... Status: 200
+2025-08-01 07:57:29,173 - spark - INFO - Fetching page 6... Status: 200
+2025-08-01 07:57:29,697 - spark - INFO - Fetching page 7... Status: 200
+2025-08-01 07:57:30,222 - spark - INFO - Fetching page 8... Status: 200
+2025-08-01 07:57:30,712 - spark - INFO - Fetching page 9... Status: 200
+2025-08-01 07:57:31,664 - spark - INFO - Fetching page 10... Status: 200
+2025-08-01 07:57:32,422 - spark - INFO - Fetching page 11... Status: 200
+2025-08-01 07:57:32,957 - spark - INFO - Fetching page 12... Status: 200
+2025-08-01 07:57:33,465 - spark - INFO - Fetching page 13... Status: 200
+2025-08-01 07:57:33,987 - spark - INFO - Fetching page 14... Status: 200
+2025-08-01 07:57:34,530 - spark - INFO - Fetching page 15... Status: 200
+2025-08-01 07:57:35,053 - spark - INFO - Fetching page 16... Status: 200
+2025-08-01 07:57:35,573 - spark - INFO - Fetching page 17... Status: 200
+2025-08-01 07:57:36,609 - spark - INFO - Fetching page 18... Status: 200
+2025-08-01 07:57:37,590 - spark - INFO - Fetching page 19... Status: 200
+2025-08-01 07:57:38,082 - spark - INFO - Fetching page 20... Status: 200

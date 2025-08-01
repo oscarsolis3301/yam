@@ -2995,13 +2995,14 @@ def session_heartbeat():
         }), 500
 
 # Import the timer service
-from app.services.leaderboard_timer_service import leaderboard_timer_service
+from app.services.leaderboard_timer_service import get_leaderboard_timer_service
 
 @bp.route('/timer/status', methods=['GET'])
 @login_required
 def get_timer_status():
     """Get the current status of the leaderboard timer"""
     try:
+        leaderboard_timer_service = get_leaderboard_timer_service()
         status = leaderboard_timer_service.get_timer_status()
         if status:
             return jsonify({
@@ -3027,6 +3028,7 @@ def start_timer():
         data = request.get_json()
         interval_minutes = data.get('interval_minutes', 60) if data else 60
         
+        leaderboard_timer_service = get_leaderboard_timer_service()
         leaderboard_timer_service.start_timer_service(interval_minutes)
         
         return jsonify({
@@ -3044,6 +3046,7 @@ def start_timer():
 def stop_timer():
     """Stop the leaderboard timer service"""
     try:
+        leaderboard_timer_service = get_leaderboard_timer_service()
         leaderboard_timer_service.stop_timer_service()
         
         return jsonify({
@@ -3064,6 +3067,7 @@ def reset_timer():
         data = request.get_json()
         interval_minutes = data.get('interval_minutes', 60) if data else 60
         
+        leaderboard_timer_service = get_leaderboard_timer_service()
         success = leaderboard_timer_service.reset_timer(interval_minutes)
         
         if success:
@@ -3074,8 +3078,8 @@ def reset_timer():
         else:
             return jsonify({
                 'success': False,
-                'error': 'Failed to reset timer'
-            }), 400
+                'error': 'Timer not found'
+            }), 404
     except Exception as e:
         return jsonify({
             'success': False,
@@ -3084,15 +3088,15 @@ def reset_timer():
 
 @bp.route('/timer/run-now', methods=['POST'])
 @login_required
-def run_leaderboard_sync_now():
-    """Manually trigger the leaderboard sync immediately"""
+def run_timer_now():
+    """Manually trigger the leaderboard sync now"""
     try:
-        # This will run the sync immediately and update the timer
+        leaderboard_timer_service = get_leaderboard_timer_service()
         leaderboard_timer_service._run_leaderboard_sync()
         
         return jsonify({
             'success': True,
-            'message': 'Leaderboard sync triggered'
+            'message': 'Leaderboard sync triggered manually'
         })
     except Exception as e:
         return jsonify({

@@ -5,8 +5,7 @@
 .widget-modal,
 .custom-date-modal,
 .performance-modal,
-.admin-sync-modal,
-.user-ticket-details-modal {
+.admin-sync-modal {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
@@ -30,22 +29,60 @@
     contain: layout style paint !important;
 }
 
+/* User Ticket Details Modal - Use centralized positioning */
+.user-ticket-details-modal {
+    position: fixed !important;
+    top: 120px !important; /* Move modals lower to clear banner completely */
+    left: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 120px) !important; /* Adjust for banner height */
+    background: rgba(0, 0, 0, 0.95) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 2147483647 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    transform: none !important;
+    transform-origin: center center !important;
+    pointer-events: auto !important;
+    isolation: isolate !important;
+    contain: layout style paint !important;
+}
+
 .yam-modal-overlay.show,
 .widget-modal.show,
 .custom-date-modal.show,
 .performance-modal.show,
-.admin-sync-modal.show,
+.admin-sync-modal.show {
+    display: flex !important;
+    animation: modalFadeIn 0.3s ease-out !important;
+}
+
 .user-ticket-details-modal.show {
     display: flex !important;
     animation: modalFadeIn 0.3s ease-out !important;
+    /* CRITICAL: Ensure complete isolation when modal is shown */
+    position: fixed !important;
+    top: 120px !important; /* Move modals lower to clear banner completely */
+    left: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 120px) !important; /* Adjust for banner height */
+    background: rgba(0, 0, 0, 0.95) !important;
+    backdrop-filter: blur(25px) !important;
+    z-index: 2147483647 !important;
+    pointer-events: auto !important;
+    isolation: isolate !important;
+    contain: layout style paint !important;
 }
 
 .yam-modal-container,
 .widget-modal-content,
 .custom-date-content,
 .performance-modal-content,
-.admin-sync-modal-content,
-.user-ticket-details-modal-content {
+.admin-sync-modal-content {
     position: absolute !important;
     top: 50% !important;
     left: 50% !important;
@@ -65,6 +102,32 @@
     display: flex !important;
     flex-direction: column !important;
     animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    z-index: 2147483647 !important;
+}
+
+.user-ticket-details-modal-content {
+    background: rgba(15, 15, 15, 0.98) !important;
+    border-radius: 24px !important;
+    width: 92% !important;
+    max-width: 1200px !important;
+    max-height: calc(90vh - 120px) !important;
+    min-height: auto !important;
+    height: auto !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(30px) !important;
+    overflow: hidden !important;
+    animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    transform: translateY(-4vh) !important; /* Move background higher for better positioning */
+    margin: 0 auto !important;
+    padding: 0 !important;
+    flex-direction: column !important;
+    display: flex !important;
+    align-self: center !important;
+    justify-self: center !important;
     z-index: 2147483647 !important;
 }
 

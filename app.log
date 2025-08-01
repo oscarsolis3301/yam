@@ -385,3 +385,53 @@ Exception: Missing user_loader or request_loader. Refer to http://flask-login.re
  * Running on http://10.20.44.45:5000
 2025-07-31 15:36:25,484 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
 2025-07-31 15:36:30,015 - werkzeug - INFO - 127.0.0.1 - - [31/Jul/2025 15:36:30] "[33mGET /api/tickets/closures/today HTTP/1.1[0m" 404 -
+2025-08-01 07:35:36,400 - app - WARNING - Failed to start leaderboard timer service: 'LeaderboardTimerService' object has no attribute 'app'
+2025-08-01 07:35:36,433 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:35:36,436 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:35:36,466 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:37:14,296 - app - WARNING - Failed to start leaderboard timer service: 'LeaderboardTimerService' object has no attribute 'app'
+2025-08-01 07:37:14,322 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:37:14,326 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:37:14,351 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:39:07,453 - app - WARNING - Failed to start leaderboard timer service: 'LeaderboardTimerService' object has no attribute 'app'
+2025-08-01 07:39:07,483 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:39:07,486 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:39:07,513 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:39:52,565 - app - WARNING - Failed to start leaderboard timer service: 'LeaderboardTimerService' object has no attribute 'app'
+2025-08-01 07:39:52,589 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:39:52,591 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:39:52,616 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:39:52,643 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:39:52,667 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:47:13,347 - app - WARNING - Failed to start leaderboard timer service: 'LeaderboardTimerService' object has no attribute 'app'
+2025-08-01 07:47:13,376 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:47:13,378 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:47:13,404 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:47:22,831 - app - WARNING - Failed to start leaderboard timer service: 'LeaderboardTimerService' object has no attribute 'app'
+2025-08-01 07:47:22,857 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:47:22,859 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:47:22,879 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:52:24,478 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:52:24,501 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:57:25,975 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:57:25,998 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:58:58,593 - app - WARNING - Failed to start leaderboard timer service: 'LeaderboardTimerService' object has no attribute 'app'
+2025-08-01 07:58:58,617 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:58:58,620 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:58:58,645 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:59:01,921 - app - WARNING - Failed to start leaderboard timer service: 'LeaderboardTimerService' object has no attribute 'app'
+2025-08-01 07:59:01,943 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:59:01,946 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:59:01,968 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:59:08,762 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:59:08,786 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:59:18,922 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:59:18,943 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:59:29,047 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:59:29,164 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:59:39,274 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:59:39,310 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:59:49,423 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:59:49,444 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined
+2025-08-01 07:59:59,543 - app - WARNING - Failed to start leaderboard timer service: minute must be in 0..59
+2025-08-01 07:59:59,565 - app - WARNING - Blueprint registration failed: name 'chat_bp' is not defined

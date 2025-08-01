@@ -11,11 +11,22 @@ from app.extensions import db
 class LeaderboardTimerService:
     """Service to manage persistent leaderboard sync timer that survives server restarts"""
     
+    _instance = None
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(LeaderboardTimerService, cls).__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+    
     def __init__(self):
+        if self._initialized:
+            return
         self.app = create_app()
         self.is_running = False
         self.timer_thread = None
         self.leaderboard_process = None
+        self._initialized = True
         
     def start_timer_service(self, interval_minutes=60):
         """Start the persistent timer service"""
@@ -33,8 +44,16 @@ class LeaderboardTimerService:
             self.timer_thread = threading.Thread(target=self._timer_loop, daemon=True)
             self.timer_thread.start()
             
+            # Show initial countdown
+            time_until_next = TimerState.get_time_until_next_run()
+            hours = time_until_next // 3600
+            minutes = (time_until_next % 3600) // 60
+            seconds = time_until_next % 60
+            
             print(f"✅ Timer service started with {interval_minutes} minute interval")
             print(f"🕐 Next sync scheduled at: {timer.next_run}")
+            print(f"⏳ Initial countdown: {hours:02d}:{minutes:02d}:{seconds:02d}")
+            print("=" * 60)
     
     def stop_timer_service(self):
         """Stop the timer service"""
@@ -57,6 +76,8 @@ class LeaderboardTimerService:
     
     def _timer_loop(self):
         """Main timer loop that checks if it's time to run the leaderboard sync"""
+        print("🕐 Leaderboard Timer Service: Starting countdown loop...")
+        
         while self.is_running:
             try:
                 with self.app.app_context():
@@ -68,11 +89,19 @@ class LeaderboardTimerService:
                         # Get time until next run
                         time_until_next = TimerState.get_time_until_next_run()
                         if time_until_next > 0:
-                            # Log countdown every 5 minutes
-                            if time_until_next % 300 == 0:  # Every 5 minutes
-                                hours = time_until_next // 3600
-                                minutes = (time_until_next % 3600) // 60
-                                print(f"🕐 Next leaderboard sync in {hours}h {minutes}m")
+                            # Calculate hours, minutes, seconds
+                            hours = time_until_next // 3600
+                            minutes = (time_until_next % 3600) // 60
+                            seconds = time_until_next % 60
+                            
+                            # Log countdown every 5 minutes or when getting close
+                            if time_until_next % 300 == 0 or time_until_next <= 600:  # Every 5 minutes or last 10 minutes
+                                if time_until_next <= 300:  # Last 5 minutes
+                                    print(f"⚠️  URGENT: Next leaderboard sync in {hours:02d}:{minutes:02d}:{seconds:02d}")
+                                elif time_until_next <= 600:  # Last 10 minutes
+                                    print(f"🕐 WARNING: Next leaderboard sync in {hours:02d}:{minutes:02d}:{seconds:02d}")
+                                else:
+                                    print(f"🕐 Next leaderboard sync in {hours:02d}:{minutes:02d}:{seconds:02d}")
                         
                         # Sleep for 1 minute before checking again
                         time.sleep(60)
@@ -172,5 +201,9 @@ class LeaderboardTimerService:
                 return True
             return False
 
-# Global instance
-leaderboard_timer_service = LeaderboardTimerService() 
+# Create singleton instance
+def get_leaderboard_timer_service():
+    """Get the singleton instance of the leaderboard timer service"""
+    if LeaderboardTimerService._instance is None:
+        LeaderboardTimerService._instance = LeaderboardTimerService()
+    return LeaderboardTimerService._instance 

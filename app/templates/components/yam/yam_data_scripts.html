@@ -628,6 +628,11 @@ window.checkChartStatus = function() {
 
 // Modal functions for current outages
 function openCurrentOutagesModal() {
+    // CRITICAL: Hide all non-modal elements and disable page scrollbar
+    if (typeof window.hideAllNonModalElements === 'function') {
+        window.hideAllNonModalElements();
+    }
+    
     const modal = document.getElementById('currentOutagesModal');
     if (modal) {
         modal.classList.add('show');
@@ -642,6 +647,11 @@ function closeCurrentOutagesModal() {
     const modal = document.getElementById('currentOutagesModal');
     if (modal) {
         modal.classList.remove('show');
+        
+        // CRITICAL: Show all non-modal elements and re-enable page scrollbar
+        if (typeof window.showAllNonModalElements === 'function') {
+            window.showAllNonModalElements();
+        }
     }
 }
 

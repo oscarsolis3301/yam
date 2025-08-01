@@ -754,12 +754,30 @@ function toggleShuffle() {
 }
 
 function openPlaylistModal() {
-    document.getElementById('playlistModal').classList.add('show');
-    renderPlaylist();
+    // Use the global modal function to ensure proper isolation
+    if (typeof window.openPlaylistModal === 'function') {
+        window.openPlaylistModal();
+    } else {
+        // Fallback to direct modal opening with scrollbar management
+        if (typeof window.hideAllNonModalElements === 'function') {
+            window.hideAllNonModalElements();
+        }
+        document.getElementById('playlistModal').classList.add('show');
+        renderPlaylist();
+    }
 }
 
 function closePlaylistModal() {
-    document.getElementById('playlistModal').classList.remove('show');
+    // Use the global modal function to ensure proper isolation
+    if (typeof window.closePlaylistModal === 'function') {
+        window.closePlaylistModal();
+    } else {
+        // Fallback to direct modal closing with scrollbar management
+        document.getElementById('playlistModal').classList.remove('show');
+        if (typeof window.showAllNonModalElements === 'function') {
+            window.showAllNonModalElements();
+        }
+    }
 }
 
 function renderPlaylist() {

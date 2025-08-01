@@ -838,6 +838,11 @@ function selectDate(dateString) {
 }
 
 function openCalendarModal() {
+    // CRITICAL: Hide all non-modal elements and disable page scrollbar
+    if (typeof window.hideAllNonModalElements === 'function') {
+        window.hideAllNonModalElements();
+    }
+    
     const modal = document.getElementById('calendarModal');
     modal.classList.add('show');
     
@@ -852,6 +857,11 @@ function closeCalendarModal() {
     const modal = document.getElementById('calendarModal');
     modal.classList.remove('show');
     document.getElementById('calendarForm').reset();
+    
+    // CRITICAL: Show all non-modal elements and re-enable page scrollbar
+    if (typeof window.showAllNonModalElements === 'function') {
+        window.showAllNonModalElements();
+    }
 }
 
 function addCalendarEvent(event) {
@@ -945,6 +955,11 @@ function goToToday() {
 }
 
 function openCalendarEventModal() {
+    // CRITICAL: Hide all non-modal elements and disable page scrollbar
+    if (typeof window.hideAllNonModalElements === 'function') {
+        window.hideAllNonModalElements();
+    }
+    
     // Set today's date as default
     const today = new Date();
     const eventStartDate = document.getElementById('eventStartDate');
@@ -957,8 +972,6 @@ function openCalendarEventModal() {
     const eventModal = document.getElementById('calendarEventModal');
     if (eventModal) {
         eventModal.classList.add('show');
-        document.body.classList.add('modal-open');
-        document.documentElement.classList.add('modal-open');
     }
 }
 
@@ -966,12 +979,15 @@ function closeCalendarEventModal() {
     const eventModal = document.getElementById('calendarEventModal');
     if (eventModal) {
         eventModal.classList.remove('show');
-        document.body.classList.remove('modal-open');
-        document.documentElement.classList.remove('modal-open');
         // Reset the form
         const form = document.getElementById('calendarForm');
         if (form) {
             form.reset();
+        }
+        
+        // CRITICAL: Show all non-modal elements and re-enable page scrollbar
+        if (typeof window.showAllNonModalElements === 'function') {
+            window.showAllNonModalElements();
         }
     }
 }

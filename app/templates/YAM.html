@@ -283,6 +283,52 @@ body {
     max-width: 100% !important;
 }
 
+/* CRITICAL: Disable page scrolling when modal is open */
+body.modal-open {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+}
+
+html.modal-open {
+    overflow: hidden !important;
+}
+
+/* CRITICAL: Force disable page scrollbar when ANY modal is open */
+body:has(.widget-modal.show),
+body:has(.yam-modal-overlay.show),
+body:has(.custom-date-modal.show),
+body:has(.performance-modal.show),
+body:has(.admin-sync-modal.show),
+body:has(.user-ticket-details-modal.show),
+body:has(.reminder-modal.show),
+body:has(#calendarModal.show),
+body:has(#calendarEventModal.show),
+body:has(#playlistModal.show),
+body:has(#reminderModal.show) {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+    top: 0 !important;
+    left: 0 !important;
+}
+
+html:has(.widget-modal.show),
+html:has(.yam-modal-overlay.show),
+html:has(.custom-date-modal.show),
+html:has(.performance-modal.show),
+html:has(.admin-sync-modal.show),
+html:has(.user-ticket-details-modal.show),
+html:has(.reminder-modal.show),
+html:has(#calendarModal.show),
+html:has(#calendarEventModal.show),
+html:has(#playlistModal.show),
+html:has(#reminderModal.show) {
+    overflow: hidden !important;
+}
+
 /* ENSURE ALL CARDS AND WIDGETS FIT PROPERLY */
 .card,
 .outages-card,
@@ -292,6 +338,146 @@ body {
     max-width: 100% !important;
     box-sizing: border-box !important;
     margin: 0 !important;
+}
+
+/* CRITICAL: Hide all non-modal elements when any modal is active */
+.widget-modal.show ~ *,
+.yam-modal-overlay.show ~ *,
+.custom-date-modal.show ~ *,
+.performance-modal.show ~ *,
+.admin-sync-modal.show ~ *,
+.user-ticket-details-modal.show ~ *,
+.reminder-modal.show ~ *,
+#calendarModal.show ~ *,
+#calendarEventModal.show ~ *,
+#playlistModal.show ~ *,
+#reminderModal.show ~ * {
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* CRITICAL: Specifically hide media player widget when any modal is active */
+.widget-modal.show ~ .media-player-widget,
+.yam-modal-overlay.show ~ .media-player-widget,
+.custom-date-modal.show ~ .media-player-widget,
+.performance-modal.show ~ .media-player-widget,
+.admin-sync-modal.show ~ .media-player-widget,
+.user-ticket-details-modal.show ~ .media-player-widget,
+.reminder-modal.show ~ .media-player-widget,
+#calendarModal.show ~ .media-player-widget,
+#calendarEventModal.show ~ .media-player-widget,
+#playlistModal.show ~ .media-player-widget,
+#reminderModal.show ~ .media-player-widget,
+.widget-modal.show ~ .widget.media-player-widget,
+.yam-modal-overlay.show ~ .widget.media-player-widget,
+.custom-date-modal.show ~ .widget.media-player-widget,
+.performance-modal.show ~ .widget.media-player-widget,
+.admin-sync-modal.show ~ .widget.media-player-widget,
+.user-ticket-details-modal.show ~ .widget.media-player-widget,
+.reminder-modal.show ~ .widget.media-player-widget,
+#calendarModal.show ~ .widget.media-player-widget,
+#calendarEventModal.show ~ .widget.media-player-widget,
+#playlistModal.show ~ .widget.media-player-widget,
+#reminderModal.show ~ .widget.media-player-widget {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    z-index: -9999 !important;
+    transform: translateX(-9999px) !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
+/* CRITICAL: Ensure modal content is always visible and interactive */
+.widget-modal.show,
+.yam-modal-overlay.show,
+.custom-date-modal.show,
+.performance-modal.show,
+.admin-sync-modal.show,
+.user-ticket-details-modal.show,
+.reminder-modal.show,
+#calendarModal.show,
+#calendarEventModal.show,
+#playlistModal.show,
+#reminderModal.show {
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+/* CRITICAL: Hide media player widget when ANY modal is active anywhere in the document */
+.widget-modal.show ~ .media-player-widget,
+.yam-modal-overlay.show ~ .media-player-widget,
+.custom-date-modal.show ~ .media-player-widget,
+.performance-modal.show ~ .media-player-widget,
+.admin-sync-modal.show ~ .media-player-widget,
+.user-ticket-details-modal.show ~ .media-player-widget,
+.reminder-modal.show ~ .media-player-widget,
+#calendarModal.show ~ .media-player-widget,
+#calendarEventModal.show ~ .media-player-widget,
+#playlistModal.show ~ .media-player-widget,
+#reminderModal.show ~ .media-player-widget,
+.widget-modal.show ~ .widget.media-player-widget,
+.yam-modal-overlay.show ~ .widget.media-player-widget,
+.custom-date-modal.show ~ .widget.media-player-widget,
+.performance-modal.show ~ .widget.media-player-widget,
+.admin-sync-modal.show ~ .widget.media-player-widget,
+.user-ticket-details-modal.show ~ .widget.media-player-widget,
+.reminder-modal.show ~ .widget.media-player-widget,
+#calendarModal.show ~ .widget.media-player-widget,
+#calendarEventModal.show ~ .widget.media-player-widget,
+#playlistModal.show ~ .widget.media-player-widget,
+#reminderModal.show ~ .widget.media-player-widget,
+/* Also target media player widget anywhere in the document when any modal is active */
+body:has(.widget-modal.show) .media-player-widget,
+body:has(.yam-modal-overlay.show) .media-player-widget,
+body:has(.custom-date-modal.show) .media-player-widget,
+body:has(.performance-modal.show) .media-player-widget,
+body:has(.admin-sync-modal.show) .media-player-widget,
+body:has(.user-ticket-details-modal.show) .media-player-widget,
+body:has(.reminder-modal.show) .media-player-widget,
+body:has(#calendarModal.show) .media-player-widget,
+body:has(#calendarEventModal.show) .media-player-widget,
+body:has(#playlistModal.show) .media-player-widget,
+body:has(#reminderModal.show) .media-player-widget,
+body:has(.widget-modal.show) .widget.media-player-widget,
+body:has(.yam-modal-overlay.show) .widget.media-player-widget,
+body:has(.custom-date-modal.show) .widget.media-player-widget,
+body:has(.performance-modal.show) .widget.media-player-widget,
+body:has(.admin-sync-modal.show) .widget.media-player-widget,
+body:has(.user-ticket-details-modal.show) .widget.media-player-widget,
+body:has(.reminder-modal.show) .widget.media-player-widget,
+body:has(#calendarModal.show) .widget.media-player-widget,
+body:has(#calendarEventModal.show) .widget.media-player-widget,
+body:has(#playlistModal.show) .widget.media-player-widget,
+body:has(#reminderModal.show) .widget.media-player-widget {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    z-index: -9999 !important;
+    transform: translateX(-9999px) !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
+.widget-modal.show *,
+.yam-modal-overlay.show *,
+.custom-date-modal.show *,
+.performance-modal.show *,
+.admin-sync-modal.show *,
+.user-ticket-details-modal.show *,
+.reminder-modal.show *,
+#calendarModal.show *,
+#calendarEventModal.show *,
+#playlistModal.show *,
+#reminderModal.show * {
+    visibility: visible !important;
+    pointer-events: auto !important;
 }
 
 /* ENSURE CHARTS RESPOND PROPERLY */
@@ -374,13 +560,13 @@ body {
 #reminderModal {
     display: none !important;
     position: fixed !important;
-    top: 0 !important;
+    top: 80px !important; /* Move modals higher to cover more of the dashboard */
     left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    background: rgba(0, 0, 0, 0.85) !important;
-    backdrop-filter: blur(20px) !important;
-    z-index: 999999999 !important;
+    width: 100vw !important;
+    height: calc(100vh - 80px) !important; /* Adjust height to account for banner */
+    background: rgba(0, 0, 0, 0.95) !important;
+    backdrop-filter: blur(25px) !important;
+    z-index: 2147483647 !important; /* Maximum z-index value */
     animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     padding: 0 !important;
     margin: 0 !important;
@@ -393,6 +579,9 @@ body {
     max-width: none !important;
     max-height: none !important;
     transform: none !important;
+    pointer-events: auto !important;
+    isolation: isolate !important;
+    contain: layout style paint !important;
 }
 
 .widget-modal.show,
@@ -409,6 +598,18 @@ body {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    /* CRITICAL: Ensure complete isolation when modal is shown */
+    position: fixed !important;
+    top: 80px !important; /* Move modals higher to cover more of the dashboard */
+    left: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 80px) !important; /* Adjust height to account for banner */
+    background: rgba(0, 0, 0, 0.95) !important;
+    backdrop-filter: blur(25px) !important;
+    z-index: 2147483647 !important;
+    pointer-events: auto !important;
+    isolation: isolate !important;
+    contain: layout style paint !important;
 }
 
 /* PERFECT MODAL CENTERING AND SIZING */
@@ -423,7 +624,7 @@ body {
     border-radius: 24px !important;
     width: 92% !important;
     max-width: 1000px !important;
-    max-height: 90vh !important;
+    max-height: calc(90vh - 80px) !important; /* Adjust for higher modal position */
     min-height: auto !important;
     height: auto !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -438,7 +639,7 @@ body {
     left: auto !important;
     right: auto !important;
     bottom: auto !important;
-    transform: translateY(-8vh) !important;
+    transform: translateY(-4vh) !important; /* Move background higher for better positioning */
     margin: 0 auto !important;
     padding: 0 !important;
     min-width: auto !important;
@@ -449,15 +650,15 @@ body {
     justify-self: center !important;
 }
 
-/* ENHANCED CALENDAR MODAL - TALLER AND NO SCROLLING */
+/* ENHANCED CALENDAR MODAL - SMALLER AND BETTER POSITIONED */
 .calendar-modal-content {
     background: rgba(15, 15, 15, 0.98) !important;
     border-radius: 24px !important;
-    width: 95% !important;
-    max-width: 1200px !important;
-    height: 95vh !important;
-    max-height: 95vh !important;
-    min-height: 95vh !important;
+    width: 85% !important; /* Make modal smaller */
+    max-width: 1000px !important; /* Reduce max width */
+    height: calc(85vh - 80px) !important; /* Adjust for higher modal position */
+    max-height: calc(85vh - 80px) !important; /* Adjust for higher modal position */
+    min-height: calc(85vh - 80px) !important; /* Adjust for higher modal position */
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     box-shadow: 
         0 25px 50px rgba(0, 0, 0, 0.6),
@@ -470,7 +671,7 @@ body {
     left: auto !important;
     right: auto !important;
     bottom: auto !important;
-    transform: translateY(-8vh) !important;
+    transform: translateY(-6vh) !important; /* Move background higher */
     margin: 0 auto !important;
     padding: 0 !important;
     min-width: auto !important;
@@ -558,7 +759,7 @@ body {
 .user-ticket-details-modal-body,
 .reminder-modal-body {
     padding: 0.8rem !important;
-    max-height: calc(90vh - 80px) !important;
+    max-height: calc(90vh - 160px) !important; /* Adjust for higher modal position + header */
     height: auto !important;
     overflow-y: visible !important;
     overflow-x: hidden !important;
@@ -571,11 +772,11 @@ body {
     scrollbar-color: rgba(255, 255, 255, 0.3) transparent !important;
 }
 
-/* ENHANCED CALENDAR MODAL BODY - FULL HEIGHT UTILIZATION */
+/* ENHANCED CALENDAR MODAL BODY - SMALLER AND BETTER POSITIONED */
 #calendarModal .widget-modal-body {
-    padding: 1rem !important;
-    max-height: calc(95vh - 100px) !important;
-    height: calc(95vh - 100px) !important;
+    padding: 1.5rem !important; /* Add more padding to move content down */
+    max-height: calc(85vh - 200px) !important; /* Adjust for higher modal position + header */
+    height: calc(85vh - 200px) !important; /* Adjust for higher modal position + header */
     overflow: hidden !important;
     flex: 1 !important;
     margin: 0 !important;
@@ -583,6 +784,8 @@ body {
     background: transparent !important;
     display: flex !important;
     flex-direction: column !important;
+    justify-content: flex-start !important; /* Ensure content starts from top */
+    align-items: center !important; /* Center content horizontally */
 }
 
 /* Custom scrollbar styling for modal body */
@@ -707,20 +910,22 @@ document.addEventListener('DOMContentLoaded', function() {
         if (userTicketsCanvas && userTicketsCanvas.chart) {
             const chart = userTicketsCanvas.chart;
             
-            // Ensure the chart has proper interaction settings
-            if (chart.options) {
-                chart.options.onClick = function(event, elements) {
-                    if (elements.length > 0) {
-                        const element = elements[0];
-                        const username = this.data.labels[element.index];
-                        const ticketCount = this.data.datasets[0].data[element.index];
-                        
-                        console.log(`🎯 User clicked on ${username} with ${ticketCount} tickets`);
-                        if (typeof showUserTicketDetails === 'function') {
-                            showUserTicketDetails(username, ticketCount);
+                            // Ensure the chart has proper interaction settings
+                if (chart.options) {
+                    chart.options.onClick = function(event, elements) {
+                        if (elements.length > 0) {
+                            const element = elements[0];
+                            const username = this.data.labels[element.index];
+                            const ticketCount = this.data.datasets[0].data[element.index];
+                            
+                            console.log(`🎯 User clicked on ${username} with ${ticketCount} tickets`);
+                            if (typeof openUserTicketDetailsModal === 'function') {
+                                openUserTicketDetailsModal(username, ticketCount);
+                            } else if (typeof showUserTicketDetails === 'function') {
+                                showUserTicketDetails(username, ticketCount);
+                            }
                         }
-                    }
-                };
+                    };
                 
                 // Ensure tooltips work properly
                 if (!chart.options.plugins) chart.options.plugins = {};
@@ -840,7 +1045,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     to { 
         opacity: 1;
-        transform: translateY(-8vh) scale(1);
+        transform: translateY(-4vh) scale(1); /* Reduced offset since we're already below banner */
     }
 }
 
@@ -852,11 +1057,11 @@ document.addEventListener('DOMContentLoaded', function() {
 @keyframes calendarModalSlideIn {
     from { 
         opacity: 0;
-        transform: translateY(-8vh) scale(0.95);
+        transform: translateY(-4vh) scale(0.95); /* Reduced offset since we're already below banner */
     }
     to { 
         opacity: 1;
-        transform: translateY(-8vh) scale(1);
+        transform: translateY(-4vh) scale(1); /* Reduced offset since we're already below banner */
     }
 }
 
@@ -913,29 +1118,31 @@ document.addEventListener('DOMContentLoaded', function() {
     overflow: hidden !important;
 }
 
-/* ENHANCED CALENDAR CONTAINER FOR MODAL - FULL HEIGHT */
+/* ENHANCED CALENDAR CONTAINER FOR MODAL - SMALLER AND BETTER POSITIONED */
 #calendarModal .calendar-container {
     width: 100% !important;
     height: 100% !important;
-    padding: 0.5rem !important;
+    padding: 1rem !important; /* Add more padding to move content down */
     display: flex !important;
     flex-direction: column !important;
-    gap: 1rem !important;
+    gap: 1.5rem !important; /* Increase gap for better spacing */
     min-height: auto !important;
     align-items: center !important;
-    justify-content: space-between !important;
+    justify-content: flex-start !important; /* Start from top */
     flex: 1 !important;
     overflow: hidden !important;
+    margin-top: 1rem !important; /* Move content down */
 }
 
 .calendar-header {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    margin-bottom: 0.8rem !important;
+    margin-bottom: 1rem !important; /* Increase bottom margin */
+    margin-top: 0.5rem !important; /* Add top margin to move down */
     padding: 0 0.5rem !important;
-    width: 100% !important;
-    max-width: 650px !important;
+    width: 90% !important; /* Match grid width */
+    max-width: 700px !important; /* Match grid max width */
     margin-left: auto !important;
     margin-right: auto !important;
 }
@@ -985,18 +1192,18 @@ document.addEventListener('DOMContentLoaded', function() {
     justify-items: center !important;
 }
 
-/* ENHANCED CALENDAR GRID FOR MODAL - FULL HEIGHT UTILIZATION */
+/* ENHANCED CALENDAR GRID FOR MODAL - SMALLER AND BETTER POSITIONED */
 #calendarModal .calendar-grid {
     display: grid !important;
     grid-template-columns: repeat(7, 1fr) !important;
-    gap: 8px !important;
-    width: 100% !important;
-    max-width: 800px !important;
+    gap: 6px !important; /* Slightly smaller gap */
+    width: 90% !important; /* Make grid smaller */
+    max-width: 700px !important; /* Reduce max width */
     background: rgba(255, 255, 255, 0.05) !important;
     border-radius: 16px !important;
-    padding: 16px !important;
-    height: calc(100% - 120px) !important;
-    min-height: 400px !important;
+    padding: 14px !important; /* Slightly smaller padding */
+    height: calc(100% - 100px) !important; /* Adjust for higher modal position */
+    min-height: 350px !important; /* Reduce minimum height */
     margin: 0 auto !important;
     align-items: center !important;
     justify-items: center !important;
@@ -1132,10 +1339,10 @@ document.addEventListener('DOMContentLoaded', function() {
 #calendarModal .calendar-quick-actions {
     display: flex !important;
     gap: 1rem !important;
-    margin-top: 0.5rem !important;
+    margin-top: 1rem !important; /* Add more top margin to move down */
     padding: 0 0.5rem !important;
-    width: 100% !important;
-    max-width: 800px !important;
+    width: 90% !important; /* Match grid width */
+    max-width: 700px !important; /* Match grid max width */
     margin-left: auto !important;
     margin-right: auto !important;
     flex-shrink: 0 !important;
@@ -1194,19 +1401,344 @@ document.addEventListener('DOMContentLoaded', function() {
     transform: translateY(-1px) !important;
     box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;
 }
+
+/* CRITICAL: Final fallback to ensure media player widget is hidden when any modal is active */
+body:has(.widget-modal.show) .media-player-widget,
+body:has(.yam-modal-overlay.show) .media-player-widget,
+body:has(.custom-date-modal.show) .media-player-widget,
+body:has(.performance-modal.show) .media-player-widget,
+body:has(.admin-sync-modal.show) .media-player-widget,
+body:has(.user-ticket-details-modal.show) .media-player-widget,
+body:has(.reminder-modal.show) .media-player-widget,
+body:has(#calendarModal.show) .media-player-widget,
+body:has(#calendarEventModal.show) .media-player-widget,
+body:has(#playlistModal.show) .media-player-widget,
+body:has(#reminderModal.show) .media-player-widget,
+body:has(.widget-modal.show) .widget.media-player-widget,
+body:has(.yam-modal-overlay.show) .widget.media-player-widget,
+body:has(.custom-date-modal.show) .widget.media-player-widget,
+body:has(.performance-modal.show) .widget.media-player-widget,
+body:has(.admin-sync-modal.show) .widget.media-player-widget,
+body:has(.user-ticket-details-modal.show) .widget.media-player-widget,
+body:has(.reminder-modal.show) .widget.media-player-widget,
+body:has(#calendarModal.show) .widget.media-player-widget,
+body:has(#calendarEventModal.show) .widget.media-player-widget,
+body:has(#playlistModal.show) .widget.media-player-widget,
+body:has(#reminderModal.show) .widget.media-player-widget {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    z-index: -9999 !important;
+    transform: translateX(-9999px) !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    border: 0 !important;
+}
+
+/* CRITICAL: Ensure modals are always positioned below sidebar banner */
+.widget-modal.show,
+.yam-modal-overlay.show,
+.custom-date-modal.show,
+.performance-modal.show,
+.admin-sync-modal.show,
+.user-ticket-details-modal.show,
+.reminder-modal.show,
+#calendarModal.show,
+#calendarEventModal.show,
+#playlistModal.show,
+#reminderModal.show {
+    top: 80px !important; /* Move modals higher to cover more of the dashboard */
+    height: calc(100vh - 80px) !important; /* Adjusted height */
+    z-index: 2147483647 !important; /* Maximum z-index */
+}
+
+/* ENHANCED USER TICKET DETAILS MODAL STYLING */
+.user-ticket-details-modal {
+    display: none !important;
+    position: fixed !important;
+    top: 120px !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 120px) !important;
+    background: rgba(0, 0, 0, 0.95) !important;
+    backdrop-filter: blur(25px) !important;
+    z-index: 2147483647 !important;
+    animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    pointer-events: auto !important;
+    isolation: isolate !important;
+    contain: layout style paint !important;
+}
+
+.user-ticket-details-modal.show {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.user-ticket-details-modal-content {
+    background: rgba(15, 15, 15, 0.98) !important;
+    border-radius: 24px !important;
+    width: 92% !important;
+    max-width: 1200px !important;
+    max-height: calc(90vh - 120px) !important;
+    min-height: auto !important;
+    height: auto !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(30px) !important;
+    overflow: hidden !important;
+    animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    transform: translateY(-2vh) !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    flex-direction: column !important;
+    display: flex !important;
+    align-self: center !important;
+    justify-self: center !important;
+}
+
+.user-ticket-details-modal-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 1.5rem 2rem !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    flex-shrink: 0 !important;
+}
+
+.user-ticket-details-modal-header h3 {
+    color: #ffffff !important;
+    margin: 0 !important;
+    font-size: 1.3rem !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.8rem !important;
+}
+
+.user-ticket-details-modal-close {
+    background: none !important;
+    border: none !important;
+    color: #888888 !important;
+    font-size: 1.2rem !important;
+    cursor: pointer !important;
+    padding: 0.5rem !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+}
+
+.user-ticket-details-modal-close:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    transform: scale(1.1) !important;
+}
+
+.user-ticket-details-modal-body {
+    padding: 0.8rem !important;
+    max-height: calc(90vh - 200px) !important;
+    height: auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    flex: 1 !important;
+    margin: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent !important;
+}
+
+.user-ticket-details-modal-body::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+.user-ticket-details-modal-body::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+.user-ticket-details-modal-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3) !important;
+    border-radius: 3px !important;
+}
+
+.user-ticket-details-modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5) !important;
+}
 </style>
 
 <!-- Simple JavaScript matching Activity Modal -->
 <script>
 
-// ENHANCED MODAL FUNCTIONS WITH BODY SCROLL LOCK
-function openCalendarModal() {
+// ENHANCED MODAL FUNCTIONS WITH BODY SCROLL LOCK AND ELEMENT ISOLATION
+// Make functions globally available for other components
+// CRITICAL: Enhanced page scrollbar management
+window.disablePageScrollbar = function() {
+    // Calculate scrollbar width to prevent layout shift
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    
+    // Store original styles for restoration
+    window.originalBodyOverflow = document.body.style.overflow;
+    window.originalDocumentOverflow = document.documentElement.style.overflow;
+    window.originalBodyPaddingRight = document.body.style.paddingRight;
+    
+    // Completely disable page scrolling
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    
+    // Prevent layout shift by adding padding equal to scrollbar width
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+    
+    // Add modal-open class for additional CSS targeting
+    document.body.classList.add('modal-open');
+    document.documentElement.classList.add('modal-open');
+    
+    console.log('🔒 Page scrollbar completely disabled with layout shift prevention');
+};
+
+window.enablePageScrollbar = function() {
+    // Restore original styles
+    document.body.style.overflow = window.originalBodyOverflow || '';
+    document.documentElement.style.overflow = window.originalDocumentOverflow || '';
+    document.body.style.paddingRight = window.originalBodyPaddingRight || '';
+    
+    // Remove modal-open classes
+    document.body.classList.remove('modal-open');
+    document.documentElement.classList.remove('modal-open');
+    
+    // Clear stored values
+    window.originalBodyOverflow = undefined;
+    window.originalDocumentOverflow = undefined;
+    window.originalBodyPaddingRight = undefined;
+    
+    console.log('🔓 Page scrollbar restored with original layout');
+};
+
+// CRITICAL: Function to specifically hide media player widget
+window.hideMediaPlayerWidget = function() {
+    const mediaPlayerWidgets = document.querySelectorAll('.media-player-widget, .widget.media-player-widget');
+    mediaPlayerWidgets.forEach(widget => {
+        widget.style.display = 'none';
+        widget.style.visibility = 'hidden';
+        widget.style.opacity = '0';
+        widget.style.pointerEvents = 'none';
+        widget.style.position = 'absolute';
+        widget.style.zIndex = '-9999';
+        widget.style.transform = 'translateX(-9999px)';
+        widget.style.width = '0';
+        widget.style.height = '0';
+        widget.style.overflow = 'hidden';
+    });
+    console.log('🔒 Media player widget specifically hidden');
+};
+
+// CRITICAL: Function to specifically show media player widget
+window.showMediaPlayerWidget = function() {
+    const mediaPlayerWidgets = document.querySelectorAll('.media-player-widget, .widget.media-player-widget');
+    mediaPlayerWidgets.forEach(widget => {
+        widget.style.display = '';
+        widget.style.visibility = '';
+        widget.style.opacity = '';
+        widget.style.pointerEvents = '';
+        widget.style.position = '';
+        widget.style.zIndex = '';
+        widget.style.transform = '';
+        widget.style.width = '';
+        widget.style.height = '';
+        widget.style.overflow = '';
+    });
+    console.log('🔓 Media player widget specifically restored');
+};
+
+window.hideAllNonModalElements = function() {
+    // CRITICAL: Disable page scrollbar first
+    disablePageScrollbar();
+    
+    // Hide all dashboard containers and widgets when modal is open
+    const elementsToHide = [
+        '.dashboard-container',
+        '.sidebar',
+        '.yam-main-content',
+        '.charts-grid',
+        '.dashboard-widgets',
+        '.user-profile',
+        '.welcome-header',
+        '.directory-grid'
+    ];
+    
+    elementsToHide.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(element => {
+            element.style.visibility = 'hidden';
+            element.style.pointerEvents = 'none';
+        });
+    });
+    
+    // CRITICAL: Specifically target media player widget with stronger hiding
+    hideMediaPlayerWidget();
+    
+    console.log('🔒 Hidden all non-modal elements and disabled page scrollbar');
+}
+
+window.showAllNonModalElements = function() {
+    // CRITICAL: Re-enable page scrollbar first
+    enablePageScrollbar();
+    
+    // Show all dashboard containers and widgets when modal is closed
+    const elementsToShow = [
+        '.dashboard-container',
+        '.sidebar',
+        '.yam-main-content',
+        '.charts-grid',
+        '.dashboard-widgets',
+        '.user-profile',
+        '.welcome-header',
+        '.directory-grid'
+    ];
+    
+    elementsToShow.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(element => {
+            element.style.visibility = '';
+            element.style.pointerEvents = '';
+        });
+    });
+    
+    // CRITICAL: Restore media player widget with proper styling
+    showMediaPlayerWidget();
+    
+    console.log('🔓 Restored all non-modal elements and re-enabled page scrollbar');
+}
+
+window.openCalendarModal = function() {
     const modal = document.getElementById('calendarModal');
     if (modal) {
-        // Lock body scrolling - disable page scrollbar
-        document.body.style.overflow = 'hidden';
-        document.documentElement.style.overflow = 'hidden';
-        document.body.style.paddingRight = '0px'; // Prevent layout shift
+        // Hide all non-modal elements first (this now handles scrollbar disabling)
+        hideAllNonModalElements();
+        
+        // Adjust modal positioning for banner height
+        if (typeof adjustModalPositioning === 'function') {
+            adjustModalPositioning();
+        }
         
         modal.classList.add('show');
         
@@ -1221,27 +1753,25 @@ function openCalendarModal() {
     }
 }
 
-function closeCalendarModal() {
+window.closeCalendarModal = function() {
     const modal = document.getElementById('calendarModal');
     if (modal) {
         modal.classList.remove('show');
-        // Restore body scrolling - re-enable page scrollbar
-        document.body.style.overflow = '';
-        document.documentElement.style.overflow = '';
-        document.body.style.paddingRight = '';
-        // Remove any potential scroll lock classes
-        document.body.classList.remove('modal-open');
-        document.documentElement.classList.remove('modal-open');
+        // Show all non-modal elements (this now handles scrollbar restoration)
+        showAllNonModalElements();
     }
 }
 
-function openCalendarEventModal() {
+window.openCalendarEventModal = function() {
     const modal = document.getElementById('calendarEventModal');
     if (modal) {
-        // Lock body scrolling - disable page scrollbar
-        document.body.style.overflow = 'hidden';
-        document.documentElement.style.overflow = 'hidden';
-        document.body.style.paddingRight = '0px'; // Prevent layout shift
+        // Hide all non-modal elements first (this now handles scrollbar disabling)
+        hideAllNonModalElements();
+        
+        // Adjust modal positioning for banner height
+        if (typeof adjustModalPositioning === 'function') {
+            adjustModalPositioning();
+        }
         
         modal.classList.add('show');
         
@@ -1255,50 +1785,71 @@ function openCalendarEventModal() {
     }
 }
 
-function closeCalendarEventModal() {
+window.closeCalendarEventModal = function() {
     const modal = document.getElementById('calendarEventModal');
     if (modal) {
         modal.classList.remove('show');
-        // Restore body scrolling - re-enable page scrollbar
-        document.body.style.overflow = '';
-        document.documentElement.style.overflow = '';
-        document.body.style.paddingRight = '';
-        // Remove any potential scroll lock classes
-        document.body.classList.remove('modal-open');
-        document.documentElement.classList.remove('modal-open');
+        // Show all non-modal elements (this now handles scrollbar restoration)
+        showAllNonModalElements();
         // Reset the form
         const form = document.getElementById('calendarForm');
         if (form) form.reset();
     }
 }
 
-function openReminderModal() {
+window.openReminderModal = function() {
     // Use calendar event modal for reminders
     openCalendarEventModal();
 }
 
-function openPlaylistModal() {
-    const modal = document.getElementById('playlistModal');
-    if (modal) {
-        // Lock body scrolling - disable page scrollbar
-        document.body.style.overflow = 'hidden';
-        document.documentElement.style.overflow = 'hidden';
-        document.body.style.paddingRight = '0px'; // Prevent layout shift
-        modal.classList.add('show');
+// Enhanced function to open user ticket details modal with proper positioning
+window.openUserTicketDetailsModal = function(username, ticketCount) {
+    console.log(`🔍 Opening user ticket details modal for ${username} with ${ticketCount} tickets`);
+    
+    // Hide all non-modal elements first (this now handles scrollbar disabling)
+    hideAllNonModalElements();
+    
+    // Adjust modal positioning for banner height
+    if (typeof window.adjustModalPositioning === 'function') {
+        window.adjustModalPositioning();
+    }
+    
+    // Call the existing showUserTicketDetails function if it exists
+    if (typeof showUserTicketDetails === 'function') {
+        showUserTicketDetails(username, ticketCount);
+    } else {
+        console.error('❌ showUserTicketDetails function not found');
     }
 }
 
-function closePlaylistModal() {
+window.openPlaylistModal = function() {
+    const modal = document.getElementById('playlistModal');
+    if (modal) {
+        // Hide all non-modal elements first (this now handles scrollbar disabling)
+        hideAllNonModalElements();
+        
+        // Adjust modal positioning for banner height
+        if (typeof adjustModalPositioning === 'function') {
+            adjustModalPositioning();
+        }
+        
+        modal.classList.add('show');
+        
+        // Render playlist content if the function exists
+        setTimeout(() => {
+            if (typeof renderPlaylist === 'function') {
+                renderPlaylist();
+            }
+        }, 50);
+    }
+}
+
+window.closePlaylistModal = function() {
     const modal = document.getElementById('playlistModal');
     if (modal) {
         modal.classList.remove('show');
-        // Restore body scrolling - re-enable page scrollbar
-        document.body.style.overflow = '';
-        document.documentElement.style.overflow = '';
-        document.body.style.paddingRight = '';
-        // Remove any potential scroll lock classes
-        document.body.classList.remove('modal-open');
-        document.documentElement.classList.remove('modal-open');
+        // Show all non-modal elements (this now handles scrollbar restoration)
+        showAllNonModalElements();
     }
 }
 
@@ -1306,22 +1857,98 @@ function closePlaylistModal() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('YAM Dashboard: Enhanced modal system loaded');
     
+    // Function to dynamically adjust modal positioning based on banner height
+    window.adjustModalPositioning = function() {
+        const sidebarBanner = document.querySelector('.sidebar-banner');
+        let bannerHeight = 80; // Move modals higher to cover more of the dashboard
+        
+        // Try to get actual banner height and add minimal padding
+        if (sidebarBanner) {
+            bannerHeight = sidebarBanner.offsetHeight + 0; // No extra padding to cover more dashboard
+            // Ensure minimum height for safety
+            if (bannerHeight < 60) bannerHeight = 80;
+        }
+        
+        console.log(`🎯 Adjusting modal positioning for banner height: ${bannerHeight}px`);
+        
+        // Update all modal positioning with fallback safety
+        const allModals = document.querySelectorAll('.widget-modal, .yam-modal-overlay, .custom-date-modal, .performance-modal, .admin-sync-modal, .user-ticket-details-modal, .reminder-modal, #calendarModal, #calendarEventModal, #playlistModal, #reminderModal, .user-ticket-details-modal');
+        
+        allModals.forEach(modal => {
+            modal.style.top = `${bannerHeight}px`;
+            modal.style.height = `calc(100vh - ${bannerHeight}px)`;
+            // Ensure modal is always visible
+            modal.style.zIndex = '2147483647';
+            modal.style.position = 'fixed';
+        });
+        
+        // Update modal content max heights
+        const modalContents = document.querySelectorAll('.widget-modal-content, .yam-modal-container, .custom-date-content, .performance-modal-content, .admin-sync-modal-content, .user-ticket-details-modal-content, .reminder-modal-content');
+        
+        modalContents.forEach(content => {
+            content.style.maxHeight = `calc(90vh - ${bannerHeight}px)`;
+            // Ensure content is properly positioned
+            content.style.position = 'relative';
+            content.style.zIndex = '2147483647';
+        });
+        
+        // Update calendar modal content specifically
+        const calendarModalContent = document.querySelector('.calendar-modal-content');
+        if (calendarModalContent) {
+            calendarModalContent.style.height = `calc(95vh - ${bannerHeight}px)`;
+            calendarModalContent.style.maxHeight = `calc(95vh - ${bannerHeight}px)`;
+            calendarModalContent.style.minHeight = `calc(95vh - ${bannerHeight}px)`;
+        }
+        
+        // Update modal body max heights
+        const modalBodies = document.querySelectorAll('.widget-modal-body, .yam-modal-body, .custom-date-body, .performance-modal-body, .admin-sync-modal-body, .user-ticket-details-modal-body, .reminder-modal-body');
+        
+        modalBodies.forEach(body => {
+            body.style.maxHeight = `calc(90vh - ${bannerHeight + 80}px)`; // banner + header
+        });
+        
+        // Update calendar modal body specifically
+        const calendarModalBody = document.querySelector('#calendarModal .widget-modal-body');
+        if (calendarModalBody) {
+            calendarModalBody.style.maxHeight = `calc(95vh - ${bannerHeight + 100}px)`; // banner + header
+            calendarModalBody.style.height = `calc(95vh - ${bannerHeight + 100}px)`;
+        }
+        
+        // CRITICAL: Ensure modals are always above the sidebar banner
+        const sidebarFixed = document.querySelector('.sidebar-fixed');
+        if (sidebarFixed) {
+            const sidebarZIndex = parseInt(window.getComputedStyle(sidebarFixed).zIndex) || 9999999;
+            const modalZIndex = Math.max(sidebarZIndex + 1, 2147483647);
+            
+            allModals.forEach(modal => {
+                modal.style.zIndex = modalZIndex.toString();
+            });
+        }
+    }
+    
+    // Initial adjustment
+    window.adjustModalPositioning();
+    
+    // Adjust on window resize
+    window.addEventListener('resize', window.adjustModalPositioning);
+    
     // Ensure no modals are open on load and restore scrolling
     const allModals = document.querySelectorAll('.widget-modal, .yam-modal-overlay, .custom-date-modal, .reminder-modal, #calendarModal, #calendarEventModal, #playlistModal, #reminderModal');
     allModals.forEach(modal => modal.classList.remove('show'));
     
-    // Restore body scrolling on page load
-    document.body.style.overflow = '';
-    document.documentElement.style.overflow = '';
-    document.body.style.paddingRight = '';
-    document.body.classList.remove('modal-open');
-    document.documentElement.classList.remove('modal-open');
+    // Ensure all non-modal elements are visible on page load
+    showAllNonModalElements();
+    
+    // Ensure page scrollbar is enabled on page load
+    enablePageScrollbar();
     
     // Add click-outside-to-close functionality
     allModals.forEach(modal => {
         modal.addEventListener('click', function(event) {
             // Only close if clicking the modal overlay (not the content)
             if (event.target === modal) {
+                console.log(`🖱️ Click outside modal detected for: ${modal.id || modal.className}`);
+                
                 // Close the appropriate modal with proper scroll restoration
                 if (modal.id === 'calendarModal') {
                     closeCalendarModal();
@@ -1329,14 +1956,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     closeCalendarEventModal();
                 } else if (modal.id === 'playlistModal') {
                     closePlaylistModal();
+                } else if (modal.id === 'userTicketDetailsModal') {
+                    // Close user ticket details modal
+                    if (typeof closeUserTicketDetailsModal === 'function') {
+                        closeUserTicketDetailsModal();
+                    } else {
+                        modal.classList.remove('show');
+                        showAllNonModalElements();
+                    }
                 } else {
                     // Generic close with scroll restoration
                     modal.classList.remove('show');
-                    document.body.style.overflow = '';
-                    document.documentElement.style.overflow = '';
-                    document.body.style.paddingRight = '';
-                    document.body.classList.remove('modal-open');
-                    document.documentElement.classList.remove('modal-open');
+                    showAllNonModalElements();
                 }
             }
         });
@@ -1346,8 +1977,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             // Find any open modal
-            const openModal = document.querySelector('.widget-modal.show, .yam-modal-overlay.show, .custom-date-modal.show, .reminder-modal.show, #calendarModal.show, #calendarEventModal.show, #playlistModal.show, #reminderModal.show');
+            const openModal = document.querySelector('.widget-modal.show, .yam-modal-overlay.show, .custom-date-modal.show, .reminder-modal.show, #calendarModal.show, #calendarEventModal.show, #playlistModal.show, #reminderModal.show, .user-ticket-details-modal.show');
             if (openModal) {
+                console.log(`⌨️ ESC key pressed, closing modal: ${openModal.id || openModal.className}`);
+                
                 // Close the appropriate modal
                 if (openModal.id === 'calendarModal') {
                     closeCalendarModal();
@@ -1355,14 +1988,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     closeCalendarEventModal();
                 } else if (openModal.id === 'playlistModal') {
                     closePlaylistModal();
+                } else if (openModal.id === 'userTicketDetailsModal') {
+                    // Close user ticket details modal
+                    if (typeof closeUserTicketDetailsModal === 'function') {
+                        closeUserTicketDetailsModal();
+                    } else {
+                        openModal.classList.remove('show');
+                        showAllNonModalElements();
+                    }
                 } else {
                     // Generic close
                     openModal.classList.remove('show');
-                    document.body.style.overflow = '';
-                    document.documentElement.style.overflow = '';
-                    document.body.style.paddingRight = '';
-                    document.body.classList.remove('modal-open');
-                    document.documentElement.classList.remove('modal-open');
+                    showAllNonModalElements();
                 }
             }
         }
@@ -1370,12 +2007,53 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Cleanup on page unload
     window.addEventListener('beforeunload', function() {
-        document.body.style.overflow = '';
-        document.documentElement.style.overflow = '';
-        document.body.style.paddingRight = '';
-        document.body.classList.remove('modal-open');
-        document.documentElement.classList.remove('modal-open');
+        enablePageScrollbar();
+        showAllNonModalElements();
     });
+    
+    // CRITICAL: Monitor for any modal state changes and ensure proper isolation
+    const modalObserver = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                const modal = mutation.target;
+                if (modal.classList.contains('show')) {
+                    // Modal was opened - ensure all other elements are hidden
+                    hideAllNonModalElements();
+                    
+                    // CRITICAL: Force hide media player widget specifically
+                    hideMediaPlayerWidget();
+                    
+                    // CRITICAL: Force disable page scrollbar as fallback
+                    document.body.style.overflow = 'hidden';
+                    document.documentElement.style.overflow = 'hidden';
+                    document.body.classList.add('modal-open');
+                    document.documentElement.classList.add('modal-open');
+                    
+                    // Adjust modal positioning for banner height
+                    if (typeof window.adjustModalPositioning === 'function') {
+                        setTimeout(() => window.adjustModalPositioning(), 10);
+                    }
+                } else {
+                    // Modal was closed - ensure all elements are visible
+                    showAllNonModalElements();
+                    
+                    // CRITICAL: Force re-enable page scrollbar as fallback
+                    document.body.style.overflow = '';
+                    document.documentElement.style.overflow = '';
+                    document.body.classList.remove('modal-open');
+                    document.documentElement.classList.remove('modal-open');
+                }
+            }
+        });
+    });
+    
+    // Observe all modal elements for class changes
+    const allModals = document.querySelectorAll('.widget-modal, .yam-modal-overlay, .custom-date-modal, .reminder-modal, #calendarModal, #calendarEventModal, #playlistModal, #reminderModal, .user-ticket-details-modal');
+    allModals.forEach(modal => {
+        modalObserver.observe(modal, { attributes: true, attributeFilter: ['class'] });
+    });
+    
+    console.log('✅ Modal isolation system initialized');
 });
 </script>
 {% endblock %}
