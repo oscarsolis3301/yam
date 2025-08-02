@@ -1,0 +1,36 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18012922883
+
+**Created At:** 2025-07-30T03:00:15Z
+
+**Updated At:** 2025-07-30T19:45:07Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+Please review the fee for D3911(50% covered). As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect
+
+## Conversations
+
+---
+
+
+Hi Chitra,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1984611.
+
+
+
+As per the review found fees not populating correctly for code D3911 in FA#843652884. As per fees schedule code not covered. Benefits updated after record was finalized. Replace to update amounts. Verified Epic EOB insurance allowed less amount and paid 50% by insurance with 50% patient responsibility with no specific reason codes. Verified Credentialing status found Billing Provider status is active for DOS. No call notes available in EPIC for the invoice# attached in ticket. So please reach out to insurance for more clarifications, Hence resolving this ticket. Please let me know for any additional questions, Thank you
+
+

@@ -1,0 +1,36 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18013796555
+
+**Created At:** 2025-07-29T07:15:04Z
+
+**Updated At:** 2025-07-30T15:56:37Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+Please review the fee for D4910 As per FA correct fee schedule attached but incorrect fees populating in Epic  as insurance expect”. 
+
+## Conversations
+
+---
+
+
+Hi Naveenkumar,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1981927.
+
+
+
+On review found fees populating correctly for code D4910 in FA#866734397. Patient has coverage United Concordia PPO - Dental / Advantage Plus same fees link attached. Verified dental eligibility found UNITED CONCORDIA PPO [865], ADVANTAGE PLUS with status Completed - ROC. Verified credentialing grid billing provider status is active for DOS. When we review the Epic EOB for code D4910 allowed and paid correctly as per FA and DE form benefits 50% insurance paid with 50% patient responsibility. But in FA we have incorrect insurance responsibility as 80%. Found in FA Benefits updated after record was finalized. Replace to update amounts. So please replace the estimate to get the correct values in FA. Hence resolving the ticket, Please let me know for any additional questions. Thank you
+
+

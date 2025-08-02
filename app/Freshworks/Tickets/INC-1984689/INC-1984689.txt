@@ -1,0 +1,59 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating.
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18012937489
+
+**Created At:** 2025-07-30T04:55:15Z
+
+**Updated At:** 2025-08-01T23:48:07Z
+
+**Category:** ROC - Eligibility
+
+**Sub Category:** Eligibility
+
+**Item Category:** Incorrect fee schedule
+
+## Description
+
+“Please review the fee for D1110 As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect”.D1110,D0274,D0230(5), D0220 are paid less than estimate.  No deductible applied. No fee overridden. Since the balance is above $25.00 for D1110. 
+hence creating fee schedule ticket and taken combined fee schedule adj. claim#C2507071099481
+
+
+## Conversations
+
+---
+
+
+Hi Sruthi Sudha
+
+Thank you for reaching out to Patient Benefits. 
+We have updated the dental eligibility form to reflect the most current benefit information. 
+Please note, if you notice the coverage does not appear to be attached in the registration, please take the following steps to attach the coverage: 
+
+
+
+ Open the Coverage Wizard, by using the “Add Coverage” link located in the top right-hand corner of the Guarantors &amp; Coverages section in the registration view. 
+Once in the Coverage Wizard, there will be Coverages located under the search bar. 
+Select the coverage that needs to be attached. 
+To complete the process, click on the “Finish” button at the bottom left of the screen. 
+It is also important to ensure the coverage is attached to the “Visit Info”
+
+Kind Regards,
+Patient Benefits Service Desk 
+
+
+---
+
+
+Hi Sruthi,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1984689.
+
+
+
+On review found fees populating correctly for codes D1110, D0274, D0230, D0220 in FA#853601336. Patient has primary coverage Renaissance Dental PPO / Diversified PPO same fees link attached. Verified dental eligibility found RENAISSANCE DENTAL PPO [765], DIVERSIFIED PPO with status ROC Request Pending. When we review the EOB For code D1110 claim not processed based on the Diversified PPO fees. For code D0220 found reason code 94 Processed in Excess of charges. &amp; 97 The benefit for this service is included in the payment/allowance for another service/procedure that has already been adjudicated. Codes D0274 &amp; D0230 denied with reason code 97 and Remark code N22 This procedure code was added/changed because it more accurately describes the services rendered. As per On Base EOB coered code D0350. Per OB Network Careington.  As per credentialing grid billing provider status is INN. Hence routed to eligibility to re-verify the eligibility and attach the correct plan to patient coverage &amp; FA. Please let me know for any additional questions. Thank you
+
+

@@ -1,0 +1,36 @@
+# Ticket Summary
+
+**Subject:** DE form matches the FA on date of service.
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18012928772
+
+**Created At:** 2025-07-29T02:23:30Z
+
+**Updated At:** 2025-07-31T13:40:04Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Insurance Paid Less/More
+
+## Description
+
+As per paper eob cdt D0120,D0220,D0230,D0274 and cdt D2391(T#19,3) paid with no PR per DE insurance covered 100% insurance paid the same balance is more then $25.0 hence create fee schedule ticket
+
+## Conversations
+
+---
+
+
+Hi Kaja,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1981715.
+
+On review found fees populating correctly for codes D0120, D0220, D0230, D0274, D2391 and also found 50.00 Individual deductible for code D2391 in FA#847241023. Patient has primary coverage Blue Cross Blue Shield of MA PPO / UCR same fees link attached. Verified dental eligibility found BLUE CROSS BLUE SHIELD OF MA PPO [327], DENTAL BLUE INDEMNITY with status ROC Request Pending. When we review the EOB claim processed based on the Dental Blue Indemnity PPO fees with no specific reason codes no deductible in EOB. As per credentialing grid billing provider status is active for DOS. So please replace a new estimate and attach the correct plan Dental Blue Indemnity in FA and also please be informed that charge has been filed for this visit, So ROC Fees cannot update or change the filing order now and this can be done at the office level by following the steps in the attached document. Hence resolving the ticket, Please let me know for any additional questions. Thank you
+
+
+
+

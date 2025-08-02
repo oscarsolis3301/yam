@@ -1,0 +1,36 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18012921480
+
+**Created At:** 2025-07-29T10:45:28Z
+
+**Updated At:** 2025-07-30T17:04:36Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+Please review the fees for D4341 UR,LR. As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect.
+
+## Conversations
+
+---
+
+
+Hi Bharkavi,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1982119.
+
+On review found fees populating correctly for code D4341 in FA#850913955. Patient has coverage United Concordia Addp Federal - Dental / Tricare (Retiree/Family) same fees link attached United Concordia - ADDP - ADDP Reg 18. Verified dental eligibility found UNITED CONCORDIA MILITARY FEDERAL [862], TRICARE (RETIREE/FAMILY) with status Verified by Auto Eligibility. When we review the Epic EOB claim processed based on the ADDP Reg 18 fees allowed amount and paid correctly as per DE form benefits 60% insurance paid with 40% patient responsibility. In FA we have the incorrect insurance responsibility as 100% for code D4341. Benefits in the DE form were updated after record was finalized. In FA Query Benefits Last updated 7/1/2025 12:58 PM, DE form Last updated:  07/02/2025, 12:09PM, So please replace the estimate to get the correct values in FA. Hence resolving the ticket, Please let me know for any additional questions. Thank you
+
+
+
+

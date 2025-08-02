@@ -1,0 +1,61 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating.
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18013141691
+
+**Created At:** 2025-07-29T04:33:27Z
+
+**Updated At:** 2025-07-30T17:10:05Z
+
+**Category:** ROC - Eligibility
+
+**Sub Category:** Eligibility
+
+**Item Category:** Reverification/resubmission
+
+## Description
+
+As per epic dos 7/10/25 cdt D3330(14), D3331(14) has debit, per epic D3330(14) got paid, no fee overridden, “Please review the fees for D3330(14) As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect, since balance above $25 hence raising fee schedule ticket
+
+## Conversations
+
+---
+
+
+Hi Raghavan Manivannan
+
+Thank you for reaching out to Patient Benefits. 
+We have updated the dental eligibility form to reflect the most current benefit information. 
+Please note, if you notice the coverage does not appear to be attached in the registration, please take the following steps to attach the coverage: 
+
+
+
+ Open the Coverage Wizard, by using the “Add Coverage” link located in the top right-hand corner of the Guarantors &amp; Coverages section in the registration view. 
+Once in the Coverage Wizard, there will be Coverages located under the search bar. 
+Select the coverage that needs to be attached. 
+To complete the process, click on the “Finish” button at the bottom left of the screen. 
+It is also important to ensure the coverage is attached to the “Visit Info”
+
+Kind Regards,
+Patient Benefits Service Desk 
+
+
+---
+
+
+Hi Raghavan,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1981821.
+
+
+
+On review found fees populating correctly for code D3330, D3331 in FA#858298101. Patient has primary coverage Starmount Life Ins CO PPO / Advantage Plus fees link attached United Concordia - Advantage Plus - Advantage Plus UT Reg 3. Verified dental eligibility found STARMOUNT LIFE INS CO PPO [813], ADVANTAGE PLUS with status Verified by Front Office. When we review the On Base EOB claim processed based on the Advantage Plus PPO fees for code D3330 allowed amount as per FA but paid 40% by insurance with 60% patient responsibility. In DE form for code D3330 50% Insurance responsibility. Code D3331 denied with reason code 1062 Service not a covered benefit according to rules. Please reach out to insurance for more clarifications on this denial code. As per credentialing grid billing provider status active for DOS. Hence routed to eligibility for benefit reverification. Please let me know for any additional questions. Thank You
+
+
+
+
+
+

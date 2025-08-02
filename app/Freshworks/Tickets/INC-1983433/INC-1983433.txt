@@ -1,0 +1,47 @@
+# Ticket Summary
+
+**Subject:** Web Viewer
+
+**Status:** 4
+
+**Priority:** 2
+
+**Requester Id:** 18012932155
+
+**Created At:** 2025-07-29T18:37:37Z
+
+**Updated At:** 2025-07-31T18:54:06Z
+
+**Category:** Epic
+
+**Sub Category:** Epic - Back Office/Clinical
+
+**Item Category:** Dental Imaging
+
+## Description
+
+We have a patient asking for images taken at the now closed office Bellevue 1 (322). I see FMX was charged out in February 25 but there are no images in Webviewer. Can you please verify there are no images for&nbsp;PT: Swetha Susan Isaac MRN: 25371637RTN1-1VU1
+
+## Conversations
+
+---
+
+
+Validated no images available on the server.
+- Accessed patient chart locally confirming there were no series captured on requested DOS or "taken date" listed
+- Validated there was no visible request for image workflow via scan request history in DTX studio
+Resolving due to no recoverable images.
+
+
+---
+
+
+I searched for the Patient Name: Swetha Susan Isaac and MRN: 25371637 in DTX but there was no patient found:
+
+
+
+I searched for the Patient Name: Swetha Susan Isaac and MRN: 25371637 in MiPacs but there was no patient found:
+
+
+
+

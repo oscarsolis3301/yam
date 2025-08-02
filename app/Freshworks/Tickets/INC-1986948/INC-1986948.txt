@@ -1,0 +1,36 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee  populating
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18013079767
+
+**Created At:** 2025-07-31T04:06:53Z
+
+**Updated At:** 2025-08-01T19:41:21Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+Please review the fees for D7210(TH#2),D4260(TH#4,25)  As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect
+
+## Conversations
+
+---
+
+
+Hi Murugapriya,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1986948.
+
+
+
+On review found fees not populating correctly for codes D4260, D7210 in FA#851447070. Benefits updated after record was finalized. Replace to update amounts. Patient has coverage Aetna PPO - Dental / Aetna Dental PPO same fees link attached. Verified dental eligibility found AETNA PPO [238], AETNA DENTAL PPO with status ROC Request Pending. As per credentialing grid billing provider status is active for DOS. When we review the Epic EOB for codes D4260, D7210 allowed and paid correctly as per updated fees schedule and 90% paid by insurance with 10% patient responsibility. Replace the estimate to get the correct values in FA. Hence resolving the ticket, Please let me know for any additional questions. Thank You
+
+

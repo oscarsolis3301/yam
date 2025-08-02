@@ -1,0 +1,87 @@
+# Ticket Summary
+
+**Subject:** LMD986283 error - D0467-ILO5 Logical Drives-Controller 0 : Logical Drive 1 statusAlertError
+
+**Status:** 10
+
+**Priority:** 2
+
+**Requester Id:** 18014001696
+
+**Created At:** 2025-07-29T21:53:37Z
+
+**Updated At:** 2025-07-31T22:05:31Z
+
+**Category:** IT
+
+**Sub Category:** Server
+
+**Item Category:** Hard Drive
+
+## Description
+
+
+
+ID: LMD986283
+Controller 0 : Logical Drive 1 (0099208FPEYHB0DRHD73FO 97D8) on HP host D0467-ILO5 is no longer operating optimally and is reporting a status code of 3.0, placing it into error state.
+
+Status Code:
+1=Other,
+2=Ok,
+3=Failed,
+4=Unconfigured,
+5=Recovering,
+6=Ready For Rebuild,
+7=Rebuilding,
+8=Wrong Drive,
+9=Bad Connect,
+10=Over Heating,
+11=Shutdown,
+12=Expanding,
+13=Not Available,
+14=Queued for Expansion,
+15=Multi-path Access Degraded,
+16=Erasing,
+17=Predictive Spare Rebuild Ready,
+18=Rapid Parity Initialization In-Progress,
+19=Rapid Parity Initialization Pending,
+20=No Access - Encrypted with No Controller Key,
+21=Unencrypted to Encrypted Transformation in Progress,
+22=New Logical Drive Key Rekey in Progress,
+23=No Access - Encrypted with Controller Encryption Not Enabled,
+24=Unencrypted To Encrypted Transformation Not Started,
+25=New Logical Drive Key Rekey Request Received
+
+
+This started at 2025-07-29 16:23:44 CDT, -- or 0h 22m ago.
+
+
+Requester Name: Christian Rodriguez    
+
+
+Requester Email: christian.rodriguez@pdshealth.com
+
+
+Requester Contact Number:  424-558-1784
+
+
+PDS Active Directory: christian.rodriguez
+
+
+Working Hours: 7:30 AM - 4:00 PM
+
+
+
+Address : 
+
+11015 N Scottsdale RdSte 101
+Scottsdale, AZ
+85254
+
+
+
+
+
+
+
+## Conversations

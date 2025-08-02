@@ -1,0 +1,39 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating.
+
+**Status:** 3
+
+**Priority:** 1
+
+**Requester Id:** 18013693465
+
+**Created At:** 2025-08-01T06:19:41Z
+
+**Updated At:** 2025-08-01T23:57:43Z
+
+**Category:** ROC - Eligibility
+
+**Sub Category:** Eligibility
+
+**Item Category:** Incorrect fee schedule
+
+## Description
+
+Please review the fees for D4342 #LR,LL. As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect
+
+## Conversations
+
+---
+
+
+Hi Anusuya,
+
+
+On review FA#831045040 found plan Blue Cross Blue Shield of KS PPO / Anthem Blue Cross Ppo100 attached as primary coverage for the DOS 06/06/2025 code D4342 and code overridden. Verified EOB found the code D4342 was allowed less than the expected amount without any specific reason. Upon reviewing the allowed amount matching with Blue Cross Urban PPO for the code D4342. Checked in CG billing provider is active.Hence routing this ticket to eligibility team for plan verification and manually overide the FA. Thank youPlease find your ticket URL: https://support.pacden.com/helpdesk/tickets/1989653.
+
+
+
+
+
+

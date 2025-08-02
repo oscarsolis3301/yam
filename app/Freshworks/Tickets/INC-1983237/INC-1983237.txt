@@ -1,0 +1,73 @@
+# Ticket Summary
+
+**Subject:** Web Viewer
+
+**Status:** 13
+
+**Priority:** 2
+
+**Requester Id:** 18012936599
+
+**Created At:** 2025-07-29T17:49:49Z
+
+**Updated At:** 2025-07-31T15:53:24Z
+
+**Category:** Epic
+
+**Sub Category:** Epic - Back Office/Clinical
+
+**Item Category:** Dental Imaging
+
+## Description
+
+Hello, we need the pano transferred from DTX to Web Viewer so that ROC can submit the claim. Thank you!&nbsp;PT: Milo Bugarni MRN: 23300212DOS: 07/14/25GIL4-1VU1
+
+## Conversations
+
+---
+
+
+I searched for the Pano under the Patient Name: Milo Bugarni MRN: 23300212 under the date of service/take date in DTX and it shows images available:
+
+
+
+
+
+I approved the Pano and saved it in the in DTX:
+
+
+I checked Web Viewer but the image was not uploaded to Web Viewer.
+Upload pending...
+
+I confirmed the Pano has has been generated from the CBCT in DTX.
+
+Solution StepsRDP to the 1vu1 server for this officeLaunch DTX and search the patientDouble click the Pano from Patient DataLaunch Snipping ToolTake a screenshot of the PanoLaunch Mipacs Dental Viewer and search the patientIn Mipacs Dental Viewer, click on the drop down to create a new Pano 1x1 template.Click Image &gt; Import Image &gt; Paste &gt; OKClick on the image of the Pano itselfIn the lower left-hand corner, you’ll find the Object Properties which has a date field that needs to be updated. 
+
+
+Enter the date and time the CBCT was captured in the format MM/DD/YYYY HH:MM:SS AM/PMFor example, 11/13/2024 10:29:10 AMOn the left, click the study nameIn the lower left-hand corner you should see Study and Series Properties which both have a date field that needs to be updated. 
+
+
+Enter the date and time the CBCT was captured in the format MM/DD/YYYY HH:MM:SS AM/PMFor example, 11/13/2024 10:29:10 AMRight click the Pano study nameClick Save, then click Approve:
+
+
+
+
+
+07/14/25 10:29 AMValidation Steps
+Confirm that all three date fields are correct
+If not, right click the study name again
+Click Change approval
+Modify the incorrect dates
+Right click the study name
+Save and Approve
+
+
+I approved the Pano in DTX and saved it to upload to Web Viewer:
+I checked Web Viewer but the image was not uploaded to Web Viewer.Upload pending...
+
+
+
+
+
+
+

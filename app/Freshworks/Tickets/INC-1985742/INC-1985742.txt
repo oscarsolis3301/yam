@@ -1,0 +1,129 @@
+# Ticket Summary
+
+**Subject:** Humana Federal - AVN6 - Tennessee
+
+**Status:** 3
+
+**Priority:** 1
+
+**Requester Id:** 18012936959
+
+**Created At:** 2025-07-30T17:04:30Z
+
+**Updated At:** 2025-07-31T14:29:57Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+I have taken a look at this plan and called a rep to confirm fees. I understand this is a Contracted Rate - Patient Co Pay = Insurance Expect plan, so it requires manually coordination. The current state in Epic is this plan is populating patient co-pays. When we have these plans, the ADA codes need to populate the contracted rate and push that completely to the patient. Than the ops team will pull patient co-pays from the fee finder and manually coordinate this plan. I have attached a patient and an example with Endo specialty fees. Can we please take a look at this plan to ensure all GP and specialty fees are populating at contracted rates. Happy to jump on a call to discuss if need be. Thanks!&nbsp;&nbsp;
+
+## Conversations
+
+---
+
+
+Ok, I am tracking. Yes, clearly not correct. Thank you! 
+
+
+
+
+
+Nicole Shelby |
+ Regional Director
+
+
+PDS Health, Tennessee Region
+C 951-663-2367
+E shelbyn@pdshealth.com W pdshealth.com +
+smilegeneration.com
+
+This electronic transmission and any documents attached hereto may contain confidential and/or
+ legally privileged information. The information is intended only for use by the recipient named above. If you have received this electronic message in error, please notify sender and delete the electronic message. Any disclosure copying distribution or use
+ of the contents of information received in error is strictly prohibited.
+ 
+
+
+
+
+
+
+
+---
+
+
+Hi Nicole,
+
+From the last thing we were told, the contracted rate is supposed to be from the Federal fee schedule that we have. 
+So the insurance is supposed to be allowing the $568, patient is supposed to pay the $508, and insurance pays the $60.
+It definitely doesn't look like that's happening though, so I need to get more information on why.
+
+Nicole Oliveri | Sr. Plan Fee Coordinator
+PDS Health, ROC
+2460 Paseo Verde Pkwy, Suite 145, Henderson, NV 89074
+T (702) 359 - 7332 E nicole.oliveri@pdshealth.com W pdshealth.com + smilegeneration.com
+
+
+
+---
+
+
+Nicole,
+
+I am not seeing what you are seeing in Epic? Here is another patient with same plan. I don't understand why we wouldn't have to override this? I need contracted rate in Allowed so I can do the math on what to expect from the insurance based on what the patient
+ co-payment is. 
+
+
+
+
+
+
+
+
+
+
+
+Nicole Shelby |
+ Regional Director
+
+
+PDS Health, Tennessee Region
+C 951-663-2367
+E shelbyn@pdshealth.com W pdshealth.com +
+smilegeneration.com
+
+This electronic transmission and any documents attached hereto may contain confidential and/or
+ legally privileged information. The information is intended only for use by the recipient named above. If you have received this electronic message in error, please notify sender and delete the electronic message. Any disclosure copying distribution or use
+ of the contents of information received in error is strictly prohibited.
+ 
+
+
+
+
+
+
+
+---
+
+
+Hi Nicole,I'm going to have to look more into this, get more examples for all of TN, and share it with Plan Partnerships.
+From looking at the EOB on this patient, the insurance is paying off of the old 2023 Humana PPO fee schedule. Last we were informed, the payment should be off of the Federal Advantage fee schedule (which is what's populating in the FA that you're overriding). Also, you should not be having to make overrides. The way it is set up in our system is giving everything it should be on Epic. 
+
+
+
+
+
+I'll let you know what progress I'm able to make. :) 
+With the new ticketing system coming out, can I suggest to please make this into an email so it isn't lost? I would greatly appreciate it. 
+
+Thanks, 
+Nicole Oliveri | Sr. Plan Fee Coordinator
+PDS Health, ROC
+2460 Paseo Verde Pkwy, Suite 145, Henderson, NV 89074
+T (702) 359 - 7332 E nicole.oliveri@pdshealth.com W pdshealth.com + smilegeneration.com
+
+

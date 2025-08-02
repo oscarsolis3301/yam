@@ -1,0 +1,36 @@
+# Ticket Summary
+
+**Subject:** fee schedule ticket
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18013111494
+
+**Created At:** 2025-07-29T10:24:34Z
+
+**Updated At:** 2025-07-30T16:50:08Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Insurance Paid Less/More
+
+## Description
+
+As per EPIC, DOS 07/02/25. CDT D0274,D1110,D1206,D0120,D0220,D0230 has debit balance. CDT D0350 has credit balance. No PR. No other coverage. per EOB, D1110,D0274,D0220,D0230,D0120 paid less. Isurance coveres 100% and paid per allowed amount. No alternated, no overridden, no deductible. Per DE, last update falls before our DOS under same plan in FA &amp; DE. So per update, hence creating the fee ticek
+
+## Conversations
+
+---
+
+
+Hi Kalaivani,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1982102.
+
+
+
+On review found fees populating correctly for codes D0274, D1110, D1206, D0120, D0220, D0230, D0350 in FA#851185896. Primary Coverage attached Premier Access PPO / UCR same fees link attached. Verified Epic EOB Code D1206 denied with reason code 6  The procedure/revenue code is inconsistent with the patient's age. No call notes in Epic, So please reach to insurance for more clarifications on this reason code. For other codes insurance allowed and paid less than estimate amount with no specific reason codes. Because billing provider out of network for DOS as per credentialing grid billing provider OROPEZA, ROSANGEL status is In Process with Premier Access PPO. Hence resolving the ticket, Please let me know for any additional questions. Thank You
+
+

@@ -1,0 +1,36 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating.
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18012921480
+
+**Created At:** 2025-07-31T05:42:13Z
+
+**Updated At:** 2025-07-31T22:58:33Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+Please review the fees for D4910. As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect.
+
+## Conversations
+
+---
+
+
+Hi Bharkavi,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1987034.
+
+
+
+On review found fees populating correctly for code D4910 and also found 50.00 Individual deductible in FA#865599041. Patient has primary coverage Principal Financial Group PPO - Dental / Principal PPO same fees link attached. When we review the EOB claim processed based on the Principal PPO fees and DE form benefits 80% Insurance paid and 20% patient responsibility deductible 16.00 only applied in EOB, Verified dental eligibility found PRINCIPAL FINANCIAL GROUP PPO [743], PRINCIPAL PPO with status Verified by Auto Eligibility. Found annual deductible 50.00 not met. As per credentialing grid billing provider out of network for DOS status is In Process with Principal PPO, So please replace a new estimate and verify whether deductible is matching or not, If deductible is not matching please manually override the FA to match EOB, Hence resolving this ticket, Please let me know for any additional questions, Thank you
+
+

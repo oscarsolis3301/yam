@@ -1,0 +1,39 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating.
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18014287236
+
+**Created At:** 2025-08-01T10:20:49Z
+
+**Updated At:** 2025-08-01T20:40:43Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+Please review the fees for D1110 As per FA correct fee schedule attached but incorrect fees populating 
+
+## Conversations
+
+---
+
+
+Hi Aswathy,
+
+
+On review FA#792512741 found plan Cigna PPO - Dental / Cigna Dental PPO attached as primary coverage for the DOS 07/16/2025 code D1110 was populating correctly. Verified EOB found the code D1110 allowed less than the expected amount with the remark code N130: Consult plan benefit documents/guidelines for information about restrictions for this service.. Verified DE form benefits are matched with the EOB. Checked in CG billing provider is OON for cigna. Hence resolving the ticket. Thank youPlease find your ticket URL: https://support.pacden.com/helpdesk/tickets/1989854.
+
+
+
+
+
+

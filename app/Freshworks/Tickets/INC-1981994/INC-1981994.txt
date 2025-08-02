@@ -1,0 +1,39 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating.
+
+**Status:** 3
+
+**Priority:** 1
+
+**Requester Id:** 18012934678
+
+**Created At:** 2025-07-29T09:10:24Z
+
+**Updated At:** 2025-07-29T22:47:57Z
+
+**Category:** ROC - Eligibility
+
+**Sub Category:** Eligibility
+
+**Item Category:** Incorrect fee schedule
+
+## Description
+
+Please review the fee for D7210[T#16]. As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect
+
+## Conversations
+
+---
+
+
+Hi Priyanga,
+
+
+On review FA#820522152 found plan Pacific Life PPO - Dental / Dental Benefit Providers PPO attached as primary coverage for the DOS 06/03/2025 code D7210 was populating correctly. Verified EOB found the code D7210 was allowed less than the expected amount without any specific reason and mentioned as Out of network. Verified DE for found plan PACIFIC LIFE PPO [1969], DENTAL BENEFIT PROVIDERS PPO status - ROC request pending and in the comment mentioned as F/S is connection dental. Checked in CG billing provider is active with DBP. Hence routing this ticket to eligibility team for plan verification. Thank youPlease find your ticket URL: https://support.pacden.com/helpdesk/tickets/1981994.
+
+
+
+
+
+

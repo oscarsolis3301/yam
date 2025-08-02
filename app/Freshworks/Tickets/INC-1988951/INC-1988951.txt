@@ -1,0 +1,48 @@
+# Ticket Summary
+
+**Subject:** Sensor
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18014616400
+
+**Created At:** 2025-07-31T21:07:29Z
+
+**Updated At:** 2025-07-31T22:07:01Z
+
+**Category:** IT
+
+**Sub Category:** Dental Imaging
+
+**Item Category:** DTX - Sensors
+
+## Description
+
+computer not working with nomad sensor D0441-OP2
+
+## Conversations
+
+---
+
+
+1.Checked the Device manager and the driver was missing.if IOSS is not installed use:
+\\dc1nas01p00\software\Sirona\IOSS_v3.2\Sidexis4Sensor\x64\en-us
+
+(make sure that all Twain software and the AE Interface Utility are removed before running IOSS)
+if IOSS shows this error: sensor is in use unavailable for next exposure
+it requires a reboot
+Customer has DTX version: 3.4.12
+1.Checked the Device manager:
+
+I confirmed Core Isolation is turned it off.
+I ran the IOSS Sensor app:
+
+I relaunched DTX.
+I confirmed Schick Elite sensor name is showing in the Devices on the Test account:
+I had customer test DTX again and confirmed that the sensor is working again:
+
+
+
+

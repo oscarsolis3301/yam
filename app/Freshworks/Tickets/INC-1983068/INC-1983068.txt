@@ -1,0 +1,152 @@
+# Ticket Summary
+
+**Subject:** Copay
+
+**Status:** 9
+
+**Priority:** 2
+
+**Requester Id:** 18013659397
+
+**Created At:** 2025-07-29T17:11:35Z
+
+**Updated At:** 2025-08-01T14:52:09Z
+
+**Category:** Epic
+
+**Sub Category:** Epic - IT Billing/Claims
+
+**Item Category:** Epic Performance
+
+## Description
+
+
+
+## Conversations
+
+---
+
+
+Hi Sergio,
+Do you have any other examples?  I have tested this patient and the RTE response.  I duplicated the appt in the TST system and when I ran the coverage through RTE, benefits filed appropriately and the copay showed as $10 due. 
+
+When I look into the history I do see that you made an edit to benefit collection for the 7/24 appointment, but I see where the copay amount had filed correctly before your change. Looking at this patient's upcoming appointment on 8/4, I can see that the benefits were filed by RTE, not edited by anyone, and the copay amount shows as due. 
+
+
+
+
+
+
+Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1983068.
+
+Since I am unable to re-create the issue with this patient example, please let me know if you have any others. 
+
+Thanks, 
+Mandie
+
+
+
+
+---
+
+
+Good Afternoon, 
+
+
+
+
+No problem at all. The attachments were reflecting MRN: 13313728
+
+DOS: 07/24/2025
+
+
+
+
+When initially running RTE, we will receive a response of a $10 copayment, which is correct. However, once you go back to the registration page pertaining to the visit, the copayment amount to collect does not reflect at the check in (registration-visit). 
+
+
+
+
+In order to reflect the copayment to collect at the time of service, I need to manually add the copayment under the collections page or manually add the copay within benefits collections under copay&gt; In Network-Family.
+
+
+
+
+
+
+
+Before, if it was asking for copayment, it would reflect the copay in the benefits collection, under Copay&gt;In Network-individual. 
+
+
+
+
+
+
+
+The goal is to show the correct copayment for PCP, and reflect it on the registration page without us having to manually input the information. 
+
+
+
+
+
+
+
+Please let me know if you are needing additional information. 
+
+
+
+
+
+
+
+Thank you, 
+
+
+
+
+
+Sergio Ledgard
+| Operations Manager
+PDS Medical Group-Laveen
+5270 W Baseline RD STE 145 Laveen, AZ 85339
+T 623-267-5570
+F 623-231-2236
+E Ledgardlandeross@pacden.com
+W
+www.Laveen1stfamilymedicine.com +
+
+smilegeneration.com
+
+
+Primary
+ Care in Laveen AZ | PDS Medical Group Laveen
+This electronic transmission and any documents attached hereto may contain confidential and/or legally privileged
+ information. The information is intended only for use by the recipient named above. If you have received this electronic message in error, please notify sender and delete the electronic message. Any disclosure copying distribution or use of the contents of
+ information received in error is strictly prohibited.
+
+
+
+
+
+
+
+
+
+
+
+---
+
+
+Hi Sergio,
+
+Thank you for submitting this ticket.  Could you please provide additional information? 
+MRN, Date of Service and which copay you expected to see filed that was not filed.  Did you find the copay in the RTE response? Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1983068.
+
+Thank you, 
+Mandie
+
+
+
+
+
+

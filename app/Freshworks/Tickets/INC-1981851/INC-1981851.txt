@@ -1,0 +1,61 @@
+# Ticket Summary
+
+**Subject:** Office # 265 incorrect Contract rate  AETNA HMO
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18012939317
+
+**Created At:** 2025-07-29T05:09:05Z
+
+**Updated At:** 2025-08-01T14:15:10Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+
+Please review the fees for D7240 tooth # 32,16,17,01 As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect
+
+
+## Conversations
+
+---
+
+
+Hi Vivian,
+
+On further review I verified provider is INN. The fees were updated after the DOS and I've checked the math. the Plan 2BA pays 50% for D7240 off the Aetna Dental PPO fee schedule. the allowed fee is $298 x 50% = $149 so the carrier had not paid out the correct amounts. It seems they are paying 50% of the Min guar (example: $237 x 50% = $118.50)
+
+attaching the fee schedule and advising to resubmit claim.
+
+for further questions or concerns, please let us know.
+
+Thank You.
+
+
+Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1981851.
+
+
+
+
+
+
+
+
+
+---
+
+
+Hi Vivian,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1981851.
+
+On review FA# 847109995 for DOS 06/26/2025 plan Aetna HMO - Dental / Plan 2ba attached as Primary coverage and fees are populating and showing Benefits updated after record was finalized. Replace to update amounts. Verified EOB insurance paid as per the fee schedule pencentage for code D7240 but as per the SP PPO fee schedule code D7240 has $298 but in Fee System we have $237 as Minimum Guar attached. Hence routing to Jocleyn Scott for further review. 
+
+Thank you
+

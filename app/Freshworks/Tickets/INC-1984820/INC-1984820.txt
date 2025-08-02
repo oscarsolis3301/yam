@@ -1,0 +1,35 @@
+# Ticket Summary
+
+**Subject:** Incorrect insurance expect/fee populating
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18013112649
+
+**Created At:** 2025-07-30T08:40:12Z
+
+**Updated At:** 2025-07-30T20:50:58Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+Please review the fees for D1110 D1206 As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect
+
+## Conversations
+
+---
+
+
+Hi Abishek,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1984820.
+
+On review FA#832069241 found plan Southwest Service Administrators - Dental / UCR attached as Primary coverage and found for code D1110 D1206 UCR Plan for Miscellaneous-UCR carrier fees link attached but patient pays not populating showing only dashes, so please try Query benefits if Query benefits does not work or takes too long to complete then please Void the FA and re-create the FA to get the fees. In fees system Southwest Service Administrators - Dental / UCR plan not found but it's comes under Miscellaneous  UCR plan. Verified DE form found   SOUTHWEST SERVICE ADMINISTRATORS [1196], UCR [30000882] is attached . Verified EOB insurance allowed and paid less amount than the FA without any specific reason for code D1110 D1206. Payer has different UCR than PDS &amp; office needs to manually coordinate with carrier to sort carrier payment, Hence resolving this ticket, Please let me know for any additional questions, Thank you
+
+
+

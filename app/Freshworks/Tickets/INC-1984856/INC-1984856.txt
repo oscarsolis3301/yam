@@ -1,0 +1,101 @@
+# Ticket Summary
+
+**Subject:** RQ26728680 - RQ-SM-002621-02 - Unusual Password Reset Activity (Pending RQ)
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18012947310
+
+**Created At:** 2025-07-30T09:33:03Z
+
+**Updated At:** 2025-07-31T18:45:18Z
+
+**Category:** IT
+
+**Sub Category:** Security
+
+**Item Category:** Hacking
+
+## Description
+
+
+RQ26728680 - RQ-SM-002621-02 - Unusual Password Reset Activity Comment: Hello @James Lortz, Thank you for reaching out. We have initiated a threat hunt on the user "claire. lyu" for the last 90 days, We will review the results of this hunt when
+
+
+
+ZjQcmQRYFpfptBannerStart
+
+
+
+
+  
+    
+      
+	This Message Is From an External Sender. If suspicious, click the button to report to IT
+      
+      
+
+      
+
+    
+    
+
+    
+	Report Suspicious
+    
+
+    
+     
+  
+
+
+ZjQcmQRYFpfptBannerEnd
+
+
+
+
+
+
+
+
+ 
+RQ26728680 - RQ-SM-002621-02 - Unusual Password Reset Activity
+
+Comment:
+Hello @James Lortz,
+
+Thank you for reaching out. 
+
+We have initiated a  threat hunt on the user "claire.lyu" for the last 90 days, We will review the results of this hunt when it completes and get back to you with an update as soon as possible.
+
+If you have any questions or concerns please don't hesitate to reach out.
+
+Kind Regards,
+Ben Hunt O'Reilly
+GreyMatter Specialist
+ReliaQuest
+State: Pending RQPriority: 3 - MediumCategory: Attack Life CycleSubcategory: PersistenceTechnology: Google Security OperationsAlert Artifacts:
+Source IP: 174.243.181.31Alarm Date: 2025-07-29 19:52:46 EDTSource URL: /reset_password/dTCxJLmOFhz-z4iorWbN?Source User: claire.lyuImpacted User: claire.lyuSource Geo: United StatesAction: BLOCKEvent Name: Fired when the user's Okta password is resetAlarm ID: Okta:Okta:OKTAUser Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36Sender: claire.lyu@pdshealth.comRecipient: claire.lyu@pdshealth.comDescription:
+
+
+## SUMMARY:__________________________________________On Jul 29, 2025 11:52:46 PM UTC, GreyMatter alerted to multiple failed password reset attempts for the user claire.lyu@pdshealth[dot]com. The activity originated from IP address 174.243.181.31 (Verizon mobile network) using an Android device. The system blocked the password reset attempts due to the user answering recovery questions incorrectly across four different sessions. The attempts triggered a security alert as they exhibited characteristics of a potential account compromise attempt.## ANALYSIS:__________________________________________A search on the user agent string `Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36` from the mobile device revealed additional activity that adds context to the alert. Logs show that immediately following the failed password reset attempts, the account for claire.lyu was locked at 23:52:47 UTC for exceeding the maximum number of sign-in attempts. Roughly 20 seconds later at 23:53:06 UTC, a sign-on attempt was made from the same IP address and device. This login was flagged for originating from an anomalous device and resulted in a multi-factor authentication (MFA) challenge being issued.Searching on the source IP address 174.243.181.31 for activity within the last four hours revealed additional context surrounding the password reset attempts. Approximately one hour prior to the alert, a series of failed login attempts for user `claire.lyu` originated from the same IP address. One of these failed logins at 22:33:19 UTC targeted the username `claire.lyu@pacden[dot]com`, suggesting the actor may not have been certain of the user's full email address. The investigation also confirmed that immediately following the fourth failed password reset attempt, the account was automatically locked at 23:52:47 UTC. Following the account lock, another sign-on attempt from the IP at 23:53:06 UTC triggered an MFA challenge due to an anomalous device, indicating continued attempts to access the account.Searching on the user `claire.lyu@pdshealth[dot]com` over the past four hours revealed activity associated with automated account provisioning and a notable group membership change. Approximately one hour before the failed password resets, a series of Okta system events added the user's account to applications such as Active Directory and Workday. More significantly, at 23:56:28 UTC, just four minutes after the final blocked password reset attempt, an Azure AD audit log shows the user was added to the "IT Test" group by the "Microsoft Approval Management" service.Historical searches on claire.lyu, claire.lyu@pdshealth[dot]com, the Okta user ID (00u10pinc7mChRpbs2p8), the source IP address, and various session IDs returned no prior incidents, indicating this may be the first security event involving this user.The intelligence analysis of the source IP 174.243.181.31 shows it belongs to Verizon's mobile network infrastructure in the United States. While Spur classifies it as a CALLBACK_PROXY, this is consistent with legitimate mobile carrier proxy infrastructure. The IP has no malicious detections on VirusTotal (0/94) and shows a 0% Abuse Confidence Score on AbuseIPDB, confirming it's a standard mobile ISP address.The pattern of activity strongly suggests a potential account takeover attempt. The sequence began with failed login attempts using an incorrect domain name (pacden[dot]com instead of pdshealth[dot]com), followed by multiple password reset attempts with incorrect security question answers. After the account was automatically locked, the actor continued trying to access the account, triggering an MFA challenge. Most concerning is the group membership change to "IT Test" shortly after these failed attempts, which could indicate either a legitimate administrative action or a successful compromise through another vector.## RECOMMENDATION:__________________________________________1. Contact claire.lyu directly through a verified phone number or in person to confirm whether she attempted these password reset actions and verify if she was added to the "IT Test" group legitimately.2. Run user_account_disable play for claire.lyu's account and ensure a secure password reset process is followed if it's determined these were unauthorized access attempts.
+
+Payload: 
+{dst_user=[claire.lyu], reason=[User answered recovery question invalid], rule_name=[rq_002621], src_sid=[00u10pinc7mChRpbs2p8], event_count=[4], src_user=[claire.lyu], dst_sid=[00u10pinc7mChRpbs2p8], session_id=[46f405577b920f6e014881d3d6c4ff50, 4d3282bdc58c39e672327bfcb7af22de, 68fff57dfa5943a993a917c183004ec9, 76c0bc37a2d081bf6759e0dad2f2ea62], logon_type=[MECHANISM_UNSPECIFIED], connector_name=[Google Chronicle], url=[/reset_password/dTCxJLmOFhz-z4iorWbN?], log_source_type=[Okta:Okta:OKTA], src_ip=[174.243.181.31], event_type=[user.account.reset_password], sender=[claire.lyu@pdshealth[dot]com], recipient=[claire.lyu@pdshealth[dot]com], event_name=[Fired when the user's Okta password is reset], action=[BLOCK], user_agent=[Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36], timestamp=[2025-07-29T23:52:46Z]}
+
+
+
+View alert details in rqPortal:
+Alert Details in rqPortal
+
+Thank you,ReliaQuestSOC: 813.518.6565reliaquest@service-now.comwww.reliaquest.com
+
+
+  
+Ref:RQMSG116349267
+
+
+
+## Conversations

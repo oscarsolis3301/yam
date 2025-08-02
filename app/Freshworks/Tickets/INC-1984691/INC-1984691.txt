@@ -1,0 +1,37 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating.
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18013135737
+
+**Created At:** 2025-07-30T04:58:17Z
+
+**Updated At:** 2025-07-30T22:26:02Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+Per Onbase ERA DOS 07/22/2025 CDT D7210#I has debit balance was paid and processed with $25 deductible.Per FA,deductible collected and discount applied.Per DE,Last updated: 07/18/2025 service covered 90% paid per coverage  As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect
+
+## Conversations
+
+---
+
+
+Hi Chinnamani,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1984691.
+On review FA# 867484321 for DOS 07/22/2025 plan Guardian PPO - Dental / Dentalguard Preferred attached as Primary coverage and fees are populating correctly for code D7210 with Ded $25 and PD of $40.40. Verified EOB insurance allowed less amount for code D7210 (DED $25) without any reason but the allowed amount is matching with Old Fee schedule of plan DentalGuard Preferred. Hence resolving this ticket. Please refile the claim to get correct fees populating. Thank you
+
+
+
+
+
+

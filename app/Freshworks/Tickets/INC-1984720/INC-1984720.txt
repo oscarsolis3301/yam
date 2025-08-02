@@ -1,0 +1,41 @@
+# Ticket Summary
+
+**Subject:** Request for Anil Kumar Kotha : Safe Permissions
+
+**Status:** 4
+
+**Priority:** 2
+
+**Requester Id:** 18012336273
+
+**Created At:** 2025-07-30T05:32:57Z
+
+**Updated At:** 2025-08-01T19:10:05Z
+
+**Category:** IT
+
+**Sub Category:** CyberArk
+
+**Item Category:** Safe Permissions
+
+## Description
+
+
+
+## Conversations
+
+---
+
+
+_admin accounts were not approved.  We hope to use this in the interim and allow Anil to change the password to a simpler one that still meets the complexity password requirement.  We can enforce a password change every 12 hours to ensure its rotating on the CyberArk end.
+
+This will help the team continue to install the Tanium Client on new CAD machines.  The Cyberark RDP is currently not working to CAD's, we believe this is due to a firewall issue and that is currently being worked on.  
+
+Without Cyberark RDP for CAD's, the only way for Akkodis to remediate them is using the Cyberark-Dameware set up.  Since the CAD machines are usually logged in with the office account, they will need to switch user after they connect via Dameware and put in admin credentials.  On this login screen, you cannot copy and paste so they need to type out the password each time which can get very cumbersome when you're dealing with 40+ cads.  We hope to use this temporarily until the RDP on Cad's are fixed
+
+For transparency sake, I had this ticket submitted in parallel with getting the _admin accounts activated hoping one or both might get approved.  I understand I'm probably on an uphill battle with this too, but I'm hoping we can have this in the interim while we wait for the RDP issue to be fixed.  Maybe 6 week access?  If we still decide to reject it, I understand.  We'll just need to pause on CAD remediations until we can reach them in Cyberark
+
+
+---
+
+Sending to Info Sec for review

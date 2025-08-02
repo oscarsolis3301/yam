@@ -1,0 +1,71 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18012936790
+
+**Created At:** 2025-07-29T09:15:01Z
+
+**Updated At:** 2025-07-30T21:51:07Z
+
+**Category:** ROC - Eligibility
+
+**Sub Category:** Eligibility
+
+**Item Category:** Incorrect fee schedule
+
+## Description
+
+Please review the fee for D3330, As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect.
+
+## Conversations
+
+---
+
+
+Hi Shan,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1982000.
+
+Corrected Notes;
+
+On review FA #873399768 found plan Delta Dental of MN PPO - Dental / Delta Preferred as primary coverage and fees are populating correctly as per FA for code D3330.  Verified DE form found plan  DELTA DENTAL OF MN PPO [448], DELTA PREFERRED with status Completed - ROC. Verified Epic EOB found for code D3330 allowed amount not matching with FA found reason code #131: Claim specific negotiated discount. Verified CyberArk unable to pull the paper. As per credentialing grid billing provider status active for DOS. Hence routed to eligibility to re-verify.
+
+Thank you!
+
+
+
+---
+
+
+Hi Shan Salim
+
+Thank you for reaching out to Patient Benefits. 
+We have updated the dental eligibility form to reflect the most current benefit information. 
+Please note, if you notice the coverage does not appear to be attached in the registration, please take the following steps to attach the coverage: 
+
+
+
+ Open the Coverage Wizard, by using the “Add Coverage” link located in the top right-hand corner of the Guarantors &amp; Coverages section in the registration view. 
+Once in the Coverage Wizard, there will be Coverages located under the search bar. 
+Select the coverage that needs to be attached. 
+To complete the process, click on the “Finish” button at the bottom left of the screen. 
+It is also important to ensure the coverage is attached to the “Visit Info”
+
+Kind Regards,
+Patient Benefits Service Desk 
+
+
+---
+
+
+Hi Shan,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1982000.
+
+On review FA #873399768 found plan Delta Dental of MN PPO - Dental / Delta Preferred as primary coverage.  Verified DE form found plan  DELTA DENTAL OF MN PPO [448], DELTA PREFERRED with status Completed - ROC. Verified DE found allowed amount not matching with FA and fee system with reason code #131: Claim specific negotiated discount. Verified CyberArk plan not found. As per credentialing grid billing provider status active for DOS. Hence routed to eligibility to re-verify.
+
+
+Thank you!
+
+

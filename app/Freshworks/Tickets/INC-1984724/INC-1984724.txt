@@ -1,0 +1,39 @@
+# Ticket Summary
+
+**Subject:** Office#458, ins: LIBERTY HMO. Need to reset the current username/password to login
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18013141358
+
+**Created At:** 2025-07-30T05:42:08Z
+
+**Updated At:** 2025-07-30T14:37:33Z
+
+**Category:** ROC - CyberArk Web Logins
+
+**Sub Category:** Insurance website login/password
+
+**Item Category:** Reset current website login/password
+
+## Description
+
+Per EPIC review, for DOS 4/2/2025 CDTD2740(TH#27), D0150, D9999, D5226 having debit balance. Per review, initially claim denied due to primary EOB. Checked previous found NEA#373905853 has been sent with Primary EOB only. Checked fastattach, found health plan message on 7/25/2025 as "In regard to NEA# 373905853 for patient DEEBONY SMITH, Liberty Dental Plan has sent below message to the Vyne Dental facility# DP124092: CLAIM PAID / PRE-D APPROVED. Treatment paid on c#64975385". Checked in web, unable to login because of Invalid username or password issue, therefore, raised CyberArk ticket for the office#458 to login.
+
+## Conversations
+
+---
+
+
+Hi Esther,
+
+
+Password has been reset. CyberArk has been updated with new credentials. Please refresh your CyberArk. Thank you. As a reminder all MFA codes will be sent to the Web Logins shared Inbox. Thank you. Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1984724.
+
+
+
+
+
+

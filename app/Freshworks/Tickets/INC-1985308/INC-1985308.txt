@@ -1,0 +1,29 @@
+# Ticket Summary
+
+**Subject:** Oralyzer
+
+**Status:** 2
+
+**Priority:** 2
+
+**Requester Id:** 18012933317
+
+**Created At:** 2025-07-30T14:35:03Z
+
+**Updated At:** 2025-07-31T17:28:53Z
+
+**Category:** IT
+
+**Sub Category:** Computer Support
+
+**Item Category:** Computer Hardware/Accessory Issue
+
+## Description
+
+Oralyzer is not accepting patientsShe said they are unable to charge out patients using the Oralyzer
+
+## Conversations
+
+---
+
+Oralyzer checklist:1. Confirm device is getting an IP address: System&gt;Status&gt;Info Menua. If no IP address is present, confirm device is connected to the network port in theback-office lab (“red-zone” area of the lab)2. Confirm Device SW version: System&gt;Status&gt;Info Menu: ISW Version 1.6.0.20716a. If the device is not on this version, please update it.i. Follow this document -https://pacificdental.box.com/s/fbslk2r3fx5wpu7zka7yelocp0pxnfy8After update3. Confirm Connect Server Hostname: AWSMMP01P01.PDSI.CORP: SelectSystem&gt;Settings&gt;Admin Area&gt;Communication Settings&gt;Connect&gt;Advanced4. Confirm the Location ID existsa. Select System&gt;Settings&gt;Admin Area&gt;CommunicationSettings&gt;Connect&gt;Advanced5. Confirm Client ID matches office #a. Select System&gt;Settings&gt;Admin Area&gt;CommunicationSettings&gt;Connect&gt;AdvancedRun the test:&nbsp;She said it shows network not available, SSL handshake failed.2. Check Date &amp; Time of device set to current Date &amp; Timea. System&gt;Settings&gt;Admin Area&gt;Date &amp; Time3. If device is offline, confirm device is getting an IP address. The IP address should followIP scheme of the office.a. On Oralyzer Device Navigate to Info Menui. System&gt;Status&gt;Info Menu4. Check the Communication Settingsa. System&gt;Settings&gt;Admin Area&gt;Communication Settingsi. In Network Confirm DHCP ONii. In Connect Confirm Hostname: AWSMMP01P01.PDSI.CORPiii. Port: 55154iv. Select Advanced, confirm Receive Orders From EPIC is selectedv. Confirm Client ID is set to Office #vi. Confirm Office Location ID (EPIC)vii. If all set correctly in connect screen select Test, this will show a Greenscreen and show “Connect Server Available”viii. If all information is correct and it fails, we need to check if Connect Serveris Online.I verified all information is correct but its still failing to connect to the server.Troubleshooting/Process Steps:1. Go to System &gt; Settings &gt; Admin &gt; Communication &gt; Network2. Look at DHCP in the top right3. If it’s on, set it to Off4. Fields for IP address, subnet mask, and gateway will appear (or have already been there if the DHCP was set to off).I checked the IP address in adapt and it shows 10.52.152.0 for office 244She said IP shows 192.168.3.11She said the subnet showed 24 so I had her set it to 255. Leave the IP address alone.6. Set the subnet mask to 25.7. Set the gateway to X.X.X.129, replacing the first three X’s with the IP scheme of the office8. Hit Save9. Go back into Network10. Turn DHCP back On11. Hit Save12. Go to System &gt; Status &gt; Info13. Ensure that the IP address doesn’t say either DISCONNECTED or 192.168.3.11a. If it does this means that there’s an issue in the network roomi. If you’re comfortable, guide them through finding the oralyzer ethernet cable in the network room and have them plug it into ports 9 through 11 on the switch closest to the wall.1. If it is plugged into the right port on the switch, this means that the VLAN is wrong. Send the ticket to field.ii. If you’re not comfortable, send the ticket to field.14. Check the home screen and check on the ethernet icon at the top of the screen. It should appear white in a minute or two if it isn’t already white.15. If it’s white, continue with the guide that you were on previous to thisI had Debbie try to update the device.a. Select System &gt; Settings &gt; Admin Area &gt; Update Software and then try to select the icon in theupper right-hand corner of the screen but the button was missing.NOTE: You may need to tap the icon in the upper right-hand corner 5-8 times to ensure thedevice receives the update. Once received, you will be prompted to upgrade to version 1.6.0.On the ORALyzer device:I had Debbie:a. Navigate to the home screenb. Select System &gt; Settings &gt; Admin Area &gt; Communication Settings &gt; Connectc. Tap the toggle switch to ONI had her change the hostname to&nbsp;AWSMMP01P02.PDSI.CORPI confirmed the Port is set to 55154f. Select SaveI had her click test and she said the test passed this time.I walked her through the steps to create a new order:Order an OralFitnessCheck Screening1. In the patient’s chart, select the Order Preference List.2. Search for “oral” or select the preference list Other Orders &gt; Point of Care.3. Select Pilot POCT Oral Fitness AMMP-8 docked device.4. Click Accept.5. Click Sign Orders.I had her go to&nbsp;the ORALyzer home screen, tap Order List.2. On the Order List screen, use the Order ID and Patient ID to locate the screening for thepatient. Tap on the order in the list.When she search for the patient she could not get the order for the patient to show up.&nbsp;

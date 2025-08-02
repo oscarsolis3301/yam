@@ -1,0 +1,35 @@
+# Ticket Summary
+
+**Subject:** : incorrect insurance expect/fee  populating
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18012920951
+
+**Created At:** 2025-07-30T07:59:22Z
+
+**Updated At:** 2025-07-30T13:12:04Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+Please review the fees for D1110 As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect”. 
+
+## Conversations
+
+---
+
+
+Hi Ashwin,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1984802.
+
+On review FA#862677688 found plan Operating Engineers Trust Funds PPO - Dental / UCR attached as Primary coverage and found for code D1110 UCR Plan for Miscellaneous-UCR carrier fees link attached. In fees system Operating Engineers Trust Funds PPO - Dental / UCR plan not found but it's comes under Miscellaneous  UCR plan. Verified DE form found same plan is attached with comments UCR-EMPFS=PTCOPAY. Verified EOB insurance allowed and paid less amount than the FA without any specific reason for code D1110. Payer has different UCR than PDS &amp; office needs to manually coordinate with carrier to sort carrier payment, Hence resolving this ticket, Please let me know for any additional questions, Thank you.
+
+
+

@@ -1,0 +1,60 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee  populating
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18013111357
+
+**Created At:** 2025-07-30T10:47:45Z
+
+**Updated At:** 2025-07-30T21:30:34Z
+
+**Category:** ROC - Eligibility
+
+**Sub Category:** Eligibility
+
+**Item Category:** Incorrect fee schedule
+
+## Description
+
+“Please review the fees for D4910. As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect
+
+## Conversations
+
+---
+
+
+Hi Surendhar Ashokkumar
+
+Thank you for reaching out to Patient Benefits. 
+We have updated the dental eligibility form to reflect the most current benefit information. 
+Please note, if you notice the coverage does not appear to be attached in the registration, please take the following steps to attach the coverage: 
+
+
+
+ Open the Coverage Wizard, by using the “Add Coverage” link located in the top right-hand corner of the Guarantors &amp; Coverages section in the registration view. 
+Once in the Coverage Wizard, there will be Coverages located under the search bar. 
+Select the coverage that needs to be attached. 
+To complete the process, click on the “Finish” button at the bottom left of the screen. 
+It is also important to ensure the coverage is attached to the “Visit Info”
+
+Kind Regards,
+Patient Benefits Service Desk 
+
+
+---
+
+
+Hi Surendhar,
+
+
+On review FA#864075845 found plan Delta Dental of GA and FL PPO - Dental / Delta Preferred attached as primary coverage for the DOS 07/21/2025 code D4910 was populating correctly and Benefits updated after record was finalized. Replace to update amounts.. Verified EOB found the code D4910 allowed less than the expected amount with the remark code 119: Benefit maximum for this time period or occurrence has been reached &amp; M86: Service denied because payment already made for same/similar procedure within set time frame. Verified DE form found the remaining maximum is $11.30. Checked in CG billing provider is active delta dental. Hence routing the ticket to eligibility for plan verification. Thank youPlease find your ticket URL: https://support.pacden.com/helpdesk/tickets/1984955.
+
+
+
+
+
+

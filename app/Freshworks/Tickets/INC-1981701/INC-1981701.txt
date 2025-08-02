@@ -1,0 +1,36 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating
+
+**Status:** 5
+
+**Priority:** 1
+
+**Requester Id:** 18014287207
+
+**Created At:** 2025-07-29T01:45:36Z
+
+**Updated At:** 2025-08-01T21:37:33Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+Please review the fee for D2393(19) As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect
+
+## Conversations
+
+---
+
+
+Hi Lijimole,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1981701.
+
+
+
+On review found fees populating correctly for code D2393 and also found 50.00 Individual deductible in FA#859334009 and EOB. Patient has coverage Cigna PPO - Dental / Cigna Dental PPO same fees link attached in FA. Verified dental eligibility found CIGNA PPO [399], CIGNA DENTAL PPO with status Completed - ROC. When we review the Epic paper EOB for code D2393 alternate benefit code D2160 paid with reason code AA Under the provision of your Dental plan, an alternate benefit allowance has been applied. Please see your plan booklet for further explanation of this provision. &amp;  D2160 have reason code AB This is the benefit allowance under the alternate benefit provision of your plan. Please reach out to insurance for the more clarification on this. As per credentialing grid billing provider status is active for DOS with Cigna PPO, Hence resolving the ticket, Please let me know for any additional questions. Thank You
+
+

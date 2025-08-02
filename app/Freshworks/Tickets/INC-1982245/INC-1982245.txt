@@ -1,0 +1,25 @@
+# Ticket Summary
+
+**Subject:** fee schedule ticket
+
+**Status:** 13
+
+**Priority:** 1
+
+**Requester Id:** 18013111494
+
+**Created At:** 2025-07-29T12:49:47Z
+
+**Updated At:** 2025-07-31T21:02:38Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Insurance Paid Less/More
+
+## Description
+
+As per EPIC, DOS 07/08/25. CDT D3310,D3911,D3220 has debit balance. CDT D0460 has credit balance. Per FA PR paid. No other coverage. Per EOB, D3310#11 paid less and deductible $50.00 applied and it was collected in other invoice #A71210459630 on DOS 06/23/25. Hence taken deductible adj and remaining insurance coveres 80% and paid per allowed amount. No alternated, no deductible, no overridden. per DE, last update date falss before the DOS under same plan in DE and FA. SO per update , hence creating the fee ticket
+
+## Conversations

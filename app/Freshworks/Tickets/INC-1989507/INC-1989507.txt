@@ -1,0 +1,36 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating.
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18013692562
+
+**Created At:** 2025-08-01T02:47:39Z
+
+**Updated At:** 2025-08-01T20:20:08Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+“Please review the fees for D4910 As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect”.
+
+## Conversations
+
+---
+
+
+Hi Hassen,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1989507.
+
+
+
+On review found fees populating correctly for code D4910 in FA#841682168. Primary Coverage attached Delta Dental of WA - Wds PPO - Dental / Delta Preferred same fees link attached. Verified dental eligibility found DELTA DENTAL OF WA - WDS PPO [465], DELTA PREFERRED with status ROC Request Pending. Verified Epic EOB insurance paid less than estimate amount for codes with no specific reason codes. Verified credentialing billing provider out of network for DOS as per credentialing grid billing provider RAYA, NIKI status is active from effective date 7/16/2025. Hence resolving the ticket, Please let me know for any additional questions. Thank You 
+
+

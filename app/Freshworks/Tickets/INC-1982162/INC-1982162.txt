@@ -1,0 +1,36 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18013009741
+
+**Created At:** 2025-07-29T11:40:12Z
+
+**Updated At:** 2025-07-31T19:02:18Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+Please review the fees for D2393 T#13,D2392 T#12,15,14 . As per FA  correct fee schedule attached but incorrect fees pD2393 T#13,D2392 opulating in Epic as insurance expect”.
+
+## Conversations
+
+---
+
+
+Hi Kishorekumar,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1982162.
+
+As per the review found fees populating correctly for codes D2392, D2393 in FA#862223898. Billing provider status is active for DOS. Verified dental eligibility found UNITED HEALTHCARE PPO [872], DENTAL BENEFIT PROVIDERS PPO with status Verified by Front Office. When we review the Epic EOB for codes D2392, D2393 paid less amount with reason code 169: Alternate benefit has been provided. And also found 50.00 deductible applied to code D2392. As per fees system payments matched with codes D2150, D2160. Please reach out to insurance for the more clarifications. Hence resolving this ticket, Please let me know for any additional questions. Thank you
+
+
+
+

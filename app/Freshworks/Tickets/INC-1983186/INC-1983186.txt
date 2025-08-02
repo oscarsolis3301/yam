@@ -1,0 +1,47 @@
+# Ticket Summary
+
+**Subject:** Not everyone on the email list is getting the email sent using proofpoint smtp server
+
+**Status:** 9
+
+**Priority:** 2
+
+**Requester Id:** 18014600263
+
+**Created At:** 2025-07-29T17:33:49Z
+
+**Updated At:** 2025-07-30T19:00:34Z
+
+**Category:** IT
+
+**Sub Category:** Email
+
+**Item Category:** Troubleshooting
+
+## Description
+
+MFT application hosted in AWS daily sends out some of the reports to multiple recipients as email. &nbsp;One of the report has the following recipients&nbsp;mft-prd-support &lt;mft-prd-support@pacden.com&gt;; Gaskins, Roland &lt;gaskinsr@pdshealth.com&gt;; Porras, Cesar &lt;porrasc@pdshealth.com&gt;; Hinton, Jody &lt;jody.hinton@pdshealth.com&gt;; Betts, Corey &lt;corey.betts@pdshealth.com&gt;; Udroiu, Natalia &lt;">UdroiuN@pdshealth.com&gt;The email is not received by all those listed after mft-prd-support even though the email received by some do have these emails listed on their To email list.&nbsp;Is there any limit for the To email field so that only the first few gets the email?&nbsp;Earlier the distribution list was at the end and people on the distribution list did not receive the emails. &nbsp;After moving it to the front, now the people after that is not receiving email,.&nbsp;SMTP server used : &nbsp;psersmtp.pdsconnect.comSending Server&nbsp; &nbsp; &nbsp;: MFT server in AWS.&nbsp;Also as seen in attached image, the emaillist is getting cutoff, there were few more names on that list actually.&nbsp;&nbsp;
+
+## Conversations
+
+---
+
+
+Hi Anoop,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1983186.
+
+
+
+
+Case Record Type
+PCMS Support
+
+
+Status
+NEW
+
+
+Case Number
+06378470
+
+
+

@@ -1,0 +1,58 @@
+# Ticket Summary
+
+**Subject:** ofz#565,Ameritas PPO,MRN#25068578,Insurance paid less than estimate.
+
+**Status:** 5
+
+**Priority:** 1
+
+**Requester Id:** 18012934518
+
+**Created At:** 2025-07-29T02:37:06Z
+
+**Updated At:** 2025-08-01T16:38:09Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+Per EPIC review for DOS 1/23/2025 CDT D6010#30 has debit balance. Per review in EPIC ERA stated that claim was processed and claim got paid and payment got posted in EPIC. No overridden charges found. No secondary insurance is listed. Hence creating a ticket
+
+## Conversations
+
+---
+
+
+Hi Ponraj,
+Please disregard the previous comments:
+
+On review FA#797453178 the plan Ameritas PPO - Dental / Ameritas PPO as secondary coverage for DOS 01/23/2025 code D6010 was populating correctly. Checked in DE form the benefits are matching with EOB for the code D6010. Verified in EOB the code D6010 was paid less than the expected amount with remark code 45. Checked in CG the billing provider Brendan Schleyer (Perio) is active for the DOS. Verified Perio Fee schedule found that the insurance allowed correct amount as per the Provider type. Hence resolving this ticket. Please manually override the FA to match EOB or please reach out to insurance for further information. Thank you
+
+Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1981728.
+
+
+
+
+
+
+
+---
+
+
+Hi Ponraj,
+
+On review FA#797453178 the plan Ameritas PPO - Dental / Ameritas PPO as secondary coverage for DOS 01/23/2025 code D6010 was populating correctly. Checked in DE form the benefits are matching with EOB for the code D6010. Verified in EOB the code D6010 was paid less than the expected amount with remark code 45. Checked in CG the billing provider is active for the DOS hence routing this ticket to eligibility team for plan verification. Thank you
+
+
+
+Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1981728.
+
+
+
+
+
+

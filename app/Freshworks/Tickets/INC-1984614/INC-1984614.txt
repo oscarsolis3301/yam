@@ -1,0 +1,36 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating.
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18013692562
+
+**Created At:** 2025-07-30T03:11:14Z
+
+**Updated At:** 2025-08-01T19:07:19Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+Please review the fees forD2740 D2950 . As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect”.
+
+## Conversations
+
+---
+
+
+Hi Hassen,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1984614.
+
+
+
+On review found fees populating correctly for codes D2950, D2740 in FA#855503518. Benefits updated after record was finalized. Replace to update amounts. Primary Coverage attached Unitedhealth Group PPO - Dental / Diversified PPO same fees link attached. Verified dental eligibility found UNITED HEALTHCARE PPO [872], DIVERSIFIED PPO with status ROC Request Pending. Verified Epic paper EOB processed as out of network claim insurance paid less than estimate amount for codes with no specific reason codes. Billing provider out of network for DOS as per credentialing grid billing provider PARK, JAE HOUNG status is In Process. Hence resolving the ticket, Please let me know for any additional questions. Thank You
+
+

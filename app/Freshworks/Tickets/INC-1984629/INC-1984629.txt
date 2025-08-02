@@ -1,0 +1,36 @@
+# Ticket Summary
+
+**Subject:** B06210005480-paid less
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18013825059
+
+**Created At:** 2025-07-30T03:29:06Z
+
+**Updated At:** 2025-08-01T17:08:12Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Insurance Paid Less/More
+
+## Description
+
+Per Onbase ERA, CDT D7240 T#32 17 16 1 D0140 paid less than estimate,Per DE,ROC status last updated on 07/08/2025.Coverage % is 80 and paid 80% from allowed amount.No other active insurance found.Hence creating ticket
+
+## Conversations
+
+---
+
+
+Hi Govadharshini,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1984629.
+
+
+
+
+On review found fees populating correctly for codes D0140, D7240 in FA#861145667. Patient has primary coverage United Concordia / Advantage Plus fees link attached UNITED CONCORDIA - ADVANTAGE PLUS - Advantage Plus OH Reg 67. As per credentialing grid billing provider status is active for DOS. As per Epic EOB review the claim was processed using the old Advantage Plus fee schedule. United Concordia is still updating their systems to the new negotiated rates and this code was processed based on the Reg - 42 2023 previous fees schedule by mistake, Need to resubmit the claim so that office can receive proper payment for the claim and reprocess with updated fee schedule. Hence resolving this ticket, Please let me know for any additional questions, Thank you
+

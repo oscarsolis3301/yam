@@ -1,0 +1,118 @@
+# Ticket Summary
+
+**Subject:** RQ26728680 - RQ-SM-002621-02 - Unusual Password Reset Activity (Pending RQ)
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18012947310
+
+**Created At:** 2025-07-30T13:36:19Z
+
+**Updated At:** 2025-07-31T18:46:27Z
+
+**Category:** IT
+
+**Sub Category:** Security
+
+**Item Category:** Physical
+
+## Description
+
+
+RQ26728680 - RQ-SM-002621-02 - Unusual Password Reset Activity Comment: Hello @James Lortz, Thank you for your patience while we investigated this activity. The hunt is still in progress but i have included the link to this hunt so your team
+
+
+
+ZjQcmQRYFpfptBannerStart
+
+
+
+
+  
+    
+      
+	This Message Is From an External Sender. If suspicious, click the button to report to IT
+      
+      
+
+      
+
+    
+    
+
+    
+	Report Suspicious
+    
+
+    
+     
+  
+
+
+ZjQcmQRYFpfptBannerEnd
+
+
+
+
+
+
+
+
+ 
+RQ26728680 - RQ-SM-002621-02 - Unusual Password Reset Activity
+
+Comment:
+Hello @James Lortz,
+
+Thank you for your patience while we investigated this activity.
+
+The hunt is still in progress but i have included the link to this hunt so your team can view the results when it completes if you would like (Hunt Link: https://greymatter.myreliaquest.com/N10GHP/hunt/6d352fa5-c27e-40c6-a536-ab25f03f6e02?dataTableInfo=rqhunt_aezemn0bqanfj0iokkqj_6d352fa5-c27e-40c6-a536-ab25f03f6e02_1753868800671&amp;start=2505010944&amp;end=2507300944 ).  
+
+Looking at the applications the user interacted with, we can only identify activity associated with Power BI over a period ranging from 18 June 2025 to 30 July 2025. The connections to Power BI do not appear to be suspicious. The IP addresses used to access Power BI resolve to trusted providers, including Microsoft (40.82.253.173), Palo Alto Networks (137.83.246.143), and Google Fixed Line ISP (136.52.74.13). This suggests legitimate business activity by the user.
+
+We performed a search focusing on the user "claire.lyu@pdshealth.com" within the Azure_AD and Azure_AD_Audit logs. The findings from these logs provide a comprehensive view of the user's provisioning, synchronization, and application membership activities. The logs indicate that the user was involved in multiple provisioning and synchronization processes, with both successful outcomes and recurring challenges. Successful provisioning was observed when the user was added to applications like "Recruitment Center," "Compensation Non Prod," and "HTML Clock Dev" via Okta, with all outcomes marked as "SUCCESS." These actions confirm that the user was properly granted access to critical organisational resources.
+
+However, the Azure_AD logs reveal synchronization issues, as the user was skipped during several attempts due to errors such as being "NotEffectivelyEntitled," not being assigned to applications, or being marked as "inactive" in the source system. These skips highlight configuration gaps in the provisioning setup, particularly around entitlement settings and application assignments. Recommendations provided in the logs include assigning the user to applications, updating scoping filters, and ensuring entitlement criteria are met to avoid such skips in the future. Despite these challenges, a successful import operation on 30 July 2025 added the user to Adobe Identity Management (OIDC), confirming account activation and updated attributes. This indicates progress in addressing earlier issues.
+
+We then investigated the second domain, "claire.lyu@pacden.com," and from these logs, we can see a mix of successful provisioning, application membership changes, logins, and single sign-on (SSO) activities, as well as a failed login attempt. The logs reveal that the user was successfully added to critical applications, such as "Freshworks" (PDS Service Desk) and "Smile Generation Merch Store," on 29 July 2025, with all provisioning actions marked as "SUCCESS." These actions demonstrate seamless integration and access granted to the user in these applications.
+
+The logs also include a failed login attempt on 29 July 2025, where the user tried to log into Okta from a mobile device in Riverside, California. The failure, marked as "VERIFICATION_ERROR," was likely due to incorrect credentials or failed multi-factor authentication. However, the event does not indicate malicious activity, as the threat flag was marked as "false." Additionally, on 27 July 2025, several application memberships were removed for the user, including "Microsoft Office 365," "Freshworks," and instances of the Bookmark App. These removals were successfully initiated by the Okta System and likely reflect routine account cleanup or entitlement adjustments.
+
+The activity associated with the first account, "claire.lyu@pdshealth.com," suggests potential troubleshooting or testing. Notably, the user was added to the IT Test group by the "Microsoft Approval Management" service, which streamlines and automates approval processes within the Microsoft ecosystem. These tools are part of Microsoft 365 and include features like Approvals in Microsoft Teams, Approvals Hub, and automated workflows in Power Automate. This indicates legitimate activity within the scope of managing access issues.
+
+The second account, "claire.lyu@pacden.com," appears to be legitimate and not the result of the user logging into the wrong domain. The activity observed reflects effective provisioning and authentication processes, with successful application access and membership management. The failed login attempt and subsequent removal of application memberships align with normal operational management rather than indicators of security concerns. These findings suggest that both accounts demonstrate activity consistent with organisational processes and policies, with no evidence of unauthorised or malicious behaviour.
+
+We attempted to gain context on the user and determine their role however no results were returned to indicate if the resources the user was granted permissions to/observed accessing would be considered normal and authorised based on their role.
+
+
+Please let us know if you have any further questions, concerns or would like any further investigation performed please let us know.
+
+Kind Regards,
+Ben Hunt O'Reilly
+GreyMatter Specialist
+ReliaQuest
+State: Pending RQPriority: 3 - MediumCategory: Attack Life CycleSubcategory: PersistenceTechnology: Google Security OperationsAlert Artifacts:
+Source IP: 174.243.181.31Alarm Date: 2025-07-29 19:52:46 EDTSource URL: /reset_password/dTCxJLmOFhz-z4iorWbN?Source User: claire.lyuImpacted User: claire.lyuSource Geo: United StatesAction: BLOCKEvent Name: Fired when the user's Okta password is resetAlarm ID: Okta:Okta:OKTAUser Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36Sender: claire.lyu@pdshealth.comRecipient: claire.lyu@pdshealth.comDescription:
+
+
+## SUMMARY:__________________________________________On Jul 29, 2025 11:52:46 PM UTC, GreyMatter alerted to multiple failed password reset attempts for the user claire.lyu@pdshealth[dot]com. The activity originated from IP address 174.243.181.31 (Verizon mobile network) using an Android device. The system blocked the password reset attempts due to the user answering recovery questions incorrectly across four different sessions. The attempts triggered a security alert as they exhibited characteristics of a potential account compromise attempt.## ANALYSIS:__________________________________________A search on the user agent string `Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36` from the mobile device revealed additional activity that adds context to the alert. Logs show that immediately following the failed password reset attempts, the account for claire.lyu was locked at 23:52:47 UTC for exceeding the maximum number of sign-in attempts. Roughly 20 seconds later at 23:53:06 UTC, a sign-on attempt was made from the same IP address and device. This login was flagged for originating from an anomalous device and resulted in a multi-factor authentication (MFA) challenge being issued.Searching on the source IP address 174.243.181.31 for activity within the last four hours revealed additional context surrounding the password reset attempts. Approximately one hour prior to the alert, a series of failed login attempts for user `claire.lyu` originated from the same IP address. One of these failed logins at 22:33:19 UTC targeted the username `claire.lyu@pacden[dot]com`, suggesting the actor may not have been certain of the user's full email address. The investigation also confirmed that immediately following the fourth failed password reset attempt, the account was automatically locked at 23:52:47 UTC. Following the account lock, another sign-on attempt from the IP at 23:53:06 UTC triggered an MFA challenge due to an anomalous device, indicating continued attempts to access the account.Searching on the user `claire.lyu@pdshealth[dot]com` over the past four hours revealed activity associated with automated account provisioning and a notable group membership change. Approximately one hour before the failed password resets, a series of Okta system events added the user's account to applications such as Active Directory and Workday. More significantly, at 23:56:28 UTC, just four minutes after the final blocked password reset attempt, an Azure AD audit log shows the user was added to the "IT Test" group by the "Microsoft Approval Management" service.Historical searches on claire.lyu, claire.lyu@pdshealth[dot]com, the Okta user ID (00u10pinc7mChRpbs2p8), the source IP address, and various session IDs returned no prior incidents, indicating this may be the first security event involving this user.The intelligence analysis of the source IP 174.243.181.31 shows it belongs to Verizon's mobile network infrastructure in the United States. While Spur classifies it as a CALLBACK_PROXY, this is consistent with legitimate mobile carrier proxy infrastructure. The IP has no malicious detections on VirusTotal (0/94) and shows a 0% Abuse Confidence Score on AbuseIPDB, confirming it's a standard mobile ISP address.The pattern of activity strongly suggests a potential account takeover attempt. The sequence began with failed login attempts using an incorrect domain name (pacden[dot]com instead of pdshealth[dot]com), followed by multiple password reset attempts with incorrect security question answers. After the account was automatically locked, the actor continued trying to access the account, triggering an MFA challenge. Most concerning is the group membership change to "IT Test" shortly after these failed attempts, which could indicate either a legitimate administrative action or a successful compromise through another vector.## RECOMMENDATION:__________________________________________1. Contact claire.lyu directly through a verified phone number or in person to confirm whether she attempted these password reset actions and verify if she was added to the "IT Test" group legitimately.2. Run user_account_disable play for claire.lyu's account and ensure a secure password reset process is followed if it's determined these were unauthorized access attempts.
+
+Payload: 
+{dst_user=[claire.lyu], reason=[User answered recovery question invalid], rule_name=[rq_002621], src_sid=[00u10pinc7mChRpbs2p8], event_count=[4], src_user=[claire.lyu], dst_sid=[00u10pinc7mChRpbs2p8], session_id=[46f405577b920f6e014881d3d6c4ff50, 4d3282bdc58c39e672327bfcb7af22de, 68fff57dfa5943a993a917c183004ec9, 76c0bc37a2d081bf6759e0dad2f2ea62], logon_type=[MECHANISM_UNSPECIFIED], connector_name=[Google Chronicle], url=[/reset_password/dTCxJLmOFhz-z4iorWbN?], log_source_type=[Okta:Okta:OKTA], src_ip=[174.243.181.31], event_type=[user.account.reset_password], sender=[claire.lyu@pdshealth[dot]com], recipient=[claire.lyu@pdshealth[dot]com], event_name=[Fired when the user's Okta password is reset], action=[BLOCK], user_agent=[Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36], timestamp=[2025-07-29T23:52:46Z]}
+
+
+
+View alert details in rqPortal:
+Alert Details in rqPortal
+
+Thank you,ReliaQuestSOC: 813.518.6565reliaquest@service-now.comwww.reliaquest.com
+
+
+  
+Ref:RQMSG116400232
+
+
+
+## Conversations

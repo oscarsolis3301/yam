@@ -1,0 +1,57 @@
+# Ticket Summary
+
+**Subject:** Incorrect insurance expect/fee populating
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18012934721
+
+**Created At:** 2025-07-29T04:10:55Z
+
+**Updated At:** 2025-07-31T19:14:31Z
+
+**Category:** ROC - Eligibility
+
+**Sub Category:** Eligibility
+
+**Item Category:** Incorrect fee schedule
+
+## Description
+
+Please review the fees for D7210(T#32) As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect
+
+## Conversations
+
+---
+
+
+Hi Saneeshmon Purushothaman
+
+Thank you for reaching out to Patient Benefits. 
+We have updated the dental eligibility form to reflect the most current benefit information. 
+Please note, if you notice the coverage does not appear to be attached in the registration, please take the following steps to attach the coverage: 
+
+
+
+ Open the Coverage Wizard, by using the “Add Coverage” link located in the top right-hand corner of the Guarantors &amp; Coverages section in the registration view. 
+Once in the Coverage Wizard, there will be Coverages located under the search bar. 
+Select the coverage that needs to be attached. 
+To complete the process, click on the “Finish” button at the bottom left of the screen. 
+It is also important to ensure the coverage is attached to the “Visit Info”
+
+Kind Regards,
+Patient Benefits Service Desk 
+
+
+---
+
+
+Hi Saneeshmon,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1981804.
+
+On review found fees populating correctly for code D7210 in FA#834013930. Patient has secondary coverage Anthem Blue Cross Blue Shield of CO PPO / Anthem Blue Cross Ppo100 same fees link attached. Verified dental eligibility found ANTHEM BLUE CROSS BLUE SHIELD OF CO PPO [276], ANTHEM BLUE CROSS PPO100 with status Verified by Front Office. When we review the EOB claim not processed based on the ANTHEM BLUE CROSS PPO100 fees. As per credentialing grid billing provider status is In Network. Hence routed to eligibility to re-verify the eligibility and attach the correct plan to patient coverage &amp; FA. Please let me know for any additional questions. Thank You
+
+
+
+

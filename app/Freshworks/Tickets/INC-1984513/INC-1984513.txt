@@ -1,0 +1,59 @@
+# Ticket Summary
+
+**Subject:** pdshealth.okta.com additional MFA setup
+
+**Status:** 4
+
+**Priority:** 2
+
+**Requester Id:** 18012922521
+
+**Created At:** 2025-07-30T00:30:51Z
+
+**Updated At:** 2025-07-31T18:12:04Z
+
+**Category:** IT
+
+**Sub Category:** IT Operating Programs/Apps
+
+**Item Category:** PDS Connect
+
+## Description
+
+
+Host Name:  rv1-fo2
+Problem(s) identified: Wanting to setup Okta verify MFA 
+Repeat issue?: 
+Troubleshooting steps taken:  Reset the MFA via the pdshealth admin account but it only allows me to reset the SMS verification. 
+I remoted in and access the settings for the account.
+Clicked "set up another" option to add an additional MFA method. 
+However that still only adds the SMS verification. 
+Transfer reason:  IAM team 
+Investment time: 
+
+
+
+## Conversations
+
+---
+
+Melba Castillo has submitted the survey response
+
+---
+
+
+No, Guidehouse is not supposed to have SMS, only voice. Where do you see its guidehouse? 
+
+
+
+
+Get Outlook for Android
+
+
+
+
+
+
+---
+
+I looked at the user in current OKTA and user only has SMS as MFA, no OKTA Verify to begin with.As the user is part of the Guidehouse, user is being only prompted for SMS

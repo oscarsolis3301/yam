@@ -1,0 +1,41 @@
+# Ticket Summary
+
+**Subject:** Incorrect fee schedule attached in FA
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18012934616
+
+**Created At:** 2025-07-31T09:57:52Z
+
+**Updated At:** 2025-07-31T20:57:56Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+LINCOLN FINANCIAL GROUP PPO paid the CDT D4346 less than EPIC estimate balance in debit, Per DE found this code D4346 should be covered by 80% insurance and it's got paid correct as per EOB allowed with ded $50.00, Per EOB D4346 insurance allowed amount is $108.31 and insurance paid of $52.48 with ded $50.00,  Per FA and DE found the insurance plan were same, 
+Please review the fees for D4346 as per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect. 
+
+
+## Conversations
+
+---
+
+
+Hi Pravin,
+
+
+On review FA#868859886 found plan Lincoln Financial Group PPO / UCR attached as Primary coverage for the DOS 07/23/2025 D4346 with deductibles $50.00. Verified EOB insurance allowed and paid less amount than the FA without any specific reason for code D4346. Payer has different UCR than PDS &amp; office needs to manually coordinate with carrier to sort carrier payment, Checked in CG billing provider is not found and considered as Provider OON. Hence resolving this ticket, Please let me know for any additional questions, Thank you.Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1987204.
+
+
+
+
+
+

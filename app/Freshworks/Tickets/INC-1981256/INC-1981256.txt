@@ -1,0 +1,50 @@
+# Ticket Summary
+
+**Subject:** claim was with held 53.50
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18014579629
+
+**Created At:** 2025-07-28T21:27:31Z
+
+**Updated At:** 2025-07-30T16:56:36Z
+
+**Category:** ROC - Insurance Billing Operations
+
+**Sub Category:** Audit
+
+**Item Category:** PLB offsets
+
+## Description
+
+
+Inv#A04310325070 DOS 5.27.25 Metlife-PPO. Claim initially processed x-rays as D8999  @125 0220 $16, 0230 $35 and 0274 as $36: total pd $212
+
+OVERPD :
+name: BALDEON,CHARLY
+DOS: 5.27.25
+inv# A04310325070
+clm#5052999222 99
+pd amount: $212
+initial ck# 623245621
+req refund: $63
+reason for offset: refund never issued to carrier for incorrect process of D8999
+
+UNDER PD:
+name:  Charly Baldeon
+inv#  A04310325070
+clm# 5052999222 99 009
+dos  5.27.25
+pd amount: 9.50
+ck/EFT# ck#681719604
+
+
+
+
+
+
+
+## Conversations

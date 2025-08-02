@@ -1,0 +1,25 @@
+# Ticket Summary
+
+**Subject:** Office#514, CIGNA HMO, need to provide correct facility ID for referring and specialist provider
+
+**Status:** 5
+
+**Priority:** 1
+
+**Requester Id:** 18013044059
+
+**Created At:** 2025-07-29T05:00:36Z
+
+**Updated At:** 2025-08-01T18:37:50Z
+
+**Category:** ROC - Credentialing
+
+**Sub Category:** ROC - Credentialing Support
+
+**Item Category:** Other
+
+## Description
+
+Per EPIC review, For 05/23/2025 CDT D7210(T#17,16,30,19,18,15,14,3) has debit balance. Per claim status, claim processed and paid under capitation. There is no supplemental due. Provider is specialist: Periodontics. Checked in grid, Provider SHARMA, ATUL K, LIC#DN28516, NPI#1790367142 and Eff date 05/01/2025 under Facility ID#776191 and for GP provider CHOI, YUNA M, LIC#DN23017, NPI#1134645005 and Eff date 05/01/2024 with same facility ID. Checked in referral form, no facility ID found for both providers. Hence creating a ticket to add know the correct facility ID for referring and rendering provider.
+
+## Conversations

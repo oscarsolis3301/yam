@@ -1,0 +1,39 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18013104905
+
+**Created At:** 2025-07-31T11:04:26Z
+
+**Updated At:** 2025-07-31T20:03:21Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+Please review the fees for D3330 As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect
+
+## Conversations
+
+---
+
+
+Hi Muthu,
+
+
+On review FA#869415876 found plan Lincoln Financial Group PPO / Advantage Plus attached as primary coverage for the DOS 07/24/2025 code D3330 was populating correctly. Verified EOB found the code D3330 allowed less than the expected amount with the remark code 45. Verified DE form benefits are not matched with the EOB. Checked in CG unable to find the billing provider and its considered as provider OON. Hence resolving the ticket. Thank youPlease find your ticket URL: https://support.pacden.com/helpdesk/tickets/1987270.
+
+
+
+
+
+

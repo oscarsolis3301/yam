@@ -1,0 +1,46 @@
+# Ticket Summary
+
+**Subject:** PLB offset
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18012901090
+
+**Created At:** 2025-07-30T15:20:04Z
+
+**Updated At:** 2025-07-31T16:05:21Z
+
+**Category:** ROC - Insurance Billing Operations
+
+**Sub Category:** Audit
+
+**Item Category:** PLB offsets
+
+## Description
+
+Overpaid Patient 
+claim # 20250417113761
+(NAME) Andrea Perez
+MRN# 25690253
+INV# B12010042950
+DOS 04/15/2025
+paid$ $ 662.10
+check/EFT# 3131063
+Reprocessed Y/N Date 04/29/2025
+Reprocessed $662.10
+Reprocessed EFT/ notification # 
+Refund $ 662.10
+Reason: corrected claim sent processed as duplicate claim is being sent for reprocessing as no true denial reason for D3330 and D0140.
+ 
+Underpaid Patient 
+Claim# 20250519117965
+Name Beau  Watson
+MRN# 25790959
+INV# B12010045130
+DOS 05/15/2025
+Allowed /withheld $ 500.15
+Check/EFT#
+
+## Conversations

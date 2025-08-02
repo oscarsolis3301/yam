@@ -1,0 +1,101 @@
+# Ticket Summary
+
+**Subject:** Acceses missing after Reactivation Snowflake
+
+**Status:** 13
+
+**Priority:** 2
+
+**Requester Id:** 18014093155
+
+**Created At:** 2025-07-30T23:39:45Z
+
+**Updated At:** 2025-07-31T17:44:26Z
+
+**Category:** IT
+
+**Sub Category:** Access/Password
+
+**Item Category:** Other Application/Software Access
+
+## Description
+
+User states that error messages appear on Jira and Snowflake after their account was re-activated.
+
+## Conversations
+
+---
+
+
+Hi Claire,This is an issue with Okta itself after your reactivation and not a DB related issue. Please reach out to the IAM (Identify Access management ) team. I have reassigned it. 
+
+
+
+
+
+
+
+---
+
+
+I also has log in issue with Jira, Box.
+ 
+
+
+
+
+
+
+
+---
+
+
+Hi, there, 
+ 
+I still can’t log in snowflake, usually I click “Single sign on”, it doesn’t work now.
+
+ 
+
+I also tried to use username and password; it just shows incorrect password for both 2 email addresses.
+ 
+Would you please investigate it?
+ 
+Thank you.
+ 
+ 
+
+Best regards,
+
+
+Claire Lyu
+
+
+
+PDS Health
+17000 Red Hill Ave., Irvine, CA 92614
+E
+claire.lyu@pdshealth.com
+W
+pdshealth.com
+ + smilegeneration.com
+
+ 
+ 
+ 
+ 
+ 
+
+
+
+
+
+---
+
+
+Hi Claire,It seems Okta disabled your account in Snowflake after your reactivation. We have to reach out to the IAM team as to why, I enabled your user in Snowflake and you should be good
+
+
+
+
+
+

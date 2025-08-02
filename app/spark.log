@@ -18861,3 +18861,55 @@
 2025-08-01 22:49:32,952 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1754113772646_8txuic5sn
 2025-08-01 22:49:32,954 - spark - INFO - [socketio] marking user 1 online
 2025-08-01 22:49:32,959 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-08-02 03:13:35,048 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-08-02 03:13:35,048 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-08-02 04:03:49,561 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-02 04:03:54,786 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-02 04:03:54,787 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-02 04:03:54,793 - spark - INFO - ✅ Ticket closure database tables verified/created
+2025-08-02 04:03:54,793 - spark - INFO - 📅 Target date: 2025-08-02
+2025-08-02 04:03:54,796 - spark - INFO - 📊 Getting today's closures
+2025-08-02 04:03:54,796 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-02
+2025-08-02 04:03:54,796 - spark - INFO - 📊 Found 0 daily records
+2025-08-02 04:03:54,796 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-02
+2025-08-02 04:03:54,796 - spark - INFO - 📊 Found 0 legacy records
+2025-08-02 04:03:54,796 - spark - INFO - 📊 No data found, returning empty result
+2025-08-02 04:03:54,806 - spark - INFO - ✅ Retrieved 0 tickets for today using enhanced service
+2025-08-02 04:03:55,266 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1754132634636_7xlwpzofx
+2025-08-02 04:03:55,270 - spark - INFO - [socketio] marking user 1 online
+2025-08-02 04:03:55,282 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-08-02 05:50:49,826 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-02 05:50:56,044 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-02 05:50:56,045 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-02 05:50:56,061 - spark - INFO - ✅ Ticket closure database tables verified/created
+2025-08-02 05:50:56,063 - spark - INFO - 📅 Target date: 2025-08-02
+2025-08-02 05:50:56,065 - spark - INFO - 📊 Getting today's closures
+2025-08-02 05:50:56,066 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-02
+2025-08-02 05:50:56,071 - spark - INFO - 📊 Found 0 daily records
+2025-08-02 05:50:56,076 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-02
+2025-08-02 05:50:56,082 - spark - INFO - 📊 Found 0 legacy records
+2025-08-02 05:50:56,083 - spark - INFO - 📊 No data found, returning empty result
+2025-08-02 05:50:56,090 - spark - INFO - ✅ Retrieved 0 tickets for today using enhanced service
+2025-08-02 05:50:56,106 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1754139055793_ox2qtg2za
+2025-08-02 05:50:56,108 - spark - INFO - [socketio] marking user 1 online
+2025-08-02 05:50:56,124 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-08-02 06:19:21,212 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-02 06:19:22,827 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1754140708048_3rz6qi7eb
+2025-08-02 06:19:22,834 - spark - INFO - [socketio] marking user 1 online
+2025-08-02 06:19:22,851 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-08-02 06:19:26,114 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-08-02 06:19:26,116 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-08-02 06:19:28,878 - spark - INFO - Fetching today's ticket closures using enhanced service
+2025-08-02 06:19:28,880 - spark - INFO - 🔄 Getting closures for period: today
+2025-08-02 06:19:28,892 - spark - INFO - ✅ Ticket closure database tables verified/created
+2025-08-02 06:19:28,893 - spark - INFO - 📅 Target date: 2025-08-02
+2025-08-02 06:19:28,895 - spark - INFO - 📊 Getting today's closures
+2025-08-02 06:19:28,897 - spark - INFO - 🔍 Querying TicketClosureDaily for date: 2025-08-02
+2025-08-02 06:19:28,901 - spark - INFO - 📊 Found 0 daily records
+2025-08-02 06:19:28,903 - spark - INFO - 🔍 Querying legacy TicketClosure for date: 2025-08-02
+2025-08-02 06:19:28,911 - spark - INFO - 📊 Found 0 legacy records
+2025-08-02 06:19:28,913 - spark - INFO - 📊 No data found, returning empty result
+2025-08-02 06:19:28,918 - spark - INFO - ✅ Retrieved 0 tickets for today using enhanced service
+2025-08-02 06:19:28,921 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1754140768618_kw8gtcew3
+2025-08-02 06:19:28,926 - spark - INFO - [socketio] marking user 1 online
+2025-08-02 06:19:28,944 - spark - INFO - [socketio] Successfully connected user 1 (admin)

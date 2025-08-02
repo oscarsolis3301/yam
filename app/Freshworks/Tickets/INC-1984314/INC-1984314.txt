@@ -1,0 +1,109 @@
+# Ticket Summary
+
+**Subject:** RQ26708113 - Request Threat Hunt - AD Security Group Modification (In Progress)
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18012947310
+
+**Created At:** 2025-07-29T22:59:13Z
+
+**Updated At:** 2025-07-31T15:53:34Z
+
+**Category:** IT
+
+**Sub Category:** Security
+
+**Item Category:** Hacking
+
+## Description
+
+
+RQ26708113 - Request Threat Hunt - AD Security Group Modification Comment: Hello Team, After investigating the root cause of Event ID 4735 recorded on 2025-07-29 at 03: 28: 25. 112 UTC on Domain Controller DC1ADC27P01, the activity appears to have
+
+
+
+ZjQcmQRYFpfptBannerStart
+
+
+
+
+  
+    
+      
+	This Message Is From an External Sender. If suspicious, click the button to report to IT
+      
+      
+
+      
+
+    
+    
+
+    
+	Report Suspicious
+    
+
+    
+     
+  
+
+
+ZjQcmQRYFpfptBannerEnd
+
+
+
+
+
+
+
+
+ 
+RQ26708113 - Request Threat Hunt - AD Security Group Modification
+
+Comment:
+Hello Team,
+
+After investigating the root cause of Event ID 4735 recorded on 2025-07-29 at 03:28:25.112 UTC on Domain Controller DC1ADC27P01, the activity appears to have been caused by automation. A review of baseline data for "Group Modification" events (Event Code 4735) over the last year reveals similar activity on March 26 and April 8 of this year. In both cases, the user "Anonymous Logon" made identical modifications to the Server Operators, Print Operators, and Backup Operators groups. The repeated nature of these changes combined with the short time intervals between modifications strongly indicate that these actions are being driven by automation rather than manual intervention.
+
+
+[1]. Some common sources of anonymous logon sessions are:
+
+Computer Browser Service: It's a legacy service from Windows 2000 and earlier versions of Windows. The service provides lists of computers and domains on the network. The service runs in the background. However, today this data is no longer used. We recommend that you disable this service across the enterprise.
+
+SID-Name mapping: It can use anonymous sessions. See Network access: Allow anonymous SID/Name translation. We recommend that you require authentication for this functionality.
+
+Client applications that don't authenticate: The application server may still create a logon session as anonymous. It's also done when there are empty strings passed for username and password in NTLM authentication.
+
+[1]. https://learn.microsoft.com/en-us/troubleshoot/windows-server/windows-security/audit-domain-controller-ntlmv1
+
+
+Best,
+
+Benjamin Wingo
+GreyMatter Specialist
+State: In ProgressPriority: 2 - HighCategory: InvestigationSubcategory: InvestigationTechnology: Google Security OperationsAlert Artifacts:
+Description:
+
+
+INITIAL INFORMATION___________________________________________________________Name, phone number, and email for the point of contact for the request: Time Frame of Incident: Initial Priority: Artifacts (Source IP, Usernames, Hashes, Filenames, etc.): What is requested as an outcome (Export of events, Analysis and Recommendation, Etc.): Additional Information (Add any CSV/Screenshot attachments): INITIAL INFORMATION___________________________________________________________Name, phone number, and email for the point of contact for the request: Time Frame of Incident: Initial Priority: Artifacts (Source IP, Usernames, Hashes, Filenames, etc.): What is requested as an outcome (Export of events, Analysis and Recommendation, Etc.): Additional Information (Add any CSV/Screenshot attachments): 
+
+
+
+
+
+
+View alert details in rqPortal:
+Alert Details in rqPortal
+
+Thank you,ReliaQuestSOC: 813.518.6565reliaquest@service-now.comwww.reliaquest.com
+
+
+  
+Ref:RQMSG116257409
+
+
+
+## Conversations

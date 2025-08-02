@@ -1,0 +1,36 @@
+# Ticket Summary
+
+**Subject:** Incorrect insurance expect/fee populating
+
+**Status:** 3
+
+**Priority:** 1
+
+**Requester Id:** 18013464655
+
+**Created At:** 2025-07-31T05:40:12Z
+
+**Updated At:** 2025-08-01T20:26:56Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Insurance Paid Less/More
+
+## Description
+
+Invoice Analysis and Action Taken: As per EPIC, for DOS 07/10/2025, CDTs D3330 (T15) has debit and D0220 has credit balance. As per OnBase EOB, D3330 (T15) was paid at 100%. As per the past form DE and FA, the fee schedules are different. D0220 was paid more. Hence, taking combined fee schedule adjustment. Fee schedule ticket raised.
+Per EPIC review, for DOS 07/10/2025, CDTs D3330 (T15) has debit and D0220 has credit balance. Per FA, balance is not PR.
+
+## Conversations
+
+---
+
+
+Hi Gautam,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1987032.
+
+On review FA#854882685 Found plan Delta Dental of CA PPO - Dental / Delta Preferred attached as primary coverage and found same plan is attached in DE form. Verified Epic EOB but could not able to find the reason for less payment, Verified OnBase but unable to access  and verified CyberArk for paper EOB but not found. Verified DE form found comments as PPO-EMP FEES SCH=PT'S COPAY , so requesting for paper EOB for more verification. Thank You
+
+
+

@@ -1,0 +1,58 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18012928991
+
+**Created At:** 2025-07-30T04:17:37Z
+
+**Updated At:** 2025-08-01T23:43:18Z
+
+**Category:** ROC - Eligibility
+
+**Sub Category:** Eligibility
+
+**Item Category:** Incorrect fee schedule
+
+## Description
+
+“Please review the fee for D4260 T#28-31 . As per FA correct fee schedule attached but incorrect fees populating in Epic 
+as insurance expect”
+
+## Conversations
+
+---
+
+
+Hi Kasturi Lakshmanan
+
+Thank you for reaching out to Patient Benefits. 
+We have updated the dental eligibility form to reflect the most current benefit information. 
+Please note, if you notice the coverage does not appear to be attached in the registration, please take the following steps to attach the coverage: 
+
+
+
+ Open the Coverage Wizard, by using the “Add Coverage” link located in the top right-hand corner of the Guarantors &amp; Coverages section in the registration view. 
+Once in the Coverage Wizard, there will be Coverages located under the search bar. 
+Select the coverage that needs to be attached. 
+To complete the process, click on the “Finish” button at the bottom left of the screen. 
+It is also important to ensure the coverage is attached to the “Visit Info”
+
+Kind Regards,
+Patient Benefits Service Desk 
+
+
+---
+
+
+Hi Kasturi,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1984658.
+
+
+
+On review found fees populating correctly for code D4260 in FA#642426908. Patient has primary coverage Renaissance Dental PPO / Dentemax PPO same fees link attached. Verified dental eligibility found RENAISSANCE DENTAL PPO [765], DENTEMAX PPO with status ROC Request Pending. When we review the attached EOB claim processed based on the Care Series PPO/POS fees. As per credentialing grid billing provider status is INN for DOS. Hence routed to eligibility to re-verify the eligibility and attach the correct plan to patient coverage &amp; FA. Please let me know for any additional questions. Thank you
+
+

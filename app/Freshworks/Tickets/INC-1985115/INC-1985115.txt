@@ -1,0 +1,41 @@
+# Ticket Summary
+
+**Subject:** Reset 2 step verification number
+
+**Status:** 4
+
+**Priority:** 2
+
+**Requester Id:** 18014631549
+
+**Created At:** 2025-07-30T13:00:59Z
+
+**Updated At:** 2025-08-01T16:33:33Z
+
+**Category:** ROC - CyberArk Web Logins
+
+**Sub Category:** Insurance website login/password
+
+**Item Category:** Reset current website login/password
+
+## Description
+
+Principal is sending the verification to a wrong number and we are unable to gain access. can you please reset where the code goes. Thank you!
+
+## Conversations
+
+---
+
+
+Hi abiud.rodriguez,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1985115.The correct phn has been updated . Please see the below screenshot. All carrier website logins are setup under weblogins@pacden.com. We use this email so that the field, ROC, and our offshore teams can all access the data needed to assist our providers. Once added, this secondary Web Logins account will populate under your primary account in Outlook. The Web Logins account populates with its own Inbox. You will not be bombarded with MFA emails in your primary Outlook account Inbox. We also use RingCentral phone number 831-610-4955 which sends a RingCentral email message to weblogins@pacden.com when the payer requires a phone number for MFA codes instead of an email. You will want to look out for an email coming from sender RingCentral. We cannot change the email address or phone number, or we will be blocking everyone else from being able to access the websites. I have attached step by step instructions on how you can add yourself to the weblogins@pacden.com shared Inbox. (Web Logins Shared Mailbox Access) If you have trouble adding yourself, please reach out to IT for assistance because the Web Access team does not have the permissions needed to grant access. Please be aware that most password reset emails and account registration emails are re-routed to an Admin Only Inbox that only my team can access. If you need assistance with any logins, please open a help ticket under Category: ROC – CyberArk Web Logins &amp; Group: ROC – Web Logins. This would be for any logins that you need created or any password resets for your existing logins. Please do not create logins or reset passwords by yourself. Hope this helps! 
+
+
+
+
+
+
+
+
+---
+
+The code is still not going to the correct number. please see screenshot. 

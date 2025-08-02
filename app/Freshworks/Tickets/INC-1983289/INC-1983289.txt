@@ -1,0 +1,37 @@
+# Ticket Summary
+
+**Subject:** Xray sensor not working. Core isolation memory integrity issue
+
+**Status:** 5
+
+**Priority:** 1
+
+**Requester Id:** 18013286808
+
+**Created At:** 2025-07-29T18:04:05Z
+
+**Updated At:** 2025-08-01T18:38:06Z
+
+**Category:** IT
+
+**Sub Category:** Dental Imaging
+
+**Item Category:** DTX - Sensors
+
+## Description
+
+
+Host Name: mlk-op5
+Problem(s) identified: Xray sensor not working. Core isolation memory integrity issue
+Repeat issue?: 
+Troubleshooting steps taken:  
+Removed the old twain in DTX settings
+Verified it has new IOSS
+Disabling the core isolation memory integrity setting
+Verified they can take test xrays 
+Transfer reason: 
+Investment time: 
+
+
+
+## Conversations

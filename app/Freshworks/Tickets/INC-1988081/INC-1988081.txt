@@ -1,0 +1,41 @@
+# Ticket Summary
+
+**Subject:** Millin Unit fails to complete milling a crown loses connection
+
+**Status:** 10
+
+**Priority:** 4
+
+**Requester Id:** 18012937179
+
+**Created At:** 2025-07-31T16:15:44Z
+
+**Updated At:** 2025-07-31T17:28:46Z
+
+**Category:** IT
+
+**Sub Category:** Dental Imaging
+
+**Item Category:** CEREC - CadCam Milling Issues
+
+## Description
+
+We can not get our Cerec to mill a crown. we have rebooted and calibrated the machine and it still it not connecting. We are in the middle of a crown and it stopped working.D0802-CAD1
+
+## Conversations
+
+---
+
+
+Delicia said she tried rebooting the pc and she said they also performed a full calibration on the OmniCam and there were no errors. 
+I tried to ping the pc it shows:
+
+She tried to hard wire the Cerec through the Milling Unit but it still wouldn't connect.
+I had her check the firewalls but she could not see the state of the firewalls on that pc it just shows no action needed
+It seems that the Cerec is managed by Cortex and we can not connect to it remotely and the cmd prompt is blocked so I can't get the ip address.
+I cannot get the ip because cmd window won't stay open. It doesn't allow her to type and the window closes and it redirects to a file explorer window.
+He said the it also keeps showing popup to do a software update. I consulted with Phillip from CDE Team and he recommended to have Patterson go out and reimage the Cerec pc. 
+
+
+
+

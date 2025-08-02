@@ -1,0 +1,38 @@
+# Ticket Summary
+
+**Subject:** Incorrect insurance expect/fee populating
+
+**Status:** 4
+
+**Priority:** 1
+
+**Requester Id:** 18012933155
+
+**Created At:** 2025-07-29T10:42:04Z
+
+**Updated At:** 2025-08-01T15:49:40Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+Please review the fee for D7230 (T#17,32). As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect.
+
+## Conversations
+
+---
+
+
+Hi Navaneethan,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1982116.
+
+
+
+
+On review FA# 856459567 for DOS 07/09/2025 plan Aetna HMO - Dental / Plan Li attached as Primary coverage and fees are populating and showing Benefits updated after record was finalized. Replace to update amounts. Verified EOB, On further review the Plan Li copay pays 40% for D7230 with Aetna Dental PPO SP fee schedule, the copay fee is $281 x 40% = $112.4. But insurance paid 40% of the Min guar (example: $220x 40% = $88). Hence resolving this ticket, Please refile the claim to get correct payment and please reach out to insurance for further information. Thank You
+
+
+

@@ -1,0 +1,92 @@
+# Ticket Summary
+
+**Subject:** fees not populating
+
+**Status:** 4
+
+**Priority:** 2
+
+**Requester Id:** 18012935541
+
+**Created At:** 2025-07-29T23:15:41Z
+
+**Updated At:** 2025-08-01T19:57:42Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Code Not Covered
+
+## Description
+
+insurance verified and connected to patient account, however, fees will not populate or query. This has happened with 3 patients today with this same plan
+
+Deltacare cac73
+
+## Conversations
+
+---
+
+
+Hi Robyn,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1984371.
+
+Please be informed that the FA# 873939854 is replaced with FA# 877068713 and the fees are populating correctly for plan Deltacare HMO - Dental / C73. Hence resolving this ticket. 
+
+Thank you
+
+
+---
+
+Robyn Cascone has submitted the survey response
+
+---
+
+
+Hello,
+ 
+Thank you for your quick response. The fees are overridden because I had to manually enter them in order for my doctor to sign the visit. No fees were populating at all and I was only getting dashes. I tried
+ recreating the FA multiple times, terming the insurance and re-entering and re-verifying and the fees would still not populate.
+
+ 
+I just wanted to bring it to attention because we noticed the same thing happening with 3 patients and they all have the same Deltacare plan, C73. We do not get the “no fees attached to plan” error in DE,
+ but there must be some kind of glitch with this plan for this to happen with each patient.
+
+ 
+Thank you,
+ 
+
+Robyn Cascone
+|
+Operations Manager
+Bay Park Smiles Dentistry
+2995 Clairemont Dr, Ste A San Diego, CA 92117
+T 858-200-0827
+F 858-291-1369
+E
+robyn.cascone@pdshealth.com
+W
+bayparkdentistry.com + smilegeneration.com
+
+ 
+This electronic transmission and any documents attached hereto may contain confidential and/or legally
+ privileged information. The information is intended only for use by the recipient named above. If you have received this electronic message in error, please notify sender and delete the electronic message. Any disclosure copying distribution or use of the
+ contents of information received in error is strictly prohibited.
+ 
+ 
+ 
+ 
+
+
+
+
+
+---
+
+
+Hi Robyn,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1984371.
+
+On review FA# 873939854 for DOS 07/29/2025 plan Deltacare HMO - Dental / C73 attached as primary coverage but the contracted fees populating in FA is overlapped with the overridden fees so showing overridden when the cursor is placed on the Total Fees of the codes so I recommend to recreate the FA and remove the manually overridden values before finalizing the FA. Verified Credentialing status found that the Treating Provider and OD is in network with Deltacare HMO. Hence resolving this ticket. 
+
+Thank you
+

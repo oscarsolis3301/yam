@@ -1,0 +1,41 @@
+# Ticket Summary
+
+**Subject:** incorrect insurance expect/fee populating.
+
+**Status:** 5
+
+**Priority:** 1
+
+**Requester Id:** 18013111465
+
+**Created At:** 2025-07-29T13:17:52Z
+
+**Updated At:** 2025-08-01T19:37:29Z
+
+**Category:** ROC - Fee Schedule
+
+**Sub Category:** Fee Population
+
+**Item Category:** Incorrect Contracted Rate
+
+## Description
+
+Please review the fee for D5211#11. As per FA correct fee schedule attached but incorrect fees populating in Epic 
+as insurance expect.
+
+
+## Conversations
+
+---
+
+
+Hi Shamsundhar,
+
+
+On review FA#860722083 found plan Unitedhealth Group PPO - Dental / Diversified PPO attached as primary coverage and fees populating correctly For the code D5211. Verified Dental Eligibility found UNITED HEALTHCARE PPO [872], DIVERSIFIED PPO with status Verified by front office. Verified in paper EOB allowed less than the expected amount and mentioned as Out of Network. Verified Credentialing status billing provider is OON for UHC, Hence resolving this ticket. Thank youPlease find your ticket URL: https://support.pacden.com/helpdesk/tickets/1982332.
+
+
+
+
+
+
