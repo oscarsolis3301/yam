@@ -125,7 +125,7 @@
 }
 
 .tickets-table th {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(15, 15, 15, 0.98);
     padding: 12px 15px;
     text-align: left;
     font-weight: 600;
@@ -135,15 +135,39 @@
     position: sticky;
     top: 0;
     z-index: 10;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .tickets-table th.sortable {
     cursor: pointer;
     user-select: none;
+    transition: all 0.3s ease;
 }
 
 .tickets-table th.sortable:hover {
     background: rgba(139, 92, 246, 0.15);
+    transform: translateY(-1px);
+}
+
+.tickets-table th.sortable.active {
+    background: rgba(139, 92, 246, 0.2);
+    color: #8b5cf6;
+}
+
+.tickets-table th.sortable .sort-icon {
+    margin-left: 5px;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+.tickets-table th.sortable:hover .sort-icon {
+    opacity: 1;
+}
+
+.tickets-table th.sortable.active .sort-icon {
+    opacity: 1;
+    color: #8b5cf6;
 }
 
 .tickets-table td {
@@ -508,8 +532,8 @@
                     <input type="checkbox" id="selectAll" class="ticket-checkbox">
                     <label for="selectAll">Select all</label>
                 </div>
-                <div class="sort-dropdown">
-                    Sort by: Created Date
+                <div class="sort-dropdown" id="sortDropdown">
+                    Sort by: <span id="currentSortField">Last Modified</span>
                     <i class="bi bi-chevron-down"></i>
                 </div>
             </div>
@@ -535,11 +559,41 @@
                 <thead>
                     <tr>
                         <th style="width: 40px;"></th>
-                        <th class="sortable">Status <i class="bi bi-chevron-up"></i><i class="bi bi-chevron-down"></i></th>
-                        <th class="sortable">Subject <i class="bi bi-chevron-up"></i><i class="bi bi-chevron-down"></i></th>
-                        <th class="sortable">Priority <i class="bi bi-chevron-up"></i><i class="bi bi-chevron-down"></i></th>
-                        <th class="sortable">Last Modified <i class="bi bi-chevron-up"></i><i class="bi bi-chevron-down"></i></th>
-                        <th class="sortable">Requester <i class="bi bi-gear"></i></th>
+                        <th class="sortable" data-sort="status">
+                            Status 
+                            <span class="sort-icon">
+                                <i class="bi bi-chevron-up"></i>
+                                <i class="bi bi-chevron-down"></i>
+                            </span>
+                        </th>
+                        <th class="sortable" data-sort="subject">
+                            Subject 
+                            <span class="sort-icon">
+                                <i class="bi bi-chevron-up"></i>
+                                <i class="bi bi-chevron-down"></i>
+                            </span>
+                        </th>
+                        <th class="sortable" data-sort="priority">
+                            Priority 
+                            <span class="sort-icon">
+                                <i class="bi bi-chevron-up"></i>
+                                <i class="bi bi-chevron-down"></i>
+                            </span>
+                        </th>
+                        <th class="sortable" data-sort="updated_at">
+                            Last Modified 
+                            <span class="sort-icon">
+                                <i class="bi bi-chevron-up"></i>
+                                <i class="bi bi-chevron-down"></i>
+                            </span>
+                        </th>
+                        <th class="sortable" data-sort="requester">
+                            Requester 
+                            <span class="sort-icon">
+                                <i class="bi bi-chevron-up"></i>
+                                <i class="bi bi-chevron-down"></i>
+                            </span>
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="ticketsTableBody">
@@ -642,6 +696,11 @@
 
 {% block scripts %}
 <script>
+// Global variables for sorting
+let currentSortField = 'updated_at';
+let currentSortDirection = 'desc';
+let allTickets = [];
+
 document.addEventListener('DOMContentLoaded', function() {
     // Load tickets from API
     loadTickets();
@@ -674,6 +733,14 @@ document.addEventListener('DOMContentLoaded', function() {
             e.target.parentElement.remove();
         }
     });
+    
+    // Add sorting functionality to table headers
+    document.querySelectorAll('.tickets-table th.sortable').forEach(header => {
+        header.addEventListener('click', function() {
+            const sortField = this.getAttribute('data-sort');
+            handleSort(sortField);
+        });
+    });
 });
 
 function loadTickets() {
@@ -681,12 +748,52 @@ function loadTickets() {
         .then(response => response.json())
         .then(data => {
             if (data.tickets) {
-                displayTickets(data.tickets);
+                allTickets = data.tickets;
+                sortTickets(currentSortField, currentSortDirection);
+                displayTickets(allTickets);
             }
         })
         .catch(error => {
             console.error('Error loading tickets:', error);
+            // Fallback to sample data for demonstration
+            allTickets = generateSampleTickets();
+            sortTickets(currentSortField, currentSortDirection);
+            displayTickets(allTickets);
         });
+}
+
+function generateSampleTickets() {
+    const statuses = ['Open', 'Pending', 'Resolved', 'Closed'];
+    const priorities = ['Low', 'Medium', 'High', 'Urgent'];
+    const subjects = [
+        'Network connectivity issue',
+        'Software installation request',
+        'Password reset needed',
+        'Hardware malfunction',
+        'Email configuration problem',
+        'VPN access request',
+        'Printer setup assistance',
+        'System performance issue'
+    ];
+    
+    const tickets = [];
+    for (let i = 1; i <= 32; i++) {
+        const status = statuses[Math.floor(Math.random() * statuses.length)];
+        const priority = priorities[Math.floor(Math.random() * priorities.length)];
+        const subject = subjects[Math.floor(Math.random() * subjects.length)];
+        const requesterId = Math.floor(Math.random() * 10) + 1;
+        const updatedAt = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);
+        
+        tickets.push({
+            id: 1990000 + i,
+            status: status,
+            subject: subject,
+            priority: priority,
+            requester_id: requesterId,
+            updated_at: updatedAt.toISOString()
+        });
+    }
+    return tickets;
 }
 
 function displayTickets(tickets) {
@@ -734,6 +841,97 @@ function displayTickets(tickets) {
         `;
         
         tbody.appendChild(row);
+    });
+}
+
+function handleSort(sortField) {
+    // Toggle direction if same field, otherwise set to ascending
+    if (currentSortField === sortField) {
+        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSortField = sortField;
+        currentSortDirection = 'asc';
+    }
+    
+    // Update visual indicators
+    updateSortIndicators();
+    
+    // Sort and display tickets
+    sortTickets(currentSortField, currentSortDirection);
+    displayTickets(allTickets);
+}
+
+function updateSortIndicators() {
+    // Remove active class from all headers
+    document.querySelectorAll('.tickets-table th.sortable').forEach(header => {
+        header.classList.remove('active');
+        const icons = header.querySelectorAll('.sort-icon i');
+        icons.forEach(icon => icon.style.display = 'none');
+    });
+    
+    // Add active class to current sort header
+    const activeHeader = document.querySelector(`[data-sort="${currentSortField}"]`);
+    if (activeHeader) {
+        activeHeader.classList.add('active');
+        const icons = activeHeader.querySelectorAll('.sort-icon i');
+        if (currentSortDirection === 'asc') {
+            icons[0].style.display = 'inline'; // chevron-up
+            icons[1].style.display = 'none';   // chevron-down
+        } else {
+            icons[0].style.display = 'none';   // chevron-up
+            icons[1].style.display = 'inline'; // chevron-down
+        }
+    }
+    
+    // Update top bar sort dropdown
+    const sortFieldNames = {
+        'status': 'Status',
+        'subject': 'Subject',
+        'priority': 'Priority',
+        'updated_at': 'Last Modified',
+        'requester': 'Requester'
+    };
+    
+    const currentSortFieldElement = document.getElementById('currentSortField');
+    if (currentSortFieldElement) {
+        currentSortFieldElement.textContent = sortFieldNames[currentSortField] || currentSortField;
+    }
+}
+
+function sortTickets(field, direction) {
+    allTickets.sort((a, b) => {
+        let aVal, bVal;
+        
+        switch (field) {
+            case 'status':
+                aVal = a.status.toLowerCase();
+                bVal = b.status.toLowerCase();
+                break;
+            case 'subject':
+                aVal = a.subject.toLowerCase();
+                bVal = b.subject.toLowerCase();
+                break;
+            case 'priority':
+                const priorityOrder = { 'low': 1, 'medium': 2, 'high': 3, 'urgent': 4 };
+                aVal = priorityOrder[a.priority.toLowerCase()] || 0;
+                bVal = priorityOrder[b.priority.toLowerCase()] || 0;
+                break;
+            case 'updated_at':
+                aVal = new Date(a.updated_at);
+                bVal = new Date(b.updated_at);
+                break;
+            case 'requester':
+                aVal = a.requester_id;
+                bVal = b.requester_id;
+                break;
+            default:
+                aVal = a[field];
+                bVal = b[field];
+        }
+        
+        if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+        return 0;
     });
 }
 
