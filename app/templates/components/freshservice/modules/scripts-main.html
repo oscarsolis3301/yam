@@ -1,0 +1,19 @@
+<!-- FRESHSERVICE MAIN SCRIPTS ENTRY POINT -->
+<!-- Include all JavaScript modules in order -->
+{% include 'components/freshservice/modules/config.js' %}
+
+<!-- Utility modules (load first) -->
+{% include 'components/freshservice/modules/utils-dom.js' %}
+{% include 'components/freshservice/modules/utils-string.js' %}
+{% include 'components/freshservice/modules/utils-date.js' %}
+{% include 'components/freshservice/modules/utils-core.js' %}
+
+<!-- Core application modules -->
+{% include 'components/freshservice/modules/core.js' %}
+{% include 'components/freshservice/modules/data-service.js' %}
+{% include 'components/freshservice/modules/ui-renderer.js' %}
+
+<!-- Event handler modules -->
+{% include 'components/freshservice/modules/event-handlers-search.js' %}
+{% include 'components/freshservice/modules/event-handlers-filters.js' %}
+{% include 'components/freshservice/modules/event-handlers-main.js' %} 

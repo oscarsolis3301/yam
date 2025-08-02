@@ -1,0 +1,55 @@
+Subject: LMD784712 warn - D0210-ILO5.pdsi.corp Physical Drives-Controller 0 : Drive 7 statusAlertWarning
+Status: 10
+Priority: 2
+Requester ID: 18014001696
+Created At: 2025-07-31T23:31:57Z
+Updated At: 2025-08-01T19:27:50Z
+
+--- Description ---
+
+ID: LMD784712
+Controller 0 : Drive 7 (Bay: 8) on HP host D0210-ILO5.pdsi.corp is no longer in an optimal operating state and has reported a status of 4.0, placing the drive into warn state.
+
+Status Codes:
+1=Other,
+2=Ok,
+3=Failed - no longer operational and should be replaced,
+4=Predictive Failure - has predictive failure and should be replaced,
+5=Erasing - currently in process of being erased,
+6=Erase Done - drive is erased and in offline state,
+7=Erase Queued - erase operation is in queue,
+8=SSD Wear Out - drive is approaching maximum usage limit for writes and should be replaced soon,
+9=Not Authenticated - Indicates the physical drive could not be authenticated as a genuine HP hard drive. The array controller will no longer control the drive LEDs. Please replace the hard drive with a genuine HP hard drive.
+
+This started at 2025-07-31 18:10:44 CDT, -- or 0h 15m ago
+
+
+Requester Name: Erika Lopez    
+
+
+Requester Email: rika.lopez@pdshealth.com
+
+
+Requester Contact Number: 916-398-0599  
+
+
+PDS Active Directory: rika.lopez
+
+
+Working Hours: 7:30 AM - 5:00 PM
+
+
+
+Address : 
+
+9630 Bruceville Rd.Ste 102
+Elk Grove, CA
+95757
+
+
+
+
+
+
+
+## Conversations

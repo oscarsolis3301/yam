@@ -1,0 +1,35 @@
+<!-- FRESHSERVICE CONTROLS COMPONENT -->
+<div class="controls-bar">
+    <div class="controls-left">
+        <div class="select-all">
+            <input type="checkbox" id="selectAll" class="form-check-input">
+            <label for="selectAll">Select all</label>
+        </div>
+        <div class="sort-dropdown">
+            <select id="sortBy" class="form-select">
+                <option value="updated_date">Sort by: Created Date</option>
+                <option value="created_date">Created Date</option>
+                <option value="priority">Priority</option>
+                <option value="status">Status</option>
+                <option value="requester">Requester</option>
+            </select>
+        </div>
+    </div>
+    <div class="controls-right">
+        <button class="btn btn-outline-secondary export-btn">
+            <i class="bi bi-upload"></i>
+            Export
+        </button>
+        <div class="pagination-info">
+            <span id="paginationInfo">1 - 32 of 32</span>
+            <div class="pagination-controls">
+                <button class="btn btn-sm btn-outline-secondary" id="prevPage">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" id="nextPage">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- FRESHSERVICE TICKETS PAGE - MODULAR VERSION -->
+<div class="freshservice-container">
+    <!-- Include Header Component -->
+    {% include 'components/freshservice/header.html' %}
+
+    <!-- Main Content -->
+    <div class="freshservice-main">
+        <!-- Left Content -->
+        <div class="tickets-content">
+            <!-- Include Controls Component -->
+            {% include 'components/freshservice/controls.html' %}
+
+            <!-- Include Tickets Table Component -->
+            {% include 'components/freshservice/tickets_table.html' %}
+        </div>
+
+        <!-- Include Filters Sidebar Component -->
+        {% include 'components/freshservice/filters_sidebar.html' %}
+    </div>
+</div>
+
+<!-- Include Ticket Detail Modal Component -->
+{% include 'components/freshservice/ticket_modal.html' %}
+
+<!-- Include Modular FreshService Component -->
+{% include 'components/freshservice/freshservice-modular.html' %}
+{% endblock %} 

@@ -947,26 +947,28 @@ def before_request_handler():
             session_startup_time = session.get('server_startup_time')
             current_startup_time = yam_app.config.get('SERVER_STARTUP_TIME')
             
-            # If session was created before current server startup, invalidate it
+            # If session was created before current server startup, handle it gracefully
             if session_startup_time and current_startup_time:
                 try:
                     session_startup_dt = datetime.fromisoformat(session_startup_time)
                     if session_startup_dt < current_startup_time:
-                        logger.info(f"Invalidating session for user {session.get('user_id')} - server restarted")
-                        session.clear()
-                        # Only redirect for non-API requests to prevent loops
-                        if not request.path.startswith('/api/'):
-                            return redirect(url_for('auth.login'))
-                        return
+                        # Instead of clearing the session, just update it with the new startup time
+                        logger.info(f"Updating session for user {session.get('user_id')} - server restarted")
+                        session['server_startup_time'] = current_startup_time.isoformat()
+                        # Re-initialize session data for authenticated users
+                        if session.get('user_id'):
+                            session['last_activity'] = datetime.utcnow().isoformat()
+                            session['session_active'] = True
+                        return None
                 except (ValueError, TypeError):
-                    # Invalid timestamp, clear session
-                    session.clear()
-                    if not request.path.startswith('/api/'):
-                        return redirect(url_for('auth.login'))
-                    return
+                    # Invalid timestamp, just update the session
+                    session['server_startup_time'] = current_startup_time.isoformat()
+                    session['last_activity'] = datetime.utcnow().isoformat()
+                    return None
             
-            # Update session with current server startup time
-            session['server_startup_time'] = current_startup_time.isoformat()
+            # Update session with current server startup time if not set
+            if not session.get('server_startup_time'):
+                session['server_startup_time'] = current_startup_time.isoformat()
         
         # Clean up stale sessions periodically
         if not hasattr(yam_app, '_last_cleanup') or time.time() - yam_app._last_cleanup > 300:  # Every 5 minutes
@@ -1950,6 +1952,12 @@ def import_blueprints():
     except Exception as e:
         logger.warning(f"Failed to import freshworks_linking blueprint: {e}")
     
+    try:
+        from app.blueprints.freshservice import bp as freshservice_bp
+        blueprints['freshservice_bp'] = freshservice_bp
+    except Exception as e:
+        logger.warning(f"Failed to import freshservice blueprint: {e}")
+    
     return blueprints
 
 def register_all_blueprints(yam_app):
@@ -2058,6 +2066,8 @@ def register_all_blueprints(yam_app):
         yam_app.register_blueprint(blueprints['private_messages_bp'], url_prefix='/api/private-messages')
     if 'freshworks_linking_bp' in blueprints:
         yam_app.register_blueprint(blueprints['freshworks_linking_bp'])
+    if 'freshservice_bp' in blueprints:
+        yam_app.register_blueprint(blueprints['freshservice_bp'])
     
     # Register additional blueprints
     try:

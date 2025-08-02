@@ -1006,3 +1006,26 @@ with app.app_context(). See the documentation for more information.
 2025-08-01 07:57:36,609 - spark - INFO - Fetching page 18... Status: 200
 2025-08-01 07:57:37,590 - spark - INFO - Fetching page 19... Status: 200
 2025-08-01 07:57:38,082 - spark - INFO - Fetching page 20... Status: 200
+2025-08-01 16:03:21,580 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 17:32:31,079 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 17:32:32,172 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1754094751853_dgs6k2i44
+2025-08-01 17:32:32,178 - spark - INFO - [socketio] marking user 1 online
+2025-08-01 17:32:32,192 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-08-01 17:39:13,874 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-08-01 17:39:13,876 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-08-01 17:39:15,918 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1754095155649_dpdgaoz33
+2025-08-01 17:39:15,919 - spark - INFO - [socketio] marking user 1 online
+2025-08-01 17:39:15,928 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-08-01 17:49:51,422 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 17:49:52,025 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1754095791705_kpj8xxp3t
+2025-08-01 17:49:52,028 - spark - INFO - [socketio] marking user 1 online
+2025-08-01 17:49:52,040 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-08-01 17:51:34,431 - spark - INFO - [socketio] DISCONNECT; user_id=1
+2025-08-01 17:51:34,432 - spark - INFO - [socketio] Successfully handled disconnect for user 1
+2025-08-01 17:51:36,305 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1754095896245_0rvw2kkab
+2025-08-01 17:51:36,307 - spark - INFO - [socketio] marking user 1 online
+2025-08-01 17:51:36,315 - spark - INFO - [socketio] Successfully connected user 1 (admin)
+2025-08-01 22:30:05,565 - spark - INFO - Scheduled periodic presence cleanup task
+2025-08-01 22:30:06,355 - spark - INFO - [socketio] CONNECT; current_user=<User admin>, connection_id=socket_1754112606041_hrl3vg96c
+2025-08-01 22:30:06,359 - spark - INFO - [socketio] marking user 1 online
+2025-08-01 22:30:06,384 - spark - INFO - [socketio] Successfully connected user 1 (admin)

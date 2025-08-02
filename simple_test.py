@@ -1,57 +1,44 @@
 #!/usr/bin/env python3
 """
-Simple HTTP test script that doesn't import server modules
+Simple test to check FreshService blueprint registration
 """
 
-import requests
-import time
+from flask import Flask
+from app.blueprints.freshservice import bp as freshservice_bp
 
-def test_login():
-    base_url = "http://127.0.0.1:5000"
-    
-    print("Testing login functionality...")
-    
-    # Test 1: Check if server is running
+def test_blueprint():
+    """Test blueprint registration"""
     try:
-        response = requests.get(f"{base_url}/login-ready", timeout=5)
-        print(f"✓ Server is running (Status: {response.status_code})")
-    except requests.exceptions.RequestException as e:
-        print(f"✗ Server is not running: {e}")
-        return False
-    
-    # Test 2: Check login page
-    try:
-        response = requests.get(f"{base_url}/login", timeout=5)
-        if response.status_code == 200:
-            print("✓ Login page is accessible")
-        else:
-            print(f"✗ Login page returned status: {response.status_code}")
-    except requests.exceptions.RequestException as e:
-        print(f"✗ Cannot access login page: {e}")
-        return False
-    
-    # Test 3: Test login with admin credentials
-    try:
-        login_data = {
-            'email': 'admin',
-            'password': 'admin'
-        }
-        response = requests.post(f"{base_url}/login", data=login_data, timeout=10, allow_redirects=False)
+        app = Flask(__name__)
+        app.config['SECRET_KEY'] = 'test-key'
         
-        if response.status_code == 302:  # Redirect after successful login
-            print("✓ Login successful (redirected)")
-            print(f"  Redirect location: {response.headers.get('Location', 'Unknown')}")
-        elif response.status_code == 200:
-            print("⚠ Login page returned (might be successful or failed)")
+        # Register the blueprint
+        app.register_blueprint(freshservice_bp)
+        
+        # Check if it's registered
+        registered_blueprints = [bp.name for bp in app.blueprints.values()]
+        print(f"Registered blueprints: {registered_blueprints}")
+        
+        if 'freshservice' in registered_blueprints:
+            print("✓ FreshService blueprint registered successfully!")
+            return True
         else:
-            print(f"✗ Login failed with status: {response.status_code}")
+            print("✗ FreshService blueprint not registered")
+            return False
             
-    except requests.exceptions.RequestException as e:
-        print(f"✗ Login request failed: {e}")
+    except Exception as e:
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
         return False
-    
-    print("\nLogin test completed!")
-    return True
 
 if __name__ == "__main__":
-    test_login() 
+    print("Testing FreshService Blueprint Registration")
+    print("=" * 50)
+    
+    success = test_blueprint()
+    
+    if success:
+        print("\n✓ FreshService blueprint works!")
+    else:
+        print("\n✗ FreshService blueprint has issues") 

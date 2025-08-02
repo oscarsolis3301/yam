@@ -1,0 +1,462 @@
+<!-- FRESHSERVICE TABLE STYLES MODULE -->
+<style>
+/* MAIN CONTENT AREA */
+.main-content {
+    margin-left: 280px; /* Account for filters sidebar */
+    margin-top: 60px; /* Account for header */
+    padding: 2rem;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* CONTROLS BAR */
+.controls-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.controls-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.select-all {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
+.sort-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sort-dropdown label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.controls-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.export-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.export-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+.pagination-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
+.pagination-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* TABLE STYLING */
+.tickets-table-container {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tickets-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.tickets-table th {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tickets-table td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    vertical-align: top;
+}
+
+.tickets-table tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.tickets-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Ticket ID */
+.ticket-id {
+    font-weight: 600;
+    color: #007bff;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.ticket-id:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* Enhanced Status badges - based on actual database values */
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+/* Status mappings based on actual database values */
+.status-1, .status-open {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: #ffffff;
+}
+
+.status-2, .status-pending {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+    color: #000000;
+}
+
+.status-3, .status-resolved {
+    background: linear-gradient(135deg, #6c757d, #495057);
+    color: #ffffff;
+}
+
+.status-4, .status-closed {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: #ffffff;
+}
+
+.status-5, .status-awaiting-user {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: #ffffff;
+}
+
+.status-6, .status-awaiting-third-party {
+    background: linear-gradient(135deg, #6f42c1, #5a32a3);
+    color: #ffffff;
+}
+
+.status-8, .status-8 {
+    background: linear-gradient(135deg, #fd7e14, #e55a00);
+    color: #ffffff;
+}
+
+.status-9, .status-9 {
+    background: linear-gradient(135deg, #20c997, #17a2b8);
+    color: #ffffff;
+}
+
+.status-10, .status-10 {
+    background: linear-gradient(135deg, #6c757d, #495057);
+    color: #ffffff;
+}
+
+.status-12, .status-12 {
+    background: linear-gradient(135deg, #ffc107, #e0a800);
+    color: #000000;
+}
+
+.status-13, .status-13 {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    color: #ffffff;
+}
+
+/* Enhanced Priority badges - based on actual database values */
+.priority-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+/* Priority mappings based on actual database values */
+.priority-1, .priority-low {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: #ffffff;
+}
+
+.priority-2, .priority-medium {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+    color: #000000;
+}
+
+.priority-3, .priority-high {
+    background: linear-gradient(135deg, #fd7e14, #e83e8c);
+    color: #ffffff;
+}
+
+.priority-4, .priority-urgent {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: #ffffff;
+}
+
+/* Requester info */
+.requester-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.requester-name {
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.requester-email {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Subject */
+.ticket-subject {
+    font-weight: 500;
+    color: #ffffff;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Description preview */
+.description-preview {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Timestamps */
+.timestamp {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Actions */
+.ticket-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    padding: 0.25rem 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    color: #ffffff;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pagination-btn {
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    color: #ffffff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pagination-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-btn.active {
+    background: #007bff;
+    border-color: #007bff;
+}
+
+/* Loading state */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Empty state */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    margin: 0 0 0.5rem 0;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Enhanced responsive design */
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+        padding: 1rem;
+    }
+    
+    .tickets-table th,
+    .tickets-table td {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .status-badge,
+    .priority-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+    }
+    
+    .ticket-subject {
+        max-width: 200px;
+    }
+    
+    .description-preview {
+        max-width: 250px;
+    }
+}
+
+/* Enhanced table responsiveness */
+@media (max-width: 1024px) {
+    .tickets-table {
+        font-size: 0.85rem;
+    }
+    
+    .tickets-table th,
+    .tickets-table td {
+        padding: 0.75rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .tickets-table-container {
+        background: white;
+        color: black;
+    }
+    
+    .tickets-table th,
+    .tickets-table td {
+        border: 1px solid #ddd;
+        color: black;
+    }
+    
+    .status-badge,
+    .priority-badge {
+        background: #f8f9fa !important;
+        color: #495057 !important;
+        border: 1px solid #dee2e6;
+    }
+}
+</style> 

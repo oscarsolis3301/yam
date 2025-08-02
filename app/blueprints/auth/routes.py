@@ -62,21 +62,18 @@ def login():
         if hasattr(current_user, 'is_online') and not current_user.is_online:
             username = current_user.username if hasattr(current_user, 'username') else 'Unknown'
             if current_app.debug:
-                print(f"User {username} is authenticated but marked offline - clearing session")
-            # Clear the session and force re-authentication
+                print(f"User {username} is authenticated but marked offline - updating online status")
+            
+            # Instead of clearing the session, just update the user's online status
             try:
-                from flask_login import logout_user
-                session.clear()
-                logout_user()
+                current_user.is_online = True
+                current_user.last_seen = datetime.utcnow()
+                db.session.commit()
                 if current_app.debug:
-                    print(f"Session cleared for offline user {username}")
-                flash('Your session has expired. Please log in again.', 'info')
-                return render_template('login.html', year=datetime.utcnow().year)
+                    print(f"Updated online status for user {username}")
             except Exception as e:
-                current_app.logger.error(f"Error clearing session for offline user: {e}")
-                # Fallback: clear session and redirect
-                session.clear()
-                return redirect(url_for('auth.login'))
+                current_app.logger.error(f"Error updating online status for user: {e}")
+                db.session.rollback()
         
         if current_app.debug:
             print(f"User already authenticated, redirecting to main.index")

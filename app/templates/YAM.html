@@ -1489,8 +1489,8 @@ body:has(#reminderModal.show) .widget.media-player-widget {
 .user-ticket-details-modal-content {
     background: rgba(15, 15, 15, 0.98) !important;
     border-radius: 24px !important;
-    width: 92% !important;
-    max-width: 1200px !important;
+    width: 90% !important;
+    max-width: 700px !important;
     max-height: calc(90vh - 120px) !important;
     min-height: auto !important;
     height: auto !important;
@@ -1515,7 +1515,7 @@ body:has(#reminderModal.show) .widget.media-player-widget {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    padding: 1.5rem 2rem !important;
+    padding: 1.2rem 1.5rem !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
     background: rgba(255, 255, 255, 0.02) !important;
     margin: 0 !important;
@@ -1526,11 +1526,11 @@ body:has(#reminderModal.show) .widget.media-player-widget {
 .user-ticket-details-modal-header h3 {
     color: #ffffff !important;
     margin: 0 !important;
-    font-size: 1.3rem !important;
+    font-size: 1.1rem !important;
     font-weight: 700 !important;
     display: flex !important;
     align-items: center !important;
-    gap: 0.8rem !important;
+    gap: 0.6rem !important;
 }
 
 .user-ticket-details-modal-close {
@@ -1556,7 +1556,7 @@ body:has(#reminderModal.show) .widget.media-player-widget {
 }
 
 .user-ticket-details-modal-body {
-    padding: 0.8rem !important;
+    padding: 1.5rem !important;
     max-height: calc(90vh - 200px) !important;
     height: auto !important;
     overflow-y: auto !important;
@@ -1584,6 +1584,307 @@ body:has(#reminderModal.show) .widget.media-player-widget {
 
 .user-ticket-details-modal-body::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* MODERN USER SUMMARY STYLES - IMPROVED LAYOUT */
+.user-summary-modern {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border-radius: 16px !important;
+    padding: 1.2rem !important;
+    margin-bottom: 1.5rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(10px) !important;
+    position: relative !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    min-height: 80px !important;
+}
+
+.user-info-modern {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    flex: 1 !important;
+}
+
+.user-avatar-modern {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    background: linear-gradient(135deg, #8b5cf6, #8b5cf6) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    flex-shrink: 0 !important;
+    border: 2px solid rgba(139, 92, 246, 0.3) !important;
+}
+
+.user-avatar-modern img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+.user-details-modern {
+    flex: 1 !important;
+}
+
+.user-name-modern {
+    color: #ffffff !important;
+    font-size: 1.4rem !important;
+    font-weight: 700 !important;
+    margin: 0 0 0.3rem 0 !important;
+}
+
+.user-role-modern {
+    color: #cccccc !important;
+    font-size: 0.9rem !important;
+    margin: 0 0 0.2rem 0 !important;
+    font-weight: 500 !important;
+}
+
+.user-date-modern {
+    color: #888888 !important;
+    font-size: 0.85rem !important;
+    margin: 0 !important;
+}
+
+.summary-stats-modern {
+    display: flex !important;
+    gap: 0 !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    margin-left: auto !important;
+}
+
+.stat-item-modern {
+    text-align: center !important;
+    padding: 1rem 1.2rem !important;
+    background: rgba(139, 92, 246, 0.15) !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(139, 92, 246, 0.3) !important;
+    min-width: 100px !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1) !important;
+}
+
+.stat-number-modern {
+    color: #8b5cf6 !important;
+    font-size: 1.8rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 0.2rem !important;
+    text-shadow: 0 0 10px rgba(139, 92, 246, 0.3) !important;
+}
+
+.stat-label-modern {
+    color: #cccccc !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* MODERN TICKET LIST STYLES - WIDER ENTRIES */
+.ticket-list-item {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 12px !important;
+    padding: 1.2rem 1.5rem !important;
+    margin-bottom: 0.8rem !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.ticket-list-item:hover {
+    background: rgba(139, 92, 246, 0.08) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15) !important;
+}
+
+.ticket-list-item:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2) !important;
+}
+
+.ticket-item-content {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 1.5rem !important;
+    width: 100% !important;
+}
+
+.ticket-number-display {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.3rem !important;
+    font-weight: 600 !important;
+    flex: 1 !important;
+}
+
+.ticket-prefix {
+    color: #8b5cf6 !important;
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+}
+
+.ticket-id {
+    color: #ffffff !important;
+    font-size: 1.2rem !important;
+    font-weight: 700 !important;
+}
+
+.ticket-action-indicator {
+    color: #8b5cf6 !important;
+    font-size: 1.4rem !important;
+    opacity: 0.7 !important;
+    transition: all 0.3s ease !important;
+    flex-shrink: 0 !important;
+}
+
+.ticket-list-item:hover .ticket-action-indicator {
+    opacity: 1 !important;
+    transform: scale(1.1) !important;
+}
+
+/* NO TICKETS STATE */
+.no-tickets-state {
+    text-align: center !important;
+    padding: 3rem 2rem !important;
+    color: #888888 !important;
+}
+
+/* RESPONSIVE IMPROVEMENTS FOR USER TICKET DETAILS MODAL */
+@media (max-width: 768px) {
+    .user-summary-modern {
+        flex-direction: column !important;
+        gap: 1rem !important;
+        text-align: center !important;
+        padding: 1.5rem !important;
+    }
+    
+    .user-info-modern {
+        justify-content: center !important;
+    }
+    
+    .summary-stats-modern {
+        justify-content: center !important;
+        margin-left: 0 !important;
+    }
+    
+    .ticket-list-item {
+        padding: 1rem 1.2rem !important;
+    }
+    
+    .ticket-item-content {
+        gap: 1rem !important;
+    }
+    
+    .ticket-prefix {
+        font-size: 1rem !important;
+    }
+    
+    .ticket-id {
+        font-size: 1.1rem !important;
+    }
+}
+
+.no-tickets-icon {
+    font-size: 3rem !important;
+    color: #666666 !important;
+    margin-bottom: 1rem !important;
+}
+
+.no-tickets-state h4 {
+    color: #cccccc !important;
+    font-size: 1.2rem !important;
+    font-weight: 600 !important;
+    margin: 0 0 0.5rem 0 !important;
+}
+
+.no-tickets-state p {
+    color: #888888 !important;
+    font-size: 0.9rem !important;
+    margin: 0 !important;
+    line-height: 1.5 !important;
+}
+
+/* LOADING STATE */
+.loading-state {
+    text-align: center !important;
+    padding: 3rem 2rem !important;
+    color: #888888 !important;
+}
+
+.loading-spinner {
+    width: 40px !important;
+    height: 40px !important;
+    border: 3px solid rgba(139, 92, 246, 0.2) !important;
+    border-top: 3px solid #8b5cf6 !important;
+    border-radius: 50% !important;
+    animation: spin 1s linear infinite !important;
+    margin: 0 auto 1rem auto !important;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-state p {
+    color: #cccccc !important;
+    font-size: 1rem !important;
+    margin: 0 !important;
+}
+
+/* ERROR STATE */
+.error-state {
+    text-align: center !important;
+    padding: 3rem 2rem !important;
+    color: #ff6b6b !important;
+}
+
+.error-state i {
+    font-size: 3rem !important;
+    margin-bottom: 1rem !important;
+}
+
+.error-state h4 {
+    color: #ff6b6b !important;
+    font-size: 1.2rem !important;
+    font-weight: 600 !important;
+    margin: 0 0 0.5rem 0 !important;
+}
+
+.error-state p {
+    color: #ff8e8e !important;
+    font-size: 0.9rem !important;
+    margin: 0 0 1rem 0 !important;
+}
+
+.error-state button {
+    background: #8b5cf6 !important;
+    color: #ffffff !important;
+    border: none !important;
+    padding: 0.8rem 1.5rem !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+}
+
+.error-state button:hover {
+    background: #7c3aed !important;
+    transform: translateY(-1px) !important;
 }
 </style>
 

@@ -275,6 +275,8 @@ except ImportError:
 
 # Import blueprints
 try:
+    from flask import Flask
+    import logging
     from .blueprints.auth import bp as auth_bp, init_auth_blueprint
     from .blueprints.main import bp as main_bp
     from .blueprints.admin import bp as admin_bp
@@ -300,6 +302,7 @@ try:
     from .blueprints.tickets_api import tickets_api_bp
     from .blueprints.settings_api import bp as settings_api_bp
     from .blueprints.freshworks_linking import bp as freshworks_linking_bp
+    from .blueprints.freshservice import bp as freshservice_bp
 except ImportError as e:
     print(f"Warning: Some blueprints could not be imported: {e}")
 
@@ -392,6 +395,15 @@ def create_app(config_class=Config):
             app.register_blueprint(tickets_api_bp)
             app.register_blueprint(settings_api_bp, url_prefix='/api/settings')
             app.register_blueprint(freshworks_linking_bp)
+            
+            # Register freshservice blueprint
+            try:
+                app.register_blueprint(freshservice_bp)
+                app.logger.info("✅ Freshservice blueprint registered successfully")
+            except Exception as e:
+                app.logger.error(f"❌ Failed to register Freshservice blueprint: {e}")
+                import traceback
+                app.logger.error(traceback.format_exc())
             
             # Import and register private messages blueprint
             from app.blueprints.api.private_messages import private_messages_bp

@@ -30,7 +30,9 @@ PUBLIC_ROUTES = {
     '/api/session/time-remaining',
     '/api/session/extend',
     '/api/activity/track',
-    '/api/activity/all'
+    '/api/activity/all',
+    '/api/tickets/invalidate-cache',
+    '/api/tickets/emit-sync-complete'
 }
 
 # API routes that should return JSON instead of redirects

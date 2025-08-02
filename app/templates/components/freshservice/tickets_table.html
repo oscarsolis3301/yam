@@ -1,0 +1,58 @@
+<!-- FRESHSERVICE TICKETS TABLE COMPONENT -->
+<div class="tickets-table-container">
+    <table class="tickets-table">
+        <thead>
+            <tr>
+                <th class="checkbox-col">
+                    <input type="checkbox" class="form-check-input">
+                </th>
+                <th class="status-col">
+                    Status
+                    <i class="bi bi-arrow-up-down"></i>
+                </th>
+                <th class="subject-col">
+                    Subject
+                    <i class="bi bi-arrow-up-down"></i>
+                </th>
+                <th class="priority-col">
+                    Priority
+                    <i class="bi bi-arrow-up-down"></i>
+                </th>
+                <th class="modified-col">
+                    Last Modified...
+                    <i class="bi bi-arrow-up-down"></i>
+                </th>
+                <th class="requester-col">
+                    Requester
+                    <i class="bi bi-arrow-up-down"></i>
+                </th>
+            </tr>
+        </thead>
+        <tbody id="ticketsTableBody">
+            <!-- Tickets will be loaded here -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Loading State -->
+<div id="loadingState" class="loading-state">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <p>Loading tickets...</p>
+</div>
+
+<!-- Database Update Indicator -->
+<div id="dbUpdateIndicator" class="db-update-indicator" style="display: none;">
+    <div class="spinner-border spinner-border-sm text-success" role="status">
+        <span class="visually-hidden">Updating...</span>
+    </div>
+    <span>Database updated, refreshing...</span>
+</div>
+
+<!-- Empty State -->
+<div id="emptyState" class="empty-state" style="display: none;">
+    <i class="bi bi-inbox"></i>
+    <h3>No tickets found</h3>
+    <p>Try adjusting your filters or search terms.</p>
+</div> 

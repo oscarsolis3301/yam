@@ -1,0 +1,129 @@
+<!-- FRESHSERVICE FILTERS SIDEBAR COMPONENT -->
+<div class="filters-sidebar">
+    <div class="filter-header">
+        <h6 class="filter-title">Filter</h6>
+        <button class="reset-filters">Reset</button>
+    </div>
+
+    <div class="filter-content">
+        <div class="filter-section">
+            <label class="filter-label">Search fields</label>
+            <div class="search-input-container">
+                <input type="text" class="form-control" data-filter="search" placeholder="Search...">
+                <i class="bi bi-search"></i>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <label class="filter-label">Agents</label>
+            <div class="filter-input-container">
+                <input type="text" class="form-control" data-filter="agent" placeholder="All agents">
+                <button class="clear-filter">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <label class="filter-label">Created</label>
+            <select class="form-select" data-filter="created">
+                <option value="any">Any</option>
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="this_week">This Week</option>
+                <option value="last_week">Last Week</option>
+                <option value="this_month">This Month</option>
+                <option value="last_month">Last Month</option>
+            </select>
+        </div>
+
+        <div class="filter-section">
+            <label class="filter-label">Status</label>
+            <select class="form-select" data-filter="status">
+                <option value="all">All Statuses</option>
+                <option value="Open">Open</option>
+                <option value="Pending">Pending</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Closed">Closed</option>
+            </select>
+        </div>
+
+        <div class="filter-section">
+            <label class="filter-label">Priority</label>
+            <select class="form-select" data-filter="priority">
+                <option value="all">All Priorities</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Urgent">Urgent</option>
+            </select>
+        </div>
+
+        <div class="filter-section">
+            <label class="filter-label">Requesters</label>
+            <div class="requester-filter-container">
+                <input type="text" class="form-control" data-filter="requester" id="requesterFilter" placeholder="Search name or email">
+                <div class="requester-suggestions" id="requesterSuggestions" style="display: none;">
+                    <div class="suggestion-header">Popular Requesters</div>
+                    <div class="suggestion-list" id="suggestionList">
+                        <!-- Suggestions will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <label class="filter-label">Departments</label>
+            <select class="form-select" data-filter="department">
+                <option value="select">Select</option>
+                <option value="IT">IT</option>
+                <option value="HR">HR</option>
+                <option value="Finance">Finance</option>
+            </select>
+        </div>
+
+        <div class="filter-section">
+            <label class="filter-label">Groups</label>
+            <select class="form-select" data-filter="group">
+                <option value="select">Select</option>
+                <option value="Support">Support</option>
+                <option value="Development">Development</option>
+            </select>
+        </div>
+
+        <div class="filter-section">
+            <label class="filter-label">Due by</label>
+            <div class="checkbox-group">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="overdue" data-filter="overdue">
+                    <label class="form-check-label" for="overdue">Overdue</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <label class="filter-label">Categories</label>
+            <select class="form-select" id="categoryFilter">
+                <option value="all">All Categories</option>
+            </select>
+        </div>
+
+        <div class="filter-section">
+            <label class="filter-label">Sub Categories</label>
+            <select class="form-select" id="subCategoryFilter">
+                <option value="all">All Sub Categories</option>
+            </select>
+        </div>
+
+        <div class="filter-section">
+            <label class="filter-label">Item Categories</label>
+            <select class="form-select" id="itemCategoryFilter">
+                <option value="all">All Item Categories</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="filter-actions">
+        <button class="btn btn-primary apply-filters-btn">Apply filters</button>
+    </div>
+</div> 

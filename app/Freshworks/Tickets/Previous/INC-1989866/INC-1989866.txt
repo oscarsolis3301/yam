@@ -1,0 +1,32 @@
+Subject: incorrect insurance expect/fee populating.
+Status: 2
+Priority: 1
+Requester ID: 18013141691
+Created At: 2025-08-01T10:47:50Z
+Updated At: 2025-08-01T10:47:51Z
+
+--- Description ---
+As per epic dos 7/23/25 cdt D2740(3), D2950(3) has debit, per era D2950(3) got paid with $50 deductible. per FA got collected in D2740(3) $50, so distributed to D2950(3) cdt.  “Please review the fees for D2950(3) As per FA correct fee schedule attached but incorrect fees populating in Epic as insurance expect, since balance above $25 hence raising fee schedule ticket
+
+--- Conversation ---
+
+Hi Raghavan,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1989866.
+
+
+
+On review found fees not populating correctly for codes D2950, D2740 Upgrade procedure charge, Applied Alternate benefit Code D2791 and also found 50.00 deductible in FA#868990381. Patient has primary coverage Delta Dental of GA and FL PPO - Dental / Delta Preferred same fees link attached. Verified dental eligibility found plan DELTA DENTAL OF GA AND FL PPO [440], DELTA PREFERRED with status N/A.  When we review the Epic EOB for code D2950 claim processed with correct allowed amount as per estimate but paid 50% by insurance with 50% patient responsibility and also applied 50.00 deductible. For Code D2740 claim processed and paid less 50% paid by insurance with remark code N22 This procedure code was added/changed because it more accurately describes the services rendered. Please reach out to insurance for more clarification on this remark code.  As per DE form for codes D2950, D2740 benefits not updated. Verified Credentialing status found Billing Provider status is active for DOS. Hence routed to Eligibility for benefit re-verification. Please let me know for any additional questions, Thank you
+
+
+
+## Conversations
+
+---
+
+
+Hi Raghavan,Please find your ticket URL: https://support.pacden.com/helpdesk/tickets/1989866.
+
+
+
+On review found fees not populating correctly for codes D2950, D2740 Upgrade procedure charge, Applied Alternate benefit Code D2791 and also found 50.00 deductible in FA#868990381. Patient has primary coverage Delta Dental of GA and FL PPO - Dental / Delta Preferred same fees link attached. Verified dental eligibility found plan DELTA DENTAL OF GA AND FL PPO [440], DELTA PREFERRED with status N/A.  When we review the Epic EOB for code D2950 claim processed with correct allowed amount as per estimate but paid 50% by insurance with 50% patient responsibility and also applied 50.00 deductible. For Code D2740 claim processed and paid less 50% paid by insurance with remark code N22 This procedure code was added/changed because it more accurately describes the services rendered. Please reach out to insurance for more clarification on this remark code.  As per DE form for codes D2950, D2740 benefits not updated. Verified Credentialing status found Billing Provider status is active for DOS. Hence routed to Eligibility for benefit re-verification. Please let me know for any additional questions, Thank you
+
+

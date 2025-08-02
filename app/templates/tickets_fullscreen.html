@@ -1,0 +1,751 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+/* Full screen layout - work around sidebar */
+.tickets-container {
+    display: flex;
+    height: calc(100vh - 80px); /* Account for sidebar banner */
+    width: calc(100vw - 56px); /* Account for sidebar width */
+    margin: 0; /* Remove margins since we're using absolute positioning */
+    padding: 0;
+    background: linear-gradient(135deg, #000000 0%, #0a0a0a 50%, #000000 100%);
+    position: absolute;
+    top: 80px; /* Position flush with banner */
+    left: 56px; /* Position flush with sidebar */
+}
+
+/* Left side - Ticket table */
+.tickets-table-section {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+}
+
+/* Top bar */
+.tickets-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(15, 15, 15, 0.98);
+    backdrop-filter: blur(10px);
+}
+
+.top-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.select-all-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #ffffff;
+}
+
+.sort-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #cccccc;
+}
+
+.top-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.export-btn {
+    background: linear-gradient(135deg, #8b5cf6, #8b5cf6);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #cccccc;
+}
+
+.pagination button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.filter-toggle {
+    background: linear-gradient(135deg, #8b5cf6, #8b5cf6);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+/* Table */
+.tickets-table {
+    flex: 1;
+    overflow: auto;
+    background: rgba(15, 15, 15, 0.98);
+}
+
+.tickets-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tickets-table th {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    color: #ffffff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.tickets-table th.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.tickets-table th.sortable:hover {
+    background: rgba(139, 92, 246, 0.15);
+}
+
+.tickets-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 14px;
+    vertical-align: middle;
+    color: #cccccc;
+}
+
+.tickets-table tr:hover {
+    background: rgba(139, 92, 246, 0.08);
+}
+
+/* Status column */
+.status-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-dropdown {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-open { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
+.status-pending { background: rgba(251, 191, 36, 0.2); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
+.status-resolved { background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
+.status-closed { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+/* Priority column */
+.priority-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.priority-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.priority-low { background: #22c55e; }
+.priority-medium { background: #3b82f6; }
+.priority-high { background: #fbbf24; }
+.priority-urgent { background: #ef4444; }
+
+/* Requester column */
+.requester-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.requester-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8b5cf6, #8b5cf6);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    border: 2px solid rgba(139, 92, 246, 0.3);
+}
+
+.requester-name {
+    font-size: 14px;
+    color: #ffffff;
+}
+
+/* Right side - Filter sidebar */
+.filter-sidebar {
+    flex: 1;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    max-width: 350px;
+    min-width: 300px;
+    background: rgba(15, 15, 15, 0.98);
+}
+
+/* Filter tabs */
+.filter-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.filter-tab {
+    flex: 1;
+    padding: 15px;
+    text-align: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #888888;
+    transition: all 0.3s ease;
+}
+
+.filter-tab.active {
+    background: linear-gradient(135deg, #8b5cf6, #8b5cf6);
+    color: white;
+}
+
+/* Filter content */
+.filter-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.filter-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.reset-btn {
+    background: none;
+    border: none;
+    color: #8b5cf6;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+/* Filter fields */
+.filter-field {
+    margin-bottom: 20px;
+}
+
+.filter-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #cccccc;
+}
+
+.filter-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.filter-input:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.filter-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+/* Filter tags */
+.filter-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.filter-tag {
+    background: rgba(139, 92, 246, 0.15);
+    color: #8b5cf6;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.filter-tag .remove {
+    cursor: pointer;
+    color: #8b5cf6;
+    transition: all 0.3s ease;
+}
+
+/* Apply filters button */
+.apply-filters-btn {
+    background: linear-gradient(135deg, #8b5cf6, #8b5cf6);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    width: 100%;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.apply-filters-btn:hover {
+    background: linear-gradient(135deg, #7c3aed, #7c3aed);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+/* Checkbox styling */
+.ticket-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #8b5cf6;
+}
+
+/* Enhanced hover effects */
+.export-btn:hover {
+    background: linear-gradient(135deg, #7c3aed, #7c3aed);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+.filter-toggle:hover {
+    background: linear-gradient(135deg, #7c3aed, #7c3aed);
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+.pagination button:hover {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.5);
+    transform: translateY(-1px);
+}
+
+.filter-tab:hover {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+}
+
+.reset-btn:hover {
+    color: #7c3aed;
+    transform: scale(1.05);
+}
+
+.filter-tag .remove:hover {
+    color: #7c3aed;
+    transform: scale(1.2);
+}
+
+/* Enhanced status dropdown hover effects */
+.status-dropdown:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Enhanced requester avatar hover effects */
+.requester-avatar:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+/* Custom scrollbar styling to match YAM theme */
+.tickets-table::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tickets-table::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.tickets-table::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.3);
+    border-radius: 4px;
+}
+
+.tickets-table::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.5);
+}
+
+.filter-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.filter-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.filter-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.filter-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Enhanced table row styling */
+.tickets-table tr {
+    transition: all 0.3s ease;
+}
+
+.tickets-table tr:hover {
+    background: rgba(139, 92, 246, 0.08);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
+}
+
+/* Enhanced table cell styling */
+.tickets-table td {
+    transition: all 0.3s ease;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .tickets-container {
+        flex-direction: column;
+    }
+    
+    .filter-sidebar {
+        max-width: none;
+        min-width: auto;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tickets-container">
+    <!-- Left side - Ticket table -->
+    <div class="tickets-table-section">
+        <!-- Top bar -->
+        <div class="tickets-top-bar">
+            <div class="top-bar-left">
+                <div class="select-all-checkbox">
+                    <input type="checkbox" id="selectAll" class="ticket-checkbox">
+                    <label for="selectAll">Select all</label>
+                </div>
+                <div class="sort-dropdown">
+                    Sort by: Created Date
+                    <i class="bi bi-chevron-down"></i>
+                </div>
+            </div>
+            <div class="top-bar-right">
+                <button class="export-btn">
+                    <i class="bi bi-arrow-up"></i>
+                    Export
+                </button>
+                <div class="pagination">
+                    <button><i class="bi bi-chevron-left"></i></button>
+                    <span>1 - 32 of 32</span>
+                    <button><i class="bi bi-chevron-right"></i></button>
+                </div>
+                <button class="filter-toggle" id="filterToggle">
+                    <i class="bi bi-funnel"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Table -->
+        <div class="tickets-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40px;"></th>
+                        <th class="sortable">Status <i class="bi bi-chevron-up"></i><i class="bi bi-chevron-down"></i></th>
+                        <th class="sortable">Subject <i class="bi bi-chevron-up"></i><i class="bi bi-chevron-down"></i></th>
+                        <th class="sortable">Priority <i class="bi bi-chevron-up"></i><i class="bi bi-chevron-down"></i></th>
+                        <th class="sortable">Last Modified <i class="bi bi-chevron-up"></i><i class="bi bi-chevron-down"></i></th>
+                        <th class="sortable">Requester <i class="bi bi-gear"></i></th>
+                    </tr>
+                </thead>
+                <tbody id="ticketsTableBody">
+                    <!-- Tickets will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Right side - Filter sidebar -->
+    <div class="filter-sidebar" id="filterSidebar">
+        <!-- Filter tabs -->
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-tab="basic">Basic filter</button>
+            <button class="filter-tab" data-tab="advanced">Advanced filter</button>
+        </div>
+        
+        <!-- Filter content -->
+        <div class="filter-content">
+            <div class="filter-header">
+                <span class="filter-title">Filter</span>
+                <button class="reset-btn">Reset</button>
+            </div>
+            
+            <!-- Search field -->
+            <div class="filter-field">
+                <label class="filter-label">Q Search fields</label>
+                <input type="text" class="filter-input" placeholder="Search...">
+            </div>
+            
+            <!-- Agents -->
+            <div class="filter-field">
+                <label class="filter-label">Agents</label>
+                <input type="text" class="filter-input" placeholder="Search agents...">
+                <div class="filter-tags">
+                    <span class="filter-tag">
+                        Me
+                        <span class="remove">&times;</span>
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Created -->
+            <div class="filter-field">
+                <label class="filter-label">Created</label>
+                <select class="filter-select">
+                    <option>Any</option>
+                    <option>Today</option>
+                    <option>Yesterday</option>
+                    <option>This week</option>
+                    <option>This month</option>
+                </select>
+            </div>
+            
+            <!-- Status -->
+            <div class="filter-field">
+                <label class="filter-label">Status</label>
+                <input type="text" class="filter-input" placeholder="Search status...">
+                <div class="filter-tags">
+                    <span class="filter-tag">
+                        All Unresolved
+                        <span class="remove">&times;</span>
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Requesters -->
+            <div class="filter-field">
+                <label class="filter-label">Requesters</label>
+                <input type="text" class="filter-input" placeholder="Search name or email">
+            </div>
+            
+            <!-- Departments -->
+            <div class="filter-field">
+                <label class="filter-label">Departments</label>
+                <input type="text" class="filter-input" placeholder="Select">
+            </div>
+            
+            <!-- Groups -->
+            <div class="filter-field">
+                <label class="filter-label">Groups</label>
+                <input type="text" class="filter-input" placeholder="Select">
+            </div>
+            
+            <!-- Due by -->
+            <div class="filter-field">
+                <label class="filter-label">Due by</label>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="overdue">
+                    <label for="overdue" style="margin: 0;">Overdue</label>
+                </div>
+            </div>
+            
+            <!-- Apply filters button -->
+            <button class="apply-filters-btn">Apply filters</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load tickets from API
+    loadTickets();
+    
+    // Filter toggle functionality
+    document.getElementById('filterToggle').addEventListener('click', function() {
+        const sidebar = document.getElementById('filterSidebar');
+        sidebar.style.display = sidebar.style.display === 'none' ? 'flex' : 'none';
+    });
+    
+    // Filter tabs functionality
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+    
+    // Select all functionality
+    document.getElementById('selectAll').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.ticket-checkbox:not(#selectAll)');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+    
+    // Remove filter tags
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove')) {
+            e.target.parentElement.remove();
+        }
+    });
+});
+
+function loadTickets() {
+    fetch('/api/tickets')
+        .then(response => response.json())
+        .then(data => {
+            if (data.tickets) {
+                displayTickets(data.tickets);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading tickets:', error);
+        });
+}
+
+function displayTickets(tickets) {
+    const tbody = document.getElementById('ticketsTableBody');
+    tbody.innerHTML = '';
+    
+    tickets.forEach(ticket => {
+        const row = document.createElement('tr');
+        
+        // Generate requester avatar
+        const requesterName = `User ${ticket.requester_id}`;
+        const avatarInitial = requesterName.charAt(0).toUpperCase();
+        const avatarColors = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#fd7e14'];
+        const avatarColor = avatarColors[ticket.requester_id % avatarColors.length];
+        
+        row.innerHTML = `
+            <td>
+                <input type="checkbox" class="ticket-checkbox" data-ticket-id="${ticket.id}">
+            </td>
+            <td>
+                <div class="status-cell">
+                    <button class="status-dropdown status-${ticket.status.toLowerCase()}">
+                        ${ticket.status}
+                    </button>
+                    <i class="bi bi-chevron-down"></i>
+                </div>
+            </td>
+            <td>${ticket.subject} #INC-${ticket.id}</td>
+            <td>
+                <div class="priority-cell">
+                    <div class="priority-dot priority-${ticket.priority.toLowerCase()}"></div>
+                    ${ticket.priority}
+                    <i class="bi bi-chevron-down"></i>
+                </div>
+            </td>
+            <td>${formatDate(ticket.updated_at)}</td>
+            <td>
+                <div class="requester-cell">
+                    <div class="requester-avatar" style="background-color: ${avatarColor}">
+                        ${avatarInitial}
+                    </div>
+                    <span class="requester-name">${requesterName}</span>
+                </div>
+            </td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+</script>
+{% endblock %} 

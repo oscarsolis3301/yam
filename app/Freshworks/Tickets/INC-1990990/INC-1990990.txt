@@ -1,0 +1,69 @@
+# Ticket Summary
+
+**Subject:** DTX
+
+**Status:** 4
+
+**Priority:** 2
+
+**Requester Id:** 18014271840
+
+**Created At:** 2025-08-01T17:51:03Z
+
+**Updated At:** 2025-08-01T21:23:18Z
+
+**Category:** IT
+
+**Sub Category:** IT Operating Programs/Apps
+
+**Item Category:** Application/Software Issue
+
+## Description
+
+DTX is not opening.
+
+
+## Conversations
+
+---
+
+
+I checked customers DTX settings and the password information was not saved. 
+I entered the password for the office and saved it. 
+I had customer try to open DTX from Epic and it opened this time.
+user: xxx-office name
+password: PD$Officexxx
+
+I checked customers DTX settings and core was not connected. The url was wrong.
+I corrected the url using the correct format https://xxx-1VU1.pdsi.corp.33000 and added the core user name xxx-(officename) and core password 1K@voC0re! information and saved the information. I had customer try to open DTX from Epic and it opened this time.
+
+DTX integration fix:
+I went DTX settings and checked if the PMS integration was enabled.
+I into Programs\PDS Integration\Epic Integration\
+and restarted the DTX integration. 
+I had customer test it she confirmed that it's working again.
+
+DTX Folder sync fix:
+I deleted the patient, transfer and sync folder and relaunched DTX with my admin.
+I had user test it she confirmed that it's working again.
+I checked her DTX folder on the C: and it was not shared so I logged in with my admin and shared the folder and added authenticated users.
+
+DTX Core not connected:
+I checked the PMS integration in DTX and it was missing.
+I added the check and saved it. I tested it in Epic and tried launching DTX on a test account and confirmed that it launches.
+I called Jocelyn back and had her test it and confirmed that DTX is launching from Epic again.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

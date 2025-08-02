@@ -2003,8 +2003,10 @@ function displayUserTicketDetails(data, username, ticketCount) {
             : `on ${new Date(date).toLocaleDateString()}`;
             
         ticketsHtml = `
-            <div class="no-tickets">
-                <i class="bi bi-inbox"></i>
+            <div class="no-tickets-state">
+                <div class="no-tickets-icon">
+                    <i class="bi bi-inbox"></i>
+                </div>
                 <h4>No Tickets Found</h4>
                 <p>No tickets were found for ${username} ${dateText}</p>
             </div>
@@ -2012,51 +2014,29 @@ function displayUserTicketDetails(data, username, ticketCount) {
         console.log(`📭 No tickets found for ${username} ${dateText}`);
     } else {
         console.log(`🎫 Found ${tickets.length} tickets for ${username}`);
+        
+        // Create a modern ticket list
         tickets.forEach((ticket, index) => {
             console.log(`🎫 Ticket ${index + 1}:`, ticket);
-            const statusClass = getStatusClass(ticket.status);
-            const priorityClass = getPriorityClass(ticket.priority);
-            const urgencyClass = getUrgencyClass(ticket.urgency);
+            
+            // Extract ticket number from the ticket data
+            const ticketNumber = ticket.ticket_number || ticket.id;
+            const ticketId = String(ticket.id).replace(/[^0-9]/g, ''); // Ensure it's just numbers
+            
+            // Create the Freshworks URL
+            const freshworksUrl = `https://pacificdental.freshservice.com/a/tickets/${ticketId}?current_tab=details`;
             
             ticketsHtml += `
-                <div class="ticket-item">
-                    <div class="ticket-header">
-                        <div class="ticket-number">${ticket.ticket_number}</div>
-                        <div class="ticket-badges">
-                            <span class="badge ${statusClass}">${getStatusText(ticket.status)}</span>
-                            <span class="badge ${priorityClass}">${getPriorityText(ticket.priority)}</span>
-                            <span class="badge ${urgencyClass}">${getUrgencyText(ticket.urgency)}</span>
+                <div class="ticket-list-item" onclick="window.open('${freshworksUrl}', '_blank')" title="Click to open ticket in Freshworks">
+                    <div class="ticket-item-content">
+                        <div class="ticket-number-display">
+                            <span class="ticket-prefix">INC-</span>
+                            <span class="ticket-id">${ticketId}</span>
+                        </div>
+                        <div class="ticket-action-indicator">
+                            <i class="bi bi-arrow-up-right"></i>
                         </div>
                     </div>
-                    <div class="ticket-subject">${ticket.subject}</div>
-                    <div class="ticket-meta">
-                        <span class="meta-item">
-                            <i class="bi bi-calendar"></i>
-                            Created: ${formatDate(ticket.created_at)}
-                        </span>
-                        <span class="meta-item">
-                            <i class="bi bi-clock"></i>
-                            Updated: ${formatDate(ticket.updated_at)}
-                        </span>
-                        ${ticket.resolved_at ? `
-                            <span class="meta-item">
-                                <i class="bi bi-check-circle"></i>
-                                Resolved: ${formatDate(ticket.resolved_at)}
-                            </span>
-                        ` : ''}
-                    </div>
-                    ${ticket.description ? `
-                        <div class="ticket-description">
-                            ${ticket.description.length > 200 ? 
-                                ticket.description.substring(0, 200) + '...' : 
-                                ticket.description}
-                        </div>
-                    ` : ''}
-                    ${ticket.tags && ticket.tags.length > 0 ? `
-                        <div class="ticket-tags">
-                            ${ticket.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                        </div>
-                    ` : ''}
                 </div>
             `;
         });
@@ -2067,33 +2047,21 @@ function displayUserTicketDetails(data, username, ticketCount) {
         : new Date(date).toLocaleDateString();
         
     const summaryHtml = `
-        <div class="user-summary">
-            <div class="user-info">
-                <div class="user-avatar">
+        <div class="user-summary-modern">
+            <div class="user-info-modern">
+                <div class="user-avatar-modern">
                     ${getUserProfileImage(user, username)}
                 </div>
-                <div class="user-details">
-                    <h3>${username}</h3>
-                    <p class="user-role">${user.role || 'User'}</p>
-                    <p class="user-date">${dateText}</p>
+                <div class="user-details-modern">
+                    <h3 class="user-name-modern">${username}</h3>
+                    <p class="user-role-modern">${user.role || 'User'}</p>
+                    <p class="user-date-modern">${dateText}</p>
                 </div>
             </div>
-            <div class="summary-stats">
-                <div class="stat-item">
-                    <div class="stat-number">${total_tickets}</div>
-                    <div class="stat-label">Total Tickets</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">${summary.total_closed}</div>
-                    <div class="stat-label">Closed</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">${summary.total_open}</div>
-                    <div class="stat-label">Open</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">${summary.high_priority}</div>
-                    <div class="stat-label">High Priority</div>
+            <div class="summary-stats-modern">
+                <div class="stat-item-modern">
+                    <div class="stat-number-modern">${total_tickets}</div>
+                    <div class="stat-label-modern">Total Tickets</div>
                 </div>
             </div>
         </div>
@@ -2103,7 +2071,7 @@ function displayUserTicketDetails(data, username, ticketCount) {
     console.log(`📝 Final HTML length: ${finalHtml.length} characters`);
     
     document.getElementById('userTicketDetailsContent').innerHTML = finalHtml;
-    console.log('✅ Ticket details displayed successfully');
+    console.log('✅ Modern ticket details displayed successfully');
 }
 
 function closeUserTicketDetailsModal() {
@@ -2266,4 +2234,5 @@ function updatePersistentTimerCountdown() {
 }
 
 
+</script> 
 </script> 

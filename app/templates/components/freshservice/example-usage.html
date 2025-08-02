@@ -1,0 +1,103 @@
+<!-- Example Usage of FreshService Modular Component -->
+
+<!-- Example 1: Full FreshService Component -->
+<!-- Use this for complete FreshService functionality -->
+{% include 'components/freshservice/freshservice-modular.html' %}
+
+<!-- Example 2: Only Styles (if you have custom scripts) -->
+<!-- Use this when you want the styling but have your own JavaScript -->
+{% include 'components/freshservice/modules/styles-main.html' %}
+
+<!-- Example 3: Only Scripts (if you have custom styles) -->
+<!-- Use this when you want the functionality but have your own CSS -->
+{% include 'components/freshservice/modules/scripts-main.html' %}
+
+<!-- Example 4: Specific Modules Only -->
+<!-- Use this when you only need certain functionality -->
+{% include 'components/freshservice/modules/base-styles.html' %}
+{% include 'components/freshservice/modules/table-styles.html' %}
+{% include 'components/freshservice/modules/core.js' %}
+{% include 'components/freshservice/modules/data-service.js' %}
+
+<!-- Example 5: Custom Entry Point -->
+<!-- Create your own entry point with only the modules you need -->
+<div class="freshservice-container">
+    <!-- Include only the styles you need -->
+    {% include 'components/freshservice/modules/base-styles.html' %}
+    {% include 'components/freshservice/modules/table-styles.html' %}
+    
+    <!-- Your custom content -->
+    <div class="main-content">
+        <h1>Custom FreshService Implementation</h1>
+        <!-- Your custom HTML here -->
+    </div>
+    
+    <!-- Include only the scripts you need -->
+    {% include 'components/freshservice/modules/core.js' %}
+    {% include 'components/freshservice/modules/data-service.js' %}
+</div>
+
+<!-- Example 6: Minimal Implementation -->
+<!-- Use this for a minimal FreshService setup -->
+{% include 'components/freshservice/modules/base-styles.html' %}
+{% include 'components/freshservice/modules/core.js' %}
+
+<!-- Example 7: Responsive Only -->
+<!-- Use this when you only need responsive styles -->
+{% include 'components/freshservice/modules/responsive-styles.html' %}
+
+<!-- Example 8: Event Handlers Only -->
+<!-- Use this when you only need event handling -->
+{% include 'components/freshservice/modules/event-handlers.js' %}
+
+<!-- Example 9: Complete Custom Implementation -->
+<!-- Build your own FreshService with specific modules -->
+<div class="freshservice-container">
+    <!-- Base styles for container -->
+    {% include 'components/freshservice/modules/base-styles.html' %}
+    
+    <!-- Header with custom content -->
+    <div class="freshservice-header">
+        <h1>Custom Header</h1>
+    </div>
+    {% include 'components/freshservice/modules/header-styles.html' %}
+    
+    <!-- Main content area -->
+    <div class="main-content">
+        <!-- Your custom content here -->
+        <div class="tickets-table-container">
+            <table class="tickets-table">
+                <!-- Your custom table -->
+            </table>
+        </div>
+    </div>
+    
+    <!-- Include table styles -->
+    {% include 'components/freshservice/modules/table-styles.html' %}
+    
+    <!-- Include responsive styles -->
+    {% include 'components/freshservice/modules/responsive-styles.html' %}
+    
+    <!-- Include core functionality -->
+    {% include 'components/freshservice/modules/core.js' %}
+    {% include 'components/freshservice/modules/event-handlers.js' %}
+</div>
+
+<!-- Example 10: Progressive Enhancement -->
+<!-- Start with basic functionality and add more as needed -->
+<!-- Step 1: Basic styles and structure -->
+{% include 'components/freshservice/modules/base-styles.html' %}
+{% include 'components/freshservice/modules/table-styles.html' %}
+
+<!-- Step 2: Add core functionality -->
+{% include 'components/freshservice/modules/core.js' %}
+
+<!-- Step 3: Add advanced features -->
+{% include 'components/freshservice/modules/data-service.js' %}
+{% include 'components/freshservice/modules/ui-renderer.js' %}
+
+<!-- Step 4: Add event handling -->
+{% include 'components/freshservice/modules/event-handlers.js' %}
+
+<!-- Step 5: Add responsive design -->
+{% include 'components/freshservice/modules/responsive-styles.html' %} 
